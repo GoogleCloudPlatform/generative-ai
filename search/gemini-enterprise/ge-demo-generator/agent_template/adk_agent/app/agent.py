@@ -2464,6 +2464,11 @@ RESULT NOTIFICATION:
 - Present the result_summary text DIRECTLY as your response in markdown format
 - DO NOT convert result_summary into A2UI cards — it is already formatted text
 - DO NOT truncate or summarize the result_summary — show the FULL content
+- FILE LINKS ARE MANDATORY: when the tool response carries a
+  deliverable_downloads list (completed file-producing tasks), your response
+  MUST include every one of those links as markdown links — a completion or
+  status report about generated files WITHOUT their download/view links is
+  an incomplete answer
 - After the result text, add suggestion chips in a separate <a2ui-json> block
 - For scheduled tasks, show execution timeline
 

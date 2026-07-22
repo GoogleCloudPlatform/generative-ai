@@ -1626,6 +1626,23 @@ limitations under the License.
                 class="flex-1 bg-gray-900/60 border border-violet-500/30 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
                 placeholder="example.co.jp"
                 onkeydown="if(event.key==='Enter'){event.preventDefault();researchDomain();}">
+              <select id="researchLangSelector" onchange="saveResearchLang()" title="Research output language (Auto = detect from the company itself)"
+                class="bg-gray-900/60 border border-violet-500/30 rounded-xl px-2 py-2.5 text-xs text-gray-300 focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all cursor-pointer">
+                <option value="auto" selected>Auto</option>
+                <option value="日本語">日本語</option>
+                <option value="English">English</option>
+                <option value="Deutsch">Deutsch</option>
+                <option value="Français">Français</option>
+                <option value="Español">Español</option>
+                <option value="Italiano">Italiano</option>
+                <option value="中文">中文</option>
+                <option value="한국어">한국어</option>
+                <option value="Português">Português</option>
+                <option value="Русский">Русский</option>
+                <option value="Nederlands">Nederlands</option>
+                <option value="Svenska">Svenska</option>
+                <option value="Suomi">Suomi</option>
+              </select>
               <button id="researchBtn" onclick="researchDomain()"
                 class="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-2 uppercase tracking-wider shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
                 <svg id="researchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -1781,10 +1798,21 @@ limitations under the License.
                       d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                     </path>
                   </svg>
-                  <select id="langSelector" onchange="updateSamples()"
+                  <select id="langSelector" onchange="setTemplateLang(this.value)"
                     class="bg-transparent text-[9px] outline-none text-sky-400/80 font-bold px-1 py-0.5 cursor-pointer hover:text-sky-300 transition-colors">
                     <option value="en">English</option>
                     <option value="ja">日本語</option>
+                    <option value="de">Deutsch</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                    <option value="it">Italiano</option>
+                    <option value="zh">中文</option>
+                    <option value="ko">한국어</option>
+                    <option value="pt">Português</option>
+                    <option value="ru">Русский</option>
+                    <option value="nl">Nederlands</option>
+                    <option value="sv">Svenska</option>
+                    <option value="fi">Suomi</option>
                   </select>
                 </div>
               </div>
@@ -1861,8 +1889,13 @@ limitations under the License.
                   </button>
                 </div>
               </div>
+              <!-- Persona changed after the last Optimize Prompt run: offer a re-run -->
+              <div id="optimizeRerunHint" class="hidden mb-3 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center gap-2">
+                <p class="flex-1 text-[11px] text-indigo-300 leading-relaxed">⚠️ The Target Persona changed after this scenario was optimized. Re-run Optimize Prompt so the Target Role and scenario reflect the new persona.</p>
+                <button onclick="optimizeGoalWithMagicWand()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all active:scale-[0.97] whitespace-nowrap">🪄 Re-run Optimize Prompt</button>
+              </div>
               <!-- Edit Tab -->
-              <textarea id="userGoal" rows="10" oninput="localStorage.setItem('ge_generator_input', this.value)"
+              <textarea id="userGoal" rows="10" oninput="localStorage.setItem('ge_generator_input', this.value); updateOptimizeRerunHint()"
                 class="w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-4 text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all shadow-inner leading-relaxed resize-y min-h-[160px] font-mono text-xs"
                 placeholder="Example: How to help a retail chain in London optimize seasonal stock based on demographic shifts and regional foot traffic trends?"></textarea>
               <!-- Preview Tab -->
@@ -2749,6 +2782,29 @@ limitations under the License.
     // ===========================================
     let cachedResearchData = null;
 
+    // ---- Research output language ----
+    // 'auto' lets the server-side model detect the company's primary business
+    // language from grounded search results; any other value is passed through
+    // as an explicit override.
+    var RESEARCH_LANG_KEY = 'ge_research_lang';
+    function getResearchLangOverride() {
+      var sel = document.getElementById('researchLangSelector');
+      if (!sel || sel.value === 'auto') return null;
+      return sel.value;
+    }
+    function saveResearchLang() {
+      var sel = document.getElementById('researchLangSelector');
+      if (sel) { try { localStorage.setItem(RESEARCH_LANG_KEY, sel.value); } catch (e) {} }
+    }
+    function restoreResearchLang() {
+      var saved = null;
+      try { saved = localStorage.getItem(RESEARCH_LANG_KEY); } catch (e) {}
+      if (!saved) return;
+      var sel = document.getElementById('researchLangSelector');
+      // Unknown stored values are a no-op: the select stays on Auto.
+      if (sel) sel.value = saved;
+    }
+
     function researchDomain() {
       const domain = document.getElementById('customerDomain').value.trim();
       if (!domain) {
@@ -2795,7 +2851,7 @@ limitations under the License.
           document.getElementById('researchError').classList.remove('hidden');
           document.getElementById('researchErrorText').textContent = '⚠️ ' + (err.message || 'An unexpected error occurred.');
         })
-        .researchCompanyByDomain(domain, getSelectedPersona());
+        .researchCompanyByDomain(domain, getSelectedPersona(), getResearchLangOverride());
     }
 
     function renderResearchResult(data) {
@@ -2846,13 +2902,6 @@ limitations under the License.
       const isSelected = div.dataset.selected === 'true';
       
       if (!isSelected) {
-        // Selecting a new one: Enforce maximum limit of 3
-        const selectedDivs = document.querySelectorAll('#researchWorkflows > div[data-selected="true"]');
-        if (selectedDivs.length >= 3) {
-          showToast('⚠️ You can select a maximum of 3 workflows to keep the demo focused.');
-          return;
-        }
-        
         div.dataset.selected = 'true';
         div.className = div.className.replace('bg-gray-800/30 border border-white/5 hover:border-white/15', 'bg-emerald-500/10 border border-emerald-500/20')
           .replace('bg-gray-800/30 border-white/5', 'bg-emerald-500/10 border-emerald-500/20');
@@ -2959,6 +3008,8 @@ limitations under the License.
           if (res && res.success) {
             el.value = res.optimizedGoal;
             localStorage.setItem('ge_generator_input', res.optimizedGoal);
+            lastOptimizedPersonaKey = currentPersonaKey();
+            updateOptimizeRerunHint();
             setGoalTab('preview'); // Show the optimized markdown rendered
             showToast('✨ Prompt optimized successfully!');
           } else {
@@ -3034,7 +3085,8 @@ limitations under the License.
           .regenerateGoalForWorkflows(
             { companyName: cachedResearchData.companyName, industry: cachedResearchData.industry, companySummary: cachedResearchData.companySummary },
             selectedWorkflows,
-            getSelectedPersona()
+            getSelectedPersona(),
+            getResearchLangOverride() || cachedResearchData.detectedLanguage || null
           );
       }
     }
@@ -3625,6 +3677,8 @@ limitations under the License.
     function resetForm() {
       // Clear form inputs
       document.getElementById('userGoal').value = '';
+      lastOptimizedPersonaKey = null;
+      updateOptimizeRerunHint();
       document.getElementById('dataProfile').value = 'standard';
       document.getElementById('publicDatasetId').value = '';
       if (document.getElementById('projectIdInput')) {
@@ -3734,68 +3788,48 @@ limitations under the License.
 
 
     const TEMPLATE_DATA = {
-      industries: {
-        en: [
-          { id: 'retail', label: '🏪 Retail', icon: 'shopping_bag' },
-          { id: 'finance', label: '🏦 Finance', icon: 'account_balance' },
-          { id: 'manufacturing', label: '🏭 Manufacturing', icon: 'precision_manufacturing' },
-          { id: 'healthcare', label: '🏥 Healthcare', icon: 'medical_services' },
-          { id: 'logistics', label: '🚚 Logistics', icon: 'local_shipping' },
-          { id: 'tech', label: '💻 Tech & SaaS', icon: 'cloud_queue' },
-          { id: 'energy', label: '⚡ Energy & Utilities', icon: 'bolt' },
-          { id: 'telecom', label: '📞 Telecommunications', icon: 'settings_input_antenna' },
-          { id: 'media', label: '🎬 Media & Entertainment', icon: 'movie' },
-          { id: 'gov', label: '🏛️ Gov & Public Sector', icon: 'account_balance_wallet' },
-          { id: 'education', label: '🎓 Education', icon: 'school' },
-          { id: 'auto', label: '🚗 Automotive', icon: 'directions_car' }
-        ],
-        ja: [
-          { id: 'retail', label: '🏪 小売', icon: 'shopping_bag' },
-          { id: 'finance', label: '🏦 金融', icon: 'account_balance' },
-          { id: 'manufacturing', label: '🏭 製造', icon: 'precision_manufacturing' },
-          { id: 'healthcare', label: '🏥 ヘルスケア', icon: 'medical_services' },
-          { id: 'logistics', label: '🚚 物流', icon: 'local_shipping' },
-          { id: 'tech', label: '💻 IT・SaaS', icon: 'cloud_queue' },
-          { id: 'energy', label: '⚡ エネルギー・公益', icon: 'bolt' },
-          { id: 'telecom', label: '📞 通信・テレコム', icon: 'settings_input_antenna' },
-          { id: 'media', label: '🎬 メディア・娯楽', icon: 'movie' },
-          { id: 'gov', label: '🏛️ 公共政策', icon: 'account_balance_wallet' },
-          { id: 'education', label: '🎓 教育', icon: 'school' },
-          { id: 'auto', label: '🚗 自動車', icon: 'directions_car' }
-        ]
-      },
-      jobFunctions: {
-        en: [
-          { id: 'all', label: 'All Functions' },
-          { id: 'sales', label: 'Sales & Revenue' },
-          { id: 'marketing', label: 'Marketing' },
-          { id: 'ops', label: 'Operations' },
-          { id: 'it_eng', label: 'IT & Engineering' },
-          { id: 'rnd', label: 'R&D' },
-          { id: 'customer_service', label: 'Customer Service' },
-          { id: 'product_mgmt', label: 'Product Mgmt' },
-          { id: 'supply_chain', label: 'Supply Chain' },
-          { id: 'finance_dept', label: 'Finance' },
-          { id: 'legal', label: 'Legal & Compliance' },
-          { id: 'hr', label: 'HR & People' }
-        ],
-        ja: [
-          { id: 'all', label: 'すべて' },
-          { id: 'sales', label: '営業・収益' },
-          { id: 'marketing', label: 'マーケティング' },
-          { id: 'ops', label: 'オペレーション' },
-          { id: 'it_eng', label: 'IT・エンジニアリング' },
-          { id: 'rnd', label: '研究開発 (R&D)' },
-          { id: 'customer_service', label: 'カスタマーサービス' },
-          { id: 'product_mgmt', label: '製品管理' },
-          { id: 'supply_chain', label: 'サプライチェーン' },
-          { id: 'finance_dept', label: '財務・経理' },
-          { id: 'legal', label: '法務・コンプライアンス' },
-          { id: 'hr', label: '人事・採用' }
-        ]
-      },
-      templates: {
-        en: [
+      // English only: other languages are translated on demand by the backend
+      // (translateTemplates) and cached per session - see setTemplateLang().
+      industries: [
+        { id: 'retail', label: '🏪 Retail', icon: 'shopping_bag' },
+        { id: 'finance', label: '🏦 Finance', icon: 'account_balance' },
+        { id: 'manufacturing', label: '🏭 Manufacturing', icon: 'precision_manufacturing' },
+        { id: 'healthcare', label: '🏥 Healthcare', icon: 'medical_services' },
+        { id: 'logistics', label: '🚚 Logistics', icon: 'local_shipping' },
+        { id: 'tech', label: '💻 Tech & SaaS', icon: 'cloud_queue' },
+        { id: 'energy', label: '⚡ Energy & Utilities', icon: 'bolt' },
+        { id: 'telecom', label: '📞 Telecommunications', icon: 'settings_input_antenna' },
+        { id: 'media', label: '🎬 Media & Entertainment', icon: 'movie' },
+        { id: 'gov', label: '🏛️ Gov & Public Sector', icon: 'account_balance_wallet' },
+        { id: 'education', label: '🎓 Education', icon: 'school' },
+        { id: 'auto', label: '🚗 Automotive', icon: 'directions_car' },
+        { id: 'insurance', label: '\uD83D\uDEE1\uFE0F Insurance', icon: 'shield' },
+        { id: 'real_estate', label: '\uD83C\uDFD7\uFE0F Real Estate & Construction', icon: 'apartment' },
+        { id: 'travel', label: '\u2708\uFE0F Travel & Hospitality', icon: 'flight' },
+        { id: 'food', label: '\uD83C\uDF7D\uFE0F Food & Beverage', icon: 'restaurant' },
+        { id: 'cpg', label: '\uD83D\uDED2 Consumer Goods', icon: 'shopping_cart' },
+        { id: 'agri', label: '\uD83C\uDF3E Agriculture', icon: 'agriculture' },
+        { id: 'legal_services', label: '\u2696\uFE0F Legal & Professional Services', icon: 'gavel' }
+      ],
+      jobFunctions: [
+        { id: 'all', label: 'All Functions' },
+        { id: 'sales', label: 'Sales & Revenue' },
+        { id: 'marketing', label: 'Marketing' },
+        { id: 'ops', label: 'Operations' },
+        { id: 'it_eng', label: 'IT & Engineering' },
+        { id: 'rnd', label: 'R&D' },
+        { id: 'customer_service', label: 'Customer Service' },
+        { id: 'product_mgmt', label: 'Product Mgmt' },
+        { id: 'supply_chain', label: 'Supply Chain' },
+        { id: 'finance_dept', label: 'Finance' },
+        { id: 'legal', label: 'Legal & Compliance' },
+        { id: 'hr', label: 'HR & People' },
+        { id: 'procurement', label: 'Procurement' },
+        { id: 'quality', label: 'Quality Assurance' },
+        { id: 'strategy', label: 'Corporate Strategy' },
+        { id: 'esg', label: 'Sustainability & ESG' }
+      ],
+      templates: [
           // Retail
           { industry: 'retail', function: 'sales', label: "Manhattan Store Optimization", text: "Retail optimization for Manhattan stores by correlating foot traffic, sales, and local weather patterns to optimize staffing and inventory levels." },
           { industry: 'retail', function: 'marketing', label: "Customer Loyalty Analysis", text: "Analyze customer purchase history and demographic data to identify high-value segments and design targeted loyalty campaigns for regional malls." },
@@ -3884,100 +3918,62 @@ limitations under the License.
           { industry: "auto", function: "ops", label: "Supply Chain Resiliency", text: "Minimize production delays by predicting potential supply chain disruptions and automatically identifying alternative suppliers for critical vehicle components." },
           { industry: "auto", function: "it_eng", label: "Autonomous Vehicle Simulation", text: "Manage and analyze petabytes of sensor data from test fleets to train and validate autonomous driving models in a high-fidelity simulation environment." },
           { industry: "auto", function: "product_mgmt", label: "EV Charging Experience", text: "Design and prioritize features for an integrated electric vehicle charging and route planning application based on user feedback and charging station data." },
-          { industry: "auto", function: "customer_service", label: "Smart Vehicle Troubleshooting", text: "Provide real-time vehicle diagnostics and service scheduling assistance to drivers via a voice-activated or mobile app AI assistant." }
-        ],
-        ja: [
-          // 小売
-          { industry: 'retail', function: 'sales', label: "都内店舗の売上最適化", text: "東京都内の小売店売上分析と、気象データを組み合わせた在庫最適化および需要予測デモ。" },
-          { industry: 'retail', function: 'marketing', label: "会員ランク移行分析", text: "顧客の購買履歴とデモグラフィックデータを分析し、高価値顧客セグメントの特定とパーソナライズされた施策の立案。" },
-          { industry: 'retail', function: 'ops', label: "棚割り・欠品防止", text: "コンピュータビジョンと重量センサーを用いた棚在庫のリアルタイム監視。自動補充トリガーにより、販売機会損失を最小化。" },
-          { industry: 'retail', function: 'supply_chain', label: "食品ロス削減", text: "消費期限、過去の廃棄率、および来店客数予測に基づいた、スーパーマーケットでの生鮮食品在庫管理の最適化。" },
-          { industry: 'retail', function: 'finance_dept', label: "ダイナミック・プライシング", text: "競合価格のモニタリングと需要弾力性モデルに基づく。家電量販店向けに、売れ筋商品の適正価格をリアルタイムで自動更新。" },
-          { industry: 'retail', function: 'hr', label: "シフト配置の最適化", text: "過去の来店客数ピーク、祝祭日、スタッフの稼働データを分析。過不足のない人員配置を予測し、人件費を効率化。" },
-          { industry: 'retail', function: 'customer_service', label: "オムニチャネル・サポート", text: "Web、モバイル、店頭を跨いでシームレスな顧客サポートを実現。Geminiが注文履歴やリアルタイムの在庫データと連携して、一貫した対応を提供。" },
-          // 金融
-          { industry: 'finance', function: 'sales', label: "富裕層向け提案の強化", text: "取引パターンと市場動向への感応度に基づいた、ウェルスマネジメントサービスのクロスセル機会の特定。" },
-          { industry: 'finance', function: 'marketing', label: "ネクスト・ベスト・オファー", text: "行動データとライフステージ分析を用いた、パーソナライズされた金融商品提案。既存顧客のエンゲージメントを最大化。" },
-          { industry: 'finance', function: 'ops', label: "不正利用検知", text: "クレジットカード取引ストリームの分析。新たに出現した不正パターンを特定し、高リスク地域での検知ルールを最適化。" },
-          { industry: 'finance', function: 'supply_chain', label: "現金輸送ルートの最適化", text: "ATMの現金補充スケジュールと輸送ルートの改善。過去の引き出し傾向と運用コストに基づき、資金効率を向上。" },
-          { industry: 'finance', function: 'finance_dept', label: "ALM感応度テスト", text: "資産負債管理（ALM）モデル。金利ショックや流動性ストレスシナリオがバランスシートに与える影響をシミュレーション。" },
-          { industry: 'finance', function: 'hr', label: "アドバイザー実績分析", text: "顧客対応データと成約率の相関分析。教育が必要なスキルの特定と、成果に基づくインセンティブ設計の最適化。" },
-          { industry: 'finance', function: 'legal', label: "規制コンプライアンス監視", text: "膨大なローン書類や取引記録のレビューを自動化。国内外で変化する金融規制への準拠を継続的に監視し、法的リスクを低減。" },
-          // 製造
-          { industry: 'manufacturing', function: 'sales', label: "B2B需要予測", text: "販売代理店の発注動向と市場センチメントを統合。生産計画を最適化し、地域ごとの在庫の過不足を解消。" },
-          { industry: 'manufacturing', function: 'marketing', label: "保守サービスの提案強化", text: "産業機器のIoTテレメトリデータを分析。交換時期が近づいた部品やメンテナンス契約の提案を自動化。" },
-          { industry: 'manufacturing', function: 'ops', label: "工場稼働率の最大化", text: "製造ラインの停止予測。センサーデータと過去の故障履歴に基づいた予防保守のタイミングの最適化。" },
-          { industry: 'manufacturing', function: 'supply_chain', label: "部品調達の弾力化", text: "配送リードタイム、港湾の混雑状況、およびサプライヤーのパフォーマンス分析によるグローバル調達の最適化。" },
-          { industry: 'manufacturing', function: 'finance_dept', label: "原価差異のリアルタイム分析", text: "原材料価格、エネルギー使用量、労働効率の変動を監視。製品ごとの原価推移を可視化し、採算管理を高度化。" },
-          { industry: 'manufacturing', function: 'hr', label: "安全管理と事故防止", text: "労働災害報告と機器の使用ログを分析。疲労やプロトコル違反の兆候を特定し、現場の安全レベルを向上。" },
-          { industry: 'manufacturing', function: 'rnd', label: "持続可能素材の探索", text: "軽量かつ持続可能な次世代素材の研究開発において、AIが化学特性や性能をシミュレーション。R&Dサイクルを大幅に短縮。" },
-          // ヘルスケア
-          { industry: 'healthcare', function: 'sales', label: "診療サービスの地域展開", text: "地域の健康トレンドと競合施設の分布を分析。特化型クリニックや専門サービスの需要が高いエリアを特定。" },
-          { industry: 'healthcare', function: 'marketing', label: "予防検診の受診促進", text: "健康リスク要因に基づいた患者のセグメンテーション。パーソナライズされた通知により、定期検診の受診率を向上。" },
-          { industry: 'healthcare', function: 'ops', label: "救急外来の混雑予測", text: "ER（救急外来）への患者流入予測。過去の診察データと季節性疾患のトレンドに基づいた看護師配置の最適化。" },
-          { industry: 'healthcare', function: 'supply_chain', label: "医薬品在庫の適正化", text: "病院ネットワーク内での医薬品在庫レベル。過去の季節的ピーク時の需要急増に基づいた発注タイミングの最適化。" },
-          { industry: 'healthcare', function: 'finance_dept', label: "レセプト査定対策", text: "診療報酬請求の返戻・査定パターンの分析。請求前のコーディングミスを特定し、キャッシュフローを改善。" },
-          { industry: 'healthcare', function: 'hr', label: "バーンアウト防止プログラム", text: "看護師のシフトと残業時間の傾向を監視。離職リスクの高い部署を特定し、メンタルヘルス対策を早期に実施。" },
-          // 物流
-          { industry: 'logistics', function: 'sales', label: "運賃見積のダイナミック化", text: "空き容量、季節的な需要ピーク、燃料価格の変動に基づく価格モデル。大口顧客向けの運賃提案を最適化。" },
-          { industry: 'logistics', function: 'marketing', label: "顧客離反の防止", text: "配送遅延の頻度やサービスレベルの低下を分析。解約リスクの高い荷主を特定し、競合他社への流出を阻止。" },
-          { industry: 'logistics', function: 'ops', label: "ラストワンマイルの効率化", text: "配送ルートの遅延予測。リアルタイムの交通渋渋滞パターンと都市部の配送密度に基づいた燃料効率の最大化。" },
-          { industry: 'logistics', function: 'supply_chain', label: "マルチモーダル調達", text: "陸・海・空の最適な輸送モードの選定。港湾の混雑状況とリードタイムを分析し、最もコスト効率の高い経路を特定。" },
-          { industry: 'logistics', function: 'finance_dept', label: "車両ライフサイクル管理", text: "保有車両の維持コスト予測。走行距離や修理履歴に基づき、最適な買い替えサイクルを算出して資産効率を向上。" },
-          { industry: 'logistics', function: 'hr', label: "ドライバー安全走行支援", text: "急ブレーキや速度超過などのテレマティクスデータ分析。安全スコアに基づく報酬制度の設計と事故率の低減。" },
-          { industry: 'logistics', function: 'product_mgmt', label: "ラストワンマイル配送プラットフォーム", text: "ドライバーのフィードバック、配送ルートの効率、顧客満足度スコアを分析。次世代配送プラットフォームのロードマップと優先機能を決定。" },
-          // IT・SaaS
-          { industry: 'tech', function: 'sales', label: "SaaS解約予測", text: "グローバルSaaS製品の解約分析。利用パターン、サポートチケット数、契約更新日に基づいたリテンション戦略の策定。" },
-          { industry: 'tech', function: 'marketing', label: "プロダクト・レッド・グロース", text: "オンボーディング時のユーザー行動と機能採用率を分析し、セルフサーブ型コンバージョンの最適化を図る。" },
-          { industry: 'tech', function: 'ops', label: "クラウドコスト管理", text: "インフラ利用状況と請求データの異常検知。各開発チームへのコスト最適化推奨事項の自動生成。" },
-          { industry: 'tech', function: 'supply_chain', label: "サーバー部品の調達リスク", text: "サプライヤーのリードタイムと地政学的リスクを分析。重要なサーバーコンポーネントの在庫確保と代替調達先を管理。" },
-          { industry: 'tech', function: 'finance_dept', label: "効率性ベンチマーク", text: "製品ラインごとの収益成長率と利益率の相関分析。投資すべき成長分野と、コスト削減が必要な非効率な事業を特定。" },
-          { industry: 'tech', function: 'hr', label: "ITスキルマップの可視化", text: "社内プロジェクトのアサインデータと保有資格を統合。不足している技術領域を特定し、戦略的な採用やリスキリングを計画。" },
-          { industry: 'tech', function: 'it_eng', label: "クラウド基盤のスケーリング", text: "クラウドのリソース需要を予測し、インフラのスケーリングを自動化。コストを最適化しながら、グローバルSaaSアプリケーションの可用性を維持。" },
-          // エネルギー・公益
-          { industry: "energy", function: "sales", label: "再生可能エネルギーの販売戦略", text: "地域のエネルギー消費トレンドと政府の補助金制度を分析。商用太陽光・風力発電の導入見込みが高い顧客を特定し、営業活動を効率化。" },
-          { industry: "energy", function: "marketing", label: "節電・省エネキャンペーン", text: "スマートメーターのデータと過去のピーク時の使用パターンを分析。一般世帯向けにパーソナライズされた節電推奨事項を作成し、グリッドの負荷を軽減。" },
-          { industry: "energy", function: "ops", label: "送電網の予測保全", text: "変圧器や送電線のセンサーデータ、気象予測、過去の故障レポートを統合。設備のメンテナンス時期を予測し、ダウンタイムを最小限に抑制。" },
-          { industry: "energy", function: "it_eng", label: "スマートグリッド基盤の最適化", text: "Geminiを活用し、分散型エネルギーリソース（DER）のネットワーク全体で、リアルタイムの負荷分散と異常検知を行うデータパイプラインを構築。" },
-          { industry: "energy", function: "product_mgmt", label: "次世代スマートホーム計画", text: "消費者の行動データとデバイスのテレメトリを活用。エネルギー消費を最適化する新しいスマートホーム管理アプリの機能を設計し、優先順位を決定。" },
-          { industry: "energy", function: "customer_service", label: "公共料金サポートAI", text: "顧客の口座データとリアルタイムの料金体系を統合。複雑な請求に関する問い合わせや、エネルギー使用量の解説を自動で行うカスタマーサポート。" },
-          // 通信・テレコム
-          { industry: "telecom", function: "sales", label: "5G法人向け展開", text: "工業地帯のロケーション、現在の接続状況、IoT導入率を分析。5Gプライベートネットワークの導入候補となる企業を特定し、アウトリーチを強化。" },
-          { industry: "telecom", function: "marketing", label: "解約率（チャーン）の低減", text: "ストリーミング利用量、通話の切断率、契約更新日などを分析。解約の兆候を捉え、最適なデータプランのアップグレードや特典をタイムリーに提案。" },
-          { industry: "telecom", function: "ops", label: "ネットワークトラフィック管理", text: "大規模イベントや通勤時間帯のトラフィック急増を予測。ネットワーク帯域を動的に割り当て、基地局のハンドオーバーを最適化して通信品質を維持。" },
-          { industry: "telecom", function: "it_eng", label: "エッジコンピューティングの統合制御", text: "リソースの可用性に基づき、低遅延アプリケーションをネットワークのエッジにデプロイ。AI駆動のオーケストレーション層を設計・実装。" },
-          { industry: "telecom", function: "product_mgmt", label: "接続プラン・バンドルのロードマップ", text: "モバイル、ブロードバンド、ストリーミングサービスを跨ぐユーザー行動を分析。マルチデバイス接続プランの構成を定義し、新機能を優先順位付け。" },
-          { industry: "telecom", function: "customer_service", label: "テクニカルサポート・アシスタント", text: "技術マニュアルのナレッジベースとリアルタイムのネットワーク診断データを活用。ネットワーク障害やデバイス設定に関するトラブルシューティングを即座に提供。" },
-          // メディア・娯楽
-          { industry: "media", function: "sales", label: "広告枠収益の最適化", text: "スポーツ中継やエンターテインメント番組の視聴者層とエンゲージメントを予測。広告在庫の価値を最大化し、収益を向上させるプライシング戦略。" },
-          { industry: "media", function: "marketing", label: "コンテンツ・パーソナライズ", text: "視聴履歴や嗜好を分析。一人ひとりに合わせたコンテンツの推奨や予告編の自動生成により、視聴維持率とサブスクリプション継続率を向上。" },
-          { industry: "media", function: "ops", label: "デジタルアセットの自動管理", text: "Geminiのマルチモーダル分析を活用し、膨大なビデオライブラリのタグ付け、分類、著作権チェックを自動化。ポストプロダクション業務を効率化。" },
-          { industry: "media", function: "it_eng", label: "ストリーミングのリアルタイム分析", text: "配信品質とエンゲージメントをグローバルに監視。視聴状況に応じたCDNの切り替えやビットレートの調整をリアルタイムで行うプラットフォームを構築。" },
-          { industry: "media", function: "product_mgmt", label: "インタラクティブOTT機能の設計", text: "ストリーミングアプリのインタラクションデータを分析。ソーシャル視聴やゲーミフィケーション要素など、次世代OTTプラットフォームの新機能を企画。" },
-          { industry: "media", function: "customer_service", label: "視聴者エンゲージメント・チャットボット", text: "番組のあらすじ、出演者の経歴、プラン内容に関する質問に回答。会話型AIにより視聴者体験を向上させ、ファンコミュニティを活性化。" },
-          // 公共政策
-          { industry: "gov", function: "sales", label: "公共サービス周知ハブ", text: "人口統計データを分析し、再生可能エネルギー助成金や社会保障プログラムの対象者に情報を最適化。行政サービスの利用率向上を図るデモ。" },
-          { industry: "gov", function: "marketing", label: "公衆衛生の啓発活動", text: "SNSのセンチメントや医療機関からのフィードバックを分析。季節性の感染症対策など、公衆衛生キャンペーンの効果を測定し、情報発信を改善。" },
-          { industry: "gov", function: "ops", label: "都市インフラ計画の最適化", text: "交通パターン、人口密度、市民のフィードバックを分析。公共交通機関のルートやゴミ収集スケジュールを最適化し、都市運営の効率を向上。" },
-          { industry: "gov", function: "it_eng", label: "サイバー脅威インテリジェンス", text: "重要インフラや住民データに対する高度なサイバー攻撃を検知・遮断。AIを活用したセキュリティ・オペレーション・センター（SOC）を構築。" },
-          { industry: "gov", function: "product_mgmt", label: "電子行政サービスポータル", text: "ヘルプデスクへの問い合わせやカスタマージャーニーを分析。住民の利便性を高めるデジタル変革プロジェクトの優先順位を決定。" },
-          { industry: "gov", function: "customer_service", label: "多言語対応・住民サポート", text: "行政手続き、許可申請、緊急情報などを多言語で案内。AIアシスタントが住民の多様なニーズにリアルタイムで対応し、窓口業務を効率化。" },
-          // 教育
-          { industry: "education", function: "sales", label: "入学者数の動向予測", text: "人口動態の変化と労働市場の需要を分析。高等教育機関における入学希望者のトレンドを予測し、効果的な学生募集戦略を策定。" },
-          { industry: "education", function: "marketing", label: "卒業生エンゲージメントの強化", text: "卒業生のキャリア実績や過去の参加履歴に基づき、寄付キャンペーンをパーソナライズ。大学コミュニティへの帰属意識を高め、支援を拡大。" },
-          { industry: "education", function: "ops", label: "キャンパスリソースの最適化", text: "図書館、食堂、研究室の混雑状況を予測。スタッフ配置とエネルギー消費を最適化し、キャンパス運営の効率性と学生の利便性を両立。" },
-          { industry: "education", function: "it_eng", label: "アダプティブ・ラーニング基盤", text: "学習者の習熟度データに基づいて、教材の難易度や形式をリアルタイムで変更。個々の進捗に合わせたパーソナライズ学習を実現するバックエンドを構築。" },
-          { industry: "education", function: "product_mgmt", label: "教育カリキュラム・イノベーション", text: "労働市場のデータと産業トレンドを分析。将来のスキル需要に応える職業訓練プログラムや修了証コースを企画・設計。" },
-          { industry: "education", function: "customer_service", label: "学生生活サポート・ナビゲーター", text: "履修登録、奨学金、キャンパスライフに関する相談に、大学のポリシーに基づいた正確な回答を提供。学生の不安を解消し、学習に集中できる環境を支援。" },
-          // 自動車
-          { industry: "auto", function: "sales", label: "販売代理店の在庫最適化", text: "地域の購買傾向、経済指標、季節要因を分析。ディーラーネットワーク全体で車両在庫の配置を最適化し、販売機会の損失を防ぎつつ回転率を向上。" },
-          { industry: "auto", function: "marketing", label: "コネクテッドカーのアップセル", text: "運転行動や車両パフォーマンスのデータを分析。プレミアムソフトウェア機能やコネクテッドサービスの販促キャンペーンを、最適なタイミングで配信。" },
-          { industry: "auto", function: "ops", label: "サプライチェーンの回復力", text: "部品の供給網における混乱リスクを予測。代替サプライヤーを自動的に特定し、車両生産の遅延を最小限に抑えるレジリエンス戦略。" },
-          { industry: "auto", function: "it_eng", label: "自動運転シミュレーション", text: "テスト車両からの膨大なセンサーデータを収集・分析。高精度なシミュレーション環境で自動運転モデルのトレーニングと検証を効率化。" },
-          { industry: "auto", function: "product_mgmt", label: "EV充電体験の向上", text: "ユーザーフィードバックと充電スタンドの稼働データを分析。電気自動車の充電スポット検索とルート案内を統合したアプリの機能を定義。" },
-          { industry: "auto", function: "customer_service", label: "車両診断・サポートAI", text: "音声操作やモバイルアプリを通じて、リアルタイムの車両診断と点検予約を支援。故障を未然に防ぎ、快適なドライブ体験を提供。" }
+          { industry: "auto", function: "customer_service", label: "Smart Vehicle Troubleshooting", text: "Provide real-time vehicle diagnostics and service scheduling assistance to drivers via a voice-activated or mobile app AI assistant." },
+          // Insurance
+          { industry: 'insurance', function: 'sales', label: "Broker Channel Performance", text: "Analyze broker submission and bind rates across commercial lines to identify high-potential partners and optimize commission structures." },
+          { industry: 'insurance', function: 'ops', label: "Claims Triage Automation", text: "Automate first-notice-of-loss claims triage by classifying severity from claim descriptions and photos, routing complex cases to senior adjusters." },
+          { industry: 'insurance', function: 'customer_service', label: "Policy Renewal Assistant", text: "Reduce policy lapse rates by predicting non-renewal risk from payment history and engagement signals, then triggering personalized outreach." },
+          { industry: 'insurance', function: 'finance_dept', label: "Loss Ratio Analytics", text: "Monitor loss ratios by product line and region to detect underpricing early and feed actuarial repricing decisions." },
+          { industry: 'insurance', function: 'quality', label: "Underwriting Audit Sampling", text: "Automate quality sampling of underwriting decisions by flagging policies that deviate from guidelines for peer review." },
+          // Real Estate & Construction
+          { industry: 'real_estate', function: 'sales', label: "Lead-to-Lease Conversion", text: "Score inbound property inquiries using budget, timeline, and browsing behavior to prioritize agent follow-up and boost lease conversion." },
+          { industry: 'real_estate', function: 'ops', label: "Site Progress Monitoring", text: "Track construction site progress by comparing drone imagery and daily field reports against project schedules to flag delays early." },
+          { industry: 'real_estate', function: 'finance_dept', label: "Portfolio Yield Analysis", text: "Analyze rent rolls, vacancy rates, and maintenance costs across a property portfolio to identify underperforming assets." },
+          { industry: 'real_estate', function: 'procurement', label: "Subcontractor Bid Analysis", text: "Compare subcontractor bids against historical cost benchmarks and performance records to flag outliers and recommend awards." },
+          { industry: 'real_estate', function: 'quality', label: "Defect Inspection Reports", text: "Digitize handover inspection reports and cluster recurring defects by trade and builder to drive corrective actions." },
+          // Travel & Hospitality
+          { industry: 'travel', function: 'sales', label: "Group Booking Pipeline", text: "Prioritize corporate group booking inquiries by scoring event size, seasonality, and account history to maximize banquet revenue." },
+          { industry: 'travel', function: 'marketing', label: "Dynamic Package Offers", text: "Create personalized travel package offers by combining booking history, seasonal demand, and loyalty tier data." },
+          { industry: 'travel', function: 'ops', label: "Housekeeping Dispatch Optimization", text: "Optimize housekeeping schedules using real-time checkout data and room status to shorten room turnaround times." },
+          { industry: 'travel', function: 'customer_service', label: "Guest Experience Recovery", text: "Detect negative guest feedback across reviews and surveys in real time and trigger service recovery workflows before checkout." },
+          { industry: 'travel', function: 'finance_dept', label: "RevPAR Forecasting", text: "Forecast revenue per available room by correlating event calendars, competitor rates, and historical occupancy." },
+          // Food & Beverage
+          { industry: 'food', function: 'ops', label: "Central Kitchen Yield", text: "Monitor central kitchen production yields and waste rates to adjust batch planning and reduce raw material losses." },
+          { industry: 'food', function: 'supply_chain', label: "Cold Chain Compliance", text: "Track temperature logs across the cold chain to detect excursions, quarantine affected lots, and alert quality teams." },
+          { industry: 'food', function: 'quality', label: "HACCP Deviation Alerts", text: "Automate HACCP monitoring by flagging critical control point deviations and generating corrective action records." },
+          { industry: 'food', function: 'marketing', label: "Menu Performance Analysis", text: "Analyze item-level sales mix and margin data across locations to optimize menu lineup and seasonal promotions." },
+          { industry: 'food', function: 'procurement', label: "Ingredient Price Hedging", text: "Track commodity price trends and supplier quotes to time purchases of key ingredients and stabilize food costs." },
+          // Consumer Goods
+          { industry: 'cpg', function: 'sales', label: "Retail Execution Insights", text: "Analyze store-level sell-through and shelf-share data to prioritize field sales visits and fix distribution gaps." },
+          { industry: 'cpg', function: 'marketing', label: "Trade Promotion ROI", text: "Measure trade promotion effectiveness by correlating discount depth, display placement, and incremental sales lift." },
+          { industry: 'cpg', function: 'supply_chain', label: "Demand Sensing", text: "Improve short-term demand forecasts by combining POS data, weather, and social trends to cut stockouts and overproduction." },
+          { industry: 'cpg', function: 'rnd', label: "Concept Test Analysis", text: "Aggregate consumer panel feedback and social listening data to score new product concepts before launch." },
+          { industry: 'cpg', function: 'esg', label: "Packaging Footprint Tracker", text: "Track packaging material usage and recyclability rates across SKUs to report progress against sustainability commitments." },
+          // Agriculture
+          { industry: 'agri', function: 'ops', label: "Crop Health Monitoring", text: "Detect crop stress early by analyzing satellite imagery, soil sensors, and weather data to schedule targeted interventions." },
+          { industry: 'agri', function: 'supply_chain', label: "Harvest Logistics Planning", text: "Coordinate harvest schedules, storage capacity, and transport availability to minimize post-harvest losses." },
+          { industry: 'agri', function: 'finance_dept', label: "Farm Profitability Analysis", text: "Analyze input costs, yields, and market prices by field to guide planting decisions for the next season." },
+          { industry: 'agri', function: 'quality', label: "Produce Grading Automation", text: "Automate produce grading using image recognition and sensor data to ensure consistent quality and reduce manual inspection." },
+          { industry: 'agri', function: 'esg', label: "Water Usage Optimization", text: "Optimize irrigation schedules using soil moisture and evapotranspiration data to cut water usage while protecting yields." },
+          // New functions across existing industries
+          { industry: 'retail', function: 'procurement', label: "Vendor Scorecard Automation", text: "Consolidate supplier delivery, defect, and cost data into automated scorecards that drive quarterly vendor negotiations." },
+          { industry: 'manufacturing', function: 'procurement', label: "Direct Material Sourcing", text: "Analyze supplier quotes, lead times, and quality history to recommend optimal sourcing splits for critical components." },
+          { industry: 'manufacturing', function: 'quality', label: "Defect Root-Cause Mining", text: "Correlate inspection results with machine parameters and material lots to identify root causes of recurring defects." },
+          { industry: 'manufacturing', function: 'esg', label: "Energy Intensity Reduction", text: "Track energy consumption per production unit across plants and recommend efficiency measures to meet reduction targets." },
+          { industry: 'auto', function: 'quality', label: "Warranty Claim Early Warning", text: "Detect emerging vehicle quality issues by mining warranty claims and dealer service records for abnormal failure patterns." },
+          { industry: 'finance', function: 'strategy', label: "M&A Target Screening", text: "Screen acquisition targets by combining market data, financial filings, and news sentiment against strategic fit criteria." },
+          { industry: 'tech', function: 'strategy', label: "Market Expansion Analysis", text: "Evaluate new market entry options by analyzing market size data, competitor presence, and regulatory requirements." },
+          { industry: 'energy', function: 'esg', label: "Emissions Reporting Automation", text: "Automate Scope 1-3 emissions data collection across sites and generate audit-ready sustainability reports." },
+          { industry: 'logistics', function: 'esg', label: "Fleet Decarbonization Planner", text: "Model EV transition scenarios for delivery fleets using route profiles, charging infrastructure, and total cost of ownership analysis." },
+          { industry: 'healthcare', function: 'quality', label: "Clinical Incident Analysis", text: "Classify and trend patient safety incident reports to prioritize preventive measures across departments." },
+          // Legal & Professional Services
+          { industry: 'legal_services', function: 'sales', label: "Client Development Analytics", text: "Analyze proposal win rates, matter pipeline, and client relationship data to prioritize business development efforts across practice areas." },
+          { industry: 'legal_services', function: 'ops', label: "Matter Intake Triage", text: "Automate new matter intake by classifying request type, running conflict checks against client databases, and routing to the right practice group." },
+          { industry: 'legal_services', function: 'legal', label: "Contract Review Acceleration", text: "Extract key clauses, obligations, and renewal dates from client contracts to accelerate review cycles and flag non-standard terms." },
+          { industry: 'legal_services', function: 'finance_dept', label: "Billing Realization Analysis", text: "Analyze billable hours, write-downs, and collection cycles by matter and partner to improve realization rates and cash flow." },
+          { industry: 'legal_services', function: 'hr', label: "Associate Utilization Balancing", text: "Monitor associate utilization and skill profiles across teams to balance staffing on new matters and reduce burnout-driven attrition." },
+          { industry: 'legal_services', function: 'quality', label: "Engagement Quality Reviews", text: "Sample completed consulting engagements for quality review by flagging deliverables that deviate from methodology standards and deadlines." }
         ]
-      }
     };
 
     let selectedIndustry = 'retail';
@@ -4008,11 +4004,24 @@ limitations under the License.
       { id: 'custom',           label: 'Custom...',              description: '' }
     ];
     let selectedPersonaId = 'auto';
+    // Persona key captured when Optimize Prompt last succeeded; null = never ran.
+    var lastOptimizedPersonaKey = null;
 
     // Stable key for change detection: distinguishes custom-text edits too.
     function currentPersonaKey() {
       const p = getSelectedPersona();
       return p ? (p.id + '|' + p.label) : 'auto';
+    }
+
+    // Shows a banner above the goal editor when the persona was changed AFTER
+    // Optimize Prompt ran, so the user knows to re-run it.
+    function updateOptimizeRerunHint() {
+      var hint = document.getElementById('optimizeRerunHint');
+      if (!hint) return;
+      var goalEl = document.getElementById('userGoal');
+      var stale = !!(lastOptimizedPersonaKey && goalEl && goalEl.value.trim() &&
+        currentPersonaKey() !== lastOptimizedPersonaKey);
+      hint.classList.toggle('hidden', !stale);
     }
 
     // Shows a banner inside the research result card when the persona was
@@ -4024,6 +4033,8 @@ limitations under the License.
         !document.getElementById('researchResult').classList.contains('hidden') &&
         currentPersonaKey() !== (cachedResearchData._personaKey || 'auto'));
       hint.classList.toggle('hidden', !stale);
+      // The optimize-prompt hint tracks the same persona changes.
+      updateOptimizeRerunHint();
     }
 
     function renderPersonaSelector() {
@@ -4062,9 +4073,82 @@ limitations under the License.
       return preset ? { id: preset.id, label: preset.label, description: preset.description } : null;
     }
 
+    // ---- Template Hub dynamic translation (ported from GE Demo Generator Lite) ----
+    // English is the only authored dataset. Other languages are translated on
+    // demand by the backend (translateTemplates) and cached per session, so
+    // non-ASCII translations never live in this inline JS (GAS minifier).
+    var currentTemplateLang = 'en';
+    var templateHubCache = {
+      en: {
+        industries: TEMPLATE_DATA.industries,
+        jobFunctions: TEMPLATE_DATA.jobFunctions,
+        templates: TEMPLATE_DATA.templates
+      }
+    };
+    var templateLangRequest = 0;
+
+    // Industry labels start with a pictogram + space; keep the pictogram out
+    // of the translation payload and re-attach it afterwards.
+    function splitLabelPrefix(label) {
+      var idx = label.indexOf(' ');
+      if (idx < 1 || idx > 8) return { prefix: '', text: label };
+      var head = label.substring(0, idx);
+      var hasSymbol = false;
+      for (var i = 0; i < head.length; i++) {
+        if (head.charCodeAt(i) > 127) { hasSymbol = true; break; }
+      }
+      if (!hasSymbol) return { prefix: '', text: label };
+      return { prefix: head + ' ', text: label.substring(idx + 1) };
+    }
+
+    function setTemplateLang(lang) {
+      currentTemplateLang = lang;
+      if (templateHubCache[lang]) { updateSamples(); return; }
+      var reqId = ++templateLangRequest;
+      var grid = document.getElementById('templateGrid');
+      if (grid) grid.innerHTML = '<div class="col-span-full flex items-center justify-center gap-2 py-10 text-gray-400 text-xs"><div class="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div><span>Translating templates...</span></div>';
+      var base = templateHubCache.en;
+      var items = [];
+      base.templates.forEach(function (t) { items.push({ label: t.label, text: t.text }); });
+      base.industries.forEach(function (ind) { items.push({ label: splitLabelPrefix(ind.label).text, text: '' }); });
+      base.jobFunctions.forEach(function (fn) { items.push({ label: fn.label, text: '' }); });
+      google.script.run
+        .withSuccessHandler(function (res) {
+          if (reqId !== templateLangRequest) return; // stale response
+          var nT = base.templates.length, nI = base.industries.length;
+          if (res && res.success && res.items && res.items.length === items.length) {
+            templateHubCache[lang] = {
+              templates: base.templates.map(function (t, i) {
+                var r = res.items[i] || {};
+                return { industry: t.industry, function: t.function, label: r.label || t.label, text: r.text || t.text };
+              }),
+              industries: base.industries.map(function (ind, i) {
+                var r = res.items[nT + i] || {};
+                var parts = splitLabelPrefix(ind.label);
+                return { id: ind.id, label: parts.prefix + (r.label || parts.text), icon: ind.icon };
+              }),
+              jobFunctions: base.jobFunctions.map(function (fn, i) {
+                var r = res.items[nT + nI + i] || {};
+                return { id: fn.id, label: r.label || fn.label };
+              })
+            };
+          } else {
+            templateHubCache[lang] = base;
+            showToast('Translation unavailable; showing English.');
+          }
+          updateSamples();
+        })
+        .withFailureHandler(function () {
+          if (reqId !== templateLangRequest) return;
+          templateHubCache[lang] = base;
+          showToast('Translation failed; showing English.');
+          updateSamples();
+        })
+        .translateTemplates(lang, items);
+    }
+
     function updateSamples() {
-      const langSelector = document.getElementById('langSelector');
-      const lang = (langSelector && langSelector.value) || 'en';
+      var hub = templateHubCache[currentTemplateLang] || templateHubCache.en;
       const industryContainer = document.getElementById('industryFilters');
       const functionContainer = document.getElementById('jobFunctionFilters');
       const templateGrid = document.getElementById('templateGrid');
@@ -4073,8 +4157,7 @@ limitations under the License.
 
       // 1. Render Industries
       industryContainer.innerHTML = '';
-      const fallbackLang = TEMPLATE_DATA.industries[lang] ? lang : 'en';
-      TEMPLATE_DATA.industries[fallbackLang].forEach(ind => {
+      hub.industries.forEach(ind => {
         const btn = document.createElement('button');
         btn.onclick = () => { selectedIndustry = ind.id; updateSamples(); };
         const isActive = selectedIndustry === ind.id;
@@ -4088,8 +4171,7 @@ limitations under the License.
 
       // 2. Render Job Functions
       functionContainer.innerHTML = '';
-      const fallbackFuncLang = TEMPLATE_DATA.jobFunctions[lang] ? lang : 'en';
-      TEMPLATE_DATA.jobFunctions[fallbackFuncLang].forEach(func => {
+      hub.jobFunctions.forEach(func => {
         const btn = document.createElement('button');
         btn.onclick = () => { selectedFunction = func.id; updateSamples(); };
         const isActive = selectedFunction === func.id;
@@ -4103,8 +4185,7 @@ limitations under the License.
 
       // 3. Render Template Grid
       templateGrid.innerHTML = '';
-      const fallbackTempLang = TEMPLATE_DATA.templates[lang] ? lang : 'en';
-      const filtered = TEMPLATE_DATA.templates[fallbackTempLang].filter(t =>
+      const filtered = hub.templates.filter(t =>
         (t.industry === selectedIndustry) &&
         (selectedFunction === 'all' || t.function === selectedFunction)
       );
@@ -4197,6 +4278,9 @@ limitations under the License.
             el.focus();
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
+          // Gallery picks feed straight into Optimize Prompt so the user
+          // lands on a fully structured scenario without an extra click.
+          optimizeGoalWithMagicWand();
         }, 50);
       }, 300);
 
@@ -5744,6 +5828,7 @@ limitations under the License.
       // Deep Link Auto-Load: restore demo if demoId is in URL
       updateSamples();
       renderPersonaSelector();
+      restoreResearchLang();
       updateProjectSetCmd();
 
       // Onboarding check

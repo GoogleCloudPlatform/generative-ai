@@ -5206,6 +5206,11 @@ ${params.importedMcpList.map((mcp, idx) => {
  * @param {Object|null} persona - { id, label, description, custom? } or null
  * @returns {string} Sanitized description text, or '' when absent
  */
+// Languages offered by the research language selector in the UI. Exact
+// membership check doubles as sanitization: only these strings are ever
+// interpolated into prompts.
+const SUPPORTED_RESEARCH_LANGS_ = ['日本語', 'English', 'Deutsch', 'Français', 'Español', 'Italiano', '中文', '한국어', 'Português', 'Русский', 'Nederlands', 'Svenska', 'Suomi'];
+
 function sanitizePersonaText_(persona) {
   if (!persona || typeof persona !== 'object') return '';
   const raw = String(persona.description || persona.label || '');
@@ -5220,7 +5225,7 @@ function sanitizePersonaText_(persona) {
  * @param {Object|null} persona - Optional target persona { id, label, description }
  * @returns {Object} Structured company research results
  */
-function researchCompanyByDomain(domain, persona) {
+function researchCompanyByDomain(domain, persona, langOverride) {
   if (!domain || typeof domain !== 'string') {
     return { success: false, error: 'Domain is required.' };
   }
@@ -5228,7 +5233,14 @@ function researchCompanyByDomain(domain, persona) {
   // Normalize domain
   domain = domain.trim().toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/.*$/, '');
 
-  // Determine response language from TLD
+  // Optional manual override from the UI language selector ('Auto' sends null).
+  const overrideLang = (typeof langOverride === 'string' && SUPPORTED_RESEARCH_LANGS_.indexOf(langOverride.trim()) !== -1)
+    ? langOverride.trim() : null;
+
+  // TLD map is no longer the decision mechanism (a Japanese company on a .com
+  // domain used to get English). It only seeds the fallback used when the
+  // model omits detectedLanguage in auto mode; the actual choice is made by
+  // the model from the grounded search results (HQ country / official site).
   const tldLangMap = {
     '.co.jp': '日本語', '.jp': '日本語', '.ne.jp': '日本語', '.or.jp': '日本語', '.ac.jp': '日本語',
     '.de': 'Deutsch', '.fr': 'Français', '.es': 'Español', '.it': 'Italiano',
@@ -5238,15 +5250,22 @@ function researchCompanyByDomain(domain, persona) {
     '.com': 'English', '.io': 'English', '.ai': 'English', '.org': 'English', '.net': 'English'
   };
 
-  let responseLang = 'English';
+  let fallbackLang = 'English';
   // Match longest TLD first (e.g., .co.jp before .jp)
   const sortedTlds = Object.keys(tldLangMap).sort((a, b) => b.length - a.length);
   for (const tld of sortedTlds) {
     if (domain.endsWith(tld)) {
-      responseLang = tldLangMap[tld];
+      fallbackLang = tldLangMap[tld];
       break;
     }
   }
+
+  const langBlock = overrideLang
+    ? '**RESPONSE LANGUAGE**: Respond entirely in ' + overrideLang + '. Set "detectedLanguage" to exactly "' + overrideLang + '".'
+    : '**RESPONSE LANGUAGE (AUTO-DETECT)**: Determine the company\'s primary business language and write ALL text values in that language.\n' +
+      '- Country-code TLDs are decisive: e.g. .jp/.co.jp -> 日本語, .de -> Deutsch, .fr -> Français, .es -> Español, .it -> Italiano, .cn/.tw -> 中文, .kr -> 한국어, .br -> Português.\n' +
+      '- For generic TLDs (.com, .io, .ai, .org, .net, ...), decide from your search results: use the primary language of the company\'s headquarters country and official website. Example: a Japanese company using a .com domain MUST still be answered in 日本語.\n' +
+      '- Report your final choice in the "detectedLanguage" JSON field, picking the closest match from: ' + SUPPORTED_RESEARCH_LANGS_.join(', ') + '.';
 
   const personaDesc = sanitizePersonaText_(persona);
   const personaBlock = personaDesc
@@ -5256,7 +5275,7 @@ function researchCompanyByDomain(domain, persona) {
   const prompt = `You are a business analyst researching a company for an AI agent demo preparation.
 Research the company behind the domain "${domain}" using the latest available information from the internet.
 
-**RESPONSE LANGUAGE**: Respond entirely in ${responseLang}.
+${langBlock}
 ${personaBlock}
 Provide the following information in a structured JSON format:
 1. **companyName**: Official company name
@@ -5275,6 +5294,7 @@ Provide the following information in a structured JSON format:
    - Follow the theme of "Autonomous Action and Core System Optimization" — the agent should detect events, analyze data, and actively update core systems
    - Span at least two departments that share the same core-system data, and describe the hand-off between them that the agent automates. Where the business problem plausibly involves only one department, model the hand-off with an adjacent supporting function (e.g., support -> billing, support -> product quality)
 7. **quantFacts**: An object of verifiable QUANTITATIVE facts about the company for grounding synthetic demo data in real-world scale. Include ONLY facts clearly supported by your search results - omit any key you are not confident about (an empty object is fine; NEVER estimate or invent numbers). All values are strings that include the unit and, when known, the as-of year. Possible keys (all optional): "storeCount", "siteCount", "employeeCount", "annualRevenue", "mainRegions" (array of region/prefecture names ordered by weight), "productCategories" (array of the main product/service categories), "notableScale" (one free-form fact like daily shipments or member count).
+8. **detectedLanguage**: The language ALL text values in this response are written in (see RESPONSE LANGUAGE above).
 
 **IMPORTANT**:
 - Use REAL, factual information about this company. Do NOT hallucinate or invent details.
@@ -5292,7 +5312,8 @@ Output pure JSON only (no code blocks, no markdown):
     {"name": "...", "automatable": false, "reason": "..."}
   ],
   "suggestedGoal": "...",
-  "quantFacts": { "storeCount": "...", "mainRegions": ["..."] }
+  "quantFacts": { "storeCount": "...", "mainRegions": ["..."] },
+  "detectedLanguage": "..."
 }`;
 
   try {
@@ -5356,7 +5377,10 @@ Output pure JSON only (no code blocks, no markdown):
       businessChallenges: parsed.businessChallenges || [],
       workflows: parsed.workflows || [],
       suggestedGoal: parsed.suggestedGoal,
-      quantFacts: parsed.quantFacts || null
+      quantFacts: parsed.quantFacts || null,
+      detectedLanguage: (typeof parsed.detectedLanguage === 'string' && parsed.detectedLanguage.trim())
+        ? parsed.detectedLanguage.trim()
+        : (overrideLang || fallbackLang)
     };
   } catch (e) {
     console.error('[RESEARCH] Error for domain ' + domain + ':', e.message);
@@ -5371,14 +5395,19 @@ Output pure JSON only (no code blocks, no markdown):
  * @param {Object} companyInfo - { companyName, industry, companySummary }
  * @param {Array} selectedWorkflows - [{ name, reason }, ...]
  * @param {Object|null} persona - Optional target persona { id, label, description }
+ * @param {string|null} language - Explicit output language (from research detectedLanguage or the UI override)
  * @returns {Object} { success: boolean, goal: string, error?: string }
  */
-function regenerateGoalForWorkflows(companyInfo, selectedWorkflows, persona) {
+function regenerateGoalForWorkflows(companyInfo, selectedWorkflows, persona, language) {
   if (!companyInfo || !selectedWorkflows || selectedWorkflows.length === 0) {
     return { success: false, error: 'Company info and at least one workflow are required.' };
   }
 
-  const responseLang = /[\u3000-\u9fff\uff00-\uffef]/.test(companyInfo.companySummary) ? '日本語' : 'English';
+  // Prefer the explicit language carried over from the research step; the CJK
+  // regex is only a JP/EN fallback for old callers (it loses e.g. German).
+  const responseLang = (typeof language === 'string' && SUPPORTED_RESEARCH_LANGS_.indexOf(language.trim()) !== -1)
+    ? language.trim()
+    : (/[\u3000-\u9fff\uff00-\uffef]/.test(companyInfo.companySummary) ? '日本語' : 'English');
 
   const personaDesc = sanitizePersonaText_(persona);
   const personaSection = personaDesc
@@ -6210,8 +6239,16 @@ function optimizeGoalWithMagicWand(rawGoal, capabilityOpts) {
   // letting the model invent one. Empty string = prompt unchanged.
   const _personaDesc = sanitizePersonaText_(_caps.persona);
   const personaRequirement = _personaDesc
-    ? '\n' + (_capManaged ? '5' : '4') + '.  **Target Persona Override (MANDATORY)**: This demo targets a specific user: ' + _personaDesc + '. Header 2 (Target Role) MUST be a single specific, professional job title matching this persona, translated naturally into the detected output language. The Business Scenario (Header 3) and the Operational Challenge (Header 4) MUST be framed around this persona\'s own business process, daily decisions, and KPIs. If the input text implies a different role, the persona specified here takes precedence.'
+    ? '\n' + (_capManaged ? '5' : '4') + '.  **Target Persona Override (MANDATORY)**: This demo targets a specific user: ' + _personaDesc + '. Header 2 (Target Role) MUST be a single specific, professional job title matching this persona, translated naturally into the detected output language. The Business Scenario (Header 3) and the Operational Challenge (Header 4) MUST be framed around this persona\'s own business process, daily decisions, and KPIs. If the input text implies or already states a different role (including an existing Target Role header from prior research or a template), the persona specified here takes precedence: REPLACE that role and reframe the scenario around this persona. Before returning, verify the Target Role matches this persona; if it does not, rewrite it.'
     : '';
+
+  // Persona must also win inside Requirement 1 itself: the generic Header 2
+  // instruction ("identify a job title") otherwise competes with the trailing
+  // override and flash-lite sometimes follows the earlier instruction or keeps
+  // a role already present in the input.
+  const header2Instruction = _personaDesc
+    ? '**Header 2 (Role)**: MUST be a single specific, professional job title matching this target persona: ' + _personaDesc + '. Do NOT keep or invent a different role, even if the input already names one.'
+    : '**Header 2 (Role)**: Identify a specific, professional job title appropriate to the role.';
 
   const prompt = `You are an expert prompt engineer and business analyst.
 Your task is to take a raw, simple, or loosely defined business scenario, OR a partially structured business scenario (which might contain company details and selected target workflows from prior research), and optimize/expand it into a **perfectly structured, high-density professional Business Scenario prompt** in Markdown format.
@@ -6230,7 +6267,7 @@ ${rawGoal}
 Requirements for the Structured Output:
 1.  **Structure Integrity**: Ensure the output contains exactly the four translated Markdown headers defined above.
     - **Header 1 (Title)**: If the input already has a company name and industry (e.g., '# SMCC (Finance)'), KEEP and preserve it. If not, create a realistic company name and vertical appropriate to the language context.
-    - **Header 2 (Role)**: Identify a specific, professional job title appropriate to the role.
+    - ${header2Instruction}
     - **Header 3 (Scenario)**: Provide a rich, realistic business context. If the input already has a scenario, expand it with realistic domain details, KPIs, and background.
     - **Header 4 (Challenge)**: Describe a clear, high-value operational challenge for an autonomous AI agent. It MUST specify:
         - A clear trigger event.
@@ -6294,3 +6331,65 @@ Return ONLY the raw Markdown text in the detected language. Do not include any c
   return { success: false, error: lastError ? lastError.message : "AI Optimization failed after retries" };
 }
 
+
+/**
+ * Translates Template Hub entries into a target language for display.
+ * Ported from GE Demo Generator Lite: the frontend ships English-only data
+ * and asks the backend for translations on demand, so non-ASCII translations
+ * never live in the inline frontend JS (which would break the GAS minifier).
+ * Entries with an empty "text" are category labels (industries/job functions).
+ * @param {string} lang - Target language code (en/ja/de/fr/es/it/zh/ko/pt/ru/nl/sv/fi)
+ * @param {Array} items - [{ label, text }]
+ * @returns {Object} { success, items } same length/order translated; originals on failure.
+ */
+function translateTemplates(lang, items) {
+  const LANGS = {
+    en: 'English', ja: 'Japanese', de: 'German', fr: 'French', es: 'Spanish',
+    it: 'Italian', zh: 'Simplified Chinese', ko: 'Korean', pt: 'Portuguese',
+    ru: 'Russian', nl: 'Dutch', sv: 'Swedish', fi: 'Finnish'
+  };
+  const target = LANGS[lang];
+  if (!target || lang === 'en') return { success: true, items: items || [] };
+  if (!items || !items.length) return { success: true, items: [] };
+
+  const prompt =
+    'Translate the "label" and "text" of each entry below into ' + target + '. ' +
+    'Keep it natural and professional (business demo scenario titles, descriptions, and category names). ' +
+    'Entries with an empty "text" are category labels - translate only their "label" and keep "text" as an empty string. ' +
+    'Return ONLY a JSON array of objects with "label" and "text", in the SAME order and SAME length as the input. ' +
+    'Do not add or remove entries.\n\nINPUT:\n' +
+    JSON.stringify(items.map(function (i) { return { label: String(i.label || ''), text: String(i.text || '') }; }));
+
+  try {
+    const location = CONFIG.LOCATION || 'global';
+    const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
+    const model = 'gemini-3.5-flash-lite';
+    const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location + '/publishers/google/models/' + model + ':generateContent';
+    const payload = {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.2, maxOutputTokens: 65535 }
+    };
+    const response = UrlFetchApp.fetch(url, {
+      method: 'POST', contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+      payload: JSON.stringify(payload), muteHttpExceptions: true
+    });
+    if (response.getResponseCode() !== 200) throw new Error('Translate Error: ' + response.getContentText().substring(0, 200));
+    const candidate = JSON.parse(response.getContentText()).candidates[0];
+    const text = candidate.content.parts.filter(function (p) { return p.text; }).map(function (p) { return p.text; }).join('');
+    let jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    let arr;
+    try {
+      arr = JSON.parse(jsonStr);
+    } catch (parseErr) {
+      const m = jsonStr.match(/\[[\s\S]*\]/);
+      if (!m) throw new Error('No JSON array in translation response');
+      arr = JSON.parse(m[0]);
+    }
+    if (!Array.isArray(arr) || arr.length !== items.length) throw new Error('Length mismatch: got ' + (arr && arr.length));
+    return { success: true, items: arr };
+  } catch (e) {
+    console.warn('[TRANSLATE] ' + e.message);
+    return { success: false, items: items, error: e.message };
+  }
+}
