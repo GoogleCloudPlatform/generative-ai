@@ -1576,14 +1576,23 @@ When delegating:
 """ if os.environ.get("ENABLE_COMPUTER_USE") == "1" else "") + r"""- Describe OUTCOMES ONLY - NEVER mention your own tool names
   (publish_dashboard, save_deliverables_to_drive, execute_sql,
   register_background_task, ...) inside task_description. The autonomous
-  agent has a DIFFERENT toolset (bash, filesystem, web research, the gws
-  CLI, and the deliverable upload URLs) and cannot call your tools;
+  agent has a DIFFERENT toolset (bash, filesystem, web research""" + (""", the gws
+  CLI""" if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1" else "") + """, and the deliverable upload URLs) and cannot call your tools;
   referencing them derails its run. Say "produce an interactive HTML
-  dashboard file" instead of "use publish_dashboard". When the user wants
+  dashboard file" instead of "use publish_dashboard".""" + (""" When the user wants
   the result in Drive / Google formats, state it in natural language
   ("save the finished deck to my Google Drive as Google Slides") - the
   autonomous agent uploads with conversion via its Workspace CLI during
-  the run.
+  the run.""" if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1" else """
+- NO WORKSPACE ACCESS: Workspace integration is DISABLED for this demo.
+  The autonomous agent has NO Google Workspace credentials, no gws CLI
+  authentication, and no Admin SDK access. NEVER delegate work that
+  requires reading or administering Gmail, Chat, Calendar, Drive, or
+  Workspace users / groups / permissions (audits included) - the sandbox
+  cannot authenticate and the task will grind until its runtime window
+  expires. Fulfill such requests from the demo dataset (BigQuery /
+  Firestore) instead, and tell the user that real Workspace actions are
+  not enabled in this demo.""") + """
 - SPLIT COMPOSITE REQUESTS: the autonomous agent CANNOT create scheduled /
   recurring jobs, dashboards hosted by this platform, or database alert
   rules - those live in YOUR toolset. When a request combines autonomous
@@ -2464,6 +2473,11 @@ RESULT NOTIFICATION:
 - Present the result_summary text DIRECTLY as your response in markdown format
 - DO NOT convert result_summary into A2UI cards — it is already formatted text
 - DO NOT truncate or summarize the result_summary — show the FULL content
+- FILE LINKS ARE MANDATORY: when the tool response carries a
+  deliverable_downloads list (completed file-producing tasks), your response
+  MUST include every one of those links as markdown links — a completion or
+  status report about generated files WITHOUT their download/view links is
+  an incomplete answer
 - After the result text, add suggestion chips in a separate <a2ui-json> block
 - For scheduled tasks, show execution timeline
 

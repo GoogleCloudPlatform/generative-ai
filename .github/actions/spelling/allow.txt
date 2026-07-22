@@ -30,6 +30,7 @@ agentic
 agg
 AGG
 aggfunc
+agri
 aiko
 ainit
 ainvoke
@@ -315,6 +316,7 @@ Cowabunga
 Cpath
 cpb
 cpet
+cpg
 crewai
 CRF
 cristo
@@ -501,6 +503,7 @@ erlang
 errlog
 erty
 ESG
+esg
 Esin
 ESPP
 ESRB
@@ -715,6 +718,7 @@ gutenberg
 Guterres
 GWLP
 gws
+HACCP
 hacer
 hadolint
 hahaha
@@ -722,6 +726,7 @@ Haichao
 halluc
 Hamamoto
 Hamers
+handover
 handovers
 Hannaneh
 hardlink
@@ -1651,6 +1656,7 @@ stdcall
 stext
 stitle
 STIX
+stockouts
 Storrer
 Stoynov
 stp
@@ -1746,6 +1752,7 @@ timecodes
 tion
 titlebar
 TLDR
+TLDs
 tobytes
 tok
 TOKENLIST

@@ -2027,7 +2027,7 @@ def get_task_result(task_id: str, tool_context: ToolContext) -> dict:
                 _ref.update({"reported_to_user": True})
             except Exception:
                 pass  # Non-critical: best-effort mark
-        return {
+        _res = {
             "task_id": _d.get("task_id"),
             "status": _d.get("status"),
             "progress_pct": _d.get("progress_pct", 0),
@@ -2039,6 +2039,18 @@ def get_task_result(task_id: str, tool_context: ToolContext) -> dict:
                 "Output the result_summary content VERBATIM as text. Do NOT skip it. Do NOT output only suggestion chips. "
                 "If your response contains NO text and only A2UI JSON, you have FAILED.",
         }
+        if _d.get("status") == "completed":
+            # Autonomous tasks share this collection, so this tool also gets
+            # asked about them. Managed-agent builds re-sign deliverable links
+            # live here (see _ma_attach_live_deliverables); a no-op for plain
+            # background tasks, which have no deliverables prefix in storage.
+            _attach = globals().get("_ma_attach_live_deliverables")
+            if _attach is not None:
+                try:
+                    _attach(_res, task_id, "result_summary")
+                except Exception:
+                    pass  # status reporting must never fail on link refresh
+        return _res
     except Exception as _fs_err:
         return {"error": "Firestore read failed: " + str(_fs_err)[:200]}
 
@@ -2780,7 +2792,40 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         "If the report above says files were produced or delivered, they exist ONLY inside the sandbox "
         "workspace and were NOT delivered to the user. Be honest about this - never present workspace-only "
         "files as delivered - and offer to run a short follow-up autonomous task that uploads the existing "
-        "files (the sandbox filesystem persists between tasks, so re-delegating an upload-only task works).")
+        "files (the sandbox filesystem persists between tasks, so re-delegating an upload-only task works; "
+        "when delegating that follow-up, pass THIS task's ticket-id as deliverables_for_task_id so the "
+        "uploads attach to this task and its status checks then return the download links).")
+
+    _MA_DL_MARKER = "DELIVERABLE DOWNLOADS (links valid for 7 days):"
+
+    def _ma_attach_live_deliverables(_out, _task_id, _report_key):
+        """Attaches freshly signed deliverable links to a completed-task status
+        payload. Status checks must NOT rely on the links frozen into the report
+        at completion time: those signatures expire, and files can also land in
+        storage AFTER the completion snapshot (a late upload, or a follow-up
+        upload-only task writing into this task's prefix). So every check
+        re-lists the bucket and mints fresh URLs. Returns True when at least one
+        link was attached."""
+        _links = _ma_collect_deliverables(_task_id)
+        if not _links:
+            return False
+        _report = _out.get(_report_key) or ""
+        # The completion-time link block (stale signatures) and the no-upload
+        # honesty note (obsolete once files exist in storage) both mislead the
+        # model when left next to the fresh links - drop them from the report.
+        if _MA_DL_MARKER in _report:
+            _report = _report.split(_MA_DL_MARKER)[0].rstrip()
+        if _MA_NO_UPLOAD_NOTE in _report:
+            _report = _report.replace(_MA_NO_UPLOAD_NOTE, "").rstrip()
+        _out[_report_key] = _report
+        _out["deliverable_downloads"] = _links
+        _out["_MANDATORY_ACTION"] = (
+            "Present the " + _report_key + " as formatted markdown text. Your response MUST ALSO list EVERY link "
+            "in deliverable_downloads, verbatim, as markdown links under a short heading meaning 'Deliverables' in "
+            "the conversation language. These are freshly signed download/view URLs for the files this task "
+            "produced (valid for 7 days; an .html link opens as an interactive page in the browser). Reporting a "
+            "completed file-producing task WITHOUT these file links is a FAILED response - never omit them.")
+        return True
 
     def _ma_run_interaction(payload, shared):
         """Thread target: POSTs one interaction and consumes its SSE stream.
@@ -2939,9 +2984,22 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         shared["last_text"] = "Live stream closed; polling interaction status (the sandbox keeps working)..."
         _url = _ma_interactions_url() + "/" + _iid
         _deadline = _t.monotonic() + _MA_POLL_EXTRA_S
+        _poll_start = _t.monotonic()
+        _polls = 0
         with httpx.Client(timeout=30.0) as _client:
             while _t.monotonic() < _deadline:
                 _t.sleep(30)
+                if shared.get("cancelled"):
+                    # Cancel pressed during the poll phase: the SSE loop's cancel
+                    # check can no longer fire once the stream is gone; without
+                    # this the thread keeps polling for up to _MA_POLL_EXTRA_S.
+                    return
+                _polls += 1
+                # Vary the liveness line per poll: a verbatim-repeating log_tail
+                # is indistinguishable from a hung monitor in the Data Viewer.
+                shared["last_text"] = ("Sandbox still working server-side - status poll #" + str(_polls)
+                                       + ", " + str(int((_t.monotonic() - _poll_start) / 60))
+                                       + " min since the live stream closed...")
                 try:
                     _headers = {
                         "Authorization": "Bearer " + _ma_get_access_token(),
@@ -3053,7 +3111,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 })
                 return
             _report = _ma_final_report(shared)
-            _links = _ma_collect_deliverables(task_id)
+            _links = _ma_collect_deliverables(shared.get("deliver_tid") or task_id)
             if _links:
                 _report = _report + chr(10) + chr(10) + "DELIVERABLE DOWNLOADS (links valid for 7 days):" + chr(10) + chr(10).join(_links)
             else:
@@ -3085,6 +3143,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         task_name: str,
         task_description: str,
         input_data: str = "",
+        deliverables_for_task_id: str = "",
         tool_context: ToolContext = None,
     ) -> dict:
         """Delegates a long-running, multi-step task to the fully autonomous cloud
@@ -3113,6 +3172,11 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 autonomous agent cannot call them and gets derailed trying.
             input_data: Optional data to embed verbatim (query results, lists,
                 constraints) so the agent does not have to re-derive them.
+            deliverables_for_task_id: LEAVE EMPTY for normal tasks. Set it ONLY
+                when re-delegating an upload-only follow-up for a FINISHED task
+                whose files stayed in the sandbox: pass that original ticket-id
+                so the uploads land in the original task's deliverable storage
+                and status checks on the original ticket return the file links.
 
         Returns:
             dict with either the finished report (status 'completed') or a
@@ -3176,7 +3240,12 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 pass
 
         _task_id = str(_uuid.uuid4())[:8]
-        _upload_urls = _ma_mint_upload_urls(_task_id)
+        # Deliverable storage prefix: normally this task's own id. An upload-only
+        # follow-up passes the ORIGINAL ticket id (see the Args doc) so its
+        # uploads attach to the original task and status checks on that ticket
+        # pick them up via the live re-collection in _ma_attach_live_deliverables.
+        _deliver_tid = "".join(_c for _c in str(deliverables_for_task_id or "") if _c.isalnum() or _c in "-_")[:64] or _task_id
+        _upload_urls = _ma_mint_upload_urls(_deliver_tid)
         _message = _ma_build_task_message(task_description, input_data, _upload_urls)
 
         # Workspace pass-through (auth-only or full MCP mode): hand the USER's
@@ -3271,7 +3340,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         _ma_drain_progress_queue()
         _ma_push_progress("Delegating to the autonomous agent: " + task_name)
         _evt = _threading.Event()
-        _shared = {"_event": _evt, "token_embedded": _ws_token_embedded, "task_id": _task_id}
+        _shared = {"_event": _evt, "token_embedded": _ws_token_embedded, "task_id": _task_id, "deliver_tid": _deliver_tid}
         if _docs_created:
             _threading.Thread(target=_ma_monitor_task, args=(_task_id, _shared), daemon=True).start()
         _threading.Thread(target=_ma_run_interaction, args=(_payload, _shared), daemon=True).start()
@@ -3286,7 +3355,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             _payload["tools"] = _ma_override_tools(False)
             _ma_push_progress("First attempt failed - retrying without data-tool attachments...")
             _evt = _threading.Event()
-            _shared = {"_event": _evt, "token_embedded": _ws_token_embedded, "task_id": _task_id}
+            _shared = {"_event": _evt, "token_embedded": _ws_token_embedded, "task_id": _task_id, "deliver_tid": _deliver_tid}
             if _docs_created:
                 _threading.Thread(target=_ma_monitor_task, args=(_task_id, _shared), daemon=True).start()
             _threading.Thread(target=_ma_run_interaction, args=(_payload, _shared), daemon=True).start()
@@ -3312,7 +3381,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                                + " - Complete what you can with inline tools and tell the user what happened.",
                 }
             _report = _ma_final_report(_shared)
-            _links = _ma_collect_deliverables(_task_id)
+            _links = _ma_collect_deliverables(_deliver_tid)
             if _links:
                 _report = _report + chr(10) + chr(10) + "DELIVERABLE DOWNLOADS (links valid for 7 days):" + chr(10) + chr(10).join(_links)
             else:
@@ -3396,6 +3465,11 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 _out["report"] = _d.get("result_summary", "")
                 _out["_MANDATORY_ACTION"] = ("Present the report as formatted markdown text, verbatim, "
                                              "including any deliverable download links.")
+                if _d.get("status") == "completed":
+                    try:
+                        _ma_attach_live_deliverables(_out, task_id, "report")
+                    except Exception:
+                        pass  # status reporting must never fail on link refresh
             return _out
         except Exception as _err:
             return {"status": "error", "message": "Status lookup failed: " + str(_err)[:200]}

@@ -2054,7 +2054,9 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         if 'SYSTEM CHECK (auto-generated): no deliverable files' in _ma_full:
                             _ma_note = (_ma_note + ' WARNING: the task uploaded NO deliverable files - any files the '
                                         'summary mentions exist only in the sandbox and were NOT delivered. Tell the '
-                                        'user honestly and offer a follow-up autonomous task to upload them.')
+                                        'user honestly and offer a follow-up autonomous task to upload them (delegate '
+                                        'it with deliverables_for_task_id set to this ticket-id so the links attach '
+                                        'to this task).')
                         _ma_notes.append(_ma_note)
                         _ma_nd.reference.update({'reported_to_user': True})
                     if _ma_notes:
