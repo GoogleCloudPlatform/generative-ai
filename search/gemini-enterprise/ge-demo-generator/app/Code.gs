@@ -3771,13 +3771,17 @@ if not op.get("done") or op.get("error"):
 # Step 2: create the free trial license config. freeTrial is pinned to True
 # and the result is only accepted if the server confirms an ACTIVE free
 # trial - a paid subscription is NEVER purchased automatically.
-today = datetime.date.today()
-end = today + datetime.timedelta(days=30)
+# The server validates startDate as "future" against Pacific time, so
+# passing today's local date fails with 400 whenever local date == PT date.
+# Always send tomorrow: the server still activates the trial immediately
+# (state=ACTIVE) and normalizes the term to one month.
+start = datetime.date.today() + datetime.timedelta(days=1)
+end = start + datetime.timedelta(days=30)
 body = {
     "subscriptionTier": "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT",
     "licenseCount": "50",
     "subscriptionTerm": "SUBSCRIPTION_TERM_CUSTOM",
-    "startDate": {"year": today.year, "month": today.month, "day": today.day},
+    "startDate": {"year": start.year, "month": start.month, "day": start.day},
     "endDate": {"year": end.year, "month": end.month, "day": end.day},
     "freeTrial": True,
 }
