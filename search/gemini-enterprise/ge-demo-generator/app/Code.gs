@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.31-public',
+  APP_VERSION: 'v11.32-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2205,6 +2205,7 @@ function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollect
     '- DRIVE SAVES: when the task asks for a file in the user\'s Google Drive (or as Google Slides / Docs / Sheets), upload it yourself with the gws CLI using an import-conversion to the native Google format (pptx to Google Slides, docx to Google Docs, xlsx to Google Sheets), then include the returned Drive webViewLink in your report. ALSO upload the original office file to the matching deliverable upload URL as a backup.' + nl +
     '- Do Workspace operations EARLY in the task: the token expires after about an hour.' + nl +
     '- HARD GUARDRAILS: never SEND email (drafts only, unless the task explicitly says to send); never delete anything in Workspace; post Chat messages only to spaces the task explicitly names; never write the token into your report, logs, code, or files.' + nl +
+    '- ADMIN LIMITS: the provided token always carries USER-level scopes only - Admin SDK APIs (Directory, Reports / audit logs, license management) and org-wide admin operations fail with 401/403 by design, and no admin credentials will ever be provided. Never retry or loop on these calls: report the limitation clearly and complete the task from data the user-level APIs can see (for example the user\'s own Drive file metadata and sharing settings).' + nl +
     '- CHAT SPACES: when the task names a Chat space, search for it first; if no space with that name exists, CREATE the space with that exact name via the gws CLI and then post there (demo environments often lack the space - creating it is expected, not an error). State in your report that you created it. If creation fails (e.g. missing permission), report the failure instead of posting elsewhere.' + nl +
     '- EMAIL ENCODING: non-ASCII email headers (Subject, display names) MUST be RFC 2047 MIME-encoded (for example =?UTF-8?B?...?=). After creating a draft, read it back and verify the subject decodes correctly; delete and recreate it if it is garbled.' + nl +
     '- REPORTING DRAFTS: when you create a Gmail draft, your report must state it ALREADY EXISTS in the user Gmail Drafts folder, with the draft subject and this link: https://mail.google.com/mail/u/0/#drafts - never paste the full email body into the report for manual copying.' + nl +

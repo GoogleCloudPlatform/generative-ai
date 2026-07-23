@@ -1087,6 +1087,25 @@ def _inject_completed_tasks(callback_context):
     if not _fs or not _demo_id:
         callback_context.state["_bg_task_results"] = ""
         return None
+    # Orphan recovery sweep (v11.32), BEFORE the completed-tasks query so a
+    # task recovered here is announced in this same turn. Autonomous tasks
+    # are monitored by in-process daemon threads; a Cloud Run instance
+    # recycle kills them and freezes the doc at status 'working' (observed
+    # live 2026-07-22: SIGTERM 16 min into a task, doc stuck at 90% while
+    # the sandbox finished server-side 30 min later). The sweep only touches
+    # docs whose monitor heartbeat is stale - see _ma_recover_orphaned_task.
+    try:
+        _wdocs = _fs.collection(_demo_id + "_task_executions").where(
+            "status", "==", "working").limit(5).stream()
+        for _wdoc in _wdocs:
+            _wd = _wdoc.to_dict()
+            if _wd.get("interaction_id"):
+                try:
+                    tools._ma_recover_orphaned_task(_wdoc.reference, _wd, False)
+                except Exception:
+                    pass
+    except Exception:
+        pass
     try:
         _docs = _fs.collection(_demo_id + "_task_executions").where(
             "reported_to_user", "==", False
@@ -1123,11 +1142,30 @@ def _inject_completed_tasks(callback_context):
                     _rd = _rdoc.to_dict()
                     _tail_lines = [_l for _l in (_rd.get("log_tail", "") or "").split(chr(10)) if _l.strip()]
                     _last_line = _tail_lines[-1][-140:] if _tail_lines else ""
-                    _rlines.append("Task '" + _rd.get("task_id", "") + "' still running: "
+                    # Honest progress (v11.32): lead with elapsed time + monitor
+                    # liveness; the percentage is an activity estimate capped at
+                    # 90 and must not be read as a completion fraction.
+                    _age_bits = []
+                    try:
+                        import datetime as _dt
+                        _now = _dt.datetime.now(_dt.timezone.utc)
+                        _rstarted = tools._ma_parse_iso_utc(_rd.get("started_at"))
+                        if _rstarted is not None:
+                            _age_bits.append(str(int((_now - _rstarted).total_seconds() / 60)) + " min elapsed")
+                        _rbeat = tools._ma_parse_iso_utc(_rd.get("updated_at"))
+                        if _rbeat is not None:
+                            _age_bits.append("last activity " + str(int((_now - _rbeat).total_seconds() / 60)) + " min ago")
+                    except Exception:
+                        pass
+                    _age_txt = (" (" + ", ".join(_age_bits) + ")") if _age_bits else ""
+                    _rlines.append("Task '" + _rd.get("task_id", "") + "' still running" + _age_txt + ": "
                                    + str(_rd.get("progress_pct", 0)) + "% - " + _last_line)
                 if _rlines:
                     _prev = callback_context.state.get("_bg_task_results", "") or ""
-                    _rmsg = "--- TASKS STILL RUNNING (progress info, NOT completed) ---" + chr(10) + chr(10).join(_rlines) + chr(10) + "--- END RUNNING ---"
+                    _rmsg = ("--- TASKS STILL RUNNING (progress info, NOT completed; the percentage is an "
+                             "activity estimate CAPPED at 90, not a completion fraction - when mentioning "
+                             "progress, lead with elapsed time / latest activity and never say 'almost done' "
+                             "from the number) ---" + chr(10) + chr(10).join(_rlines) + chr(10) + "--- END RUNNING ---")
                     callback_context.state["_bg_task_results"] = (_prev + chr(10) + _rmsg).strip()
             except Exception:
                 pass
