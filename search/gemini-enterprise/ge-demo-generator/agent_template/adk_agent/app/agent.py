@@ -1067,6 +1067,9 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     # window, so the F1 hang pattern does not apply.
     _all_tools.append(tools.delegate_autonomous_task)
     _all_tools.append(tools.get_autonomous_task_status)
+    # Recurring autonomous schedules (v11.33): Cloud Scheduler fires
+    # /execute_task, which delegates to the sandbox headlessly.
+    _all_tools.append(tools.register_scheduled_autonomous_task)
 if (os.environ.get("ENABLE_MANAGED_AGENT") == "1" and (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1")):
     # Drive handoff needs BOTH the user's Workspace OAuth (drive.file) and the
     # Managed Agent deliverables in GCS.
@@ -1633,12 +1636,15 @@ When delegating:
   not enabled in this demo.""") + """
 - SPLIT COMPOSITE REQUESTS: the autonomous agent CANNOT create scheduled /
   recurring jobs, dashboards hosted by this platform, or database alert
-  rules - those live in YOUR toolset. When a request combines autonomous
-  work (research / file deliverables / Workspace actions) with a recurring
-  monitoring job or schedule, delegate ONLY the autonomous part and, in
-  the SAME turn, set up the recurring part yourself with
-  register_scheduled_task (and tell the user you did both). Never put
-  "set up a daily job" wording into task_description.
+  rules - those live in YOUR toolset. When the user wants autonomous work
+  (research / file deliverables / Workspace actions) to run on a RECURRING
+  schedule, register it with register_scheduled_autonomous_task - each fire
+  then delegates to the sandbox automatically, even while the user is
+  offline, and results are announced on their next message. When a request
+  combines a ONE-SHOT autonomous task with a recurring demo-database
+  monitoring job, delegate the autonomous part and set up the database job
+  with register_scheduled_task in the SAME turn (and tell the user you did
+  both). Never put "set up a daily job" wording into task_description.
 - Call delegate_autonomous_task EXACTLY ONCE per user request.
 - Status 'completed': present the report verbatim as markdown (it is already
   in the user's language) including any deliverable download links.
@@ -2091,7 +2097,14 @@ SCHEDULED TASKS:
 - register_scheduled_task: Register a recurring task with cron schedule.
 - update_scheduled_task: Change the cron schedule of an existing task.
 - delete_scheduled_task: Remove a scheduled task and its Cloud Scheduler job.
-- run_scheduled_task_now: Trigger ONE immediate background execution of an
+""" + ("""- register_scheduled_autonomous_task: Register a RECURRING schedule for
+  AUTONOMOUS sandbox work (web research, file deliverables, Workspace
+  actions). Fires even while the user is offline; each fire creates an
+  autonomous ticket whose progress and completion are announced
+  automatically on the user's next message. Use for "every day / week, do
+  X" requests that need the autonomous agent - NOT register_scheduled_task
+  (that one runs the demo-database background worker).
+""" if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else "") + """- run_scheduled_task_now: Trigger ONE immediate background execution of an
   already-registered scheduled task (manual test run). Returns a ticket
   instantly; the result is reported automatically when done (or via
   get_task_result).
@@ -2456,6 +2469,11 @@ SCHEDULED TASKS:
   The task runs via Cloud Scheduler at the specified intervals.
 - update_scheduled_task: Change the cron schedule of an existing scheduled task.
 - delete_scheduled_task: Remove a scheduled task and its Cloud Scheduler job.
+""" + ("""- register_scheduled_autonomous_task: Register a RECURRING schedule for
+  AUTONOMOUS sandbox work (web research, file deliverables, Workspace
+  actions). Fires even while the user is offline; results are announced
+  automatically on the user's next message.
+""" if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else "") + """
 - run_scheduled_task_now: Trigger ONE immediate background execution of an
   already-registered scheduled task (manual test run). Returns a ticket
   instantly; the result is reported automatically when done (or via
@@ -2738,6 +2756,8 @@ WRONG: beginRendering object without tags (missing tags and brackets = SYSTEM CR
 _bg_tools = [t for t in _all_tools if t is not tools.background_task_tool]
 _bg_tools = [t for t in _bg_tools if t is not tools.register_scheduled_task]
 _bg_tools = [t for t in _bg_tools if t is not tools.run_scheduled_task_now]
+if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+    _bg_tools = [t for t in _bg_tools if t is not tools.register_scheduled_autonomous_task]
 
 _bg_computer_use_section = r"""
 --- COMPUTER USE (BROWSER AGENT) ---

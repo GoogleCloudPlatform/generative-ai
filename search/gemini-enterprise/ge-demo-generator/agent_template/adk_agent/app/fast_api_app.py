@@ -4781,6 +4781,40 @@ async def execute_task(request: Request):
                 _wlogger.warning("execute_task: task %s already %s, skipping re-execution", _task_id, _current.get("status"))
                 return {"status": _current.get("status"), "task_id": _task_id}
 
+            # Scheduled AUTONOMOUS fire (v11.33): delegate to the sandbox
+            # agent instead of running the background worker. Each fire
+            # creates its own per-run autonomous ticket; the SCHEDULE's
+            # execution doc only records fire metadata and stays status
+            # 'scheduled', so cancelling it stops future fires via the
+            # cancelled guard above.
+            if os.environ.get("ENABLE_MANAGED_AGENT") == "1" and _def_data.get("task_type") == "scheduled_autonomous":
+                _fire_res = {}
+                try:
+                    _fire_res = _agent_tools._ma_fire_scheduled_autonomous(_def_data, _msg_id)
+                except Exception as _fire_err:
+                    _fire_res = {"status": "error", "message": str(_fire_err)[:200]}
+                _wlogger.warning("execute_task: scheduled_autonomous %s fire -> %s (ticket=%s)",
+                                 _task_id, str(_fire_res.get("status", "")), str(_fire_res.get("ticket-id", "")))
+                try:
+                    _fire_now = _dt.datetime.now(_dt.timezone.utc)
+                    _fire_line = ("[" + _fire_now.strftime("%H:%M:%S") + "] SCHEDULER: fire -> "
+                                  + str(_fire_res.get("status", "")) + " ticket "
+                                  + str(_fire_res.get("ticket-id", "") or "-") + chr(10))
+                    _sched_update = {
+                        "status": "scheduled",
+                        "last_fired_at": _fire_now.isoformat(),
+                        "log_tail": (((_current or {}).get("log_tail", "") or "") + _fire_line)[-1500:],
+                    }
+                    if _msg_id:
+                        _sched_update["last_sched_msg_id"] = _msg_id
+                    _exec_ref.set(_sched_update, merge=True)
+                except Exception:
+                    pass
+                return {"status": str(_fire_res.get("status", "error")), "task_id": _task_id,
+                        "ticket": str(_fire_res.get("ticket-id", ""))}
+
+
+
             # Update status to working — use set(merge=True) so it works for
             # both pre-existing docs (immediate tasks) and new docs (scheduled tasks)
             _now = _dt.datetime.now(_dt.timezone.utc).isoformat()
