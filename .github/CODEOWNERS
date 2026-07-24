@@ -43,6 +43,7 @@
 /generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @saeedaghabozorgi
 /generative-ai/gemini/use-cases/multimodal-sentiment-analysis/intro_to_multimodal_sentiment_analysis.ipynb                       @GoogleCloudPlatform/generative-ai-devrel @Mansari
 /generative-ai/gemini/use-cases/productivity/productivity_coaching_with_google_calendar_and_gmail.ipynb                          @GoogleCloudPlatform/generative-ai-devrel @Mansari
+/generative-ai/gemini/use-cases/prompt-watchdog/                                                                                     @GoogleCloudPlatform/generative-ai-devrel @g-emarco
 /generative-ai/gemini/use-cases/retail                                                                                           @GoogleCloudPlatform/generative-ai-devrel @iamthuya
 /generative-ai/gemini/use-cases/retail/product_attributes_extraction.ipynb                                                       @GoogleCloudPlatform/generative-ai-devrel @tianli
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_pipeline_terabyte_scale_with_bigframes.ipynb                  @GoogleCloudPlatform/generative-ai-devrel @eliasecchig @lspatarog

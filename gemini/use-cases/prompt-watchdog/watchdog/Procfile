@@ -1,0 +1,1 @@
+web: functions-framework --target=subscribe --signature-type=cloudevent
