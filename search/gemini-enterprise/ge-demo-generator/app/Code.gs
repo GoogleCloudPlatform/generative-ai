@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.31-public',
+  APP_VERSION: 'v11.37-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -847,7 +847,7 @@ function planAndGenerateData(userGoal, options) {
     - You MUST leverage this capability when generating the 'businessInstruction' and 'demoGuide' (prompts).
     - In 'businessInstruction', mention that the agent can hand off deep autonomous work (research, building deliverables, iterative code work) to a managed autonomous agent and deliver finished files back to the user.
     - You MUST design at least TWO prompts (out of the 7 required) in the 'demoGuide' that showcase the autonomous agent, following BOTH patterns below:
-      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").${ options.enableComputerUse ? ` Because the browser agent is ALSO enabled, Pattern A MAY additionally name ONE specific external page or portal to check interactively (e.g. a competitor's public pricing page) - the assistant will then operate its real browser live in the chat BEFORE handing off to the autonomous agent, which makes a strong combined showcase. Keep it to a single, quickly checkable page; the deep multi-source research still belongs to the autonomous agent.` : ''}
+      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").${ options.enableComputerUse ? ` Because the browser agent is ALSO enabled, Pattern A MUST name ONE specific external page or portal to check interactively (e.g. a competitor's public pricing page or an official statistics portal) AND phrase that part as an explicit browse request (e.g. "browse <site> live for the latest ..."), so the assistant operates its real browser live in the chat BEFORE handing off to the autonomous agent - a strong combined showcase. Keep it to a single, quickly checkable page; the deep multi-source research still belongs to the autonomous agent.` : ''}
       - **Pattern B (COMPLEX LONG-HORIZON DELIVERABLE)**: one prompt MUST ask for finished, downloadable business output whose production requires SEQUENTIALLY DEPENDENT phases (real quantitative analysis of the internal data -> charts built from that analysis -> professional assembly), so the request genuinely deserves tens of minutes of autonomous work. Make it one of these two shapes, whichever fits the scenario better: (1) TWO complementary formats built from the same analysis - e.g. a board presentation deck PLUS a 2-page summary PDF for the field team, or a formal proposal document PLUS a one-page web briefing; or (2) a WORKING INTERACTIVE TOOL - a self-contained web app the user opens in a browser (e.g. a pricing / capacity / what-if simulator) whose coefficients come from the actual data analysis, plus a short document explaining the model. The prompt should sound like a real executive request and SHOULD state 1-2 explicit quality conditions in natural business language (e.g. "lead with the conclusion on the first page", "every number must be sourced from our data or a cited reference") - these conditions make the agent's self-review-and-rebuild loop visible in the demo. Patterns A and B MUST use DIFFERENT deliverable formats so the demo shows variety.${ crossOrgEnabled_() ? '\n      - **CROSS-DEPARTMENTAL DELIVERABLE (MANDATORY)**: the delegated mission MUST synthesize data owned by at least two departments and address its deliverable to the department (or executive) that owns the decision - framed as the journey summary of the demo narrative: what happened in each department, where the process stalled, and what was resolved. Because the Pattern A prompt occupies the final core slot, ITS deliverable also carries the NARRATIVE ARC finale duty: it MUST close with the quantified process outcomes of the demo narrative (before/after cycle time or lead time, items resolved, hand-offs completed).' : '' }${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? `
       - **MANDATORY WORKSPACE COMBINATION**: Google Workspace access is ALSO enabled for this demo, and the autonomous agent can act on the user's Workspace (save files to Drive as native Google Slides/Docs/Sheets, draft Gmail messages, post to named Google Chat spaces, create Calendar events). At least ONE of the two autonomous prompts MUST chain a Workspace action onto the deliverable so the demo showcases BOTH capabilities together, e.g.: "Research the latest industry trends, build the executive deck, save it to my Drive as Google Slides, and draft an email to the leadership team summarizing it" or "...and post the summary with the document link to the <team> Chat space, then set up a 30-minute review meeting on my calendar". Keep the Workspace actions realistic for the persona, and prefer DRAFT email wording (the agent creates drafts, it does not send unless explicitly told).` : ''}
     - 🎯 SLOT ASSIGNMENT (overrides the base 7-prompt distribution): put Pattern B in the Prompt 5 slot, REPLACING the large-scope background workflow prompt (the autonomous delegation itself runs in the background and demonstrates background execution plus completion announcements, so that story is preserved). Weave Pattern A into the Prompt 7 slot (End-to-End Strategic Automation): its web research + internal data synthesis IS the end-to-end showcase${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? ', and the MANDATORY WORKSPACE COMBINATION chain belongs there' : ''}. Do NOT merge Patterns A and B into a single prompt - the demo needs TWO distinct autonomous moments. Because slots 5 and 7 are now autonomous, fold the MANDATORY INTERACTIVE DASHBOARD prompt into slot 1 or 2 (make one of the foundation prompts ask for the browser-openable interactive overview dashboard, keeping its explicit open-in-browser signal) - the dashboard prompt must NOT displace slot 5 or 7 and must NOT be dropped.
@@ -2205,6 +2205,7 @@ function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollect
     '- DRIVE SAVES: when the task asks for a file in the user\'s Google Drive (or as Google Slides / Docs / Sheets), upload it yourself with the gws CLI using an import-conversion to the native Google format (pptx to Google Slides, docx to Google Docs, xlsx to Google Sheets), then include the returned Drive webViewLink in your report. ALSO upload the original office file to the matching deliverable upload URL as a backup.' + nl +
     '- Do Workspace operations EARLY in the task: the token expires after about an hour.' + nl +
     '- HARD GUARDRAILS: never SEND email (drafts only, unless the task explicitly says to send); never delete anything in Workspace; post Chat messages only to spaces the task explicitly names; never write the token into your report, logs, code, or files.' + nl +
+    '- ADMIN LIMITS: the provided token always carries USER-level scopes only - Admin SDK APIs (Directory, Reports / audit logs, license management) and org-wide admin operations fail with 401/403 by design, and no admin credentials will ever be provided. Never retry or loop on these calls: report the limitation clearly and complete the task from data the user-level APIs can see (for example the user\'s own Drive file metadata and sharing settings).' + nl +
     '- CHAT SPACES: when the task names a Chat space, search for it first; if no space with that name exists, CREATE the space with that exact name via the gws CLI and then post there (demo environments often lack the space - creating it is expected, not an error). State in your report that you created it. If creation fails (e.g. missing permission), report the failure instead of posting elsewhere.' + nl +
     '- EMAIL ENCODING: non-ASCII email headers (Subject, display names) MUST be RFC 2047 MIME-encoded (for example =?UTF-8?B?...?=). After creating a draft, read it back and verify the subject decodes correctly; delete and recreate it if it is garbled.' + nl +
     '- REPORTING DRAFTS: when you create a Gmail draft, your report must state it ALREADY EXISTS in the user Gmail Drafts folder, with the draft subject and this link: https://mail.google.com/mail/u/0/#drafts - never paste the full email body into the report for manual copying.' + nl +
@@ -2372,6 +2373,18 @@ function generateSetupScript(params) {
     // generate_content computer_use tool config.
     playwright: 'playwright==1.55.0',
     genaiComputerUse: 'google-genai>=2.7.0',
+    // (v11.36) google-genai>=2.7.0 is only satisfiable with recent
+    // google-cloud-aiplatform releases (older ones cap google-genai<2.0.0),
+    // and those releases depend on Google Cloud OTel packages whose satisfying
+    // versions are pre-releases (1.12.0a0). uv ignores pre-release markers
+    // on TRANSITIVE deps, so without these direct floors the resolver
+    // rejects every aiplatform that allows genai 2.x and the build fails
+    // ("pre-releases weren't enabled"). Declaring them as direct deps with
+    // explicit pre-release floors scopes pre-release resolution to exactly
+    // these two packages (unlike --prerelease=allow, which would also pull
+    // mcp/pydantic pre-releases).
+    cuOtelGcpLogging: 'opentelemetry-exporter-gcp-logging>=1.12.0a0',
+    cuOtelGcpResourceDetector: 'opentelemetry-resourcedetector-gcp>=1.12.0a0',
   };
 
   
@@ -2408,7 +2421,11 @@ function generateSetupScript(params) {
   bqCommands += `SCHEMA=\$3\n`;
   bqCommands += `DATASET=\$4\n`;
   bqCommands += `echo "📥 Loading \$TABLE..."\n`;
-  bqCommands += `if bq load --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines --null_marker="" --quote='"' --encoding=UTF-8 --max_bad_records=5 --location=US "\$DATASET.\$TABLE" "\$CSV" "\$SCHEMA"; then\n`;
+  // --replace (v11.35): a re-run of the same setup script must not APPEND the
+  // same rows again (observed live: every full re-run doubled every table).
+  // The CSVs are embedded in this script, so replacing the table is always
+  // the correct idempotent behavior.
+  bqCommands += `if bq load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines --null_marker="" --quote='"' --encoding=UTF-8 --max_bad_records=5 --location=US "\$DATASET.\$TABLE" "\$CSV" "\$SCHEMA"; then\n`;
   bqCommands += `  echo "    ✅ Loaded table: \$TABLE"\n`;
   bqCommands += `else\n`;
   bqCommands += `  echo "    ⚠️  ERROR: Failed to load table: \$TABLE"\n`;
@@ -2556,9 +2573,16 @@ Requirements:
     firestoreCommands += `cp "$GE_TPL/viewer_app/requirements.txt" ${dirName}/viewer_app/requirements.txt\n`;
 
     firestoreCommands += `echo "🌐 Checking/Deploying Real-time Data Viewer Web App..."\n`;
+    // v11.35: ALWAYS deploy. The old exists->skip fast path meant viewer code
+    // updates never reached a re-deployed demo (Cloud Run agent updated, viewer
+    // stale). gcloud functions deploy is an idempotent update-in-place for an
+    // existing function, so re-running is safe - it just costs the build time.
     firestoreCommands += `if gcloud functions describe ${dirName}-viewer --gen2 --region=us-central1 --project="$PROJECT_ID" >/dev/null 2>&1; then\n`;
-    firestoreCommands += `  echo "    ✅ Cloud Run Function already exists."\n`;
+    firestoreCommands += `  echo "    ♻️  Function exists - redeploying to apply the latest viewer code (update-in-place)..."\n`;
     firestoreCommands += `else\n`;
+    firestoreCommands += `  echo "    🚀 Deploying new Data Viewer function..."\n`;
+    firestoreCommands += `fi\n`;
+    firestoreCommands += `if true; then\n`;
     firestoreCommands += `  VIEWER_LOG=\$(mktemp /tmp/viewer-deploy-XXXXXX.log)\n`;
     // v11.12: --no-allow-unauthenticated + IAP (see the IAP block below). Never
     // grants allUsers, so the deploy works under Domain Restricted Sharing org
@@ -2571,12 +2595,14 @@ Requirements:
     firestoreCommands += `    sleep 5\n`;
     firestoreCommands += `  done\n`;
     firestoreCommands += `  echo ""\n`;
-    firestoreCommands += `  wait \$VIEWER_PID || true\n`;
-    // NOTE: don't trust the exit code here — the deploy runs in the background and
-    // `wait ... || true` always yields 0. Verify the function actually exists instead
-    // (same source of truth as the final summary), so we never print a false success.
-    firestoreCommands += `  if gcloud functions describe ${dirName}-viewer --gen2 --region=us-central1 --project="$PROJECT_ID" >/dev/null 2>&1; then\n`;
-    firestoreCommands += `    echo "    ✅ Cloud Run Function deployed."\n`;
+    firestoreCommands += `  VIEWER_RC=0\n`;
+    firestoreCommands += `  wait \$VIEWER_PID || VIEWER_RC=\$?\n`;
+    // v11.35: wait's status IS the deploy's exit code - required now that
+    // re-runs redeploy an EXISTING function (describe alone would report a
+    // false success when the update failed but the old function remains).
+    // The describe check stays as the fresh-deploy source of truth.
+    firestoreCommands += `  if [ "\$VIEWER_RC" = "0" ] && gcloud functions describe ${dirName}-viewer --gen2 --region=us-central1 --project="$PROJECT_ID" >/dev/null 2>&1; then\n`;
+    firestoreCommands += `    echo "    ✅ Data Viewer deployed (latest viewer code active)."\n`;
     firestoreCommands += `  else\n`;
     firestoreCommands += `    echo "    ⚠️ WARNING: Failed to deploy Firestore Data Viewer. Build log:"\n`;
     firestoreCommands += `    cat "\$VIEWER_LOG"\n`;
@@ -3078,15 +3104,42 @@ else
   echo "   If Chat posts fail with a permission/configuration error, open 'Configuration' there and set it up (App name: '${enableWorkspaceMcp ? 'Chat MCP' : 'GE Demo Agent'}')."
 fi
 
-# Create authorization resource in Gemini Enterprise
+# Create or UPDATE (v11.35) the authorization resource in Gemini Enterprise.
+# A re-run previously hit a silent 409 and kept the OLD resource, so OAuth
+# scope additions never reached overwrite-deployed demos (stale scopes
+# surface later as confusing 403s in Workspace tools). PATCH keeps the
+# scopes in sync with THIS script version; the resource NAME is unchanged,
+# so the agent binding survives (verified live 2026-07-23).
 AUTH_ID="${dirName}-auth"
-echo "🔐 Creating authorization resource in Gemini Enterprise..."
-curl -X POST \
+AUTH_PAYLOAD='{ "name": "projects/'"\$PROJECT_ID"'/locations/global/authorizations/'"\$AUTH_ID"'", "serverSideOauth2": { "clientId": "'"\$OAUTH_CLIENT_ID"'", "clientSecret": "'"\$OAUTH_CLIENT_SECRET"'", "authorizationUri": "https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.compose%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.modify%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.calendarlist.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.freebusy%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.spaces.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.memberships.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.messages.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.messages.create%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.users.readstate.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdirectory.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcontacts.readonly&client_id='"\$OAUTH_CLIENT_ID"'&redirect_uri=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Foauth-redirect", "tokenUri": "https://oauth2.googleapis.com/token" } }'
+echo "🔐 Creating/updating authorization resource in Gemini Enterprise..."
+AUTH_RESP=\$(mktemp /tmp/auth-resp-XXXXXX.json)
+AUTH_HTTP=\$(curl -s -o "\$AUTH_RESP" -w "%{http_code}" -X POST \
   -H "Authorization: Bearer \$TOKEN" \
   -H "Content-Type: application/json" \
   -H "X-Goog-User-Project: \$PROJECT_ID" \
   "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations?authorizationId=\$AUTH_ID" \
-  -d '{ "name": "projects/'"\$PROJECT_ID"'/locations/global/authorizations/'"\$AUTH_ID"'", "serverSideOauth2": { "clientId": "'"\$OAUTH_CLIENT_ID"'", "clientSecret": "'"\$OAUTH_CLIENT_SECRET"'", "authorizationUri": "https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.compose%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.modify%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.calendarlist.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.freebusy%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.spaces.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.memberships.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.messages.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.messages.create%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.users.readstate.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdirectory.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcontacts.readonly&client_id='"\$OAUTH_CLIENT_ID"'&redirect_uri=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Foauth-redirect", "tokenUri": "https://oauth2.googleapis.com/token" } }'
+  -d "\$AUTH_PAYLOAD")
+if [ "\$AUTH_HTTP" = "200" ]; then
+  echo "    ✅ Authorization resource created."
+elif [ "\$AUTH_HTTP" = "409" ]; then
+  AUTH_HTTP=\$(curl -s -o "\$AUTH_RESP" -w "%{http_code}" -X PATCH \
+    -H "Authorization: Bearer \$TOKEN" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: \$PROJECT_ID" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations/\$AUTH_ID" \
+    -d "\$AUTH_PAYLOAD")
+  if [ "\$AUTH_HTTP" = "200" ]; then
+    echo "    ♻️  Authorization already existed - updated in place (OAuth scopes refreshed)."
+  else
+    echo "    ⚠️  Authorization update failed (HTTP \$AUTH_HTTP) - keeping the existing resource:"
+    cat "\$AUTH_RESP"
+  fi
+else
+  echo "    ⚠️  Authorization creation failed (HTTP \$AUTH_HTTP):"
+  cat "\$AUTH_RESP"
+fi
+rm -f "\$AUTH_RESP"
 
 `;
   }
@@ -4227,7 +4280,7 @@ ${PINNED_DEPS.pubsub}
 ${PINNED_DEPS.firestore}
 ${PINNED_DEPS.logging}
 ${PINNED_DEPS.otel}
-${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}` : '' }
+${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}\n${PINNED_DEPS.cuOtelGcpLogging}\n${PINNED_DEPS.cuOtelGcpResourceDetector}` : '' }
 __REQ_EOF__
 
 # Generate pyproject.toml required for adk project type
@@ -5014,26 +5067,71 @@ if auth_id:
         data["authorizationConfig"] = { "agentAuthorization": auth_id }
     else:
         data["authorizationConfig"] = { "agentAuthorization": f"projects/{project_id}/locations/{location}/authorizations/{auth_id}" }
+auth_path = data.get("authorizationConfig", {}).get("agentAuthorization", "")
 
-req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers)
-try:
-    with urllib.request.urlopen(req) as response:
-        resp_data = json.loads(response.read().decode("utf-8"))
-        print("Successfully registered agent:")
-        print(json.dumps(resp_data, indent=2))
-        agent_name = resp_data.get("name", "")
-        agent_id = agent_name.split("/")[-1]
-        print(f"AGENT_ID:{agent_id}")
+def call(method, call_url, payload=None):
+    body = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(call_url, data=body, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as response:
+            return response.getcode(), json.loads(response.read().decode("utf-8") or "{}")
+    except urllib.error.HTTPError as e:
+        return e.code, {"error": e.read().decode("utf-8", "replace")[:500]}
+    except Exception as e:
+        return 0, {"error": str(e)[:500]}
 
+# Idempotent overwrite (v11.34): re-running the setup script for the SAME
+# demo must UPDATE the existing registration (display name, description,
+# agent card, auth binding) instead of failing with FAILED_PRECONDITION
+# "authorization ... is used by another agent". Match by the agent card's
+# internal name (the unique demo dirName - same matching the cleanup script
+# uses); fall back to whichever agent holds this demo's authorization.
+existing = ""
+list_code, listing = call("GET", url + "?pageSize=100")
+if list_code == 200:
+    for a in listing.get("agents", []):
+        try:
+            card = json.loads((a.get("a2aAgentDefinition") or {}).get("jsonAgentCard") or "{}")
+        except Exception:
+            card = {}
+        if card.get("name") == agent_name:
+            existing = a.get("name", "")
+            break
+    if not existing and auth_path:
+        for a in listing.get("agents", []):
+            if (a.get("authorizationConfig") or {}).get("agentAuthorization", "") == auth_path:
+                existing = a.get("name", "")
+                break
 
+def print_agent_id(resource_name):
+    print("AGENT_ID:" + resource_name.split("/")[-1])
 
-except urllib.error.HTTPError as e:
-    print(f"Error registering agent: {e}", file=sys.stderr)
-    print(e.read().decode("utf-8"), file=sys.stderr)
-    sys.exit(1)
-except Exception as e:
-    print(f"Unexpected error: {e}", file=sys.stderr)
-    sys.exit(1)
+if existing:
+    patch_body = dict(data)
+    patch_body["name"] = existing
+    patch_code, resp = call("PATCH", f"https://{endpoint}/v1alpha/{existing}", patch_body)
+    if patch_code == 200:
+        print("Updated the existing agent registration (overwrite deploy):")
+        print(json.dumps(resp, indent=2))
+        print_agent_id(resp.get("name", "") or existing)
+        sys.exit(0)
+    # PATCH semantics on this v1alpha surface are not guaranteed - fall back
+    # to delete+create. NOTE: this changes the agent resource id (pinned
+    # agents / conversation-thread association in the GE UI may reset).
+    print(f"PATCH failed ({patch_code}): {resp.get('error', '')} - falling back to delete+create", file=sys.stderr)
+    del_code, del_resp = call("DELETE", f"https://{endpoint}/v1alpha/{existing}")
+    if del_code not in (200, 204):
+        print(f"DELETE of the existing agent also failed ({del_code}): {del_resp.get('error', '')}", file=sys.stderr)
+        sys.exit(1)
+
+create_code, resp = call("POST", url, data)
+if create_code == 200:
+    print("Successfully registered agent:")
+    print(json.dumps(resp, indent=2))
+    print_agent_id(resp.get("name", ""))
+    sys.exit(0)
+print(f"Error registering agent ({create_code}): {resp.get('error', '')}", file=sys.stderr)
+sys.exit(1)
 EOF
 
   if [ "$APP_COUNT" = "1" ]; then
@@ -5041,11 +5139,16 @@ EOF
     SELECTED_LOC="\${APP_LOCS[0]}"
     echo "✅ Found exactly one Gemini Enterprise app ($SELECTED_APP_ID). Automating registration..."
 
-    REG_OUTPUT=$(python3 register_agent.py "$SELECTED_LOC" "$PROJECT_NUMBER" "$SELECTED_LOC" "$SELECTED_APP_ID" "$TOKEN" "${dirName}" "$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "$AUTH_ID")
+    REG_OUTPUT=$(python3 register_agent.py "$SELECTED_LOC" "$PROJECT_NUMBER" "$SELECTED_LOC" "$SELECTED_APP_ID" "$TOKEN" "${dirName}" "$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "$AUTH_ID" 2>&1) || true
     echo "$REG_OUTPUT"
     AGENT_ID=$(echo "$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
     rm register_agent.py
-    
+    if [ -z "\$AGENT_ID" ]; then
+      echo "⚠️  Gemini Enterprise registration failed, but the Cloud Run deployment itself is COMPLETE."
+      echo "    An existing registration of this demo (if any) keeps working against the new deployment."
+      echo "    To (re)register manually: Gemini Enterprise > Agents > Add, URL: $SERVICE_URL/a2a/app"
+    fi
+
   else
     if [ "$APP_COUNT" = "0" ]; then
       echo "⚠️ No Gemini Enterprise apps found in 'global', 'us', or 'eu'. You might need to create one first."
@@ -5070,10 +5173,15 @@ EOF
       
       echo "✅ Selected app: \${APP_DISPLAY_NAMES[\$CHOICE]}. Automating registration..."
       
-      REG_OUTPUT=$(python3 register_agent.py "\$SELECTED_LOC" "\$PROJECT_NUMBER" "\$SELECTED_LOC" "\$SELECTED_APP_ID" "\$TOKEN" "${dirName}" "\$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "\$AUTH_ID")
+      REG_OUTPUT=$(python3 register_agent.py "\$SELECTED_LOC" "\$PROJECT_NUMBER" "\$SELECTED_LOC" "\$SELECTED_APP_ID" "\$TOKEN" "${dirName}" "\$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "\$AUTH_ID" 2>&1) || true
       echo "\$REG_OUTPUT"
       AGENT_ID=$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
       rm register_agent.py
+      if [ -z "\$AGENT_ID" ]; then
+        echo "⚠️  Gemini Enterprise registration failed, but the Cloud Run deployment itself is COMPLETE."
+        echo "    An existing registration of this demo (if any) keeps working against the new deployment."
+        echo "    To (re)register manually: Gemini Enterprise > Agents > Add, URL: \$SERVICE_URL/a2a/app"
+      fi
     fi
   fi
 

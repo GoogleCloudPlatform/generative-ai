@@ -1458,6 +1458,7 @@ rarians
 ratelimit
 rawbytes
 rbc
+rbeat
 rbf
 rbm
 rdoc
@@ -1518,6 +1519,7 @@ rsi
 RSI
 rslora
 rsp
+rstarted
 RTN
 rubra
 rubrum
@@ -1917,6 +1919,8 @@ wcontext
 wcslen
 wdir
 WDIR
+wdoc
+wdocs
 weaviate
 webcam
 webclient

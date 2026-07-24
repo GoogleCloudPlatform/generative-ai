@@ -782,8 +782,13 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
     "web pages programmatically and has NO interactive browser. Tasks whose PRIMARY goal is "
     "operating a site - clicking, typing, filling forms, working a portal, or a browse the "
     "user wants to watch live - are YOURS via computer_use_browse; never delegate them. "
-    "Delegate instead only when web reading merely feeds a bigger job that also needs a "
-    "downloadable file deliverable, a Workspace action, or software work. For such a "
+    "LIVE-BROWSE TRIGGER: whenever the request mentions web browsing (in ANY language) or "
+    "names a specific external site, page, portal, or URL to consult, you MUST run the live "
+    "browser on it FIRST - even if the same pages could in principle be read "
+    "programmatically. The visible browser run IS part of what the user asked to see; "
+    "skipping it and delegating everything is a routing error. "
+    "Delegate when web reading feeds a bigger job that also needs a "
+    "downloadable file deliverable, a Workspace action, or software work - but for such a "
     "COMPOSITE job the order is: short focused browse FIRST (live-view link shown), then "
     "delegate_autonomous_task in the SAME turn with the browse result_summary inside "
     "input_data labeled 'BROWSER FINDINGS (gathered live from <url>):'.\n"
@@ -814,8 +819,13 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
         "computer_use_browse - the browser screenshots still stream into THIS chat automatically.\n"
         "  You MUST show the link BEFORE calling computer_use_browse, because that call blocks until "
         "the browser finishes - showing it after is too late to watch live. The result_summary is "
-        "your answer. Inline is capped (~12 steps); if it returns status 'partial', offer to re-run "
-        "as a background task.\n"
+        "your answer. Inline is capped (about 30 steps / 4 minutes of browsing). If it returns "
+        "status 'partial' and browsing WAS the user's primary ask, do NOT stop there: in the SAME "
+        "turn call register_background_task with a task_prompt that CONTINUES the browse via "
+        "computer_use_browse from where it left off (background runs get a much larger step "
+        "budget), present what was already found, and tell the user the deeper browse continues "
+        "in the background. If the browse was a pre-browse feeding a delegation, pass the partial "
+        "findings on per the PRE-BROWSE rule instead.\n"
         "- LONG or multi-page jobs (deep audits, many pages, monitoring): use register_background_task "
         "with a task_prompt that instructs the background agent to use computer_use_browse. Its result "
         "includes a live_view_url; surface it the same Markdown-link way.\n"
@@ -1067,6 +1077,9 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     # window, so the F1 hang pattern does not apply.
     _all_tools.append(tools.delegate_autonomous_task)
     _all_tools.append(tools.get_autonomous_task_status)
+    # Recurring autonomous schedules (v11.33): Cloud Scheduler fires
+    # /execute_task, which delegates to the sandbox headlessly.
+    _all_tools.append(tools.register_scheduled_autonomous_task)
 if (os.environ.get("ENABLE_MANAGED_AGENT") == "1" and (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1")):
     # Drive handoff needs BOTH the user's Workspace OAuth (drive.file) and the
     # Managed Agent deliverables in GCS.
@@ -1087,6 +1100,25 @@ def _inject_completed_tasks(callback_context):
     if not _fs or not _demo_id:
         callback_context.state["_bg_task_results"] = ""
         return None
+    # Orphan recovery sweep (v11.32), BEFORE the completed-tasks query so a
+    # task recovered here is announced in this same turn. Autonomous tasks
+    # are monitored by in-process daemon threads; a Cloud Run instance
+    # recycle kills them and freezes the doc at status 'working' (observed
+    # live 2026-07-22: SIGTERM 16 min into a task, doc stuck at 90% while
+    # the sandbox finished server-side 30 min later). The sweep only touches
+    # docs whose monitor heartbeat is stale - see _ma_recover_orphaned_task.
+    try:
+        _wdocs = _fs.collection(_demo_id + "_task_executions").where(
+            "status", "==", "working").limit(5).stream()
+        for _wdoc in _wdocs:
+            _wd = _wdoc.to_dict()
+            if _wd.get("interaction_id"):
+                try:
+                    tools._ma_recover_orphaned_task(_wdoc.reference, _wd, False)
+                except Exception:
+                    pass
+    except Exception:
+        pass
     try:
         _docs = _fs.collection(_demo_id + "_task_executions").where(
             "reported_to_user", "==", False
@@ -1123,11 +1155,30 @@ def _inject_completed_tasks(callback_context):
                     _rd = _rdoc.to_dict()
                     _tail_lines = [_l for _l in (_rd.get("log_tail", "") or "").split(chr(10)) if _l.strip()]
                     _last_line = _tail_lines[-1][-140:] if _tail_lines else ""
-                    _rlines.append("Task '" + _rd.get("task_id", "") + "' still running: "
+                    # Honest progress (v11.32): lead with elapsed time + monitor
+                    # liveness; the percentage is an activity estimate capped at
+                    # 90 and must not be read as a completion fraction.
+                    _age_bits = []
+                    try:
+                        import datetime as _dt
+                        _now = _dt.datetime.now(_dt.timezone.utc)
+                        _rstarted = tools._ma_parse_iso_utc(_rd.get("started_at"))
+                        if _rstarted is not None:
+                            _age_bits.append(str(int((_now - _rstarted).total_seconds() / 60)) + " min elapsed")
+                        _rbeat = tools._ma_parse_iso_utc(_rd.get("updated_at"))
+                        if _rbeat is not None:
+                            _age_bits.append("last activity " + str(int((_now - _rbeat).total_seconds() / 60)) + " min ago")
+                    except Exception:
+                        pass
+                    _age_txt = (" (" + ", ".join(_age_bits) + ")") if _age_bits else ""
+                    _rlines.append("Task '" + _rd.get("task_id", "") + "' still running" + _age_txt + ": "
                                    + str(_rd.get("progress_pct", 0)) + "% - " + _last_line)
                 if _rlines:
                     _prev = callback_context.state.get("_bg_task_results", "") or ""
-                    _rmsg = "--- TASKS STILL RUNNING (progress info, NOT completed) ---" + chr(10) + chr(10).join(_rlines) + chr(10) + "--- END RUNNING ---"
+                    _rmsg = ("--- TASKS STILL RUNNING (progress info, NOT completed; the percentage is an "
+                             "activity estimate CAPPED at 90, not a completion fraction - when mentioning "
+                             "progress, lead with elapsed time / latest activity and never say 'almost done' "
+                             "from the number) ---" + chr(10) + chr(10).join(_rlines) + chr(10) + "--- END RUNNING ---")
                     callback_context.state["_bg_task_results"] = (_prev + chr(10) + _rmsg).strip()
             except Exception:
                 pass
@@ -1507,7 +1558,10 @@ Decide by CAPABILITY, in this order:
    WATCH - handle it yourself with the browser tools per the COMPUTER USE
    section (inline, or register_background_task for long multi-page jobs).
    The autonomous agent reads pages programmatically and has NO interactive
-   browser, so do NOT delegate pure browser-operation tasks. Delegate only
+   browser, so do NOT delegate pure browser-operation tasks. This rule ALSO
+   fires whenever the request mentions web browsing (in any language) or
+   names a specific external site / page / URL to consult - the live
+   browser run is part of what the user asked to see. Delegate only
    when the browsing merely feeds a bigger job that also needs a file
    deliverable, a Workspace action, or software work - and in that case
    run the browse FIRST yourself and pass the findings via input_data
@@ -1532,7 +1586,8 @@ case call delegate_autonomous_task as your VERY FIRST action with that
 brief, and NEVER re-ask clarifying questions. When no card was shown, the
 brief was judged specific enough: also delegate as your VERY FIRST action
 without asking your own questions. """ + ("""SOLE EXCEPTION - PRE-BROWSE: when
-the brief needs data that only interactive browsing can obtain, the
+the brief mentions web browsing or names a specific site / page / URL to
+consult (or needs data only interactive browsing can obtain), the
 COMPUTER USE browse sequence comes first and delegate_autonomous_task
 immediately after, in the SAME turn; clarifying questions remain
 forbidden either way. """ if os.environ.get("ENABLE_COMPUTER_USE") == "1" else "") + """The tool manages inline-vs-background by
@@ -1561,11 +1616,13 @@ When delegating:
   files uploaded to this chat. Extract their contents yourself first (your
   vision / file parsing) and pass the structured findings as text via
   input_data.
-""" + ("""- PRE-BROWSE: when the task ALSO depends on data that only interactive
-  browsing can obtain (a specific portal, a competitor page, a form-gated
-  site), gather it BEFORE delegating using the COMPUTER USE section's exact
-  sequence (start_browser_session -> show the live-view link -> a single
-  computer_use_browse with a NARROW goal that fits the inline step cap).
+""" + ("""- PRE-BROWSE: when the task mentions web browsing, names a specific
+  external site / page / portal / URL to consult, or depends on data that
+  only interactive browsing can obtain, gather that part BEFORE delegating
+  using the COMPUTER USE section's exact sequence (start_browser_session ->
+  show the live-view link -> a single computer_use_browse with a NARROW
+  goal that fits the inline step cap). This is MANDATORY when a site is
+  named - the live browse is a showcase moment, not an optimization choice.
   Then put the result_summary into input_data under the label
   "BROWSER FINDINGS (gathered live from <url>):" so the autonomous agent
   builds on real, fresh web data. If the browse returns status 'partial',
@@ -1595,12 +1652,15 @@ When delegating:
   not enabled in this demo.""") + """
 - SPLIT COMPOSITE REQUESTS: the autonomous agent CANNOT create scheduled /
   recurring jobs, dashboards hosted by this platform, or database alert
-  rules - those live in YOUR toolset. When a request combines autonomous
-  work (research / file deliverables / Workspace actions) with a recurring
-  monitoring job or schedule, delegate ONLY the autonomous part and, in
-  the SAME turn, set up the recurring part yourself with
-  register_scheduled_task (and tell the user you did both). Never put
-  "set up a daily job" wording into task_description.
+  rules - those live in YOUR toolset. When the user wants autonomous work
+  (research / file deliverables / Workspace actions) to run on a RECURRING
+  schedule, register it with register_scheduled_autonomous_task - each fire
+  then delegates to the sandbox automatically, even while the user is
+  offline, and results are announced on their next message. When a request
+  combines a ONE-SHOT autonomous task with a recurring demo-database
+  monitoring job, delegate the autonomous part and set up the database job
+  with register_scheduled_task in the SAME turn (and tell the user you did
+  both). Never put "set up a daily job" wording into task_description.
 - Call delegate_autonomous_task EXACTLY ONCE per user request.
 - Status 'completed': present the report verbatim as markdown (it is already
   in the user's language) including any deliverable download links.
@@ -2053,7 +2113,14 @@ SCHEDULED TASKS:
 - register_scheduled_task: Register a recurring task with cron schedule.
 - update_scheduled_task: Change the cron schedule of an existing task.
 - delete_scheduled_task: Remove a scheduled task and its Cloud Scheduler job.
-- run_scheduled_task_now: Trigger ONE immediate background execution of an
+""" + ("""- register_scheduled_autonomous_task: Register a RECURRING schedule for
+  AUTONOMOUS sandbox work (web research, file deliverables, Workspace
+  actions). Fires even while the user is offline; each fire creates an
+  autonomous ticket whose progress and completion are announced
+  automatically on the user's next message. Use for "every day / week, do
+  X" requests that need the autonomous agent - NOT register_scheduled_task
+  (that one runs the demo-database background worker).
+""" if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else "") + """- run_scheduled_task_now: Trigger ONE immediate background execution of an
   already-registered scheduled task (manual test run). Returns a ticket
   instantly; the result is reported automatically when done (or via
   get_task_result).
@@ -2418,6 +2485,11 @@ SCHEDULED TASKS:
   The task runs via Cloud Scheduler at the specified intervals.
 - update_scheduled_task: Change the cron schedule of an existing scheduled task.
 - delete_scheduled_task: Remove a scheduled task and its Cloud Scheduler job.
+""" + ("""- register_scheduled_autonomous_task: Register a RECURRING schedule for
+  AUTONOMOUS sandbox work (web research, file deliverables, Workspace
+  actions). Fires even while the user is offline; results are announced
+  automatically on the user's next message.
+""" if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else "") + """
 - run_scheduled_task_now: Trigger ONE immediate background execution of an
   already-registered scheduled task (manual test run). Returns a ticket
   instantly; the result is reported automatically when done (or via
@@ -2700,6 +2772,8 @@ WRONG: beginRendering object without tags (missing tags and brackets = SYSTEM CR
 _bg_tools = [t for t in _all_tools if t is not tools.background_task_tool]
 _bg_tools = [t for t in _bg_tools if t is not tools.register_scheduled_task]
 _bg_tools = [t for t in _bg_tools if t is not tools.run_scheduled_task_now]
+if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+    _bg_tools = [t for t in _bg_tools if t is not tools.register_scheduled_autonomous_task]
 
 _bg_computer_use_section = r"""
 --- COMPUTER USE (BROWSER AGENT) ---

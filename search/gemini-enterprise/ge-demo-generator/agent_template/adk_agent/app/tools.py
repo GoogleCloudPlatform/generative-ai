@@ -1199,7 +1199,15 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
     # =====================================================================
     _CU_VIEWPORT_W = 1440
     _CU_VIEWPORT_H = 900
-    _CU_MAX_STEPS = 40
+    # Step/wall budgets (v11.37): env-tunable per demo via
+    # 'gcloud run services update --update-env-vars' so a demo needing deeper
+    # browsing does not require a code redeploy. Inline runs must finish inside
+    # GE's chat render window; background runs are bounded by the /execute_task
+    # request (Cloud Run --timeout 1800).
+    _CU_MAX_STEPS = int(os.environ.get("COMPUTER_USE_MAX_STEPS", "80"))
+    _CU_WALL_S = int(os.environ.get("COMPUTER_USE_WALL_S", "1200"))
+    _CU_INLINE_MAX_STEPS = int(os.environ.get("COMPUTER_USE_INLINE_MAX_STEPS", "30"))
+    _CU_INLINE_WALL_S = int(os.environ.get("COMPUTER_USE_INLINE_WALL_S", "240"))
     _CU_KEEP_SHOTS = 3
     _CU_STEP_TIMEOUT_MS = 15000
     _CU_MAX_CHAT_SHOTS = 6
@@ -1524,8 +1532,8 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
         # Inline calls must finish inside GE's chat render window, so cap steps and
         # wall-clock tightly; background calls (via a task) can run much longer.
         import time as _time
-        _max_steps = 20 if _is_inline else _CU_MAX_STEPS
-        _wall_budget = 240.0 if _is_inline else 600.0
+        _max_steps = _CU_INLINE_MAX_STEPS if _is_inline else _CU_MAX_STEPS
+        _wall_budget = float(_CU_INLINE_WALL_S) if _is_inline else float(_CU_WALL_S)
         _deadline = _time.monotonic() + _wall_budget
 
         _shots_for_chat = []
@@ -1553,6 +1561,18 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             _start = start_url or "https://duckduckgo.com/"
             if "://" not in _start:
                 _start = "https://" + _start
+            # Google search hard-blocks headless Chrome with a CAPTCHA wall, burning
+            # steps before the run even starts (v11.37). Rewrite any google search
+            # start_url to the automation-friendly DuckDuckGo html results page
+            # carrying the same query.
+            try:
+                from urllib.parse import urlparse as _cu_up, parse_qs as _cu_pq, quote_plus as _cu_qp
+                _pu = _cu_up(_start)
+                if "google." in (_pu.netloc or "").lower():
+                    _gq = (_cu_pq(_pu.query or "").get("q") or [""])[0]
+                    _start = ("https://duckduckgo.com/html/?q=" + _cu_qp(_gq)) if _gq else "https://duckduckgo.com/html/"
+            except Exception:
+                pass
             try:
                 await page.goto(_start, wait_until="load", timeout=_CU_STEP_TIMEOUT_MS)
             except Exception:
@@ -1561,8 +1581,22 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             _shot = await page.screenshot(type="png")
             _jpg = await page.screenshot(type="jpeg", quality=60)
             await _cu_publish(session_id, 0, "Opened " + _start, page.url, "working", base64.b64encode(_jpg).decode("ascii"))
+            # The browsing policy must travel WITH the goal: the computer-use model
+            # inside this loop never sees the root agent's instruction, so without
+            # this preamble it happily opens google.com and burns the step budget
+            # on the bot wall (observed live 2026-07-24).
+            _policy = (
+                "Browsing policy (follow strictly - every action costs one step from a budget of " + str(_max_steps) + "):" + chr(10)
+                + "- NEVER navigate to google.com: it shows a CAPTCHA wall to automated browsers. To search the web, "
+                "navigate directly to https://duckduckgo.com/html/?q=<url-encoded terms>." + chr(10)
+                + "- If a page shows a CAPTCHA / bot check / 'unusual traffic' message, do not fight it: switch ONCE to "
+                "duckduckgo html results or another authoritative source and continue." + chr(10)
+                + "- Prefer navigating straight to the most authoritative page for the goal over searching." + chr(10)
+                + "- Be economical: no re-visits, no exploratory clicks. Once the goal is met - or the budget is nearly "
+                "spent - stop and summarize what you have."
+            )
             history = [types.Content(role="user", parts=[
-                types.Part.from_text(text="Goal: " + (goal or "") + chr(10) + "Complete this task in the browser. When finished, summarize what you found or did."),
+                types.Part.from_text(text="Goal: " + (goal or "") + chr(10) + _policy + chr(10) + "Complete this task in the browser. When finished, summarize what you found or did."),
                 types.Part.from_bytes(data=_shot, mime_type="image/png"),
             ])]
 
@@ -2553,6 +2587,7 @@ def save_document_to_db(
 
 # --- Managed Agent (Antigravity) autonomous delegation (ENABLE_MANAGED_AGENT) ---
 if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+
     # =============================================================================
     # Managed Autonomous Agent (Antigravity) delegation - v11.0
     # The setup script provisions a managed agent (Agents API, Pre-GA) that runs in
@@ -2564,6 +2599,13 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     # task_executions doc + _inject_completed_tasks announcement) while a daemon
     # thread keeps consuming the SSE stream. Cloud Run runs with min-instances=1
     # and no CPU throttling, so the thread survives after the turn returns.
+    # CAVEAT (v11.32, observed live 2026-07-22): min-instances keeps AN instance
+    # warm but Cloud Run still RECYCLES instances at will (SIGTERM mid-task); the
+    # daemon threads die with the process and the task doc freezes at 'working'.
+    # Monitoring is therefore best-effort push + guaranteed pull: every status
+    # check and every turn's _inject_completed_tasks sweep can finalize an
+    # orphaned doc directly from the persisted interaction (see
+    # _ma_recover_orphaned_task).
     # =============================================================================
     _MANAGED_AGENT_ID = os.environ.get("MANAGED_AGENT_ID", "").strip()
     _MANAGED_AGENT_LOCATION = "global"  # the Managed Agents API is global-only
@@ -2577,6 +2619,10 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     # After the SSE stream window closes, the interaction keeps running
     # server-side (background=true); we keep polling GET for this much longer.
     _MA_POLL_EXTRA_S = int(os.environ.get("MANAGED_AGENT_POLL_EXTRA_S", "3600"))
+    # Monitor heartbeat staleness (v11.32): the monitor thread rewrites the task
+    # doc every ~12s; this much silence means the monitor process is dead and
+    # pull-based recovery may finalize the doc from the live interaction.
+    _MA_MONITOR_STALE_S = int(os.environ.get("MANAGED_AGENT_MONITOR_STALE_S", "180"))
 
     _ma_creds = None
 
@@ -2968,6 +3014,47 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         if _evt is not None:
             _evt.set()
 
+    def _ma_harvest_interaction_report(data):
+        """Rebuilds the report text from a persisted interaction GET body.
+
+        Collects text from ALL non-input steps (not just type model_output -
+        long agentic runs have surfaced text under other step shapes).
+        user_input steps are EXCLUDED: they contain the task message (and
+        possibly the Workspace token). Returns '' when the steps carry no text
+        at all - observed live 2026-07-22 on a completed 52-step run whose GET
+        body held only function_call/function_result steps - so callers MUST
+        handle an empty harvest with a fallback report."""
+        _texts = []
+        def _collect_step_texts(node):
+            if isinstance(node, dict):
+                for _k, _v in node.items():
+                    if _k == "text" and isinstance(_v, str) and _v.strip():
+                        _texts.append(_v)
+                    else:
+                        _collect_step_texts(_v)
+            elif isinstance(node, list):
+                for _item in node:
+                    _collect_step_texts(_item)
+        for _step in (data.get("steps") or []):
+            if isinstance(_step, dict) and _step.get("type") != "user_input":
+                _collect_step_texts(_step)
+        return (chr(10) + chr(10)).join(_texts)
+
+    def _ma_log_empty_harvest_shape(data):
+        """Diagnostic for an empty harvest: log the step STRUCTURE only (never
+        content - it could include the task message / token)."""
+        try:
+            import logging as _l
+            _shape = []
+            for _step in (data.get("steps") or []):
+                if isinstance(_step, dict):
+                    _ctypes = [(_c.get("type", "?") if isinstance(_c, dict) else "?") for _c in (_step.get("content") or [])]
+                    _shape.append(str(_step.get("type", "?")) + ":" + ",".join(_ctypes))
+            _l.getLogger("managed_agent").warning(
+                "poll harvest found NO text; interaction step shapes: %s", "; ".join(_shape)[:800])
+        except Exception:
+            pass
+
     def _ma_poll_interaction(shared):
         """Polls GET .../interactions/<id> after the SSE stream is gone.
 
@@ -3016,41 +3103,11 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     shared["environment_id"] = _data["environment_id"]
                 _status = _data.get("status", "")
                 if _status == "completed":
-                    # Harvest report text from ALL non-input steps (not just
-                    # type model_output - long agentic runs have surfaced text
-                    # under other step shapes). user_input steps are EXCLUDED:
-                    # they contain the task message (and possibly the Workspace
-                    # token).
-                    _texts = []
-                    def _collect_step_texts(node):
-                        if isinstance(node, dict):
-                            for _k, _v in node.items():
-                                if _k == "text" and isinstance(_v, str) and _v.strip():
-                                    _texts.append(_v)
-                                else:
-                                    _collect_step_texts(_v)
-                        elif isinstance(node, list):
-                            for _item in node:
-                                _collect_step_texts(_item)
-                    for _step in (_data.get("steps") or []):
-                        if isinstance(_step, dict) and _step.get("type") != "user_input":
-                            _collect_step_texts(_step)
-                    if _texts:
-                        shared["report_buf"] = (chr(10) + chr(10)).join(_texts)
+                    _harvested = _ma_harvest_interaction_report(_data)
+                    if _harvested:
+                        shared["report_buf"] = _harvested
                     else:
-                        # Diagnostic: log the STRUCTURE only (never content - it
-                        # could include the task message / token).
-                        try:
-                            import logging as _l
-                            _shape = []
-                            for _step in (_data.get("steps") or []):
-                                if isinstance(_step, dict):
-                                    _ctypes = [(_c.get("type", "?") if isinstance(_c, dict) else "?") for _c in (_step.get("content") or [])]
-                                    _shape.append(str(_step.get("type", "?")) + ":" + ",".join(_ctypes))
-                            _l.getLogger("managed_agent").warning(
-                                "poll harvest found NO text; interaction step shapes: %s", "; ".join(_shape)[:800])
-                        except Exception:
-                            pass
+                        _ma_log_empty_harvest_shape(_data)
                     shared["completed"] = True
                     return
                 if _status in ("failed", "cancelled"):
@@ -3078,6 +3135,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             return
         _ref = _fs.collection(_demo_id + "_task_executions").document(task_id)
         _log = ""
+        _mon_start = _t.monotonic()
         while not shared.get("done"):
             _t.sleep(12)
             try:
@@ -3090,10 +3148,23 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 _log = _log + "[" + _now + "] SANDBOX: " + _snippet + chr(10)
                 if len(_log) > 1500:
                     _log = _log[-1500:]
-                _pct = max(10, min(90, 10 + int(shared.get("events", 0) / 3)))
-                # interaction_id is mirrored for diagnosability: it lets operators
-                # inspect the live interaction via GET .../interactions/<id>.
-                _ref.update({"progress_pct": _pct, "log_tail": _log, "interaction_id": shared.get("interaction_id", "")})
+                # Honest-ish progress (v11.32): the old events/3 estimate hit the
+                # 90 cap ~12 min into chatty runs, reading as "stuck at 90%".
+                # Blend in a wall-clock ramp (2 pct/min -> reaches the cap only
+                # after ~40 min, the typical long-task duration) and take the
+                # LOWER of the two so neither signal alone can saturate early.
+                # 90 stays a hard cap: 100 is reserved for actual completion.
+                _event_pct = 10 + int(shared.get("events", 0) / 3)
+                _time_pct = 10 + int((_t.monotonic() - _mon_start) / 30)
+                _pct = max(10, min(90, _event_pct, _time_pct))
+                # interaction_id is mirrored for diagnosability AND recovery: it
+                # lets operators inspect the live interaction and lets
+                # _ma_recover_orphaned_task finalize the doc if this monitor
+                # process dies (instance recycle). updated_at is the heartbeat
+                # that recovery uses to tell a live monitor from a dead one.
+                _ref.update({"progress_pct": _pct, "log_tail": _log,
+                             "interaction_id": shared.get("interaction_id", ""),
+                             "updated_at": _dt.datetime.now(_dt.timezone.utc).isoformat()})
             except Exception:
                 pass
         try:
@@ -3125,6 +3196,197 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             _ma_finalize_interaction_record(shared)
         except Exception:
             pass
+
+    def _ma_parse_iso_utc(value):
+        import datetime as _dt
+        try:
+            _parsed = _dt.datetime.fromisoformat(str(value))
+            if _parsed.tzinfo is None:
+                _parsed = _parsed.replace(tzinfo=_dt.timezone.utc)
+            return _parsed
+        except Exception:
+            return None
+
+    def _ma_recover_orphaned_task(ref, doc, mark_reported):
+        """Pull-based recovery (v11.32) for an autonomous task whose in-process
+        monitor died. Cloud Run recycles instances at will (observed live
+        2026-07-22: SIGTERM 16 min into a task); the daemon threads that stream
+        the interaction and finalize the Firestore doc die with the process,
+        freezing the doc at status 'working' / 90% forever while the sandbox
+        interaction finishes server-side unobserved. This reads the live
+        interaction via the interaction_id the monitor mirrored into the doc and
+        finalizes the doc from it.
+
+        mark_reported=True is for get_autonomous_task_status (the recovered
+        report is presented in the same turn); the _inject_completed_tasks sweep
+        passes False so the normal completed-task injection announces it.
+
+        Returns the updated doc dict when the doc was finalized, else None."""
+        import datetime as _dt
+        import httpx
+        if doc.get("status") != "working":
+            return None
+        _iid = doc.get("interaction_id", "")
+        if not _iid:
+            return None
+        # Heartbeat gate: a live monitor rewrites the doc every ~12s (updated_at,
+        # v11.32). Docs from older builds lack updated_at: for those, only recover
+        # after the full monitoring window has passed, so a healthy monitor is
+        # never raced.
+        _now = _dt.datetime.now(_dt.timezone.utc)
+        _beat = _ma_parse_iso_utc(doc.get("updated_at"))
+        if _beat is not None:
+            if (_now - _beat).total_seconds() < _MA_MONITOR_STALE_S:
+                return None
+        else:
+            _started = _ma_parse_iso_utc(doc.get("started_at"))
+            if _started is None or (_now - _started).total_seconds() < (_MA_MAX_RUNTIME_S + _MA_POLL_EXTRA_S):
+                return None
+        try:
+            _headers = {
+                "Authorization": "Bearer " + _ma_get_access_token(),
+                "Api-Revision": _INTERACTIONS_API_REVISION,
+            }
+            _resp = httpx.get(_ma_interactions_url() + "/" + _iid, headers=_headers, timeout=30.0)
+            _code = _resp.status_code
+            _data = _resp.json() if _code == 200 else {}
+        except Exception:
+            return None  # transient lookup failure - the next turn retries
+        _now_iso = _now.isoformat()
+        _deliver_tid = doc.get("deliver_tid") or doc.get("task_id", "")
+        _status = _data.get("status", "")
+        if _code == 200 and _status == "completed":
+            _report = _ma_harvest_interaction_report(_data).strip()
+            if not _report:
+                _ma_log_empty_harvest_shape(_data)
+                _report = ("The autonomous agent finished this task server-side, but its monitor was "
+                           "interrupted by a server restart and the original text report could not be "
+                           "recovered from the persisted steps. Any uploaded deliverable files are "
+                           "linked below; the step-by-step activity log is in the Data Viewer Tasks tab.")
+            _links = _ma_collect_deliverables(_deliver_tid)
+            if _links:
+                _report = _report + chr(10) + chr(10) + _MA_DL_MARKER + chr(10) + chr(10).join(_links)
+            else:
+                _report = _report + chr(10) + chr(10) + _MA_NO_UPLOAD_NOTE
+            _update = {
+                "status": "completed",
+                "result_summary": _report,
+                "progress_pct": 100,
+                "completed_at": _now_iso,
+            }
+        elif _code == 200 and _status in ("failed", "cancelled"):
+            _update = {
+                "status": "failed",
+                "result_summary": "Autonomous task ended server-side with status: " + _status
+                                  + " (recovered after its monitor was lost to a server restart).",
+                "completed_at": _now_iso,
+            }
+        elif _code == 404:
+            # Monitor dead AND interaction record gone (expired or already
+            # deleted): nothing is left to wait on. Uploaded deliverables may
+            # still prove the task finished.
+            _links = _ma_collect_deliverables(_deliver_tid)
+            if _links:
+                _report = ("The autonomous task finished, but its monitor was interrupted by a server "
+                           "restart and the sandbox interaction record is no longer available. The "
+                           "uploaded deliverable files are linked below."
+                           + chr(10) + chr(10) + _MA_DL_MARKER + chr(10) + chr(10).join(_links))
+                _update = {
+                    "status": "completed",
+                    "result_summary": _report,
+                    "progress_pct": 100,
+                    "completed_at": _now_iso,
+                }
+            else:
+                _update = {
+                    "status": "failed",
+                    "result_summary": "Autonomous task orphaned: its monitor died (server restart) and the "
+                                      "sandbox interaction record is no longer available. Re-delegate the "
+                                      "task if the result is still needed.",
+                    "completed_at": _now_iso,
+                }
+        else:
+            # Interaction genuinely still running server-side, just unobserved.
+            # Refresh the heartbeat + log so (a) users see live truth instead of
+            # a frozen log, and (b) the next recovery attempt waits a full
+            # staleness window instead of re-polling every turn.
+            try:
+                _tail = ((doc.get("log_tail", "") or "")
+                         + "[" + _now.strftime("%H:%M:%S") + "] RECOVERY: monitor lost (server restart); "
+                         "interaction still running server-side - tracked via direct polling." + chr(10))
+                ref.update({"updated_at": _now_iso, "log_tail": _tail[-1500:]})
+            except Exception:
+                pass
+            return None
+        _update["updated_at"] = _now_iso
+        if mark_reported:
+            _update["reported_to_user"] = True
+        try:
+            ref.update(_update)
+        except Exception:
+            return None
+        if _update.get("status") == "completed" and _code == 200:
+            # Same post-completion hygiene as the monitor path: persists sandbox
+            # continuity and deletes token-bearing interaction records.
+            try:
+                _ma_finalize_interaction_record({
+                    "interaction_id": _iid,
+                    "environment_id": _data.get("environment_id", ""),
+                    "token_embedded": bool(doc.get("token_embedded")),
+                    "task_id": doc.get("task_id", ""),
+                })
+            except Exception:
+                pass
+        _merged = dict(doc)
+        _merged.update(_update)
+        return _merged
+
+    if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
+        def _ma_refresh_token_object(_tid, _tok):
+            # Rotating token object: the sandbox re-fetches the CURRENT user
+            # token from a pre-signed URL when its snapshot expires. Kept fresh
+            # by fast_api_app on every user turn (best-effort).
+            _bkt = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+            if not _bkt or not _tok:
+                return
+            try:
+                from google.cloud import storage as _st
+                _st.Client().bucket(_bkt).blob("autonomous/" + _tid + "/.wstoken").upload_from_string(_tok, content_type="text/plain")
+            except Exception:
+                pass
+
+    def _ma_append_workspace_access(message, task_id, ws_auth):
+        if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
+            """Appends the WORKSPACE ACCESS section (user token + guardrails + rotating
+            token refresh URL) to a task message. Shared by the live delegation tool
+            and the scheduled-autonomous fire path (v11.33). Returns
+            (message, token_embedded)."""
+            if not str(ws_auth or "").startswith("Bearer "):
+                return message, False
+            message = (message + chr(10) + chr(10)
+                       + "WORKSPACE ACCESS (handle with care):" + chr(10)
+                       + "- Before any Google Workspace operation, run: export GOOGLE_WORKSPACE_CLI_TOKEN=" + ws_auth[7:] + chr(10)
+                       + "- This user access token expires in about an hour: do Workspace operations EARLY in the task." + chr(10)
+                       + "- ADMIN LIMITS: this token carries USER-level scopes only. Admin SDK APIs (Directory, Reports / audit logs, license management) and org-wide admin exports WILL fail with 401/403 - that is expected, not an error to fix. Do NOT retry, poll, or grind on them: derive what you can from user-level APIs (Drive / Gmail / Calendar data this user can see), state the limitation clearly in your report, and continue with the rest of the task." + chr(10)
+                       + "- Use the gws CLI for ALL Workspace reads/writes (see the gws-* skills under /.agent/skills). It is usually pre-installed at $HOME/bin/gws - call it by that absolute path. If missing: mkdir -p $HOME/bin && curl -sL https://github.com/googleworkspace/cli/releases/latest/download/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz | tar xz -C $HOME/bin ./gws && chmod +x $HOME/bin/gws (do NOT use npm - its Linux binary needs GLIBC 2.39 which this sandbox lacks)." + chr(10)
+                       + "- GUARDRAILS: NEVER send email - create Gmail drafts only, unless the task explicitly says to send. NEVER delete anything in Workspace. Post Chat messages ONLY to spaces the task explicitly names - and if the named space does not exist yet, CREATE it with that exact name first, then post (expected in demo environments; mention the creation in your report). Create Calendar events only when the task asks for them." + chr(10)
+                       + "- Non-ASCII email headers (Subject etc.) MUST be RFC 2047 MIME-encoded; read the draft back to verify the subject is not garbled, and recreate it if needed." + chr(10)
+                       + "- Report created drafts as ALREADY EXISTING in Gmail (subject + link https://mail.google.com/mail/u/0/#drafts), never as text to copy manually." + chr(10)
+                       + "- NEVER write this token into your report, logs, code, or any file.")
+            _ma_refresh_token_object(task_id, ws_auth[7:])
+            try:
+                _ws_refresh_url = _generate_v4_signed_url(
+                    os.environ.get("DASHBOARDS_BUCKET", "").strip(),
+                    "autonomous/" + task_id + "/.wstoken", "text/plain", 7)
+                message = (message + chr(10)
+                           + "- TOKEN REFRESH: if a Workspace call fails with 401 / invalid credentials, fetch the CURRENT token with: curl -s " + chr(34) + _ws_refresh_url + chr(34)
+                           + " then re-export GOOGLE_WORKSPACE_CLI_TOKEN with the response body and retry. A fresh token appears there whenever the user talks to the assistant; if it is still expired, note that in your report and continue with the non-Workspace parts of the task.")
+            except Exception:
+                pass
+            return message, True
+        else:
+            # Workspace integration disabled for this demo: never embed tokens.
+            return message, False
 
     def _ma_build_task_message(task_description, input_data, upload_urls):
         _msg = task_description.strip()
@@ -3254,45 +3516,13 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         # (it expires in about an hour); token-bearing interactions are DELETED
         # from the store right after their result is harvested.
         _ws_token_embedded = False
+        _ws_auth = ""
         if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
-            def _ma_refresh_token_object(_tid, _tok):
-                # Rotating token object: the sandbox re-fetches the CURRENT user
-                # token from a pre-signed URL when its snapshot expires. Kept fresh
-                # by fast_api_app on every user turn (best-effort).
-                _bkt = os.environ.get("DASHBOARDS_BUCKET", "").strip()
-                if not _bkt or not _tok:
-                    return
-                try:
-                    from google.cloud import storage as _st
-                    _st.Client().bucket(_bkt).blob("autonomous/" + _tid + "/.wstoken").upload_from_string(_tok, content_type="text/plain")
-                except Exception:
-                    pass
             try:
                 _ws_auth = (_workspace_header_provider(tool_context) or {}).get("Authorization", "")
             except Exception:
                 _ws_auth = ""
-            if _ws_auth.startswith("Bearer "):
-                _message = (_message + chr(10) + chr(10)
-                            + "WORKSPACE ACCESS (handle with care):" + chr(10)
-                            + "- Before any Google Workspace operation, run: export GOOGLE_WORKSPACE_CLI_TOKEN=" + _ws_auth[7:] + chr(10)
-                            + "- This user access token expires in about an hour: do Workspace operations EARLY in the task." + chr(10)
-                            + "- Use the gws CLI for ALL Workspace reads/writes (see the gws-* skills under /.agent/skills). It is usually pre-installed at $HOME/bin/gws - call it by that absolute path. If missing: mkdir -p $HOME/bin && curl -sL https://github.com/googleworkspace/cli/releases/latest/download/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz | tar xz -C $HOME/bin ./gws && chmod +x $HOME/bin/gws (do NOT use npm - its Linux binary needs GLIBC 2.39 which this sandbox lacks)." + chr(10)
-                            + "- GUARDRAILS: NEVER send email - create Gmail drafts only, unless the task explicitly says to send. NEVER delete anything in Workspace. Post Chat messages ONLY to spaces the task explicitly names - and if the named space does not exist yet, CREATE it with that exact name first, then post (expected in demo environments; mention the creation in your report). Create Calendar events only when the task asks for them." + chr(10)
-                            + "- Non-ASCII email headers (Subject etc.) MUST be RFC 2047 MIME-encoded; read the draft back to verify the subject is not garbled, and recreate it if needed." + chr(10)
-                            + "- Report created drafts as ALREADY EXISTING in Gmail (subject + link https://mail.google.com/mail/u/0/#drafts), never as text to copy manually." + chr(10)
-                            + "- NEVER write this token into your report, logs, code, or any file.")
-                _ws_token_embedded = True
-                _ma_refresh_token_object(_task_id, _ws_auth[7:])
-                try:
-                    _ws_refresh_url = _generate_v4_signed_url(
-                        os.environ.get("DASHBOARDS_BUCKET", "").strip(),
-                        "autonomous/" + _task_id + "/.wstoken", "text/plain", 7)
-                    _message = (_message + chr(10)
-                                + "- TOKEN REFRESH: if a Workspace call fails with 401 / invalid credentials, fetch the CURRENT token with: curl -s " + chr(34) + _ws_refresh_url + chr(34)
-                                + " then re-export GOOGLE_WORKSPACE_CLI_TOKEN with the response body and retry. A fresh token appears there whenever the user talks to the assistant; if it is still expired, note that in your report and continue with the non-Workspace parts of the task.")
-                except Exception:
-                    pass
-
+        _message, _ws_token_embedded = _ma_append_workspace_access(_message, _task_id, _ws_auth)
 
         # Task docs are created UP FRONT (not only on background handoff) so the
         # Data Viewer Tasks tab shows the sandbox working live from second zero.
@@ -3318,6 +3548,12 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     "started_at": _now_iso,
                     "completed_at": "",
                     "reported_to_user": False,
+                    # Persisted for _ma_recover_orphaned_task (v11.32): recovery
+                    # runs in a fresh process where the in-memory shared dict of
+                    # the original delegation no longer exists.
+                    "updated_at": _now_iso,
+                    "deliver_tid": _deliver_tid,
+                    "token_embedded": _ws_token_embedded,
                 })
                 _docs_created = True
             except Exception:
@@ -3455,12 +3691,41 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             if not _snap.exists:
                 return {"status": "not_found", "message": "No autonomous task with ticket-id " + task_id}
             _d = _snap.to_dict()
+            if _d.get("status") == "working":
+                # Self-heal (v11.32): if the in-process monitor died (Cloud Run
+                # instance recycle), finalize directly from the persisted
+                # interaction instead of reporting a frozen 'working' doc forever.
+                # mark_reported=True: the recovered report is presented right now.
+                try:
+                    _recovered = _ma_recover_orphaned_task(_snap.reference, _d, True)
+                    if _recovered:
+                        _d = _recovered
+                except Exception:
+                    pass  # status reporting must never fail on recovery
             _out = {
                 "status": _d.get("status", ""),
                 "progress_pct": _d.get("progress_pct", 0),
                 "recent_activity": _d.get("log_tail", ""),
                 "interaction_id": _d.get("interaction_id", ""),
             }
+            if _d.get("status") == "working":
+                # Honest progress (v11.32): progress_pct is an activity heartbeat
+                # CAPPED at 90 by design, so users read long tasks as "stuck at
+                # 90%". Give the model real signals to phrase progress with.
+                import datetime as _dt
+                _now = _dt.datetime.now(_dt.timezone.utc)
+                _started_at = _ma_parse_iso_utc(_d.get("started_at"))
+                if _started_at is not None:
+                    _out["elapsed_minutes"] = int((_now - _started_at).total_seconds() / 60)
+                _beat = _ma_parse_iso_utc(_d.get("updated_at"))
+                if _beat is not None:
+                    _out["last_activity_minutes_ago"] = int((_now - _beat).total_seconds() / 60)
+                _out["progress_note"] = (
+                    "progress_pct is a rough activity-based estimate CAPPED at 90 - it is NOT a "
+                    "completion fraction, and long tasks legitimately sit at 90 until they finish. "
+                    "When telling the user about progress, lead with elapsed_minutes and the latest "
+                    "concrete activity from recent_activity; never phrase the percentage as "
+                    "'almost done'.")
             if _d.get("status") in ("completed", "failed"):
                 _out["report"] = _d.get("result_summary", "")
                 _out["_MANDATORY_ACTION"] = ("Present the report as formatted markdown text, verbatim, "
@@ -3474,10 +3739,222 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         except Exception as _err:
             return {"status": "error", "message": "Status lookup failed: " + str(_err)[:200]}
 
+    def _ma_fire_scheduled_autonomous(sched_def, fire_msg_id):
+        """Fires ONE run of a scheduled autonomous task (v11.33). Called by the
+        /execute_task worker when Cloud Scheduler triggers a definition with
+        task_type 'scheduled_autonomous' - this is NOT a registered tool. It
+        creates a normal per-fire autonomous ticket (own definition + execution
+        docs) and hands off immediately (no sync wait: nobody is watching a
+        scheduler fire), so the existing monitor, orphan recovery, completion
+        injection, and Data Viewer flows all apply unchanged - including the
+        'announce status on the user's next message' behavior.
 
-    # Drive handoff requires BOTH the Managed Agent and Workspace auth
-    # (inside the Managed Agent guard, so this equals the drive-handoff condition).
+        Workspace access: a scheduled fire has no live user turn, so the token
+        embedded is the one captured on the LAST user turn (builtins global) -
+        possibly expired. That is the accepted degrade path: fast_api_app
+        re-uploads a fresh token to the rotating .wstoken object for ACTIVE
+        autonomous tasks on every user turn, so the sandbox regains Workspace
+        access as soon as the user talks while the run is active; until then it
+        follows the documented fallback (report the limitation, continue with
+        the non-Workspace parts).
+
+        Returns a dict with status and ticket-id."""
+        import builtins
+        import threading as _threading
+        import datetime as _dt
+        import uuid as _uuid
+        if not _MANAGED_AGENT_ID:
+            return {"status": "unavailable", "message": "The autonomous agent is not provisioned."}
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        if not _fs or not _demo_id:
+            return {"status": "error", "message": "Task backend unavailable."}
+        _sched_id = sched_def.get("task_id", "")
+        _name = sched_def.get("task_name", "scheduled_autonomous")
+        _description = sched_def.get("task_description", "") or sched_def.get("task_prompt", "")
+        _input_data = sched_def.get("input_data", "")
+        # Overlap guard: skip this fire while the previous run of the SAME
+        # schedule is still active (long sandbox runs can outlast the interval).
+        try:
+            _actives = _fs.collection(_demo_id + "_task_executions").where(
+                "status", "in", ["submitted", "working"]).stream()
+            for _edoc in _actives:
+                _edata = _edoc.to_dict()
+                if _edata.get("scheduled_by") == _sched_id:
+                    return {"status": "skipped_overlap",
+                            "ticket-id": _edata.get("task_id", ""),
+                            "message": "Previous scheduled run still active - this fire was skipped."}
+        except Exception:
+            pass
+        _task_id = str(_uuid.uuid4())[:8]
+        _upload_urls = _ma_mint_upload_urls(_task_id)
+        _now = _dt.datetime.now(_dt.timezone.utc)
+        _message = _ma_build_task_message(_description, _input_data, _upload_urls)
+        _message = (_message + chr(10) + chr(10)
+                    + "SCHEDULED RUN: this task was fired automatically by its schedule at "
+                    + _now.strftime("%Y-%m-%d %H:%M UTC")
+                    + " (no live user turn). State in your report that this was an automatic scheduled run.")
+        _ws_auth = str(getattr(builtins, "_workspace_oauth_token", "") or "")
+        if _ws_auth and not _ws_auth.startswith("Bearer "):
+            _ws_auth = "Bearer " + _ws_auth
+        _message, _ws_token_embedded = _ma_append_workspace_access(_message, _task_id, _ws_auth)
+        _now_iso = _now.isoformat()
+        try:
+            _fs.collection(_demo_id + "_task_definitions").document(_task_id).set({
+                "task_id": _task_id,
+                "task_name": _name,
+                "task_description": _description,
+                "task_prompt": _message,
+                "task_type": "autonomous",
+                "scheduled_by": _sched_id,
+                "created_at": _now_iso,
+            })
+            _fs.collection(_demo_id + "_task_executions").document(_task_id).set({
+                "task_id": _task_id,
+                "definition_id": _task_id,
+                "scheduled_by": _sched_id,
+                "status": "working",
+                "progress_pct": 10,
+                "log_tail": "Scheduled fire (" + str(fire_msg_id or "manual") + ") - delegated to the autonomous sandbox agent." + chr(10),
+                "result_summary": "",
+                "started_at": _now_iso,
+                "completed_at": "",
+                "reported_to_user": False,
+                "updated_at": _now_iso,
+                "deliver_tid": _task_id,
+                "token_embedded": _ws_token_embedded,
+            })
+        except Exception as _doc_err:
+            return {"status": "error", "message": "Could not create task docs: " + str(_doc_err)[:200]}
+        _session = _ma_read_session_state()
+        _env_value = _session.get("environment_id") or os.environ.get("MANAGED_AGENT_ENV_ID", "").strip() or _ma_fresh_environment()
+        _payload = {
+            "agent": _MANAGED_AGENT_ID,
+            "stream": True,
+            "background": True,
+            "store": True,
+            "environment": _env_value,
+            "input": [{"type": "user_input", "content": [{"type": "text", "text": _message}]}],
+            "tools": _ma_override_tools(True),
+        }
+        # No previous_interaction_id: scheduled fires are independent runs and
+        # must not chain onto (or corrupt) the conversational sandbox thread.
+        _shared = {"handoff": True, "token_embedded": _ws_token_embedded,
+                   "task_id": _task_id, "deliver_tid": _task_id}
+        _threading.Thread(target=_ma_monitor_task, args=(_task_id, _shared), daemon=True).start()
+        _threading.Thread(target=_ma_run_interaction, args=(_payload, _shared), daemon=True).start()
+        return {"status": "working_in_background", "ticket-id": _task_id, "task_name": _name}
+
+    def register_scheduled_autonomous_task(
+        task_name: str,
+        task_description: str,
+        schedule_cron: str,
+        input_data: str = "",
+        tool_context: ToolContext = None,
+    ) -> dict:
+        """Registers a RECURRING schedule that automatically delegates a task to
+        the fully autonomous cloud sandbox agent at the given cron times - even
+        while the user is offline. Each fire creates a normal autonomous ticket;
+        its progress and completion (with deliverable download links) are
+        announced automatically the next time the user sends a message.
+
+        USE FOR: recurring autonomous work - e.g. a daily audit dashboard,
+        weekly web-research digest, scheduled report/deck generation.
+        DO NOT USE FOR: recurring demo-DB batch workflows (use
+        register_scheduled_task) or one-shot work (use delegate_autonomous_task).
+
+        NOTE on Workspace: at fire time there may be no fresh Workspace token;
+        Workspace parts of the task then degrade gracefully (the sandbox reports
+        the limitation and completes the rest, and regains Workspace access as
+        soon as the user talks while the run is still active).
+
+        Args:
+            task_name: Short identifier (e.g. 'daily_audit_dashboard').
+            task_description: COMPLETE, self-contained instruction in the USER'S
+                language - same rules as delegate_autonomous_task: describe
+                OUTCOMES only, never this agent's own tool names.
+            schedule_cron: Cron expression, Asia/Tokyo timezone (e.g. '0 8 * * 1-5').
+            input_data: Optional data to embed verbatim into every fire.
+
+        Returns:
+            dict with schedule_id, schedule, and job_name.
+        """
+        import builtins, json as _json, logging as _logging
+        if not _MANAGED_AGENT_ID:
+            return {"status": "unavailable",
+                    "message": "The autonomous agent is not provisioned in this project, so autonomous "
+                               "schedules cannot be created. Offer a scheduled background task instead."}
+        if tool_context is not None and getattr(tool_context, "user_id", "") == "background-worker":
+            return {"status": "blocked",
+                    "message": "Background workers must not register autonomous schedules."}
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        _project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+        _region = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
+        if _region == "global":
+            _region = "us-central1"
+        if not _fs or not _demo_id:
+            return {"status": "error", "message": "Task backend unavailable."}
+        _sched_id = str(_task_uuid.uuid4())[:8]
+        _now = _task_dt.datetime.now(_task_dt.timezone.utc).isoformat()
+        _fs.collection(_demo_id + "_task_definitions").document(_sched_id).set({
+            "task_id": _sched_id,
+            "task_name": task_name,
+            "task_description": task_description,
+            "task_prompt": task_description,
+            "input_data": input_data,
+            "task_type": "scheduled_autonomous",
+            "schedule_cron": schedule_cron,
+            "created_at": _now,
+        })
+        # The schedule's own execution doc stays status 'scheduled'; per-fire
+        # tickets get their own docs. Cancelling THIS doc stops future fires
+        # (the /execute_task guard skips cancelled non-refire tasks).
+        _fs.collection(_demo_id + "_task_executions").document(_sched_id).set({
+            "task_id": _sched_id,
+            "definition_id": _sched_id,
+            "status": "scheduled",
+            "progress_pct": 0,
+            "log_tail": "",
+            "result_summary": "",
+            "started_at": "",
+            "completed_at": "",
+            "reported_to_user": False,
+        })
+        _job_name = ""
+        try:
+            from google.cloud import scheduler_v1
+            _sched_client = scheduler_v1.CloudSchedulerClient()
+            _parent = "projects/" + _project_id + "/locations/" + _region
+            _job_id = _demo_id + "-sched-" + _sched_id
+            _payload = _json.dumps({"task_id": _sched_id, "demo_id": _demo_id}).encode("utf-8")
+            _topic_path = "projects/" + _project_id + "/topics/" + _demo_id + "-sched-tasks"
+            _job = scheduler_v1.Job(
+                name=_parent + "/jobs/" + _job_id,
+                schedule=schedule_cron,
+                time_zone="Asia/Tokyo",
+                pubsub_target=scheduler_v1.PubsubTarget(topic_name=_topic_path, data=_payload),
+            )
+            _created = _sched_client.create_job(parent=_parent, job=_job)
+            _job_name = _created.name
+            _logging.warning("Created Cloud Scheduler job for autonomous schedule: " + _job_name)
+        except Exception as _e:
+            _logging.error("Failed to create autonomous scheduler job: " + str(_e))
+            return {"status": "partial", "schedule_id": _sched_id,
+                    "error": "Definition saved but scheduler creation failed: " + str(_e)[:200]}
+        return {
+            "status": "scheduled",
+            "schedule_id": _sched_id,
+            "task_name": task_name,
+            "schedule": schedule_cron,
+            "job_name": _job_name,
+            "message": "Autonomous schedule registered (timezone Asia/Tokyo). Each fire runs in the sandbox "
+                       "even while the user is offline; progress and completion are announced automatically "
+                       "on the user's next message. Tell the user this, including the schedule in plain words.",
+        }
+
     if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
+
         # =============================================================================
         # Google Drive handoff for Managed Agent deliverables (v11.0)
         # Requires BOTH Workspace MCP (user OAuth with drive.file scope via the GE
@@ -3640,4 +4117,3 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             if _errors:
                 _out["problems"] = _errors
             return _out
-
