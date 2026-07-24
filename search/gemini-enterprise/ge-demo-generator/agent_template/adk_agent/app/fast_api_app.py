@@ -1050,9 +1050,10 @@ logger = logging_client.logger(__name__)
 # Pre-browse delegation-note fragment (used inside the Managed-Agent-guarded
 # briefing-press handler; empty when Computer Use is off).
 _MA_PREBROWSE_EXCEPTION = (
-    'EXCEPTION - PRE-BROWSE: if the brief needs data that only interactive browsing '
-    'can obtain, run the COMPUTER USE browse sequence first and delegate immediately '
-    'after, in this same turn. '
+    'EXCEPTION - PRE-BROWSE: if the brief mentions web browsing or names a '
+    'specific site / page / URL to consult (or needs data only interactive '
+    'browsing can obtain), run the COMPUTER USE browse sequence first and '
+    'delegate immediately after, in this same turn. '
 ) if os.environ.get("ENABLE_COMPUTER_USE") == "1" else ""
 
 # Pre-browse planner override fragment: only meaningful when BOTH the Managed

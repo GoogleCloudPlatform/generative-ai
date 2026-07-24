@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.35-public',
+  APP_VERSION: 'v11.37-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -847,7 +847,7 @@ function planAndGenerateData(userGoal, options) {
     - You MUST leverage this capability when generating the 'businessInstruction' and 'demoGuide' (prompts).
     - In 'businessInstruction', mention that the agent can hand off deep autonomous work (research, building deliverables, iterative code work) to a managed autonomous agent and deliver finished files back to the user.
     - You MUST design at least TWO prompts (out of the 7 required) in the 'demoGuide' that showcase the autonomous agent, following BOTH patterns below:
-      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").${ options.enableComputerUse ? ` Because the browser agent is ALSO enabled, Pattern A MAY additionally name ONE specific external page or portal to check interactively (e.g. a competitor's public pricing page) - the assistant will then operate its real browser live in the chat BEFORE handing off to the autonomous agent, which makes a strong combined showcase. Keep it to a single, quickly checkable page; the deep multi-source research still belongs to the autonomous agent.` : ''}
+      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").${ options.enableComputerUse ? ` Because the browser agent is ALSO enabled, Pattern A MUST name ONE specific external page or portal to check interactively (e.g. a competitor's public pricing page or an official statistics portal) AND phrase that part as an explicit browse request (e.g. "browse <site> live for the latest ..."), so the assistant operates its real browser live in the chat BEFORE handing off to the autonomous agent - a strong combined showcase. Keep it to a single, quickly checkable page; the deep multi-source research still belongs to the autonomous agent.` : ''}
       - **Pattern B (COMPLEX LONG-HORIZON DELIVERABLE)**: one prompt MUST ask for finished, downloadable business output whose production requires SEQUENTIALLY DEPENDENT phases (real quantitative analysis of the internal data -> charts built from that analysis -> professional assembly), so the request genuinely deserves tens of minutes of autonomous work. Make it one of these two shapes, whichever fits the scenario better: (1) TWO complementary formats built from the same analysis - e.g. a board presentation deck PLUS a 2-page summary PDF for the field team, or a formal proposal document PLUS a one-page web briefing; or (2) a WORKING INTERACTIVE TOOL - a self-contained web app the user opens in a browser (e.g. a pricing / capacity / what-if simulator) whose coefficients come from the actual data analysis, plus a short document explaining the model. The prompt should sound like a real executive request and SHOULD state 1-2 explicit quality conditions in natural business language (e.g. "lead with the conclusion on the first page", "every number must be sourced from our data or a cited reference") - these conditions make the agent's self-review-and-rebuild loop visible in the demo. Patterns A and B MUST use DIFFERENT deliverable formats so the demo shows variety.${ crossOrgEnabled_() ? '\n      - **CROSS-DEPARTMENTAL DELIVERABLE (MANDATORY)**: the delegated mission MUST synthesize data owned by at least two departments and address its deliverable to the department (or executive) that owns the decision - framed as the journey summary of the demo narrative: what happened in each department, where the process stalled, and what was resolved. Because the Pattern A prompt occupies the final core slot, ITS deliverable also carries the NARRATIVE ARC finale duty: it MUST close with the quantified process outcomes of the demo narrative (before/after cycle time or lead time, items resolved, hand-offs completed).' : '' }${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? `
       - **MANDATORY WORKSPACE COMBINATION**: Google Workspace access is ALSO enabled for this demo, and the autonomous agent can act on the user's Workspace (save files to Drive as native Google Slides/Docs/Sheets, draft Gmail messages, post to named Google Chat spaces, create Calendar events). At least ONE of the two autonomous prompts MUST chain a Workspace action onto the deliverable so the demo showcases BOTH capabilities together, e.g.: "Research the latest industry trends, build the executive deck, save it to my Drive as Google Slides, and draft an email to the leadership team summarizing it" or "...and post the summary with the document link to the <team> Chat space, then set up a 30-minute review meeting on my calendar". Keep the Workspace actions realistic for the persona, and prefer DRAFT email wording (the agent creates drafts, it does not send unless explicitly told).` : ''}
     - 🎯 SLOT ASSIGNMENT (overrides the base 7-prompt distribution): put Pattern B in the Prompt 5 slot, REPLACING the large-scope background workflow prompt (the autonomous delegation itself runs in the background and demonstrates background execution plus completion announcements, so that story is preserved). Weave Pattern A into the Prompt 7 slot (End-to-End Strategic Automation): its web research + internal data synthesis IS the end-to-end showcase${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? ', and the MANDATORY WORKSPACE COMBINATION chain belongs there' : ''}. Do NOT merge Patterns A and B into a single prompt - the demo needs TWO distinct autonomous moments. Because slots 5 and 7 are now autonomous, fold the MANDATORY INTERACTIVE DASHBOARD prompt into slot 1 or 2 (make one of the foundation prompts ask for the browser-openable interactive overview dashboard, keeping its explicit open-in-browser signal) - the dashboard prompt must NOT displace slot 5 or 7 and must NOT be dropped.
@@ -2373,6 +2373,18 @@ function generateSetupScript(params) {
     // generate_content computer_use tool config.
     playwright: 'playwright==1.55.0',
     genaiComputerUse: 'google-genai>=2.7.0',
+    // (v11.36) google-genai>=2.7.0 is only satisfiable with recent
+    // google-cloud-aiplatform releases (older ones cap google-genai<2.0.0),
+    // and those releases depend on Google Cloud OTel packages whose satisfying
+    // versions are pre-releases (1.12.0a0). uv ignores pre-release markers
+    // on TRANSITIVE deps, so without these direct floors the resolver
+    // rejects every aiplatform that allows genai 2.x and the build fails
+    // ("pre-releases weren't enabled"). Declaring them as direct deps with
+    // explicit pre-release floors scopes pre-release resolution to exactly
+    // these two packages (unlike --prerelease=allow, which would also pull
+    // mcp/pydantic pre-releases).
+    cuOtelGcpLogging: 'opentelemetry-exporter-gcp-logging>=1.12.0a0',
+    cuOtelGcpResourceDetector: 'opentelemetry-resourcedetector-gcp>=1.12.0a0',
   };
 
   
@@ -4268,7 +4280,7 @@ ${PINNED_DEPS.pubsub}
 ${PINNED_DEPS.firestore}
 ${PINNED_DEPS.logging}
 ${PINNED_DEPS.otel}
-${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}` : '' }
+${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}\n${PINNED_DEPS.cuOtelGcpLogging}\n${PINNED_DEPS.cuOtelGcpResourceDetector}` : '' }
 __REQ_EOF__
 
 # Generate pyproject.toml required for adk project type

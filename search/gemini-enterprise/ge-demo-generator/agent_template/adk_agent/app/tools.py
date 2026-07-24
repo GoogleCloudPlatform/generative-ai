@@ -1199,7 +1199,15 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
     # =====================================================================
     _CU_VIEWPORT_W = 1440
     _CU_VIEWPORT_H = 900
-    _CU_MAX_STEPS = 40
+    # Step/wall budgets (v11.37): env-tunable per demo via
+    # 'gcloud run services update --update-env-vars' so a demo needing deeper
+    # browsing does not require a code redeploy. Inline runs must finish inside
+    # GE's chat render window; background runs are bounded by the /execute_task
+    # request (Cloud Run --timeout 1800).
+    _CU_MAX_STEPS = int(os.environ.get("COMPUTER_USE_MAX_STEPS", "80"))
+    _CU_WALL_S = int(os.environ.get("COMPUTER_USE_WALL_S", "1200"))
+    _CU_INLINE_MAX_STEPS = int(os.environ.get("COMPUTER_USE_INLINE_MAX_STEPS", "30"))
+    _CU_INLINE_WALL_S = int(os.environ.get("COMPUTER_USE_INLINE_WALL_S", "240"))
     _CU_KEEP_SHOTS = 3
     _CU_STEP_TIMEOUT_MS = 15000
     _CU_MAX_CHAT_SHOTS = 6
@@ -1524,8 +1532,8 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
         # Inline calls must finish inside GE's chat render window, so cap steps and
         # wall-clock tightly; background calls (via a task) can run much longer.
         import time as _time
-        _max_steps = 20 if _is_inline else _CU_MAX_STEPS
-        _wall_budget = 240.0 if _is_inline else 600.0
+        _max_steps = _CU_INLINE_MAX_STEPS if _is_inline else _CU_MAX_STEPS
+        _wall_budget = float(_CU_INLINE_WALL_S) if _is_inline else float(_CU_WALL_S)
         _deadline = _time.monotonic() + _wall_budget
 
         _shots_for_chat = []
@@ -1553,6 +1561,18 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             _start = start_url or "https://duckduckgo.com/"
             if "://" not in _start:
                 _start = "https://" + _start
+            # Google search hard-blocks headless Chrome with a CAPTCHA wall, burning
+            # steps before the run even starts (v11.37). Rewrite any google search
+            # start_url to the automation-friendly DuckDuckGo html results page
+            # carrying the same query.
+            try:
+                from urllib.parse import urlparse as _cu_up, parse_qs as _cu_pq, quote_plus as _cu_qp
+                _pu = _cu_up(_start)
+                if "google." in (_pu.netloc or "").lower():
+                    _gq = (_cu_pq(_pu.query or "").get("q") or [""])[0]
+                    _start = ("https://duckduckgo.com/html/?q=" + _cu_qp(_gq)) if _gq else "https://duckduckgo.com/html/"
+            except Exception:
+                pass
             try:
                 await page.goto(_start, wait_until="load", timeout=_CU_STEP_TIMEOUT_MS)
             except Exception:
@@ -1561,8 +1581,22 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             _shot = await page.screenshot(type="png")
             _jpg = await page.screenshot(type="jpeg", quality=60)
             await _cu_publish(session_id, 0, "Opened " + _start, page.url, "working", base64.b64encode(_jpg).decode("ascii"))
+            # The browsing policy must travel WITH the goal: the computer-use model
+            # inside this loop never sees the root agent's instruction, so without
+            # this preamble it happily opens google.com and burns the step budget
+            # on the bot wall (observed live 2026-07-24).
+            _policy = (
+                "Browsing policy (follow strictly - every action costs one step from a budget of " + str(_max_steps) + "):" + chr(10)
+                + "- NEVER navigate to google.com: it shows a CAPTCHA wall to automated browsers. To search the web, "
+                "navigate directly to https://duckduckgo.com/html/?q=<url-encoded terms>." + chr(10)
+                + "- If a page shows a CAPTCHA / bot check / 'unusual traffic' message, do not fight it: switch ONCE to "
+                "duckduckgo html results or another authoritative source and continue." + chr(10)
+                + "- Prefer navigating straight to the most authoritative page for the goal over searching." + chr(10)
+                + "- Be economical: no re-visits, no exploratory clicks. Once the goal is met - or the budget is nearly "
+                "spent - stop and summarize what you have."
+            )
             history = [types.Content(role="user", parts=[
-                types.Part.from_text(text="Goal: " + (goal or "") + chr(10) + "Complete this task in the browser. When finished, summarize what you found or did."),
+                types.Part.from_text(text="Goal: " + (goal or "") + chr(10) + _policy + chr(10) + "Complete this task in the browser. When finished, summarize what you found or did."),
                 types.Part.from_bytes(data=_shot, mime_type="image/png"),
             ])]
 
