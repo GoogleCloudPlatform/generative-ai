@@ -1,0 +1,217 @@
+{
+  "metadata": {
+    "description": "Auto-generated evaluation scenarios for user_4.",
+    "total_scenarios": 18,
+    "similar_scenarios": 10,
+    "different_scenarios": 8,
+    "user_id": "user_4",
+    "persona": "Small business owner (cafe). Non-technical, practical.",
+    "generated_from_pool": true,
+    "llm_reviewed": true,
+    "seed": 42
+  },
+  "scenarios": [
+    {
+      "scenario_id": "eval_u4_sim_001",
+      "category": "similar",
+      "intent": "supplier_negotiation",
+      "expected_swarm_agent": "supplier_management",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user receives practical advice on how to pitch their cafe as a showcase account to negotiate a discount on high-end equipment.",
+      "opening_message": "I'm looking at buying a really high-end commercial blender setup. I can't really afford the sticker price, but my cafe is in a high-traffic area with lots of other food business owners coming in. Can I negotiate a discount by offering to let the manufacturer use my shop as a local showcase or reference? Does that actually work?",
+      "follow_up_strategy": "pivot",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u4_sim_002",
+      "category": "similar",
+      "intent": "legal_questions",
+      "expected_swarm_agent": "business_insurance_inquiries",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user understands the difference between a standard food license and the requirements for serving alcohol, including temporary event permits.",
+      "opening_message": "We usually just sell coffee and tea, but I'm thinking about offering mimosas and wine for a special Mother's Day brunch event next month. Since it's just a one-off weekend thing and not a permanent menu change, do I still need to go through the whole process of getting a liquor license? Is there some kind of temporary permit I can get instead so I don't break any laws?",
+      "follow_up_strategy": "pivot",
+      "max_turns": 3,
+      "_validation_warning": "Expected business_insurance_inquiries but embedding best match is cafe_management_operations (score=0.494)"
+    },
+    {
+      "scenario_id": "eval_u4_sim_003",
+      "category": "similar",
+      "intent": "hiring_process",
+      "expected_swarm_agent": "small_business_tax_prep",
+      "should_trigger_swarm": true,
+      "goal_definition": "User understands the legal and tax differences between a 1099 contractor and a W-2 employee in the context of an in-house baker.",
+      "opening_message": "For the last year, I've had a local baker making pastries at her house and dropping them off. I just paid her as an independent contractor. Now I want her to come bake in my cafe's kitchen using my equipment for 20 hours a week. Do I have to make her an official employee now with taxes and everything, or can I keep paying her as a contractor? I want to keep the paperwork as simple as possible.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_sim_004",
+      "category": "similar",
+      "intent": "social_media_marketing",
+      "expected_swarm_agent": "cafe_management_operations",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI outlines a simple, weekly Facebook posting schedule tailored to an older demographic focusing on community and daily specials.",
+      "opening_message": "Most of my regular customers are a bit older and they all use Facebook, not Instagram or TikTok. I have a Facebook page for the cafe, but right now I just post when we are closed for holidays. What should I actually be posting on there week to week to keep them engaged and coming back for our daily lunch specials? I need simple ideas I can schedule in advance.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_sim_005",
+      "category": "similar",
+      "intent": "legal_questions",
+      "expected_swarm_agent": "business_insurance_inquiries",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user understands their rights regarding price locks in vendor contracts and how to formally dispute an unauthorized price hike.",
+      "opening_message": "I signed a one-year contract with my wholesale coffee bean roaster back in January that locked in our price per pound. Yesterday, they sent an invoice with a 15% price increase, claiming inflation is forcing their hand. Can they legally just change the price in the middle of our contract like that? I rely on those margins to keep the cafe afloat, and I want to know if I can push back.",
+      "follow_up_strategy": "correct",
+      "max_turns": 4,
+      "_validation_warning": "Expected business_insurance_inquiries but embedding best match is cafe_menu_pricing (score=0.588)"
+    },
+    {
+      "scenario_id": "eval_u4_sim_006",
+      "category": "similar",
+      "intent": "menu_pricing",
+      "expected_swarm_agent": "cafe_menu_pricing",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI explains the psychological impact of different price endings specifically for a local cafe brand.",
+      "opening_message": "I'm reprinting my physical menu boards next week. Right now all my prices are flat numbers, like $4.00 or $6.00. A friend told me I should change everything to $3.99 or $5.95 because it looks cheaper. Does that actually work for a cozy neighborhood cafe, or does it just make me look like a fast food joint?",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_sim_007",
+      "category": "similar",
+      "intent": "customer_feedback",
+      "expected_swarm_agent": "cafe_management_operations",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user receives actionable advice on handling customer complaints regarding the cafe's music and atmosphere.",
+      "opening_message": "I've had a couple of reviews lately saying the music in the cafe is either too loud or just not the right vibe for working. Right now, my baristas just play whatever Spotify playlist they feel like. I know there are commercial music services that curate the vibe, but they cost a monthly fee. Is it worth paying for a professional music service, or should I just make strict rules for my staff about what they can play?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_sim_008",
+      "category": "similar",
+      "intent": "hiring_process",
+      "expected_swarm_agent": "small_business_tax_prep",
+      "should_trigger_swarm": true,
+      "goal_definition": "User gets a practical framework for deciding whether to promote an existing barista to shift supervisor or hire an external candidate.",
+      "opening_message": "My cafe is getting too busy for me to be there every single weekend. I need a shift supervisor for Saturdays and Sundays. I have a team of five baristas right now. Two of them are pretty good, but they are friends with everyone else. Should I promote one of them to be the boss on weekends, or is it better to hire an outsider with management experience? I'm worried about drama if I promote from within, but training an outsider on our menu takes forever.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 5,
+      "_validation_warning": "Expected small_business_tax_prep but embedding best match is cafe_management_operations (score=0.585)"
+    },
+    {
+      "scenario_id": "eval_u4_sim_009",
+      "category": "similar",
+      "intent": "financial_planning",
+      "expected_swarm_agent": "cafe_management_operations",
+      "should_trigger_swarm": true,
+      "goal_definition": "User receives a plain-English explanation of cash flow versus profit, and a simple template idea for tracking weekly cash.",
+      "opening_message": "My bookkeeper told me I need to start looking at my 'cash flow' and not just my profit. I keep having trouble making payroll on the 15th of the month, even though the cafe is busy and we are supposedly making a profit. I don't understand accounting jargon at all. What is a really simple way for me to track the actual cash coming in versus going out so I stop stressing about payroll?",
+      "follow_up_strategy": "correct",
+      "max_turns": 4,
+      "_validation_warning": "Expected cafe_management_operations but embedding best match is small_business_tax_prep (score=0.568)"
+    },
+    {
+      "scenario_id": "eval_u4_sim_010",
+      "category": "similar",
+      "intent": "business_insurance",
+      "expected_swarm_agent": "business_insurance_inquiries",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user understands if equipment breakdown coverage is necessary for their espresso machine and how it differs from standard property insurance.",
+      "opening_message": "I just dropped $12,000 on a new commercial espresso machine for the shop. A buddy of mine who owns a bakery said I need 'equipment breakdown' insurance, but I already have a standard business policy. Do I really need to pay extra for this? If the machine dies, I can't sell coffee, but I don't want to get suckered into buying useless add-ons.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u4_diff_001",
+      "category": "different",
+      "intent": "home_improvement",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a practical DIY plan with materials and steps.",
+      "opening_message": "I want to repaint my bedroom. The walls have some nail holes and a few small cracks. What's the right prep work and what type of paint should I use? I've never painted a room before.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_002",
+      "category": "different",
+      "intent": "astronomy",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a clear explanation of an astronomy concept.",
+      "opening_message": "My kid asked me why the moon changes shape during the month. I know it has to do with the sun but I can't explain it clearly. Can you help me understand lunar phases so I can explain it to a 7-year-old?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_003",
+      "category": "different",
+      "intent": "fitness",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a beginner workout plan.",
+      "opening_message": "I want to start exercising but I'm completely out of shape. I can't run for more than 2 minutes. What's a realistic plan to build up fitness over the next 3 months? I have no gym membership.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_004",
+      "category": "different",
+      "intent": "gardening",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical gardening advice with a planting plan.",
+      "opening_message": "I want to start growing vegetables in my backyard. I have a 10x10 patch that gets about 6 hours of sun. What should I plant for a beginner? I'm in Zone 6.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_005",
+      "category": "different",
+      "intent": "pet_care",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical pet care advice.",
+      "opening_message": "I'm thinking about getting a cat. I've never had a pet before. What are the basics I need to know — costs, supplies, vet visits? I live in a small apartment.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_006",
+      "category": "different",
+      "intent": "parenting",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical advice for the described parenting situation.",
+      "opening_message": "My 10-year-old has been struggling with math and is starting to say he hates school. His teacher says he's capable but just doesn't try. How do I motivate him without adding pressure?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_007",
+      "category": "different",
+      "intent": "python_programming",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get help with a basic programming question.",
+      "opening_message": "My nephew asked me to help with his Python homework. He needs to write a program that sorts a list of numbers. I have no idea about coding. Can you explain it simply?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u4_diff_008",
+      "category": "different",
+      "intent": "car_repair",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get advice on whether to repair or replace and approximate costs.",
+      "opening_message": "My car has been making a weird rattling noise from the engine area when I accelerate. It's a 2016 Honda Civic with 95K miles. Should I be worried? Is this something I can check myself?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    }
+  ]
+}

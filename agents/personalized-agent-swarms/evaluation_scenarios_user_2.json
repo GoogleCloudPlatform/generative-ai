@@ -1,0 +1,214 @@
+{
+  "metadata": {
+    "description": "Auto-generated evaluation scenarios for user_2.",
+    "total_scenarios": 18,
+    "similar_scenarios": 10,
+    "different_scenarios": 8,
+    "user_id": "user_2",
+    "persona": "Marketing manager. Wants structured output with headers.",
+    "generated_from_pool": true,
+    "llm_reviewed": true,
+    "seed": 42
+  },
+  "scenarios": [
+    {
+      "scenario_id": "eval_u2_sim_001",
+      "category": "similar",
+      "intent": "write_campaign_copy",
+      "expected_swarm_agent": "email_copywriting_and_campaigns",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides organized landing page copy for a coffee shop franchise opportunity, covering hero, investment, and timeline sections.",
+      "opening_message": "I need landing page copy for our new franchise opportunity campaign. We are expanding our local organic coffee shop brand, 'Bean & Branch', nationwide. The target audience is prospective franchisees. Please provide the copy using strict headers for: Hero Section (Headline and Subhead), The Opportunity (brief pitch), Investment Requirements (bulleted list), and Next Steps/Timeline. Keep the tone professional, encouraging, and highly structured.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u2_sim_002",
+      "category": "similar",
+      "intent": "draft_email_newsletter",
+      "expected_swarm_agent": "email_copywriting_and_campaigns",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides a 4-email post-purchase sequence formatted with headers, subject lines, and copy focused on UGC and cross-selling.",
+      "opening_message": "Write a post-purchase nurture sequence for our high-end fitness equipment brand. I need 4 emails spaced over 30 days after delivery. The goal is twofold: encourage them to post user-generated content on Instagram, and cross-sell our premium resistance bands and maintenance kits. Please format the output clearly, using headers for 'Email 1', 'Email 2', etc., along with suggested subject lines and the core message for each.",
+      "follow_up_strategy": "correct",
+      "max_turns": 5
+    },
+    {
+      "scenario_id": "eval_u2_sim_003",
+      "category": "similar",
+      "intent": "create_brand_guidelines",
+      "expected_swarm_agent": "executive_presentation_outlining",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI delivers a structured brand voice document with headers outlining how to sound playful, sustainable, and inclusive in marketing copy.",
+      "opening_message": "I'm managing the marketing for an upcoming eco-friendly apparel brand, and we need a solid foundation for our brand voice. Our target audience is Gen Z and Millennials. Help me create a brand voice document that ensures we sound playful, sustainable, and inclusive. I expect the response to be highly structured with clear headers for each characteristic, detailing what it means and how our writers should apply it.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3,
+      "_validation_warning": "Expected executive_presentation_outlining but embedding best match is social_media_content_creation (score=0.570)"
+    },
+    {
+      "scenario_id": "eval_u2_sim_004",
+      "category": "similar",
+      "intent": "plan_event",
+      "expected_swarm_agent": "comprehensive_marketing_strategy",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user's goal is met when the assistant delivers a 3-day event schedule and three distinct sponsorship tiers using clear headers.",
+      "opening_message": "We are putting together our first Global Partner Summit at a resort in Miami. It will be a 3-day retreat for 200 of our top agency partners, with a budget of $250K. I need to outline the event schedule and create three tiers of sponsorship packages to help offset costs. Please provide the schedule and sponsorship tiers using distinct headers and structured bullet points.",
+      "follow_up_strategy": "pivot",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_sim_005",
+      "category": "similar",
+      "intent": "draft_email_newsletter",
+      "expected_swarm_agent": "email_copywriting_and_campaigns",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides 5 subject lines and a structured cart abandonment email draft with headers for the hook, items, and CTA.",
+      "opening_message": "Our cart abandonment email series for our e-commerce apparel brand is underperforming. Our current conversion rate is a dismal 1.8%. I need you to help me rewrite the first email in the flow to drive immediate urgency. Please give me 5 new, high-converting subject line options. Then, draft the email body using a structured format with clear headers for the hook, the abandoned items placeholder, and a strong CTA.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_sim_006",
+      "category": "similar",
+      "intent": "plan_campaign_strategy",
+      "expected_swarm_agent": "comprehensive_marketing_strategy",
+      "should_trigger_swarm": true,
+      "goal_definition": "The goal is met when the AI provides a structured campaign plan for repositioning a niche B2B tool into a comprehensive enterprise platform.",
+      "opening_message": "We started as a niche SEO reporting tool for small agencies, but over the last two years, we've built out a full suite of enterprise marketing analytics features. We need a campaign strategy to reposition ourselves as a comprehensive enterprise platform. The challenge is doing this while keeping our loyal agency user base engaged and feeling valued. Please draft a strategic plan. I expect the output to be highly organized with clear headers for Rebranding Phases, Communication Strategy, and Retention Initiatives.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_sim_007",
+      "category": "similar",
+      "intent": "analyze_marketing_metrics",
+      "expected_swarm_agent": "analyze_marketing_metrics",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI provides a structured KPI framework to measure the lifecycle ROI of field marketing events.",
+      "opening_message": "We are heavily investing in field marketing this year, with 5 major in-person events planned. I need a standardized way to measure the ROI and impact of these events across the entire lifecycle. Please build a structured KPI framework using clear headers to measure pre-event engagement, on-site activation and booth traffic, and post-event pipeline generation.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_sim_008",
+      "category": "similar",
+      "intent": "create_brand_guidelines",
+      "expected_swarm_agent": "executive_presentation_outlining",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI delivers a structured list with headers showing words to avoid and words to use to keep the brand's food copy appetizing rather than preachy.",
+      "opening_message": "I oversee marketing for a plant-based meal delivery service. We have a major inconsistency issue where some freelancers sound overly preachy about veganism, which alienates mainstream customers. I need a structured 'Do's and Don'ts' vocabulary guide. Please use headers to separate 'Preachy Words to Avoid' from 'Appetizing Words to Embrace'. Give me a robust list of terms and phrases so our writers focus on flavor and convenience rather than activism.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u2_sim_009",
+      "category": "similar",
+      "intent": "conduct_ab_test",
+      "expected_swarm_agent": "ab_testing_strategy",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides a structured governance framework with headers to prevent overlapping A/B tests on the same audience.",
+      "opening_message": "Our marketing department has a bad habit of running multiple A/B tests on the homepage simultaneously without segmenting the traffic. Last week, we had three different pop-up tests running on the same user base, which completely muddied the data. I need to establish a strict testing governance model. Can you provide a structured framework to prevent overlapping tests? Please use headers for Governance Rules, Traffic Segmentation, and Test Prioritization.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 5
+    },
+    {
+      "scenario_id": "eval_u2_sim_010",
+      "category": "similar",
+      "intent": "analyze_competitor",
+      "expected_swarm_agent": "analyze_marketing_metrics",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user's goal is met when the assistant provides a structured feature-by-feature comparison framework for CRM platforms.",
+      "opening_message": "I need to build a comprehensive feature comparison framework evaluating our new CRM platform against Salesforce, HubSpot, and Pipedrive. Please provide a highly structured breakdown with clear headers. What specific dimensions, such as automation capabilities, integration ecosystems, reporting dashboards, and pricing models, should I be evaluating to effectively highlight our unique value proposition to enterprise buyers?",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u2_diff_001",
+      "category": "different",
+      "intent": "home_improvement",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a practical DIY plan with materials and steps.",
+      "opening_message": "I want to repaint my bedroom. The walls have some nail holes and a few small cracks. What's the right prep work and what type of paint should I use? I've never painted a room before.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_002",
+      "category": "different",
+      "intent": "astronomy",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a clear explanation of an astronomy concept.",
+      "opening_message": "My kid asked me why the moon changes shape during the month. I know it has to do with the sun but I can't explain it clearly. Can you help me understand lunar phases so I can explain it to a 7-year-old?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_003",
+      "category": "different",
+      "intent": "fitness",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a beginner workout plan.",
+      "opening_message": "I want to start exercising but I'm completely out of shape. I can't run for more than 2 minutes. What's a realistic plan to build up fitness over the next 3 months? I have no gym membership.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_004",
+      "category": "different",
+      "intent": "gardening",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical gardening advice with a planting plan.",
+      "opening_message": "I want to start growing vegetables in my backyard. I have a 10x10 patch that gets about 6 hours of sun. What should I plant for a beginner? I'm in Zone 6.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_005",
+      "category": "different",
+      "intent": "pet_care",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical pet care advice.",
+      "opening_message": "I'm thinking about getting a cat. I've never had a pet before. What are the basics I need to know — costs, supplies, vet visits? I live in a small apartment.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_006",
+      "category": "different",
+      "intent": "parenting",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical advice for the described parenting situation.",
+      "opening_message": "My 10-year-old has been struggling with math and is starting to say he hates school. His teacher says he's capable but just doesn't try. How do I motivate him without adding pressure?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_007",
+      "category": "different",
+      "intent": "python_programming",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get help with a basic programming question.",
+      "opening_message": "My nephew asked me to help with his Python homework. He needs to write a program that sorts a list of numbers. I have no idea about coding. Can you explain it simply?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u2_diff_008",
+      "category": "different",
+      "intent": "car_repair",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get advice on whether to repair or replace and approximate costs.",
+      "opening_message": "My car has been making a weird rattling noise from the engine area when I accelerate. It's a 2016 Honda Civic with 95K miles. Should I be worried? Is this something I can check myself?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    }
+  ]
+}
