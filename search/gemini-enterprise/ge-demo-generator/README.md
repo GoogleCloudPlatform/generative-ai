@@ -448,6 +448,12 @@ If sub-agents fail to modify Firestore or pull from BigQuery:
   - `roles/bigquery.dataViewer` & `roles/bigquery.jobUser`
   - `roles/aiplatform.user`
  
+#### 6. Endless "The agent requires additional authorization" Prompt
+If every message comes back with the Gemini Enterprise authorization card, you complete consent, and the very next turn asks again — with no error anywhere in the UI, in Cloud Run, or in the agent logs:
+- **Cause**: Consent only validates the `client_id` and the redirect URI, so it succeeds even when the code-to-token exchange that Gemini Enterprise performs afterwards fails. The usual reason is a stored OAuth client secret that no longer matches the client (rotated or deleted). Because every demo in a project shares one OAuth client, this breaks **all** Workspace-authorization demos at once.
+- **Detection**: The setup script now probes the token endpoint with a throwaway code before wiring the credentials into Gemini Enterprise. `invalid_grant` means the credentials are good (only the fake code was rejected); `invalid_client` means the secret is stale.
+- **Fix**: Add a **new secret to the existing OAuth client** (the `client_id` and redirect URI stay valid) at `https://console.cloud.google.com/auth/clients`, then re-run the setup script — it prompts for the new secret, verifies it, stores it as a new Secret Manager version, and refreshes the authorization resource.
+ 
 ---
  
 ### 13.3 Cleanup

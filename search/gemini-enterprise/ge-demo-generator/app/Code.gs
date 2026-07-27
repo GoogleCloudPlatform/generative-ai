@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.37-public',
+  APP_VERSION: 'v11.38-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -3104,12 +3104,57 @@ else
   echo "   If Chat posts fail with a permission/configuration error, open 'Configuration' there and set it up (App name: '${enableWorkspaceMcp ? 'Chat MCP' : 'GE Demo Agent'}')."
 fi
 
+# ── OAuth credential pre-flight (v11.38) ──────────────────────────────────
+# A rotated or deleted client secret is the #1 cause of the Gemini Enterprise
+# "The agent requires additional authorization for: <demo>-auth" loop. The
+# consent step still succeeds (Google only validates client_id and the
+# redirect URI there), but GE's code->token exchange fails with
+# invalid_client, no token is ever persisted, and every following turn
+# re-prompts - with no error surfaced anywhere in the GE UI.
+# Probing the token endpoint with a throwaway code separates the two cases:
+#   invalid_grant  -> credentials are GOOD (only the fake code was rejected)
+#   invalid_client -> the stored secret no longer matches the OAuth client
+probe_oauth_client() {
+  curl -s -X POST "https://oauth2.googleapis.com/token" \
+    -d client_id="\$OAUTH_CLIENT_ID" \
+    -d client_secret="\$OAUTH_CLIENT_SECRET" \
+    -d code="preflight-probe-not-a-real-code" \
+    -d grant_type="authorization_code" \
+    -d redirect_uri="https://vertexaisearch.cloud.google.com/oauth-redirect"
+}
+echo "🩺 Verifying the OAuth client credentials before wiring them into Gemini Enterprise..."
+if probe_oauth_client | grep -q '"invalid_client"'; then
+  echo "    ❌ Google rejected this client_id/secret pair (invalid_client)."
+  echo "       The stored secret no longer matches the OAuth client - it was rotated or deleted."
+  echo "       Add a NEW secret to the EXISTING client (the client_id and redirect URI stay valid):"
+  echo "       https://console.cloud.google.com/auth/clients/\$OAUTH_CLIENT_ID?project=\$PROJECT_ID"
+  if [ -t 0 ]; then
+    read -s -p "    Paste the NEW OAuth Client Secret (or press [Enter] to skip): " NEW_OAUTH_SECRET
+    echo ""
+    if [ -n "\$NEW_OAUTH_SECRET" ]; then
+      OAUTH_CLIENT_SECRET="\$NEW_OAUTH_SECRET"
+      if probe_oauth_client | grep -q '"invalid_client"'; then
+        echo "    ⚠️  The new secret was rejected too - continuing, but Workspace tools will not work."
+      else
+        echo -n "\$OAUTH_CLIENT_SECRET" | gcloud secrets versions add \$CLIENT_SECRET_SECRET --data-file=- --project="\$PROJECT_ID" >/dev/null
+        echo "    ✅ New secret verified and stored as a new Secret Manager version."
+      fi
+    else
+      echo "    ⚠️  Skipped - Workspace authorization will loop until the secret is fixed."
+    fi
+  else
+    echo "    ⚠️  Non-interactive run - continuing, but Workspace authorization will loop."
+  fi
+else
+  echo "    ✅ OAuth client credentials accepted by Google."
+fi
+
 # Create or UPDATE (v11.35) the authorization resource in Gemini Enterprise.
 # A re-run previously hit a silent 409 and kept the OLD resource, so OAuth
 # scope additions never reached overwrite-deployed demos (stale scopes
 # surface later as confusing 403s in Workspace tools). PATCH keeps the
 # scopes in sync with THIS script version; the resource NAME is unchanged,
-# so the agent binding survives (verified live 2026-07-23).
+# so the agent binding survives.
 AUTH_ID="${dirName}-auth"
 AUTH_PAYLOAD='{ "name": "projects/'"\$PROJECT_ID"'/locations/global/authorizations/'"\$AUTH_ID"'", "serverSideOauth2": { "clientId": "'"\$OAUTH_CLIENT_ID"'", "clientSecret": "'"\$OAUTH_CLIENT_SECRET"'", "authorizationUri": "https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.compose%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.modify%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.calendarlist.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.freebusy%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.spaces.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.memberships.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.messages.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.messages.create%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fchat.users.readstate.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdirectory.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcontacts.readonly&client_id='"\$OAUTH_CLIENT_ID"'&redirect_uri=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Foauth-redirect", "tokenUri": "https://oauth2.googleapis.com/token" } }'
 echo "🔐 Creating/updating authorization resource in Gemini Enterprise..."
@@ -3123,14 +3168,26 @@ AUTH_HTTP=\$(curl -s -o "\$AUTH_RESP" -w "%{http_code}" -X POST \
 if [ "\$AUTH_HTTP" = "200" ]; then
   echo "    ✅ Authorization resource created."
 elif [ "\$AUTH_HTTP" = "409" ]; then
+  # updateMask is MANDATORY here (v11.38). Without it this endpoint accepts
+  # the request, answers HTTP 200, and silently changes NOTHING - so every
+  # re-run since v11.35 only *claimed* to refresh scopes and the secret
+  # (observed live 2026-07-27).
   AUTH_HTTP=\$(curl -s -o "\$AUTH_RESP" -w "%{http_code}" -X PATCH \
     -H "Authorization: Bearer \$TOKEN" \
     -H "Content-Type: application/json" \
     -H "X-Goog-User-Project: \$PROJECT_ID" \
-    "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations/\$AUTH_ID" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations/\$AUTH_ID?updateMask=serverSideOauth2" \
     -d "\$AUTH_PAYLOAD")
   if [ "\$AUTH_HTTP" = "200" ]; then
-    echo "    ♻️  Authorization already existed - updated in place (OAuth scopes refreshed)."
+    # A 200 is not proof the write landed - read the resource back and check
+    # that the full authorizationUri (not a truncated legacy one) is present.
+    if curl -s -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" \
+         "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations/\$AUTH_ID" \
+         | grep -q "vertexaisearch.cloud.google.com%2Foauth-redirect"; then
+      echo "    ♻️  Authorization already existed - updated in place and verified (OAuth scopes + secret refreshed)."
+    else
+      echo "    ⚠️  Authorization PATCH returned 200 but the resource did not change - re-authorization will loop."
+    fi
   else
     echo "    ⚠️  Authorization update failed (HTTP \$AUTH_HTTP) - keeping the existing resource:"
     cat "\$AUTH_RESP"
@@ -5066,7 +5123,12 @@ if auth_id:
     if auth_id.startswith("projects/"):
         data["authorizationConfig"] = { "agentAuthorization": auth_id }
     else:
-        data["authorizationConfig"] = { "agentAuthorization": f"projects/{project_id}/locations/{location}/authorizations/{auth_id}" }
+        # Authorization resources are ALWAYS created in "global" (see the
+        # setup script), regardless of where the GE app itself lives. Binding
+        # to locations/{location} pointed a "us"/"eu" app at a resource that
+        # does not exist, which reproduces the endless "requires additional
+        # authorization" prompt. Always bind to global. (v11.38)
+        data["authorizationConfig"] = { "agentAuthorization": f"projects/{project_id}/locations/global/authorizations/{auth_id}" }
 auth_path = data.get("authorizationConfig", {}).get("agentAuthorization", "")
 
 def call(method, call_url, payload=None):
