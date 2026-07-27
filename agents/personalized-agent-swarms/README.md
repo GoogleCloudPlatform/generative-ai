@@ -4,7 +4,7 @@ An end-to-end system that analyzes a user's past conversations with an AI assist
 
 Built on [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/) with Google Cloud and Gemini models.
 
-**Author:** [Tanya Dixit](https://github.com/tanyagoogle) (`@tanyagoogle`)
+**Authors:** [Tanya Dixit](https://github.com/tanyagoogle) (`@tanyagoogle`), [Pouya Omran](https://github.com/PouyaOmran) (`@PouyaOmran`)
 
 > [!NOTE]
 > This is an **experimental research pipeline** shared as a sample, not a
