@@ -502,8 +502,8 @@ Erinome
 erlang
 errlog
 erty
-ESG
 esg
+ESG
 Esin
 ESPP
 ESRB
@@ -1837,6 +1837,7 @@ Urs
 Usain
 usb
 usd
+useast
 usebackq
 usecases
 USERDATA
