@@ -1,0 +1,23 @@
+[
+  { "beginRendering": { "surfaceId": "maps-results", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "maps-results", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "div1", "place1", "place1Detail", "div2", "place2", "place2Detail", "div3", "place3", "place3Detail", "div4", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📍 Recommended Venues Nearby — Search Results" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "place1", "component": { "Text": { "text": { "literalString": "🏢 Palace Hotel Tokyo  ⭐ 4.6" }, "usageHint": "h3" } } },
+    { "id": "place1Detail", "component": { "Text": { "text": { "literalString": "📌 Marunouchi 1-1-1, Chiyoda | ☎ 03-3211-5211 — 💰 Budget: [CURRENCY]30,000+/person | Capacity: up to 200" }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "place2", "component": { "Text": { "text": { "literalString": "🏢 Andaz Tokyo  ⭐ 4.5" }, "usageHint": "h3" } } },
+    { "id": "place2Detail", "component": { "Text": { "text": { "literalString": "📌 Toranomon 1-23-4, Minato | ☎ 03-6830-1234 — 💰 Budget: [CURRENCY]25,000+/person | Capacity: up to 150" }, "usageHint": "body" } } },
+    { "id": "div3", "component": { "Divider": {} } },
+    { "id": "place3", "component": { "Text": { "text": { "literalString": "🏢 Imperial Hotel  ⭐ 4.4" }, "usageHint": "h3" } } },
+    { "id": "place3Detail", "component": { "Text": { "text": { "literalString": "📌 Uchisaiwaicho 1-1-1, Chiyoda | ☎ 03-3504-1111 — 💰 Budget: [CURRENCY]35,000+/person | Capacity: up to 300" }, "usageHint": "body" } } },
+    { "id": "div4", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnBook", "btnCompare"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnBook", "component": { "Button": { "child": "lblBook", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Create a detailed event plan at Palace Hotel Tokyo" } }] } } } },
+    { "id": "lblBook", "component": { "Text": { "text": { "literalString": "🏢 Plan with #1" }, "usageHint": "body" } } },
+    { "id": "btnCompare", "component": { "Button": { "child": "lblCompare", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Create a detailed comparison of the 3 venues" } }] } } } },
+    { "id": "lblCompare", "component": { "Text": { "text": { "literalString": "📊 Compare Venues" }, "usageHint": "body" } } }
+  ] } }
+]

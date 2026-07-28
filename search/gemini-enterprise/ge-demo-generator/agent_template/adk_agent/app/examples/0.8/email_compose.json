@@ -1,0 +1,19 @@
+[
+  { "beginRendering": { "surfaceId": "email-compose", "root": "root" } },
+  { "dataModelUpdate": { "surfaceId": "email-compose", "path": "/form", "contents": [{ "key": "to", "valueString": "supplier@example.com" }, { "key": "subject", "valueString": "Restock Request" }, { "key": "body", "valueString": "Hello,\n\nPlease restock the following items at your earliest convenience.\n\nThanks." }] } },
+  { "surfaceUpdate": { "surfaceId": "email-compose", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "fTo", "fSubject", "fBody", "div2", "actions"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "✉️ Compose Email Draft" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "fTo", "component": { "TextField": { "label": { "literalString": "To" }, "text": { "path": "/form/to" }, "textFieldType": "shortText" } } },
+    { "id": "fSubject", "component": { "TextField": { "label": { "literalString": "Subject" }, "text": { "path": "/form/subject" }, "textFieldType": "shortText" } } },
+    { "id": "fBody", "component": { "TextField": { "label": { "literalString": "Body" }, "text": { "path": "/form/body" }, "textFieldType": "longText" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actions", "component": { "Row": { "children": { "explicitList": ["btnSave", "btnCancel"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnSave", "component": { "Button": { "child": "lblSave", "primary": true, "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Create a Gmail draft with these details:" } }, { "key": "to", "value": { "path": "/form/to" } }, { "key": "subject", "value": { "path": "/form/subject" } }, { "key": "body", "value": { "path": "/form/body" } }] } } } },
+    { "id": "lblSave", "component": { "Text": { "text": { "literalString": "💾 Save Draft" }, "usageHint": "body" } } },
+    { "id": "btnCancel", "component": { "Button": { "child": "lblCancel", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Cancel the email draft" } }] } } } },
+    { "id": "lblCancel", "component": { "Text": { "text": { "literalString": "🚫 Cancel" }, "usageHint": "body" } } }
+  ] } }
+]

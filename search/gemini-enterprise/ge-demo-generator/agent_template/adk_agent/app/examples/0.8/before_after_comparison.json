@@ -1,0 +1,262 @@
+[
+  {
+    "beginRendering": {
+      "surfaceId": "comparison-surface",
+      "root": "root"
+    }
+  },
+  {
+    "surfaceUpdate": {
+      "surfaceId": "comparison-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": {
+            "Card": {
+              "child": "outerColumn"
+            }
+          }
+        },
+        {
+          "id": "outerColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "compTitle",
+                  "divider1",
+                  "comparisonRow",
+                  "divider2",
+                  "actionRow"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "stretch"
+            }
+          }
+        },
+        {
+          "id": "compTitle",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Data Update Preview"
+              },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "divider1",
+          "component": {
+            "Divider": {}
+          }
+        },
+        {
+          "id": "comparisonRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "beforeCard",
+                  "afterCard"
+                ]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "start"
+            }
+          }
+        },
+        {
+          "id": "beforeCard",
+          "component": {
+            "Card": {
+              "child": "beforeColumn"
+            }
+          }
+        },
+        {
+          "id": "beforeColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "beforeTitle",
+                  "beforeStatus",
+                  "beforePriority",
+                  "beforeAssigned"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "start"
+            }
+          }
+        },
+        {
+          "id": "beforeTitle",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Before" },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "beforeStatus",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Status: Discrepancy Found" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "beforePriority",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Priority: High" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "beforeAssigned",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Assigned: Unassigned" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "afterCard",
+          "component": {
+            "Card": {
+              "child": "afterColumn"
+            }
+          }
+        },
+        {
+          "id": "afterColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "afterTitle",
+                  "afterStatus",
+                  "afterPriority",
+                  "afterAssigned"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "start"
+            }
+          }
+        },
+        {
+          "id": "afterTitle",
+          "component": {
+            "Text": {
+              "text": { "literalString": "After" },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "afterStatus",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Status: Resolved" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "afterPriority",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Priority: Low" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "afterAssigned",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Assigned: Tanaka Yuki" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "divider2",
+          "component": {
+            "Divider": {}
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "btnApply",
+                  "btnCancel"
+                ]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "btnApply",
+          "component": {
+            "Button": {
+              "child": "lblApply",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Apply this update" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblApply",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Apply Changes" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "btnCancel",
+          "component": {
+            "Button": {
+              "child": "lblCancel",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Cancel this update" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblCancel",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Cancel" },
+              "usageHint": "body"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

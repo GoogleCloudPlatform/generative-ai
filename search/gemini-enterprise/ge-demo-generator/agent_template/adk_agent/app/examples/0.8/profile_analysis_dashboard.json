@@ -1,0 +1,311 @@
+[
+  {
+    "beginRendering": {
+      "surfaceId": "profile-dashboard",
+      "root": "root"
+    }
+  },
+  {
+    "surfaceUpdate": {
+      "surfaceId": "profile-dashboard",
+      "components": [
+        {
+          "id": "root",
+          "component": {
+            "Card": {
+              "child": "mainColumn"
+            }
+          }
+        },
+        {
+          "id": "mainColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "headerTitle",
+                  "profileSubtitle",
+                  "divider1",
+                  "kpiRow",
+                  "divider2",
+                  "timelineTitle",
+                  "timelineItem1",
+                  "timelineItem2",
+                  "divider3",
+                  "insightTitle",
+                  "insightBody",
+                  "divider4",
+                  "actionRow"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "stretch"
+            }
+          }
+        },
+        {
+          "id": "headerTitle",
+          "component": {
+            "Text": {
+              "text": { "literalString": "📊 Kenta Takahashi (ALM-005) Profile Analysis" },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "profileSubtitle",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Class of 2000, Economics | Mitsubishi UFJ Bank, Head of Corporate Planning" },
+              "usageHint": "h3"
+            }
+          }
+        },
+        {
+          "id": "divider1",
+          "component": { "Divider": {} }
+        },
+        {
+          "id": "kpiRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": ["kpiScore", "kpiDonation", "kpiRank"]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "kpiScore",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["kpiScoreValue", "kpiScoreLabel"]
+              },
+              "distribution": "start",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "kpiScoreValue",
+          "component": {
+            "Text": {
+              "text": { "literalString": "45" },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "kpiScoreLabel",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Engagement" },
+              "usageHint": "caption"
+            }
+          }
+        },
+        {
+          "id": "kpiDonation",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["kpiDonationValue", "kpiDonationLabel"]
+              },
+              "distribution": "start",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "kpiDonationValue",
+          "component": {
+            "Text": {
+              "text": { "literalString": "[CURRENCY]50,000" },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "kpiDonationLabel",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Lifetime Donations" },
+              "usageHint": "caption"
+            }
+          }
+        },
+        {
+          "id": "kpiRank",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["kpiRankValue", "kpiRankLabel"]
+              },
+              "distribution": "start",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "kpiRankValue",
+          "component": {
+            "Text": {
+              "text": { "literalString": "CFO" },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "kpiRankLabel",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Current Title" },
+              "usageHint": "caption"
+            }
+          }
+        },
+        {
+          "id": "divider2",
+          "component": { "Divider": {} }
+        },
+        {
+          "id": "timelineTitle",
+          "component": {
+            "Text": {
+              "text": { "literalString": "📅 Event Attendance History" },
+              "usageHint": "h3"
+            }
+          }
+        },
+        {
+          "id": "timelineItem1",
+          "component": {
+            "Text": {
+              "text": { "literalString": "✅ 2024/03/05 Global Career Seminar — Attended" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "timelineItem2",
+          "component": {
+            "Text": {
+              "text": { "literalString": "❌ 2024/04/10 Spring Gala 2024 — Absent (coincided with CFO appointment)" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "divider3",
+          "component": { "Divider": {} }
+        },
+        {
+          "id": "insightTitle",
+          "component": {
+            "Text": {
+              "text": { "literalString": "💡 Cross-Silo Insights & Recommended Actions" },
+              "usageHint": "h3"
+            }
+          }
+        },
+        {
+          "id": "insightBody",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Post-CFO appointment workload likely caused the absence. As things stabilize, now is the ideal time for a 1-on-1 outreach from the Dean or a VIP dinner invitation." },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "divider4",
+          "component": { "Divider": {} }
+        },
+        {
+          "id": "actionRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": ["btnDeepDive", "btnSchedule", "btnUpdateDb"]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "btnDeepDive",
+          "component": {
+            "Button": {
+              "child": "lblDeepDive",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Analyze Takahashi's donation history in detail" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblDeepDive",
+          "component": {
+            "Text": {
+              "text": { "literalString": "🔍 Deep-Dive" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "btnSchedule",
+          "component": {
+            "Button": {
+              "child": "lblSchedule",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Draft an outreach email for Takahashi" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblSchedule",
+          "component": {
+            "Text": {
+              "text": { "literalString": "✉️ Draft Email" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "btnUpdateDb",
+          "component": {
+            "Button": {
+              "child": "lblUpdateDb",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Update Takahashi's Engagement Score" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblUpdateDb",
+          "component": {
+            "Text": {
+              "text": { "literalString": "📝 Update DB" },
+              "usageHint": "body"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

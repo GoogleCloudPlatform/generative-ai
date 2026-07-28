@@ -1,0 +1,9 @@
+{
+  "name": "ge-demo-generator",
+  "version": "1.0.0",
+  "scripts": {
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "open": "clasp open"
+  }
+}

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLAP Session Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0e14;
+      --surface-color: #1a1f29;
+      --surface-hover: #232a37;
+      --primary-color: #4f46e5;
+      --secondary-color: #10b981;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border-color: #2d3748;
+      --accent-glow: rgba(79, 70, 229, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      background-color: var(--surface-color);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .session-selector {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 8px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .session-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .session-item {
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .session-item:hover {
+      background-color: var(--surface-hover);
+    }
+
+    .session-item.active {
+      background-color: var(--accent-glow);
+      border-color: var(--primary-color);
+    }
+
+    .session-id {
+      font-size: 14px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Main Content Styling */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .viewer-header {
+      padding: 16px 32px;
+      background-color: var(--surface-color);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .timeline {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Event Cards */
+    .event-card {
+      background-color: var(--surface-color);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      animation: slideIn 0.3s ease-out;
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      margin-bottom: 8px;
+      /* Extra safety */
+    }
+
+    .refresh-btn {
+      padding: 6px 12px;
+      background: var(--surface-hover);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .event-header {
+      padding: 12px 20px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .event-type {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .type-beforeModel {
+      color: #60a5fa;
+      background: rgba(96, 165, 250, 0.1);
+    }
+
+    .type-afterModel {
+      color: #f472b6;
+      background: rgba(244, 114, 182, 0.1);
+    }
+
+    .type-beforeTool {
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+    }
+
+    .type-afterTool {
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+    }
+
+    .agent-name {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .event-body {
+      padding: 20px;
+    }
+
+    .content-text {
+      font-family: 'Inter', sans-serif;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+
+    .prompt-container {
+      margin-top: 16px;
+      background-color: #0d1117;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .prompt-header {
+      padding: 8px 16px;
+      background-color: #161b22;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .prompt-content {
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #d1d5db;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .prompt-content.active {
+      display: block;
+    }
+
+    .metrics {
+      margin-top: 12px;
+      display: flex;
+      gap: 20px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+
+    .tokens-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* Tool specific styling */
+    .tool-name-tag {
+      color: #fbbf24;
+      font-weight: 700;
+    }
+
+    .json-viewer {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #9ecbff;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+      margin-top: 8px;
+    }
+
+    .json-viewer.active {
+      display: block;
+    }
+
+    /* Responsive Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#4F46E5" />
+            <path d="M16 8L24 16L16 24L8 16L16 8Z" fill="white" />
+          </svg>
+          SLAP Explorer
+        </div>
+        <select id="sessionDropdown" class="session-selector">
+          <option value="">Select a session...</option>
+        </select>
+      </div>
+      <div id="sessionList" class="session-list">
+        <!-- Session items will be dynamically added here -->
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="viewer-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <h2 id="activeSessionTitle">Explore your AI interactions</h2>
+          <button onclick="location.reload()" class="refresh-btn">↻ Refresh</button>
+        </div>
+        <div id="sessionStatus"></div>
+      </header>
+      <div id="timeline" class="timeline">
+        <div style="text-align:center; padding-top: 100px; color: var(--text-muted);">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; opacity: 0.5;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <p>Select a session from the sidebar to view logs</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+
+    async function loadSessions() {
+      try {
+        const response = await fetch(`${API_BASE}/sessions`);
+        const sessions = await response.json();
+        const container = document.getElementById('sessionList');
+        const dropdown = document.getElementById('sessionDropdown');
+
+        container.innerHTML = '';
+        sessions.forEach(id => {
+          // List Item
+          const item = document.createElement('div');
+          item.className = 'session-item';
+          item.innerHTML = `<span class="session-id">${id}</span>`;
+          item.onclick = () => selectSession(id, item);
+          container.appendChild(item);
+
+          // Dropdown Item
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = id;
+          dropdown.appendChild(option);
+        });
+
+        dropdown.onchange = (e) => {
+          const id = e.target.value;
+          if (id) {
+            const items = document.querySelectorAll('.session-item');
+            const target = Array.from(items).find(i => i.textContent.includes(id));
+            selectSession(id, target);
+          }
+        };
+      } catch (e) {
+        console.error("Failed to load sessions", e);
+      }
+    }
+
+    async function selectSession(id, element) {
+      document.querySelectorAll('.session-item').forEach(i => i.classList.remove('active'));
+      if (element) element.classList.add('active');
+
+      document.getElementById('activeSessionTitle').textContent = `Session: ${id}`;
+      document.getElementById('timeline').innerHTML = '<p style="text-align:center">Loading events...</p>';
+
+      try {
+        const response = await fetch(`/logs/sessions/${id}.jsonl`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const text = await response.text();
+        const events = text.split('\n')
+          .filter(line => line.trim())
+          .map(line => {
+            try {
+              return JSON.parse(line);
+            } catch (e) {
+              console.error('Error parsing line:', line, e);
+              return null;
+            }
+          })
+          .filter(e => e !== null);
+        renderTimeline(events);
+      } catch (e) {
+        document.getElementById('timeline').innerHTML = `<p style="color:#ef4444; text-align:center; padding: 20px;">
+                    Error loading session data: ${e.message}<br>
+                    <small style="color:var(--text-muted)">Ensure logs/sessions/${id}.jsonl exists and is accessible.</small>
+                </p>`;
+      }
+    }
+
+    function renderTimeline(events) {
+      const container = document.getElementById('timeline');
+      container.innerHTML = '';
+
+      events.forEach(event => {
+        const card = document.createElement('div');
+        card.className = 'event-card';
+
+        const timestamp = new Date(event.timestamp).toLocaleTimeString();
+
+        let bodyHtml = '';
+
+        if (event.type === 'beforeModel') {
+          bodyHtml = `
+                        <div class="agent-name">To LLM: ${event.model || 'Unknown Model'}</div>
+                        <div class="prompt-container">
+                            <div class="prompt-header" onclick="this.parentElement.querySelector('.prompt-content').classList.toggle('active')">
+                                Aggregated Prompt (Full Context) <span>▼ View More</span>
+                            </div>
+                            <div class="prompt-content">${(event.full_prompt_text || 'No text available').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                        </div>
+                    `;
+        } else if (event.type === 'afterModel') {
+          bodyHtml = `
+                        <div class="metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">TTFB</span>
+                                <span class="metric-value">${event.ttfb_ms || 0}ms</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">${event.latency_ms || 0}ms</span>
+                            </div>
+                        </div>
+                        <div class="tokens-grid">
+                            <div class="metric-item">
+                                <span class="metric-label">Prompt</span>
+                                <span class="metric-value" style="color:var(--text-main)">${event.prompt_tokens || 0}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Candidates</span>
+                                <span class="metric-value" style="color:var(--text-main)">${event.candidates_tokens || 0}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Cached</span>
+                                <span class="metric-value" style="color:#60a5fa">${event.cached_tokens || 0}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Thoughts</span>
+                                <span class="metric-value" style="color:var(--text-main)">${event.thoughts_tokens || 0}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Total</span>
+                                <span class="metric-value" style="color:var(--text-main)">${event.total_tokens || 0}</span>
+                            </div>
+                        </div>
+                        <div class="prompt-container" style="margin-top:16px">
+                            <div class="prompt-header" onclick="this.parentElement.querySelector('.json-viewer').classList.toggle('active')" style="display:inline-block; font-size:12px; opacity:0.7; margin-bottom:4px; font-weight:normal">
+                                Model Response <span>▼ Show JSON</span>
+                            </div>
+                            <div class="json-viewer">${JSON.stringify(event.response || {}, null, 2)}</div>
+                        </div>
+                    `;
+        } else if (event.type === 'beforeTool') {
+          bodyHtml = `
+                        <div>Calling Tool: <span class="tool-name-tag">${event.toolName || 'Unknown'}</span></div>
+                        <div class="prompt-container" style="margin-top:10px">
+                            <div class="prompt-header" onclick="this.parentElement.querySelector('.json-viewer').classList.toggle('active')" style="display:inline-block; font-size:12px; opacity:0.7; margin-bottom:4px; font-weight:normal">
+                                Tool Arguments <span>▼ Show JSON</span>
+                            </div>
+                            <div class="json-viewer">${JSON.stringify(event.parameters || {}, null, 2)}</div>
+                        </div>
+                    `;
+        } else if (event.type === 'afterTool') {
+          bodyHtml = `
+                        <div>Tool Result: <span class="tool-name-tag">${event.toolName || 'Unknown'}</span></div>
+                        <div class="metric-item" style="margin: 10px 0">
+                            <span class="metric-label">Tool Latency</span>
+                            <span class="metric-value">${event.latency_ms || 0}ms</span>
+                        </div>
+                        <div class="prompt-container">
+                            <div class="prompt-header" onclick="this.parentElement.querySelector('.json-viewer').classList.toggle('active')" style="display:inline-block; font-size:12px; opacity:0.7; margin-bottom:4px; font-weight:normal">
+                                Result Data <span>▼ Show JSON</span>
+                            </div>
+                            <div class="json-viewer">${JSON.stringify(event.result || {}, null, 2)}</div>
+                        </div>
+                    `;
+        } else if (event.type === 'beforeAgent') {
+          bodyHtml = `<div>Starting Agent Turn: <strong>${event.agentName || 'Unknown Agent'}</strong></div>`;
+        } else {
+          bodyHtml = `<div><small style="color:var(--text-muted)">Raw Event Data:</small><br><div class="json-viewer">${JSON.stringify(event, null, 2)}</div></div>`;
+        }
+
+        card.innerHTML = `
+                    <div class="event-header">
+                        <span class="event-type type-${event.type}">${event.type}</span>
+                        <span class="agent-name">${event.agentName}</span>
+                        <span style="color:var(--text-muted)">${timestamp}</span>
+                    </div>
+                    <div class="event-body">
+                        ${bodyHtml}
+                    </div>
+                `;
+        container.appendChild(card);
+      });
+    }
+
+    loadSessions();
+  </script>
+</body>
+
+</html>

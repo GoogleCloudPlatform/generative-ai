@@ -1,0 +1,186 @@
+[
+  {
+    "beginRendering": {
+      "surfaceId": "dashboard-surface",
+      "root": "root"
+    }
+  },
+  {
+    "surfaceUpdate": {
+      "surfaceId": "dashboard-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": {
+            "Card": {
+              "child": "mainColumn"
+            }
+          }
+        },
+        {
+          "id": "mainColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "dashTitle",
+                  "divider1",
+                  "statusList",
+                  "divider2",
+                  "refreshRow"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "stretch"
+            }
+          }
+        },
+        {
+          "id": "dashTitle",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Operational Status Dashboard"
+              },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "divider1",
+          "component": {
+            "Divider": {}
+          }
+        },
+        {
+          "id": "statusList",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "item1",
+                  "item2",
+                  "item3",
+                  "item4"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "stretch"
+            }
+          }
+        },
+        {
+          "id": "item1",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "✅ Invoice Processing: 142 completed, 0 errors"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "item2",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "⚠️ Compliance Review: 8 items pending (3 high priority)"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "item3",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "❌ Data Reconciliation: 2 mismatches found in Region-APAC"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "item4",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "✅ Audit Trail: All 56 entries verified"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "divider2",
+          "component": {
+            "Divider": {}
+          }
+        },
+        {
+          "id": "refreshRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "btnRefresh",
+                  "btnResolve"
+                ]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "btnRefresh",
+          "component": {
+            "Button": {
+              "child": "lblRefresh",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Refresh the operational status" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblRefresh",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Refresh Status" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "btnResolve",
+          "component": {
+            "Button": {
+              "child": "lblResolve",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Investigate and resolve the data reconciliation mismatches" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblResolve",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Resolve Issues" },
+              "usageHint": "body"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

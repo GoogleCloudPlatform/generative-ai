@@ -1,0 +1,186 @@
+[
+  {
+    "beginRendering": {
+      "surfaceId": "analysis-surface",
+      "root": "root"
+    }
+  },
+  {
+    "surfaceUpdate": {
+      "surfaceId": "analysis-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": {
+            "Card": {
+              "child": "mainColumn"
+            }
+          }
+        },
+        {
+          "id": "mainColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "titleText",
+                  "divider1",
+                  "kpiRow",
+                  "divider2",
+                  "summaryText",
+                  "actionRow"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "stretch"
+            }
+          }
+        },
+        {
+          "id": "titleText",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Analysis Summary: Q4 Revenue Performance"
+              },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "divider1",
+          "component": {
+            "Divider": {}
+          }
+        },
+        {
+          "id": "kpiRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "kpi1",
+                  "kpi2",
+                  "kpi3"
+                ]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "kpi1",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Total Revenue: $12.4M (+8.2%)"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "kpi2",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Anomalies Detected: 23"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "kpi3",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Resolution Rate: 87%"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "divider2",
+          "component": {
+            "Divider": {}
+          }
+        },
+        {
+          "id": "summaryText",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Key findings: Revenue growth driven by APAC region (+15.3%). Three critical anomalies in billing reconciliation require immediate attention. Recommended action: escalate invoice IDs INV-4521, INV-4589 to finance team."
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "btnDrillDown",
+                  "btnExport"
+                ]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "btnDrillDown",
+          "component": {
+            "Button": {
+              "child": "lblDrillDown",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Show me the detailed breakdown of the anomalies" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblDrillDown",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Drill Down" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "btnExport",
+          "component": {
+            "Button": {
+              "child": "lblExport",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Generate a visual summary report" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblExport",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Generate Report" },
+              "usageHint": "body"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

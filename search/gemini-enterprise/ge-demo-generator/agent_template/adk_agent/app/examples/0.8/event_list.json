@@ -1,0 +1,29 @@
+[
+  { "beginRendering": { "surfaceId": "event-list", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "event-list", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "subtitle", "div1", "eventList", "div2", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📅 Event Attendance History" }, "usageHint": "h2" } } },
+    { "id": "subtitle", "component": { "Text": { "text": { "literalString": "Kenta Takahashi (ALM-005) — Past 12 Months" }, "usageHint": "caption" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "eventList", "component": { "List": { "children": { "explicitList": ["ev1", "ev2", "ev3", "ev4"] }, "direction": "vertical", "alignment": "stretch" } } },
+    { "id": "ev1", "component": { "Row": { "children": { "explicitList": ["ev1Icon", "ev1Text"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "ev1Icon", "component": { "Icon": { "name": { "literalString": "check" } } } },
+    { "id": "ev1Text", "component": { "Text": { "text": { "literalString": "2024/03/05  Global Career Seminar — Attended" }, "usageHint": "body" } } },
+    { "id": "ev2", "component": { "Row": { "children": { "explicitList": ["ev2Icon", "ev2Text"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "ev2Icon", "component": { "Icon": { "name": { "literalString": "close" } } } },
+    { "id": "ev2Text", "component": { "Text": { "text": { "literalString": "2024/04/10  Spring Gala 2024 — No-Show" }, "usageHint": "body" } } },
+    { "id": "ev3", "component": { "Row": { "children": { "explicitList": ["ev3Icon", "ev3Text"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "ev3Icon", "component": { "Icon": { "name": { "literalString": "check" } } } },
+    { "id": "ev3Text", "component": { "Text": { "text": { "literalString": "2024/06/15  Alumni Summer Meetup — Attended" }, "usageHint": "body" } } },
+    { "id": "ev4", "component": { "Row": { "children": { "explicitList": ["ev4Icon", "ev4Text"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "ev4Icon", "component": { "Icon": { "name": { "literalString": "event" } } } },
+    { "id": "ev4Text", "component": { "Text": { "text": { "literalString": "2024/09/20  Autumn Gala 2024 — Invited (Pending)" }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnAll", "btnInvite"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnAll", "component": { "Button": { "child": "lblAll", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Show the full event attendance history for Takahashi" } }] } } } },
+    { "id": "lblAll", "component": { "Text": { "text": { "literalString": "📋 Show All" }, "usageHint": "body" } } },
+    { "id": "btnInvite", "component": { "Button": { "child": "lblInvite", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Draft an RSVP confirmation email for Autumn Gala 2024" } }] } } } },
+    { "id": "lblInvite", "component": { "Text": { "text": { "literalString": "✉️ RSVP Email" }, "usageHint": "body" } } }
+  ] } }
+]
