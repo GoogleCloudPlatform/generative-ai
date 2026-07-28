@@ -9,6 +9,6 @@ dependencies = [
     "geopy>=2.4.1",
     "google-adk>=1.0.0",
     "google-cloud>=0.34.0",
-    "mcp>=1.6.0",
+    "mcp>=1.28.1",
     "uvicorn>=0.34.1",
 ]
