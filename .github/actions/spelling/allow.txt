@@ -502,8 +502,8 @@ Erinome
 erlang
 errlog
 erty
-ESG
 esg
+ESG
 Esin
 ESPP
 ESRB
