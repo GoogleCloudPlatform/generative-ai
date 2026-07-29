@@ -305,8 +305,8 @@ colorway
 colurna
 colvis
 colwidth
-Condesa
 Cómo
+Condesa
 Connectez
 CONOUT
 constexpr
@@ -1435,13 +1435,13 @@ Pranav
 praw
 prcntg
 PRD
-proc
 Pré
 PREBROWSE
 preds
 preflight
 pregel
 Priya
+proc
 produc
 programar
 projectid
