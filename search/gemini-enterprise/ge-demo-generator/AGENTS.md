@@ -192,6 +192,21 @@ branch tip). Delete both properties after the upstream merge.
 - **Modify files with byte-exact tools**: when scripting edits to Code.gs or
   the templates, operate on raw bytes/strings, not on regex replacements with
   `\n` in the replacement text (Python `re` interprets them).
+- **`authorizations.patch` silently no-ops without `updateMask`**: a full-body
+  PATCH to the Discovery Engine authorization endpoint returns **HTTP 200 and
+  changes nothing**. Pass `?updateMask=serverSideOauth2`, and never treat the
+  200 as proof — read the resource back and check it actually changed.
+- **Authorization resources always live in `global`**: they are created at
+  `projects/<id>/locations/global/authorizations/<id>` regardless of where the
+  Gemini Enterprise app itself lives. Binding an agent to
+  `locations/<app-location>/...` points a `us`/`eu` app at a resource that does
+  not exist, which reproduces the endless re-authorization prompt.
+- **A failed OAuth token exchange is invisible**: Gemini Enterprise performs
+  the code-to-token exchange server-side after consent and surfaces nothing
+  when it fails — no UI error, no Cloud Run log, no agent-side signal. Probe
+  `https://oauth2.googleapis.com/token` with a throwaway code to tell the
+  cases apart: `invalid_grant` means the credentials are fine, `invalid_client`
+  means the stored secret is stale.
 
 ## 7. Verification
 

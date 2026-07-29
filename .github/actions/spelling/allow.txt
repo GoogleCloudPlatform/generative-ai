@@ -502,8 +502,8 @@ Erinome
 erlang
 errlog
 erty
-ESG
 esg
+ESG
 Esin
 ESPP
 ESRB
@@ -1383,6 +1383,7 @@ PRD
 Pré
 PREBROWSE
 preds
+preflight
 pregel
 produc
 programar
@@ -1837,6 +1838,7 @@ Urs
 Usain
 usb
 usd
+useast
 usebackq
 usecases
 USERDATA
