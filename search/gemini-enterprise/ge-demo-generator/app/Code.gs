@@ -2430,7 +2430,7 @@ function generateSetupScript(params) {
   // == constraints.txt (v11.40) ==
   // Caps in requirements.txt only bind the install WE issue. Cloned custom MCP
   // server repos run their own `uv pip install` inside the same image (see the
-  // __DOCKER_MCP_INSTALL_*__ layers), and a vendored `mcp>=2` in someone else's
+  // __DOCKER_MCP_INSTALL_*__ layers), and an `mcp>=2` pinned in someone else's
   // requirements.txt would upgrade straight past our cap and reintroduce the
   // exact ModuleNotFoundError the cap exists to prevent -- in a layer we do not
   // control and did not write. Passing -c makes the caps apply image-wide.
@@ -4590,8 +4590,8 @@ __DOCKER_MCP_CLONE_${idx}_EOF__
     let installStep;
     // -c /app/constraints.txt (v11.40): this installs a repo we did not write,
     // with dependency bounds we did not choose, into the same site-packages the
-    // agent imports from. Without the constraints file a vendored `mcp>=2` here
-    // silently upgrades past our cap and the container dies at import.
+    // agent imports from. Without the constraints file an `mcp>=2` pinned in
+    // that repo upgrades past our cap and the container dies at import.
     const pipCmd = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then uv pip install --system -c /app/constraints.txt . 2>/dev/null || true; elif [ -f requirements.txt ]; then uv pip install --system -c /app/constraints.txt -r requirements.txt; fi)`;
     const npmCmd = `(npm install && npm run build 2>/dev/null || true)`;
     const ign = mcp.npm_ignore_scripts ? 'ENV NPM_CONFIG_IGNORE_SCRIPTS=true\n' : '';
