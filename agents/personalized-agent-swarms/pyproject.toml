@@ -1,0 +1,18 @@
+[project]
+name = "active-long-memory"
+version = "0.1.0"
+description = "Personalized Mini-Agent Swarms from Conversational History (Google ADK + Google Cloud)"
+requires-python = ">=3.10"
+dependencies = [
+    "google-adk[vertexai]",
+    "google-cloud-aiplatform[agent_engines,adk]",
+    "python-dotenv",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+]
+
+[tool.uv]
+# This project is a collection of scripts, not an installable package.
+package = false

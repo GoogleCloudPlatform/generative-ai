@@ -1,0 +1,37 @@
+{
+  "eval_set_id": "basic_eval",
+  "name": "Basic Agent Evaluation",
+  "description": "Sample evaluation set for testing core agent functionality. Customize these cases based on your DESIGN_SPEC.md.",
+  "eval_cases": [
+    {
+      "eval_id": "greeting",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [{"text": "Hello, what can you help me with?"}]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "weather_query",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [{"text": "What's the weather like in San Francisco?"}]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    }
+  ]
+}

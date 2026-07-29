@@ -115,3 +115,4 @@ ignore$
 py\.typed$
 ^\Qaudio/speech/use-cases/storytelling/macbeth_the_sitcom.json\E$
 .ruff.toml
+^\Q.gemini/styleguide.md\E$

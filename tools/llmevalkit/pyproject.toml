@@ -1,0 +1,41 @@
+[project]
+name = "llmevalkit"
+version = "0.1.0"
+description = "LLM Evaluation Kit"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-genai",
+    "vertexai",
+    "streamlit",
+    "pandas",
+    "google-cloud-storage",
+    "python-dotenv",
+    "pydantic",
+    "plotly",
+    "matplotlib",
+    "db-dtypes",
+    "nbformat>=4.2.0",
+    "streamlit-tags",
+    "google-cloud-pipeline-components",
+    "gcsfs",
+    "ipython",
+    "tqdm",
+    "tenacity",
+    "etils",
+    "importlib-resources",
+    "fsspec",
+    "ipywidgets",
+    "google-cloud-aiplatform",
+    "tensorflow",
+    "pylint",
+    "ipykernel"
+]
+
+[tool.uv]
+index = [{ url = "https://pypi.org/simple", default = true }]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

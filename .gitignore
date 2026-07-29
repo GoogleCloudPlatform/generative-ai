@@ -185,3 +185,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+.agent/*
+tools/llmevalkit/uv.lock
+agent-development-answers.yml

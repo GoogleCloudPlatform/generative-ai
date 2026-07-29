@@ -1,0 +1,5 @@
+google-adk
+google-auth>=2.20.0
+google-cloud-storage>=2.10.0
+python-dotenv>=1.0.0
+requests>=2.31.0

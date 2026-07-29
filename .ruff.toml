@@ -13,6 +13,7 @@ ignore = [
     "D100",   # Ignore Missing docstring in public module (often desired at top level __init__.py)
     "D104",   # Ignore Missing docstring in public package (often desired at top level __init__.py)
     "D107",   # Ignore Missing docstring in __init__ (use class docstring)
+    "TC006",  # Ignore unquoted type expressions in typing.cast() calls.
     "TD002",  # Ignore Missing author in TODOs (often not required)
     "TD003",  # Ignore Missing issue link in TODOs (often not required/available)
     "T201",   # Ignore print presence

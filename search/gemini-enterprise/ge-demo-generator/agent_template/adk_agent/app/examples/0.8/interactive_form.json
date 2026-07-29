@@ -1,0 +1,23 @@
+[
+  { "beginRendering": { "surfaceId": "edit-form", "root": "root" } },
+  { "dataModelUpdate": { "surfaceId": "edit-form", "path": "/form", "contents": [{ "key": "name", "valueString": "Kenta Takahashi" }, { "key": "dept", "valueString": "Corporate Planning" }, { "key": "faculty", "valueMap": [{ "key": "0", "valueString": "Economics" }] }, { "key": "score", "valueNumber": 45 }, { "key": "contactDate", "valueString": "2024-03-05" }, { "key": "vip", "valueBoolean": false }, { "key": "notes", "valueString": "Key contact for CFO network.\nSchedule follow-up after Autumn Gala." }] } },
+  { "surfaceUpdate": { "surfaceId": "edit-form", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "div1", "fieldName", "fieldDept", "choiceFaculty", "sliderScore", "dateContact", "chkVip", "fieldNotes", "div2", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📝 Edit Alumni Record" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "fieldName", "component": { "TextField": { "label": { "literalString": "Name" }, "text": { "path": "/form/name" }, "textFieldType": "shortText" } } },
+    { "id": "fieldDept", "component": { "TextField": { "label": { "literalString": "Department" }, "text": { "path": "/form/dept" }, "textFieldType": "shortText" } } },
+    { "id": "choiceFaculty", "component": { "MultipleChoice": { "selections": { "path": "/form/faculty" }, "options": [{ "label": { "literalString": "Economics" }, "value": "Economics" }, { "label": { "literalString": "Engineering" }, "value": "Engineering" }, { "label": { "literalString": "Law" }, "value": "Law" }, { "label": { "literalString": "Medicine" }, "value": "Medicine" }, { "label": { "literalString": "Literature" }, "value": "Literature" }], "maxAllowedSelections": 1, "variant": "chips" } } },
+    { "id": "sliderScore", "component": { "Slider": { "label": { "literalString": "Engagement Score" }, "value": { "path": "/form/score" }, "minValue": 0, "maxValue": 100 } } },
+    { "id": "dateContact", "component": { "DateTimeInput": { "value": { "path": "/form/contactDate" }, "enableDate": true, "enableTime": false } } },
+    { "id": "chkVip", "component": { "CheckBox": { "label": { "literalString": "Register as VIP" }, "value": { "path": "/form/vip" } } } },
+    { "id": "fieldNotes", "component": { "TextField": { "label": { "literalString": "Notes" }, "text": { "path": "/form/notes" }, "textFieldType": "longText" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnSave", "btnCancel"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnSave", "component": { "Button": { "child": "lblSave", "primary": true, "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Update the record with the following values:" } }, { "key": "name", "value": { "path": "/form/name" } }, { "key": "dept", "value": { "path": "/form/dept" } }, { "key": "faculty", "value": { "path": "/form/faculty" } }, { "key": "score", "value": { "path": "/form/score" } }, { "key": "contactDate", "value": { "path": "/form/contactDate" } }, { "key": "vip", "value": { "path": "/form/vip" } }, { "key": "notes", "value": { "path": "/form/notes" } }] } } } },
+    { "id": "lblSave", "component": { "Text": { "text": { "literalString": "💾 Save" }, "usageHint": "body" } } },
+    { "id": "btnCancel", "component": { "Button": { "child": "lblCancel", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Cancel editing" } }] } } } },
+    { "id": "lblCancel", "component": { "Text": { "text": { "literalString": "🚫 Cancel" }, "usageHint": "body" } } }
+  ] } }
+]

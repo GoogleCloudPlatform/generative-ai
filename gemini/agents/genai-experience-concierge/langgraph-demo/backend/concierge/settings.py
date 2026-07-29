@@ -5,9 +5,10 @@
 
 from typing import Self
 
-from concierge.langgraph_server import schemas
 import pydantic
 import pydantic_settings
+
+from concierge.langgraph_server import schemas
 
 
 class RuntimeSettings(pydantic_settings.BaseSettings):
@@ -30,13 +31,13 @@ class RuntimeSettings(pydantic_settings.BaseSettings):
 
     # sane default values, only configure as needed
     region: str = "us-central1"
-    chat_model_name: str = "gemini-2.0-flash-001"
-    function_calling_model_name: str = "gemini-2.0-flash-001"
-    router_model_name: str = "gemini-2.0-flash-001"
-    guardrail_model_name: str = "gemini-2.0-flash-001"
-    planner_model_name: str = "gemini-2.0-flash-001"
-    executor_model_name: str = "gemini-2.0-flash-001"
-    reflector_model_name: str = "gemini-2.0-flash-001"
+    chat_model_name: str = "gemini-3.5-flash"
+    function_calling_model_name: str = "gemini-3.5-flash"
+    router_model_name: str = "gemini-3.5-flash"
+    guardrail_model_name: str = "gemini-3.5-flash"
+    planner_model_name: str = "gemini-3.5-flash"
+    executor_model_name: str = "gemini-3.5-flash"
+    reflector_model_name: str = "gemini-3.5-flash"
     max_router_turn_history: int = 3
 
     model_config = pydantic_settings.SettingsConfigDict(
@@ -48,7 +49,6 @@ class RuntimeSettings(pydantic_settings.BaseSettings):
     @pydantic.model_validator(mode="after")
     def ensure_cymbal_dataset_resources(self) -> Self:
         """Ensure that the Cymbal dataset resources are set."""
-
         if self.cymbal_embedding_model_uri is None:
             self.cymbal_embedding_model_uri = (
                 f"{self.project}.{self.cymbal_dataset}.text_embedding"

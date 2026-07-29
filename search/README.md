@@ -10,7 +10,7 @@ This directory contains notebooks and resources for Vertex AI Search.
 
 ## Samples
 
-- [AgentSpace](agentspace/): Learn how to use AgentSpace with Vertex AI Search.
+- [Gemini Enterprise](gemini-enterprise/): Learn how to use Gemini Enterprise with Vertex AI Search.
 - [Bulk Question Answering](bulk-question-answering/): Learn how to perform bulk question answering with Vertex AI Search.
 - [Cloud Function](cloud-function/): Learn how to access Vertex AI Search via Google Cloud Functions.
 - [Custom Embeddings](custom-embeddings/): Learn how to use custom embeddings with Vertex AI Search.

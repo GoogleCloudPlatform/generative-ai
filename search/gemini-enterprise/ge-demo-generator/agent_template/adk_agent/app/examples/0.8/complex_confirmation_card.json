@@ -1,0 +1,134 @@
+[
+  { 
+    "beginRendering": { 
+      "surfaceId": "confirmation-surface", 
+      "root": "root" 
+    } 
+  },
+  { 
+    "surfaceUpdate": {
+      "surfaceId": "confirmation-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": {
+            "Card": {
+              "child": "mainColumn"
+            }
+          }
+        },
+        {
+          "id": "mainColumn",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "titleText",
+                  "beforeText",
+                  "afterText",
+                  "actionRow"
+                ]
+              },
+              "distribution": "spaceAround",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "titleText",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Confirm Data Update"
+              },
+              "usageHint": "h2"
+            }
+          }
+        },
+        {
+          "id": "beforeText",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Before: [Previous Data Summary]"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "afterText",
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "After: [New Data Summary]"
+              },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "btnApprove",
+                  "btnReject"
+                ]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "btnApprove",
+          "component": {
+            "Button": {
+              "child": "lblApprove",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Approved" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblApprove",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Approve" },
+              "usageHint": "body"
+            }
+          }
+        },
+        {
+          "id": "btnReject",
+          "component": {
+            "Button": {
+              "child": "lblReject",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Rejected" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "lblReject",
+          "component": {
+            "Text": {
+              "text": { "literalString": "Cancel" },
+              "usageHint": "body"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

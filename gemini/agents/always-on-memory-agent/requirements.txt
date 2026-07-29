@@ -1,0 +1,5 @@
+streamlit>=1.40.0
+google-genai>=1.0.0
+google-adk>=1.0.0
+aiohttp>=3.9.0
+requests>=2.31.0

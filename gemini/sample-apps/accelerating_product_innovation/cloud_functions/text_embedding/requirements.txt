@@ -1,3 +1,0 @@
-functions-framework==3.*
-dotenv
-vertexai

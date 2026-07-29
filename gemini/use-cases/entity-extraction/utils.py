@@ -30,7 +30,7 @@ def load_config_from_gcs(bucket_name: str, file_name: str) -> dict:
         config_data = blob.download_as_string()
         return json.loads(config_data)
     except Exception as e:
-        logging.info(f"ERROR: Failed to load GCS config: {e}")
+        logging.error(f"ERROR: Failed to load GCS config: {e}")
         raise
 
 
@@ -41,7 +41,7 @@ def load_config_from_local(file_path: str) -> dict:
         with open(file_path) as f:
             return json.load(f)
     except Exception as e:
-        logging.info(f"ERROR: Failed to load local config {file_path}: {e}")
+        logging.error(f"ERROR: Failed to load local config {file_path}: {e}")
         raise
 
 
@@ -51,11 +51,14 @@ def load_app_config(config_path: str) -> dict:
         try:
             # Parse the GCS path: "gs://[BUCKET_NAME]/[FILE_PATH]"
             path_parts = config_path.replace("gs://", "").split("/", 1)
-            bucket_name = path_parts[0]
-            file_path = path_parts[1]
+            if len(path_parts) < 2 or not path_parts[0] or not path_parts[1]:
+                raise ValueError(
+                    "GCS path must be in gs://<bucket-name>/<file-path> format."
+                )
+            bucket_name, file_path = path_parts
             return load_config_from_gcs(bucket_name, file_path)
         except Exception as e:
-            logging.info(f"ERROR: Could not parse GCS path '{config_path}': {e}")
+            logging.error(f"ERROR: Could not parse GCS path '{config_path}': {e}")
             raise
     else:
         # Treat it as a local file path

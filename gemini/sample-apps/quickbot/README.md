@@ -79,7 +79,7 @@ This is the **simplest way to get the entire application (frontend and backend) 
 1.  **Ensure Docker and Docker Compose v2 are installed and running.**
 
 2.  **Authenticate with Google Cloud:**
-    Your template (agents with Agent Engine, Imagen 4, VertexAI Search, etc) will need to interact with Google Cloud services, so you need to provide Google Cloud credentials. For local development with ADC:
+    Your template (agents with Agent Engine, Imagen 4, VertexAI Search, etc.) will need to interact with Google Cloud services, so you need to provide Google Cloud credentials. For local development with ADC:
     ```bash
     gcloud auth application-default login
     gcloud config set project <your-gcp-project-id> # If using a specific GCP project

@@ -1,0 +1,2982 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contract Compliance Engine - Multi-Agent A2A Panel</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="16" fill="%23121212"/><path d="M16 6l8 3v6c0 5-3.4 8.8-8 11-4.6-2.2-8-6-8-11V9l8-3z" fill="%231ed760"/></svg>' />
+    
+    <!-- design.md Spotify-inspired font stack and component tokens -->
+    <style>
+      :root {
+        color-scheme: dark;
+        --color-bg: #121212;
+        --color-bg-soft: #181818;
+        --color-card: #181818;
+        --color-card-active: #1f1f1f;
+        --color-card-elevated: #252525;
+        --color-surface-elevated-dark: #252525;
+        --color-border: #4d4d4d;
+        --color-border-light: #7c7c7c;
+        --color-on-dark: #000000;
+        
+        --color-text: #ffffff;
+        --color-muted: #b3b3b3;
+        --color-quiet: #7c7c7c;
+        
+        --color-primary: #1ed760;
+        --color-primary-active: #1db954;
+        --color-success: #1ed760;
+        --color-success-ink: #121212;
+        --color-error: #f3727f;
+        --color-amber: #ffa42b;
+        --color-info: #539df5;
+        
+        --rounded-lg: 8px;
+        --rounded-md: 8px;
+        --rounded-sm: 4px;
+        --rounded-input: 500px;
+        --rounded-pill: 9999px;
+        --shadow-heavy: rgba(0, 0, 0, 0.5) 0px 8px 24px;
+        --shadow-card: rgba(0, 0, 0, 0.3) 0px 8px 8px;
+        --shadow-inset: rgb(18, 18, 18) 0px 1px 0px, rgb(124, 124, 124) 0px 0px 0px 1px inset;
+        --shadow-glow: rgba(0, 0, 0, 0.3) 0px 8px 8px;
+        --font-display: SpotifyMixUITitle, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, "Helvetica Neue", Helvetica, Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, "MS Gothic", sans-serif;
+        --font-ui: SpotifyMixUI, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, "Helvetica Neue", Helvetica, Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, "MS Gothic", sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-ui);
+        font-feature-settings: "ss03";
+        line-height: 1.5;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Near-black app workspace shell */
+      .app-container {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* Compact Spotify-inspired header bar */
+      header.topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .brand-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-logo {
+        width: 38px;
+        height: 38px;
+        background: transparent;
+        border: 2px solid var(--color-on-dark);
+        border-radius: var(--rounded-md);
+        display: grid;
+        place-items: center;
+        color: var(--color-on-dark);
+        box-shadow: none;
+      }
+
+      .brand-title h1 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0;
+      }
+
+      .brand-title p {
+        font-size: 12px;
+        color: var(--color-muted);
+      }
+
+      .system-status {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--color-bg-soft);
+        border: 1px solid var(--color-border);
+        padding: 6px 12px;
+        border-radius: 99px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-success);
+        box-shadow: 0 0 8px var(--color-success);
+        animation: pulseAnimation 2s infinite;
+      }
+
+      @keyframes pulseAnimation {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255,255,255,0.28); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255,255,255,0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+      }
+
+      /* Multi-agent execution strip */
+      .sequential-strip {
+        background: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-lg);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        backdrop-filter: blur(12px);
+      }
+
+      .steps-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--color-quiet);
+        font-weight: 700;
+      }
+
+      .steps-track {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        max-width: 1000px;
+      }
+
+      .step-node {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-quiet);
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .step-node .icon-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--color-border);
+        display: grid;
+        place-items: center;
+        font-size: 10px;
+        background: var(--color-bg);
+      }
+
+      .step-node.completed {
+        color: var(--color-success);
+      }
+      .step-node.completed .icon-dot {
+        border-color: var(--color-success);
+        background: transparent;
+        color: var(--color-success);
+      }
+
+      .step-node.active {
+        color: var(--color-primary);
+        font-weight: 600;
+        text-shadow: none;
+      }
+      .step-node.active .icon-dot {
+        border-color: var(--color-primary);
+        background: transparent;
+        color: var(--color-primary);
+        box-shadow: none;
+        animation: activePulse 1.5s infinite alternate;
+      }
+
+      .step-node.manual-alert {
+        color: var(--color-amber);
+      }
+      .step-node.manual-alert .icon-dot {
+        border-color: var(--color-amber);
+        background: transparent;
+        color: var(--color-amber);
+      }
+
+      @keyframes activePulse {
+        from { transform: scale(1); }
+        to { transform: scale(1.08); }
+      }
+
+      .step-divider {
+        flex: 1;
+        height: 1px;
+        background: var(--color-border);
+      }
+      .step-divider.active {
+        background: var(--color-primary);
+      }
+      .step-divider.completed {
+        background: var(--color-success);
+      }
+
+      /* Workspace column grid */
+      .workspace-grid {
+        display: grid;
+        grid-template-columns: minmax(400px, 450px) minmax(420px, 1fr) minmax(320px, 360px);
+        gap: 24px;
+        align-items: start;
+      }
+
+      /* Dashboard cockpit panel base */
+      .panel {
+        background: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-lg);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow-glow);
+        min-height: 720px;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 16px;
+      }
+
+      .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .panel-title i {
+        color: var(--color-primary);
+      }
+
+      .panel-title h3 {
+        font-size: 18px;
+        font-weight: 550;
+      }
+
+      /* Panel 1: operations legal desk */
+      .operations-desk {
+        min-height: 720px;
+      }
+
+      /* Contract selection list */
+      .upload-container {
+        border: 2px dashed var(--color-border);
+        background: var(--color-bg-soft);
+        border-radius: var(--rounded-lg);
+        padding: 32px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .upload-container:hover {
+        border-color: var(--color-primary);
+        background: var(--color-card-active);
+      }
+
+      .upload-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid var(--color-border);
+        display: grid;
+        place-items: center;
+        color: var(--color-primary);
+      }
+
+      .contract-selector-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .contract-card {
+        background: var(--color-bg-soft);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .contract-card:hover {
+        border-color: var(--color-primary-active);
+        background: var(--color-card-active);
+      }
+
+      .contract-card.selected {
+        border-color: var(--color-primary);
+        background: var(--color-card-active);
+      }
+
+      .contract-info {
+        text-align: left;
+      }
+
+      .contract-info strong {
+        display: block;
+        font-size: 13px;
+        color: var(--color-text);
+      }
+
+      .contract-info span {
+        font-size: 11px;
+        color: var(--color-muted);
+      }
+
+      .btn-run {
+        width: 100%;
+        background: var(--color-primary);
+        color: var(--color-on-dark);
+        border: 2px solid var(--color-on-dark);
+        padding: 12px 24px;
+        border-radius: var(--rounded-pill);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: none;
+        transition: all 0.25s ease;
+      }
+
+      .btn-run:hover {
+        background: var(--color-on-dark);
+        color: var(--color-bg);
+        box-shadow: none;
+      }
+
+      .btn-run:disabled {
+        background: var(--color-border);
+        color: var(--color-quiet);
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      /* Active case log stream */
+      .events-box {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 280px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .events-box::-webkit-scrollbar {
+        width: 4px;
+      }
+      .events-box::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 99px;
+      }
+
+      .event-row {
+        background: var(--color-bg-soft);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        padding: 10px 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 12px;
+      }
+
+      .event-indicator {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        margin-top: 6px;
+        background: var(--color-primary);
+        flex-shrink: 0;
+      }
+
+      .event-indicator.system { background: var(--color-muted); }
+      .event-indicator.agent { background: var(--color-primary); }
+      .event-indicator.network { background: var(--color-amber); }
+      .event-indicator.trace { background: var(--color-success); }
+      .event-indicator.error { background: var(--color-error); }
+
+      .event-details {
+        flex: 1;
+      }
+
+      .event-details strong {
+        display: block;
+        color: var(--color-text);
+      }
+
+      .event-details span {
+        color: var(--color-muted);
+      }
+
+      .event-time {
+        color: var(--color-quiet);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+      }
+
+      /* Panel 2: legal artifact preview */
+      .stage-panel {
+        min-height: 720px;
+        background: var(--color-bg-soft);
+        border-color: var(--color-border);
+      }
+
+      .stage-viewports {
+        flex: 1;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-lg);
+        background: var(--color-bg);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .stage-navbar {
+        background: var(--color-card);
+        border-bottom: 1px solid var(--color-border);
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        overflow-x: auto;
+      }
+
+      .tab-btn {
+        background: transparent;
+        border: none;
+        color: var(--color-muted);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: var(--rounded-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .tab-btn:hover {
+        color: var(--color-text);
+        background: hsla(220, 10%, 50%, 0.05);
+      }
+
+      .tab-btn.selected {
+        color: var(--color-primary);
+        background: var(--color-card-active);
+      }
+
+      .stage-canvas {
+        flex: 1;
+        width: 100%;
+        border: none;
+        background: var(--color-bg);
+      }
+
+      .stage-empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        color: var(--color-quiet);
+        text-align: center;
+        padding: 32px;
+      }
+
+      /* Panel 3: developer engine monitor */
+      .engine-monitor {
+        min-height: 720px;
+      }
+
+      /* Policy settings editor */
+      .editor-box {
+        background: var(--color-bg-soft);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        padding: 12px 16px;
+      }
+
+      .policy-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 110px;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .field-row label {
+        font-size: 11px;
+        color: var(--color-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .field-row input {
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        padding: 6px 8px;
+        color: var(--color-text);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        text-align: right;
+        width: 100%;
+      }
+
+      /* Network latency simulator */
+      .simulator-card {
+        background: var(--color-bg-soft);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        overflow: hidden;
+        background: var(--color-bg);
+      }
+
+      .toggle-btn {
+        background: transparent;
+        border: none;
+        color: var(--color-quiet);
+        font-size: 11px;
+        padding: 8px 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .toggle-btn.selected {
+        background: var(--color-primary);
+        color: var(--color-on-dark);
+      }
+      .toggle-btn.selected.delayed {
+        background: var(--color-amber);
+        color: var(--color-on-dark);
+      }
+      .toggle-btn.selected.crashed {
+        background: var(--color-error);
+        color: var(--color-text);
+      }
+
+      .latency-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .latency-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--color-muted);
+      }
+
+      .latency-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 99px;
+        background: var(--color-border);
+        outline: none;
+      }
+
+      .latency-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        cursor: pointer;
+        box-shadow: 0 0 8px var(--color-primary);
+      }
+
+      /* Agent-to-agent handoff monitor */
+      .handoff-panel {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        background: var(--color-bg-soft);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .handoff-flow {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+      }
+
+      .handoff-agent {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        background: var(--color-bg);
+        padding: 10px;
+        min-height: 96px;
+      }
+
+      .handoff-agent span,
+      .handoff-metric span {
+        display: block;
+        color: var(--color-quiet);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .handoff-agent strong {
+        display: block;
+        color: var(--color-text);
+        font-size: 12px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .handoff-agent small {
+        display: block;
+        color: var(--color-muted);
+        font-size: 11px;
+        line-height: 1.35;
+        margin-top: 6px;
+      }
+
+      .handoff-arrow {
+        color: var(--color-primary);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        min-width: 66px;
+      }
+
+      .handoff-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .handoff-metric {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        background: var(--color-bg);
+        padding: 8px;
+        min-width: 0;
+      }
+
+      .handoff-metric code {
+        display: block;
+        color: var(--color-text);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        line-height: 1.35;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .payload-preview {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        background: var(--color-bg);
+        color: var(--color-muted);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        line-height: 1.45;
+        max-height: 190px;
+        overflow: auto;
+        padding: 10px;
+        white-space: pre-wrap;
+      }
+
+      .handoff-verdict {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        padding: 9px 10px;
+        color: var(--color-muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .handoff-verdict-title {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--color-text);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+      }
+
+      .handoff-verdict-summary {
+        display: block;
+        color: var(--color-muted);
+      }
+
+      .handoff-violation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .handoff-violation-list li {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-sm);
+        background: var(--color-bg);
+        color: var(--color-text);
+        padding: 8px 9px;
+      }
+
+      .handoff-verdict.success {
+        border-color: var(--color-on-dark);
+        color: var(--color-success);
+        background: transparent;
+      }
+
+      .handoff-verdict.error {
+        border-color: hsla(346, 84%, 61%, 0.45);
+        color: var(--color-error);
+        background: hsla(346, 84%, 61%, 0.07);
+      }
+
+      .handoff-verdict.warning {
+        border-color: hsla(38, 92%, 58%, 0.45);
+        color: var(--color-amber);
+        background: hsla(38, 92%, 58%, 0.08);
+      }
+
+      /* Distributed tracing span tracks */
+      .trace-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .trace-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .trace-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .trace-name {
+        color: var(--color-text);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .trace-duration {
+        color: var(--color-quiet);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .trace-bar-track {
+        height: 8px;
+        background: var(--color-bg-soft);
+        border-radius: 99px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid var(--color-border);
+      }
+
+      .trace-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: var(--color-primary);
+        width: 0%;
+        transition: width 0.8s cubic-bezier(0.1, 0.8, 0.25, 1);
+      }
+
+      .trace-bar-fill.success { background: var(--color-success); }
+      .trace-bar-fill.warning { background: var(--color-amber); }
+      .trace-bar-fill.error { background: var(--color-error); }
+      .trace-bar-fill.delay { background: var(--color-amber); }
+
+      /* Visual ticker console */
+      .ticker-terminal {
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        padding: 12px;
+        color: var(--color-muted);
+        min-height: 120px;
+        max-height: 120px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        text-align: left;
+      }
+
+      .ticker-line {
+        line-height: 1.4;
+      }
+
+      .ticker-line.blue { color: var(--color-primary); }
+      .ticker-line.amber { color: var(--color-amber); }
+      .ticker-line.green { color: var(--color-success); }
+      .ticker-line.red { color: var(--color-error); }
+
+      /* Spotify design.md component normalization */
+      .app-container {
+        max-width: 1520px;
+        padding: 28px 20px 72px;
+        gap: 28px;
+      }
+
+      header.topbar {
+        background: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-lg);
+        padding: 16px 18px;
+        box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+      }
+
+      .brand-logo {
+        width: 42px;
+        height: 42px;
+        background: var(--color-primary);
+        border-radius: var(--rounded-pill);
+        box-shadow: none;
+      }
+
+      .brand-title h1 {
+        font-family: var(--font-display);
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: 0;
+      }
+
+      .brand-title p {
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--color-muted);
+      }
+
+      .status-pill {
+        background: var(--color-bg-soft);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-pill);
+        color: var(--color-text);
+        min-height: 34px;
+      }
+
+      .pulse {
+        background: var(--color-success-ink);
+        box-shadow: none;
+      }
+
+      .sequential-strip,
+      .panel {
+        background: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-lg);
+        backdrop-filter: none;
+        box-shadow: var(--shadow-glow);
+      }
+
+      .sequential-strip {
+        padding: 18px 24px;
+      }
+
+      .steps-label,
+      .panel-title h3,
+      .handoff-agent span,
+      .handoff-metric span,
+      .field-row label,
+      .latency-header {
+        letter-spacing: 0.72px;
+      }
+
+      .panel-title h3 {
+        color: var(--color-text);
+        font-family: var(--font-display);
+        font-weight: 500;
+      }
+
+      .panel-title i,
+      .upload-icon,
+      .event-indicator.agent,
+      .ticker-line.blue {
+        color: var(--color-primary);
+      }
+
+      .panel-title i {
+        color: var(--color-primary) !important;
+      }
+
+      .step-node.active {
+        color: var(--color-primary);
+        text-shadow: none;
+      }
+
+      .step-node .icon-dot {
+        background: var(--color-bg-soft);
+      }
+
+      .step-node.active .icon-dot,
+      .step-node.completed .icon-dot {
+        background: transparent;
+        border-color: var(--color-text);
+        color: var(--color-text);
+        box-shadow: none;
+      }
+
+      .step-divider.active,
+      .step-divider.completed {
+        background: var(--color-primary);
+      }
+
+      .contract-card,
+      .event-row,
+      .editor-box,
+      .simulator-card,
+      .handoff-panel,
+      .stage-viewports {
+        background: var(--color-bg-soft);
+        border-color: var(--color-border);
+        box-shadow: none;
+      }
+
+      .contract-card {
+        border-radius: var(--rounded-lg);
+        padding: 16px;
+      }
+
+      .contract-card:hover {
+        border-color: var(--color-primary);
+        background: var(--color-surface-elevated-dark);
+      }
+
+      .contract-card.selected {
+        border-color: var(--color-text);
+        background: var(--color-card-active);
+      }
+
+      .contract-info strong {
+        color: var(--color-text);
+        font-weight: 550;
+      }
+
+      .btn-run,
+      .toggle-btn.selected {
+        background: transparent;
+        border: 2px solid var(--color-text);
+        color: var(--color-text);
+        border-radius: var(--rounded-pill);
+        box-shadow: none;
+      }
+
+      .btn-run {
+        min-height: 48px;
+        font-size: 16px;
+        font-weight: 550;
+      }
+
+      .btn-run:hover {
+        background: var(--color-text);
+        color: var(--color-bg);
+        box-shadow: none;
+      }
+
+      .btn-run:disabled {
+        background: var(--color-card-active);
+        border-color: var(--color-border);
+        color: var(--color-quiet);
+      }
+
+      .stage-panel {
+        background: var(--color-card);
+      }
+
+      .stage-navbar,
+      .stage-canvas {
+        background: var(--color-bg-soft);
+      }
+
+      .tab-btn,
+      .toggle-btn {
+        border-radius: var(--rounded-pill);
+      }
+
+      .tab-btn.selected {
+        color: var(--color-text);
+        background: var(--color-card-active);
+        border-color: var(--color-text);
+      }
+
+      .toggle-grid {
+        border-radius: var(--rounded-pill);
+        background: var(--color-bg);
+        padding: 4px;
+        gap: 4px;
+      }
+
+      .toggle-btn.selected.delayed {
+        background: transparent;
+        border: 1px solid var(--color-amber);
+        color: var(--color-amber);
+      }
+
+      .toggle-btn.selected.crashed {
+        background: transparent;
+        border: 1px solid var(--color-error);
+        color: var(--color-error);
+      }
+
+      .field-row input,
+      .latency-slider,
+      .handoff-agent,
+      .handoff-metric,
+      .handoff-verdict {
+        background: var(--color-bg);
+        color: var(--color-text);
+        border-color: var(--color-border);
+      }
+
+      .field-row input {
+        min-height: 42px;
+        border-radius: var(--rounded-md);
+        font-family: var(--font-mono);
+      }
+
+      input[type="checkbox"] {
+        accent-color: var(--color-primary);
+      }
+
+      .latency-slider::-webkit-slider-thumb {
+        background: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(255,255,255,0.12);
+      }
+
+      .handoff-arrow {
+        color: var(--color-primary);
+      }
+
+      .payload-preview,
+      .ticker-terminal {
+        background: var(--color-bg);
+        border-color: var(--color-border);
+        color: var(--color-muted);
+        border-radius: var(--rounded-lg);
+      }
+
+      .handoff-verdict.success {
+        border-color: var(--color-success-ink);
+        color: var(--color-success-ink);
+        background: transparent;
+      }
+
+      .handoff-verdict.error {
+        border-color: rgba(200,63,95,0.36);
+        color: var(--color-error);
+        background: transparent;
+      }
+
+      .handoff-verdict.warning {
+        border-color: rgba(215,168,79,0.42);
+        color: var(--color-amber);
+        background: transparent;
+      }
+
+      .trace-bar-track {
+        background: var(--color-bg-soft);
+      }
+
+      .trace-bar-fill,
+      .trace-bar-fill.delay {
+        background: var(--color-primary);
+      }
+
+      .trace-bar-fill.success {
+        background: var(--color-success-ink);
+      }
+
+      .trace-bar-fill.warning {
+        background: var(--color-amber);
+      }
+
+      .trace-bar-fill.error {
+        background: var(--color-error);
+      }
+
+      .ticker-line.green {
+        color: var(--color-on-dark);
+      }
+
+      .ticker-line.amber {
+        color: var(--color-amber);
+      }
+
+      .ticker-line.red {
+        color: var(--color-error);
+      }
+
+      /* Spotify design.md source-of-truth component overrides */
+      body {
+        background: var(--color-bg);
+        color: var(--color-text);
+      }
+
+      header.topbar,
+      .sequential-strip,
+      .panel {
+        background: var(--color-card);
+        border-color: transparent;
+        box-shadow: var(--shadow-card);
+      }
+
+      header.topbar {
+        border-radius: var(--rounded-lg);
+        box-shadow: var(--shadow-heavy);
+      }
+
+      .brand-logo {
+        background: var(--color-primary);
+        border: 0;
+        border-radius: 50%;
+        color: var(--color-on-dark);
+        box-shadow: rgba(0, 0, 0, 0.45) 0px 8px 18px;
+      }
+
+      .status-pill,
+      .contract-card,
+      .event-row,
+      .editor-box,
+      .simulator-card,
+      .handoff-panel,
+      .stage-viewports,
+      .stage-navbar,
+      .stage-canvas,
+      .field-row input,
+      .handoff-agent,
+      .handoff-metric,
+      .handoff-verdict {
+        background: var(--color-card-active);
+        border-color: var(--color-border);
+        color: var(--color-text);
+      }
+
+      .status-pill {
+        border-radius: var(--rounded-pill);
+        border-color: transparent;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .pulse {
+        background: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(30, 215, 96, 0.14);
+      }
+
+      .panel-title h3 {
+        font-family: var(--font-ui);
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0;
+      }
+
+      .panel-title i,
+      .upload-icon,
+      .handoff-arrow,
+      .ticker-line.blue {
+        color: var(--color-primary);
+      }
+
+      .steps-label,
+      .field-row label,
+      .handoff-agent span,
+      .handoff-metric span,
+      .latency-header {
+        color: var(--color-muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+      }
+
+      .step-node {
+        color: var(--color-muted);
+        font-size: 14px;
+        font-weight: 400;
+      }
+
+      .step-node.completed,
+      .step-node.active {
+        color: var(--color-text);
+        font-weight: 700;
+      }
+
+      .step-node.active .icon-dot,
+      .step-node.completed .icon-dot {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: var(--color-on-dark);
+      }
+
+      .contract-card:hover,
+      .contract-card.selected,
+      .tab-btn.selected {
+        background: var(--color-card-active);
+        border-color: var(--color-primary);
+        color: var(--color-text);
+      }
+
+      .btn-run {
+        background: var(--color-primary);
+        border: 0;
+        color: var(--color-on-dark);
+        border-radius: var(--rounded-pill);
+        box-shadow: var(--shadow-heavy);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .btn-run:hover {
+        background: var(--color-primary-active);
+        color: var(--color-on-dark);
+        transform: translateY(-1px);
+      }
+
+      .btn-run:disabled {
+        background: var(--color-border);
+        color: var(--color-quiet);
+        transform: none;
+        box-shadow: none;
+      }
+
+      .toggle-grid {
+        background: var(--color-bg);
+        border-color: transparent;
+        box-shadow: var(--shadow-inset);
+      }
+
+      .toggle-btn.selected {
+        background: var(--color-primary);
+        border: 0;
+        color: var(--color-on-dark);
+      }
+
+      .toggle-btn.selected.delayed {
+        background: transparent;
+        border: 1px solid var(--color-amber);
+        color: var(--color-amber);
+      }
+
+      .toggle-btn.selected.crashed {
+        background: transparent;
+        border: 1px solid var(--color-error);
+        color: var(--color-error);
+      }
+
+      .latency-slider::-webkit-slider-thumb {
+        background: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(30, 215, 96, 0.16);
+      }
+
+      .payload-preview,
+      .ticker-terminal {
+        background: var(--color-bg);
+        border-color: var(--color-border);
+        color: var(--color-muted);
+      }
+
+      .handoff-verdict.success {
+        background: rgba(30, 215, 96, 0.08);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
+
+      .handoff-verdict.error {
+        background: rgba(243, 114, 127, 0.08);
+        border-color: var(--color-error);
+        color: var(--color-error);
+      }
+
+      .handoff-verdict.warning {
+        background: rgba(255, 164, 43, 0.08);
+        border-color: var(--color-amber);
+        color: var(--color-amber);
+      }
+
+      .ticker-line.green {
+        color: var(--color-primary);
+      }
+
+      .ticker-line.amber {
+        color: var(--color-amber);
+      }
+
+      .ticker-line.red {
+        color: var(--color-error);
+      }
+
+      .field-row input {
+        border: 0;
+        border-radius: var(--rounded-input);
+        box-shadow: var(--shadow-inset);
+      }
+
+      .tab-btn,
+      .toggle-btn {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+      }
+
+      .trace-bar-fill.success {
+        background: var(--color-primary);
+      }
+
+      .trace-bar-fill.warning,
+      .trace-bar-fill.delay {
+        background: var(--color-amber);
+      }
+
+      .trace-bar-fill.error {
+        background: var(--color-error);
+      }
+
+      /* UX layout pass: left-to-right audit cockpit with diagnostics below. */
+      .workspace-grid {
+        grid-template-columns: minmax(320px, 360px) minmax(520px, 1fr) minmax(360px, 400px);
+        grid-template-areas:
+          "ops stage exchange"
+          "controls controls controls";
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .operations-desk,
+      .stage-panel,
+      .engine-monitor {
+        min-height: clamp(580px, calc(100vh - 280px), 660px);
+        height: clamp(580px, calc(100vh - 280px), 660px);
+      }
+
+      .operations-desk {
+        grid-area: ops;
+        gap: 16px;
+        overflow: auto;
+      }
+
+      .stage-panel {
+        grid-area: stage;
+      }
+
+      .stage-viewports {
+        min-height: 0;
+      }
+
+      .events-box {
+        min-height: 0;
+        max-height: 156px;
+      }
+
+      .event-log-header,
+      .events-box {
+        display: none;
+      }
+
+      .ticker-terminal {
+        min-height: 104px;
+        max-height: 104px;
+      }
+
+      .engine-monitor {
+        grid-area: exchange;
+        min-height: 0;
+        padding: 20px;
+        gap: 14px;
+        overflow: hidden;
+      }
+
+      .engine-monitor-header {
+        padding-bottom: 12px;
+      }
+
+      .engine-monitor-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "handoff"
+          "payload";
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 12px;
+        align-items: stretch;
+        min-height: 0;
+        flex: 1;
+      }
+
+      .monitor-card,
+      .trace-panel {
+        min-width: 0;
+      }
+
+      .simulator-card {
+        grid-area: simulator;
+      }
+
+      .editor-box {
+        grid-area: policy;
+      }
+
+      .handoff-panel {
+        grid-area: handoff;
+      }
+
+      .payload-panel {
+        grid-area: payload;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        background: var(--color-card-active);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      .trace-panel {
+        grid-area: trace;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        background: var(--color-card-active);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .trace-panel .panel-header {
+        border: 0;
+        margin: 0;
+        padding: 0;
+      }
+
+      .trace-panel .trace-timeline {
+        flex: 1;
+        justify-content: space-between;
+      }
+
+      .engine-monitor .handoff-flow {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: stretch;
+      }
+
+      .engine-monitor .handoff-panel {
+        padding: 14px;
+      }
+
+      .engine-monitor .handoff-agent {
+        min-height: 96px;
+      }
+
+      .engine-monitor .handoff-agent strong {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .engine-monitor .handoff-agent small {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .engine-monitor .handoff-arrow {
+        min-width: 58px;
+        text-align: center;
+        align-self: center;
+      }
+
+      .engine-monitor .handoff-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .engine-monitor .payload-preview {
+        flex: 1;
+        max-height: none;
+        min-height: 160px;
+      }
+
+      .test-controls-panel {
+        grid-area: controls;
+        min-height: 0;
+        height: auto;
+        padding: 20px;
+      }
+
+      .test-controls-grid {
+        display: grid;
+        grid-template-columns: minmax(380px, 1.1fr) minmax(260px, 0.7fr) minmax(420px, 1.2fr);
+        grid-template-areas:
+          "trace simulator policy";
+        gap: 16px;
+        align-items: start;
+      }
+
+      .test-controls-grid .trace-panel,
+      .test-controls-grid .simulator-card,
+      .test-controls-grid .editor-box {
+        align-self: start;
+        min-height: 0;
+        padding: 16px;
+      }
+
+      .test-controls-grid .simulator-card,
+      .test-controls-grid .editor-box {
+        min-height: 183px;
+      }
+
+      .test-controls-grid .simulator-card {
+        gap: 18px;
+      }
+
+      .test-controls-grid .latency-header {
+        color: var(--color-muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
+      .test-controls-grid .toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-pill);
+        background: var(--color-bg);
+        box-shadow: none;
+      }
+
+      .test-controls-grid .toggle-btn {
+        min-height: 36px;
+        border-radius: var(--rounded-pill);
+        padding: 0 8px;
+        font-size: 10px;
+        letter-spacing: 0.9px;
+        line-height: 1.15;
+        white-space: normal;
+      }
+
+      .test-controls-grid .toggle-btn.selected {
+        box-shadow: none;
+      }
+
+      .test-controls-grid .latency-bar {
+        gap: 10px;
+      }
+
+      .test-controls-grid .latency-slider {
+        height: 6px;
+        background: var(--color-bg);
+        box-shadow: inset 0 0 0 1px var(--color-border);
+      }
+
+      .test-controls-grid .latency-slider::-webkit-slider-thumb {
+        width: 16px;
+        height: 16px;
+        box-shadow: 0 0 0 5px rgba(30, 215, 96, 0.16);
+      }
+
+      .test-controls-grid .editor-box {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .policy-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .policy-card-header .panel-title h3 {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.9px;
+        text-transform: uppercase;
+      }
+
+      .policy-mode-pill {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-pill);
+        color: var(--color-primary);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.9px;
+        line-height: 1;
+        padding: 6px 9px;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .policy-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .policy-summary-item {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        background: var(--color-bg);
+        min-width: 0;
+        padding: 9px 10px;
+      }
+
+      .policy-summary-item span,
+      .policy-blocked span {
+        display: block;
+        color: var(--color-muted);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        line-height: 1.2;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+      }
+
+      .policy-summary-item strong,
+      .policy-blocked strong {
+        display: block;
+        color: var(--color-text);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.25;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .policy-blocked {
+        border-top: 1px solid rgba(77, 77, 77, 0.72);
+        padding-top: 10px;
+      }
+
+      .policy-rule-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .policy-rule-list span {
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-pill);
+        color: var(--color-text);
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1;
+        padding: 5px 7px;
+        white-space: nowrap;
+      }
+
+      .policy-source-form {
+        display: none !important;
+      }
+
+      .test-controls-grid .policy-form {
+        gap: 0;
+      }
+
+      .test-controls-grid .field-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(128px, 168px);
+        gap: 18px;
+        align-items: center;
+        min-height: 48px;
+        padding: 10px 0;
+        border-top: 1px solid rgba(77, 77, 77, 0.72);
+      }
+
+      .test-controls-grid .field-row label {
+        color: var(--color-muted);
+        font-size: 10px !important;
+        font-weight: 700;
+        letter-spacing: 1px;
+        line-height: 1.25;
+        text-transform: uppercase;
+      }
+
+      .test-controls-grid .field-row input:not([type="checkbox"]) {
+        justify-self: end;
+        min-height: 36px;
+        width: 100%;
+        max-width: 168px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-md);
+        background: var(--color-bg);
+        box-shadow: none;
+        color: var(--color-text);
+        font-family: var(--font-mono) !important;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 12px;
+      }
+
+      .test-controls-grid .switch-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .test-controls-grid #pol-req-exit {
+        -webkit-appearance: none;
+        appearance: none;
+        position: relative;
+        width: 42px !important;
+        height: 24px !important;
+        min-height: 24px !important;
+        padding: 0 !important;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-pill);
+        background: var(--color-bg);
+        box-shadow: none !important;
+        cursor: pointer;
+        flex: 0 0 auto;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+
+      .test-controls-grid #pol-req-exit::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--color-muted);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .test-controls-grid #pol-req-exit:checked {
+        border-color: var(--color-primary);
+        background: rgba(30, 215, 96, 0.18);
+      }
+
+      .test-controls-grid #pol-req-exit:checked::before {
+        transform: translateX(18px);
+        background: var(--color-primary);
+      }
+
+      .test-controls-grid .allow-list-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        align-items: stretch;
+        padding-bottom: 0;
+      }
+
+      .test-controls-grid .allow-list-row input:not([type="checkbox"]) {
+        justify-self: stretch;
+        max-width: none;
+        text-align: left;
+      }
+
+      @media (max-width: 1280px) {
+        .app-container {
+          max-width: 100%;
+        }
+
+        .workspace-grid {
+          grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+          grid-template-areas:
+            "ops stage"
+            "exchange exchange"
+            "controls controls";
+        }
+
+        .engine-monitor-grid {
+          grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+          grid-template-areas:
+            "handoff payload";
+        }
+
+        .operations-desk,
+        .stage-panel {
+          height: clamp(580px, calc(100vh - 280px), 660px);
+          min-height: clamp(580px, calc(100vh - 280px), 660px);
+        }
+
+        .engine-monitor {
+          height: auto;
+          min-height: 0;
+        }
+
+        .engine-monitor .handoff-flow {
+          grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        }
+
+        .engine-monitor .handoff-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .test-controls-grid {
+          grid-template-columns: 1fr 1fr;
+          grid-template-areas:
+            "trace trace"
+            "simulator policy";
+        }
+      }
+
+      @media (max-width: 960px) {
+        .workspace-grid {
+          grid-template-columns: 1fr;
+          grid-template-areas:
+            "ops"
+            "stage"
+            "exchange"
+            "controls";
+        }
+
+        .engine-monitor-grid {
+          grid-template-columns: 1fr;
+          grid-template-areas:
+            "handoff"
+            "payload";
+        }
+
+        .engine-monitor .handoff-flow {
+          grid-template-columns: 1fr;
+        }
+
+        .engine-monitor .handoff-arrow {
+          min-width: 0;
+          text-align: left;
+        }
+
+        .engine-monitor .handoff-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .test-controls-grid {
+          grid-template-columns: 1fr;
+          grid-template-areas:
+            "trace"
+            "simulator"
+            "policy";
+        }
+
+        .operations-desk,
+        .stage-panel,
+        .engine-monitor {
+          height: auto;
+          min-height: 0;
+        }
+
+        .stage-panel {
+          min-height: 620px;
+        }
+
+      }
+
+      @media (max-width: 760px) {
+        .topbar,
+        .system-status,
+        .sequential-strip {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .workspace-grid,
+        .engine-monitor-grid,
+        .test-controls-grid,
+        .handoff-grid {
+          grid-template-columns: 1fr;
+          min-width: 0;
+        }
+
+        .panel {
+          min-height: auto;
+          padding: 18px;
+          min-width: 0;
+        }
+
+        .workspace-grid > *,
+        .stage-viewports,
+        .field-row {
+          min-width: 0;
+        }
+
+        .app-container {
+          padding-inline: 12px;
+        }
+
+        .field-row {
+          grid-template-columns: 1fr;
+        }
+
+        .steps-track {
+          width: 100%;
+          max-width: none;
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+
+      <!-- Spotify-inspired app header -->
+      <header class="topbar">
+        <div class="brand-box">
+          <div class="brand-logo">
+            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div class="brand-title">
+            <h1>Contract Compliance Engine</h1>
+            <p>Building cross-language multi-agent systems using ADK and A2A</p>
+          </div>
+        </div>
+        <div class="system-status">
+          <div class="status-pill">
+            <div class="pulse"></div>
+            <span>Agent Server Online</span>
+          </div>
+          <div class="status-pill" style="font-family: 'JetBrains Mono', monospace; color: var(--color-muted);">
+            127.0.0.1:8000
+          </div>
+        </div>
+      </header>
+
+      <!-- Multi-agent state timeline ribbon -->
+      <section class="sequential-strip">
+        <div class="steps-label">Pipeline Progress</div>
+        <div class="steps-track">
+
+          <div class="step-node completed" id="node-ingested">
+            <div class="icon-dot"><i data-lucide="file-down" style="width: 11px; height: 11px;"></i></div>
+            <span>Ingested</span>
+          </div>
+          <div class="step-divider" id="div-extracted"></div>
+
+          <div class="step-node" id="node-extracted">
+            <div class="icon-dot"><i data-lucide="binary" style="width: 11px; height: 11px;"></i></div>
+            <span>Extracted</span>
+          </div>
+          <div class="step-divider" id="div-pending"></div>
+          
+          <div class="step-node" id="node-pending">
+            <div class="icon-dot"><i data-lucide="git-compare" style="width: 11px; height: 11px;"></i></div>
+            <span>A2A Handoff</span>
+          </div>
+          <div class="step-divider" id="div-complete"></div>
+          
+          <div class="step-node" id="node-completed">
+            <div class="icon-dot"><i data-lucide="award" style="width: 11px; height: 11px;"></i></div>
+            <span>Audited</span>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- Main workspace panel grid -->
+      <div class="workspace-grid">
+        
+        <!-- Column 1: Control & Ops Desk -->
+        <section class="panel operations-desk">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="briefcase" style="width: 20px; height: 20px;"></i>
+              <h3>Ops Portal Desk</h3>
+            </div>
+            <span class="status-pill" id="case-status-badge" style="font-size: 10px; font-weight: 700; text-transform: uppercase;">Idle</span>
+          </div>
+
+          <div style="font-size: 13px; color: var(--color-muted);">
+            Pick one of the pre-loaded vendor contracts from the corporate repository below to execute a real-time policy compliance audit.
+          </div>
+
+          <div class="contract-selector-list">
+            
+            <div class="contract-card selected" id="opt-std" onclick="selectContract('standard-vendor-agreement.pdf')">
+              <div class="contract-info">
+                <strong>standard-vendor-agreement.pdf</strong>
+                <span>Acme Cloud Solutions | Value: $250k | Coverage: $2M</span>
+              </div>
+              <i data-lucide="check" class="check-icon" style="color: var(--color-primary); width: 16px; height: 16px;"></i>
+            </div>
+
+            <div class="contract-card" id="opt-high" onclick="selectContract('high-risk-liability-contract.pdf')">
+              <div class="contract-info">
+                <strong>high-risk-liability-contract.pdf</strong>
+                <span>Apex Data Systems | Value: $450k | Unlimited liability</span>
+              </div>
+              <i data-lucide="check" class="check-icon" style="color: var(--color-primary); width: 16px; height: 16px; display: none;"></i>
+            </div>
+
+            <div class="contract-card" id="opt-bad" onclick="selectContract('non-compliant-contract.pdf')">
+              <div class="contract-info">
+                <strong>non-compliant-contract.pdf</strong>
+                <span>Legacy Networks Corp | Value: $850k | Value & term limit breach</span>
+              </div>
+              <i data-lucide="check" class="check-icon" style="color: var(--color-primary); width: 16px; height: 16px; display: none;"></i>
+            </div>
+            
+          </div>
+
+          <button class="btn-run" id="btn-submit-contract" onclick="runComplianceCheck()">
+            <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+            <span>Run Pipeline Audit</span>
+          </button>
+
+          <!-- Ticker / Trace logging cockpit console -->
+          <div class="panel-header" style="border: none; padding: 0; margin-top: 10px;">
+            <div class="panel-title">
+              <i data-lucide="terminal" style="width: 16px; height: 16px; color: var(--color-primary);"></i>
+              <h3 style="font-size: 13px;">Ambient ADK Event Ticker</h3>
+            </div>
+          </div>
+          <div class="ticker-terminal" id="ticker-console">
+            <div class="ticker-line">[System] Cockpit loaded. Session listening on 127.0.0.1:8000. Ready to dispatch.</div>
+          </div>
+
+          <!-- Historic runs log stream list -->
+          <div class="panel-header event-log-header" style="border: none; padding: 0; margin-top: 10px;">
+            <div class="panel-title">
+              <i data-lucide="scroll" style="width: 16px; height: 16px; color: var(--color-primary);"></i>
+              <h3 style="font-size: 13px;">Execution Spans Log</h3>
+            </div>
+          </div>
+          <div class="events-box" id="events-stream-list">
+            <div class="event-row">
+              <div class="event-indicator system"></div>
+              <div class="event-details">
+                <strong>Framework initialized</strong>
+                <span>SQLite persistence database loaded successfully.</span>
+              </div>
+              <div class="event-time" id="init-time">08:36:21</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Column 2: Legal Stage Preview (Iframe artifacts) -->
+        <section class="panel stage-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="eye" style="width: 20px; height: 20px;"></i>
+              <h3>Case Artifact Viewer</h3>
+            </div>
+          </div>
+          <div class="stage-viewports">
+            <div class="stage-navbar">
+              <button class="tab-btn selected" id="tab-extracted-sheet" onclick="switchStageTab('param')">
+                <i data-lucide="file-text" style="width: 12px; height: 12px;"></i>
+                <span>Parameters Sheet</span>
+              </button>
+              <button class="tab-btn" id="tab-compliance-cert" onclick="switchStageTab('cert')">
+                <i data-lucide="file-check" style="width: 12px; height: 12px;"></i>
+                <span>Go Compliance Certificate</span>
+              </button>
+            </div>
+            
+            <iframe class="stage-canvas" id="artifact-frame" style="display: none;"></iframe>
+            
+            <div class="stage-empty" id="viewport-empty-box">
+              <i data-lucide="inbox" style="width: 48px; height: 48px; color: var(--color-border);"></i>
+              <div>
+                <strong style="display: block; color: var(--color-text); font-size: 15px; margin-bottom: 4px;">Zero Auditing Runs Loaded</strong>
+                <p style="font-size: 13px; max-width: 280px; margin: 0 auto;">Upload or select a vendor contract above and trigger compliance validation to review extracted reports.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Agent exchange rail -->
+        <section class="panel engine-monitor">
+          <div class="panel-header engine-monitor-header">
+            <div class="panel-title">
+              <i data-lucide="cpu" style="width: 20px; height: 20px;"></i>
+              <h3>Agent Exchange</h3>
+            </div>
+          </div>
+
+          <div class="engine-monitor-grid">
+          <!-- Live Python -> Go handoff inspector -->
+          <div class="handoff-panel monitor-card">
+            <div class="panel-title">
+              <i data-lucide="git-branch" style="width: 14px; height: 14px; color: var(--color-primary);"></i>
+              <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-muted);">Live Agent Handoff</h3>
+            </div>
+            <div class="handoff-flow">
+              <div class="handoff-agent">
+                <span>Source</span>
+                <strong id="handoff-source">python-extraction-agent</strong>
+                <small id="handoff-source-detail">Waiting for contract extraction.</small>
+              </div>
+              <div class="handoff-arrow" id="handoff-method">SendMessage</div>
+              <div class="handoff-agent">
+                <span>Target</span>
+                <strong id="handoff-target">go-compliance-agent</strong>
+                <small id="handoff-target-detail">Waiting for agent card discovery.</small>
+              </div>
+            </div>
+            <div class="handoff-grid">
+              <div class="handoff-metric">
+                <span>Agent Card</span>
+                <code id="handoff-card-url">GET localhost:8888/.well-known/agent.json</code>
+              </div>
+              <div class="handoff-metric">
+                <span>Task ID</span>
+                <code id="handoff-task-id">not dispatched</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Structured A2A payload and verdict output -->
+          <div class="payload-panel monitor-card">
+            <div class="panel-title">
+              <i data-lucide="braces" style="width: 14px; height: 14px; color: var(--color-primary);"></i>
+              <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-muted);">A2A Payload & Verdict</h3>
+            </div>
+            <pre class="payload-preview" id="handoff-payload-preview">Run an audit to see the structured A2A SendMessage payload that ADK sends to the Go agent.</pre>
+            <div class="handoff-verdict" id="handoff-verdict">No verdict returned yet.</div>
+          </div>
+          </div>
+        </section>
+
+        <!-- Advanced run configuration controls -->
+        <section class="panel test-controls-panel">
+          <div class="panel-header engine-monitor-header">
+            <div class="panel-title">
+              <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+              <h3>Run Configuration</h3>
+            </div>
+          </div>
+
+          <div class="test-controls-grid">
+            <!-- Distributed Trace Timeline visual Spans mapping -->
+            <div class="trace-panel monitor-card">
+              <div class="panel-header" style="border: none; padding: 0;">
+                <div class="panel-title">
+                  <i data-lucide="line-chart" style="width: 16px; height: 16px; color: var(--color-success);"></i>
+                  <h3 style="font-size: 13px;">Distributed OTel Trace Spans</h3>
+                </div>
+              </div>
+              <div class="trace-timeline" id="trace-timeline-box">
+
+                <div class="trace-row" id="span-upload">
+                  <div class="trace-label">
+                    <span class="trace-name">POST /api/compliance/upload</span>
+                    <span class="trace-duration">0ms</span>
+                  </div>
+                  <div class="trace-bar-track"><div class="trace-bar-fill success" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="trace-row" id="span-extract">
+                  <div class="trace-label">
+                    <span class="trace-name">extract_contract_fields</span>
+                    <span class="trace-duration">0ms</span>
+                  </div>
+                  <div class="trace-bar-track"><div class="trace-bar-fill" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="trace-row" id="span-discover">
+                  <div class="trace-label">
+                    <span class="trace-name">GET /.well-known/agent.json</span>
+                    <span class="trace-duration">0ms</span>
+                  </div>
+                  <div class="trace-bar-track"><div class="trace-bar-fill" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="trace-row" id="span-tasks">
+                  <div class="trace-label">
+                    <span class="trace-name">ADK RemoteA2aAgent SendMessage</span>
+                    <span class="trace-duration">0ms</span>
+                  </div>
+                  <div class="trace-bar-track"><div class="trace-bar-fill" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="trace-row" id="span-go-validate">
+                  <div class="trace-label">
+                    <span class="trace-name">go_validate_policy</span>
+                    <span class="trace-duration">0ms</span>
+                  </div>
+                  <div class="trace-bar-track"><div class="trace-bar-fill success" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="trace-row" id="span-delay" style="display: none;">
+                  <div class="trace-label">
+                    <span class="trace-name">simulated_latency_wait</span>
+                    <span class="trace-duration">0ms</span>
+                  </div>
+                  <div class="trace-bar-track"><div class="trace-bar-fill delay" style="width: 0%;"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Latency/Connection simulator toggles -->
+            <div class="simulator-card monitor-card">
+              <div class="latency-header">
+                <span style="font-weight: 700; text-transform: uppercase; font-size: 10px;">A2A Simulator Mode</span>
+                <span style="font-family: monospace; font-size: 11px; font-weight: bold; color: var(--color-primary);" id="lbl-sim-mode">NORMAL</span>
+              </div>
+              <div class="toggle-grid">
+                <button class="toggle-btn selected" id="sim-btn-normal" onclick="setSimMode('normal')">Healthy</button>
+                <button class="toggle-btn" id="sim-btn-delay" onclick="setSimMode('delayed')">Delayed</button>
+                <button class="toggle-btn" id="sim-btn-crash" onclick="setSimMode('crashed')">Crashed (503)</button>
+              </div>
+              <div class="latency-bar">
+                <div class="latency-header">
+                  <span>Simulated Network Delay</span>
+                  <span style="font-family: monospace;" id="lbl-latency">1.5s</span>
+                </div>
+                <input type="range" class="latency-slider" id="slider-latency" min="0" max="5" step="0.5" value="1.5" oninput="updateLatencyValue(this.value)" />
+              </div>
+            </div>
+
+            <!-- Active compliance policy summary. Hidden inputs below preserve the policy override payload. -->
+            <div class="editor-box monitor-card">
+              <div class="policy-card-header">
+                <div class="panel-title">
+                  <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--color-primary);"></i>
+                  <h3>Active Compliance Policy</h3>
+                </div>
+                <span class="policy-mode-pill">Standard</span>
+              </div>
+
+              <div class="policy-summary-grid">
+                <div class="policy-summary-item">
+                  <span>Value Cap</span>
+                  <strong>$500k</strong>
+                </div>
+                <div class="policy-summary-item">
+                  <span>Term Limit</span>
+                  <strong>5 yrs</strong>
+                </div>
+                <div class="policy-summary-item">
+                  <span>Insurance</span>
+                  <strong>$1M+</strong>
+                </div>
+              </div>
+
+              <div class="policy-blocked">
+                <span>Required Rule Set</span>
+                <div class="policy-rule-list">
+                  <span>Exit clause</span>
+                  <span>No unlimited liability</span>
+                  <span>No &gt;3yr renewal</span>
+                </div>
+              </div>
+
+              <form class="policy-form policy-source-form" onsubmit="event.preventDefault();" aria-hidden="true">
+                <div class="field-row">
+                  <label>Max Contract Value</label>
+                  <input type="text" id="pol-max-val" value="$500,000" onchange="formatCurrencyInput(this)" />
+                </div>
+                <div class="field-row">
+                  <label>Max Term Years</label>
+                  <input type="number" id="pol-max-term" min="1" max="20" value="5" />
+                </div>
+                <div class="field-row">
+                  <label>Required Insurance</label>
+                  <input type="text" id="pol-min-ins" value="$1,000,000" onchange="formatCurrencyInput(this)" />
+                </div>
+                <div class="field-row switch-row">
+                  <label>Exits Safety Required</label>
+                  <input type="checkbox" id="pol-req-exit" checked />
+                </div>
+                <div class="field-row allow-list-row">
+                  <label>Prohibited Clauses Allow-list</label>
+                  <input type="text" id="pol-blacklist" value="unlimited liability, auto-renewal > 3yr" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Cockpit client scripts -->
+    <script>
+      // Client runtime state
+      let selectedContractFile = "standard-vendor-agreement.pdf";
+      let activeCaseId = null;
+      let activeSessionId = null;
+      let simulationMode = "normal";
+      let networkLatencyVal = 1.5;
+      let pollingInterval = null;
+      let lastTickerMessage = "";
+      const API_ORIGIN = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : "";
+
+      function apiUrl(path) {
+        const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+        return `${API_ORIGIN}${normalizedPath}`;
+      }
+
+      // Console logger helper
+      function tickerLog(msg, colorClass = "") {
+        if (msg === lastTickerMessage) return;
+        lastTickerMessage = msg;
+
+        const terminal = document.getElementById("ticker-console");
+        const line = document.createElement("div");
+        line.className = "ticker-line " + colorClass;
+        
+        const timestamp = new Date().toLocaleTimeString();
+        line.textContent = `[${timestamp}] ${msg}`;
+        
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+
+      if (API_ORIGIN) {
+        tickerLog(`Static file mode detected. API requests will target ${API_ORIGIN}.`, "system");
+      }
+
+      function updateLatencyValue(val) {
+        document.getElementById("lbl-latency").textContent = parseFloat(val).toFixed(1) + "s";
+        networkLatencyVal = parseFloat(val);
+        tickerLog(`Latency slider adjusted to ${networkLatencyVal}s.`, "system");
+      }
+
+      function setSimMode(mode) {
+        // Clear active classes
+        document.getElementById("sim-btn-normal").classList.remove("selected");
+        document.getElementById("sim-btn-delay").classList.remove("selected");
+        document.getElementById("sim-btn-delay").classList.remove("delayed");
+        document.getElementById("sim-btn-crash").classList.remove("selected");
+        
+        let label = "NORMAL";
+        if (mode === "normal") {
+          document.getElementById("sim-btn-normal").classList.add("selected");
+          label = "NORMAL";
+        } else if (mode === "delayed") {
+          document.getElementById("sim-btn-delay").classList.add("selected");
+          document.getElementById("sim-btn-delay").classList.add("delayed");
+          label = "DELAYED";
+        } else if (mode === "crashed") {
+          document.getElementById("sim-btn-crash").classList.add("selected");
+          label = "CRASHED (503)";
+        }
+        
+        simulationMode = mode;
+        document.getElementById("lbl-sim-mode").textContent = label;
+        
+        tickerLog(`Simulator parameters swapped to: ${label}`, "system");
+      }
+
+      function selectContract(file) {
+        document.getElementById("opt-std").classList.remove("selected");
+        document.getElementById("opt-high").classList.remove("selected");
+        document.getElementById("opt-bad").classList.remove("selected");
+        
+        document.getElementById("opt-std").querySelector(".check-icon").style.display = "none";
+        document.getElementById("opt-high").querySelector(".check-icon").style.display = "none";
+        document.getElementById("opt-bad").querySelector(".check-icon").style.display = "none";
+        
+        let targetCard = null;
+        if (file === "standard-vendor-agreement.pdf") {
+          targetCard = document.getElementById("opt-std");
+        } else if (file === "high-risk-liability-contract.pdf") {
+          targetCard = document.getElementById("opt-high");
+        } else if (file === "non-compliant-contract.pdf") {
+          targetCard = document.getElementById("opt-bad");
+        }
+        
+        targetCard.classList.add("selected");
+        targetCard.querySelector(".check-icon").style.display = "block";
+        
+        selectedContractFile = file;
+        tickerLog(`Operational choice targeting files: ${selectedContractFile}`, "system");
+      }
+
+      function formatCurrencyInput(elem) {
+        let value = elem.value.replace(/[^\d.]/g, '');
+        if (!isNaN(parseFloat(value))) {
+          elem.value = "$" + parseFloat(value).toLocaleString();
+        }
+      }
+
+      async function fetchSelectedContractBody(filename) {
+        let sampleRes;
+        try {
+          sampleRes = await fetch(apiUrl(`/api/compliance/sample-contracts/${encodeURIComponent(filename)}`), {
+            cache: "no-store"
+          });
+        } catch (err) {
+          throw new Error(`Sample contract fetch failed. Confirm FastAPI is running at ${API_ORIGIN || window.location.origin}.`);
+        }
+        if (!sampleRes.ok) {
+          const err = await sampleRes.json().catch(() => ({ detail: "Sample contract fetch failed" }));
+          throw new Error(err.detail || "Sample contract fetch failed");
+        }
+        return await sampleRes.text();
+      }
+
+      async function readErrorMessage(response, fallback) {
+        const text = await response.text().catch(() => "");
+        if (!text) return fallback;
+        try {
+          const payload = JSON.parse(text);
+          return payload.detail || payload.message || fallback;
+        } catch (_) {
+          return text;
+        }
+      }
+
+      function setCaseStatusBadge(text, tone = "neutral") {
+        const badge = document.getElementById("case-status-badge");
+        const tones = {
+          neutral: { border: "var(--color-border)", color: "var(--color-muted)" },
+          active: { border: "var(--color-primary)", color: "var(--color-primary)" },
+          passed: { border: "var(--color-primary)", color: "var(--color-primary)" },
+          review: { border: "var(--color-amber)", color: "var(--color-amber)" },
+          error: { border: "var(--color-error)", color: "var(--color-error)" }
+        };
+        const style = tones[tone] || tones.neutral;
+        badge.textContent = text;
+        badge.style.background = "transparent";
+        badge.style.borderColor = style.border;
+        badge.style.color = style.color;
+      }
+
+      // Main compliance trigger drive
+      async function runComplianceCheck() {
+        tickerLog(`Audit requested for: ${selectedContractFile}. Checking bounds...`, "system");
+        
+        // 1. Fetch customized policy config parameters
+        const maxValRaw = document.getElementById("pol-max-val").value.replace(/[^\d.]/g, '');
+        const maxTerm = parseInt(document.getElementById("pol-max-term").value);
+        const minInsRaw = document.getElementById("pol-min-ins").value.replace(/[^\d.]/g, '');
+        const reqExit = document.getElementById("pol-req-exit").checked;
+        const prohibitRaw = document.getElementById("pol-blacklist").value.split(",").map(s => s.trim());
+        
+        const policies = {
+          max_contract_value: parseFloat(maxValRaw) || 500000.0,
+          max_term_years: maxTerm,
+          required_insurance_minimum: parseFloat(minInsRaw) || 1000000.0,
+          required_termination_clause: reqExit,
+          prohibited_clauses: prohibitRaw
+        };
+
+        // UI updates resetting visual ribbon states
+        resetUIRibbonState();
+        document.getElementById("btn-submit-contract").disabled = true;
+        setCaseStatusBadge("Processing", "active");
+        
+        try {
+          const selectedContractBody = await fetchSelectedContractBody(selectedContractFile);
+          tickerLog(`Loaded ${selectedContractBody.length} bytes from bundled sample contract fixture.`, "system");
+
+          // Form payload mapping
+          const formData = new FormData();
+          formData.append("file", new File([selectedContractBody], selectedContractFile, { type: "text/plain" }));
+          formData.append("simulated_latency", networkLatencyVal);
+          formData.append("simulated_server_state", simulationMode);
+          formData.append("custom_policies", JSON.stringify(policies));
+
+          tickerLog("Browser sent real contract text and policy config to Python FastAPI intake.", "system");
+          animateSpanTrack("span-upload", true, networkLatencyVal * 50);
+
+          const res = await fetch(apiUrl("/api/compliance/upload"), {
+            method: "POST",
+            body: formData
+          });
+          
+          if (!res.ok) {
+            throw new Error(await readErrorMessage(res, "Connection Error"));
+          }
+          
+          const payload = await res.json();
+          activeCaseId = payload.case.id;
+          activeSessionId = payload.case.session_id;
+          
+          tickerLog(`Compliance case established. Python assigned task ID: ${activeCaseId.substring(0,8)}`, "system");
+          updateCaseMetadata(payload.case);
+          
+          // Start Polling state audits
+          startCaseMonitoring();
+          
+        } catch(err) {
+          tickerLog(`Transaction aborted: Ingestion failed: ${err.message}`, "red");
+          animateSpanTrack("span-upload", false, 0, "error");
+          document.getElementById("btn-submit-contract").disabled = false;
+          setCaseStatusBadge("Failed", "error");
+        }
+      }
+      
+      // Bind runComplianceCheck global for inline click handlers.
+      window.runComplianceCheck = runComplianceCheck;
+
+      function resetHandoffPanel() {
+        document.getElementById("handoff-source").textContent = "python-extraction-agent";
+        document.getElementById("handoff-source-detail").textContent = "Waiting for contract extraction.";
+        document.getElementById("handoff-target").textContent = "go-compliance-agent";
+        document.getElementById("handoff-target-detail").textContent = "Waiting for agent card discovery.";
+        document.getElementById("handoff-method").textContent = "SendMessage";
+        document.getElementById("handoff-card-url").textContent = "GET localhost:8888/.well-known/agent.json";
+        document.getElementById("handoff-task-id").textContent = "not dispatched";
+        document.getElementById("handoff-payload-preview").textContent = "Run an audit to see the structured A2A SendMessage payload that ADK sends to the Go agent.";
+        const verdict = document.getElementById("handoff-verdict");
+        verdict.className = "handoff-verdict";
+        verdict.textContent = "No verdict returned yet.";
+      }
+
+      function setHandoffVerdict(verdictBox, tone, title, summary, violations = []) {
+        verdictBox.className = "handoff-verdict";
+        if (tone) verdictBox.classList.add(tone);
+
+        const titleEl = document.createElement("strong");
+        titleEl.className = "handoff-verdict-title";
+        titleEl.textContent = title;
+
+        const summaryEl = document.createElement("span");
+        summaryEl.className = "handoff-verdict-summary";
+        summaryEl.textContent = summary;
+
+        verdictBox.replaceChildren(titleEl, summaryEl);
+
+        if (violations.length > 0) {
+          const list = document.createElement("ul");
+          list.className = "handoff-violation-list";
+          violations.forEach((violation) => {
+            const item = document.createElement("li");
+            item.textContent = violation;
+            list.appendChild(item);
+          });
+          verdictBox.appendChild(list);
+        }
+      }
+
+      function compactHandoffRequest(request) {
+        if (!request || !request.params || !request.params.message) return null;
+        const message = request.params.message;
+        const dataPart = message.parts && message.parts[0]
+          ? message.parts[0].data
+          : {};
+        const data = Object.assign({}, dataPart || {});
+        if (data.contract) {
+          data.contract = {
+            contractor_name: data.contract.contractor_name,
+            contract_value: data.contract.contract_value,
+            insurance_coverage: data.contract.insurance_coverage,
+            liability_limit: data.contract.liability_limit,
+            term_length_years: data.contract.term_length_years,
+            auto_renewal: data.contract.auto_renewal,
+            has_termination_clause: data.contract.has_termination_clause
+          };
+        }
+        if (data.policy) {
+          data.policy = {
+            max_contract_value: data.policy.max_contract_value,
+            required_insurance_minimum: data.policy.required_insurance_minimum,
+            max_term_years: data.policy.max_term_years,
+            required_termination_clause: data.policy.required_termination_clause,
+            prohibited_clauses: data.policy.prohibited_clauses
+          };
+        }
+        return {
+          jsonrpc: request.jsonrpc,
+          id: request.id,
+          method: request.method,
+          params: {
+            metadata: request.params.metadata,
+            message: {
+              kind: message.kind,
+              messageId: message.messageId,
+              taskId: message.taskId,
+              role: message.role,
+              parts: [{ data, mediaType: "application/json" }]
+            }
+          }
+        };
+      }
+
+      function renderHandoff(caseData) {
+        const handoff = caseData.handoff || {};
+        const details = handoff.contract_details || {};
+        const risk = handoff.risk_assessment || {};
+        const verdict = handoff.verdict || {};
+        const agentCard = handoff.agent_card || {};
+
+        if (!handoff.task_id) {
+          resetHandoffPanel();
+          return;
+        }
+
+        document.getElementById("handoff-source").textContent = handoff.source_agent || "python-extraction-agent";
+        document.getElementById("handoff-target").textContent = agentCard.name || handoff.target_agent || "go-compliance-agent";
+        document.getElementById("handoff-method").textContent = handoff.method || "SendMessage";
+        document.getElementById("handoff-card-url").textContent = "GET " + (handoff.agent_card_url || "http://localhost:8888/.well-known/agent.json");
+        document.getElementById("handoff-task-id").textContent = handoff.task_id.substring(0, 8) + "...";
+
+        const contractValue = Number(details.contract_value || 0).toLocaleString();
+        document.getElementById("handoff-source-detail").textContent =
+          `${details.contractor_name || "Contract"} extracted; value $${contractValue}; risk ${risk.risk_tier || caseData.risk_tier}.`;
+
+        const targetDetail = agentCard.skills && agentCard.skills.length > 0
+          ? `${agentCard.skills[0].name}; status ${handoff.status || "prepared"}.`
+          : `Policy validator status ${handoff.status || "prepared"}.`;
+        document.getElementById("handoff-target-detail").textContent = targetDetail;
+
+        const compactRequest = compactHandoffRequest(handoff.request);
+        document.getElementById("handoff-payload-preview").textContent =
+          compactRequest ? jsonStringifySecure(compactRequest, null, 2) : "Python prepared the task, but no payload preview is available.";
+
+        const verdictBox = document.getElementById("handoff-verdict");
+        verdictBox.className = "handoff-verdict";
+        if (handoff.status === "failed") {
+          const violations = Array.isArray(verdict.violations) ? verdict.violations : [];
+          setHandoffVerdict(
+            verdictBox,
+            "warning",
+            "Manual review required",
+            `Handoff failed: ${handoff.error || "Go agent unavailable"}. Python routed this case to manual review.`,
+            violations
+          );
+        } else if (verdict.passed === true) {
+          setHandoffVerdict(
+            verdictBox,
+            "success",
+            "Passed compliance",
+            "Go verdict returned with zero policy violations."
+          );
+        } else if (verdict.passed === false) {
+          const violations = Array.isArray(verdict.violations) ? verdict.violations : [];
+          const count = violations.length;
+          setHandoffVerdict(
+            verdictBox,
+            "error",
+            `Review required: ${count} Go policy violation${count === 1 ? "" : "s"}`,
+            "The Go compliance agent rejected this contract against the active policy.",
+            violations
+          );
+        } else {
+          setHandoffVerdict(
+            verdictBox,
+            "",
+            "Awaiting Go verdict",
+            "Python prepared the A2A task and is waiting for the Go compliance response."
+          );
+        }
+      }
+
+      function resetUIRibbonState() {
+        document.getElementById("node-ingested").className = "step-node";
+        document.getElementById("node-extracted").className = "step-node";
+        document.getElementById("node-pending").className = "step-node";
+        document.getElementById("node-completed").className = "step-node";
+        
+        document.getElementById("div-extracted").className = "step-divider";
+        document.getElementById("div-pending").className = "step-divider";
+        document.getElementById("div-complete").className = "step-divider";
+        
+        // Clear timeline spans bars
+        resetSpanTrack("span-upload");
+        resetSpanTrack("span-extract");
+        resetSpanTrack("span-discover");
+        resetSpanTrack("span-tasks");
+        resetSpanTrack("span-go-validate");
+        resetSpanTrack("span-delay");
+        
+        document.getElementById("span-delay").style.display = "none";
+        
+        // Hide viewport empty box and frames
+        document.getElementById("viewport-empty-box").style.display = "flex";
+        document.getElementById("artifact-frame").style.display = "none";
+        resetHandoffPanel();
+      }
+
+      function startCaseMonitoring() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        
+        pollingInterval = setInterval(async () => {
+          if (!activeCaseId) return;
+          try {
+            const res = await fetch(apiUrl(`/api/compliance/cases/${activeCaseId}`));
+            const data = await res.json();
+            
+            updateCaseMetadata(data.case);
+            
+            // Check exit bounds on completion
+            const step = data.case.current_step;
+            if (step === "APPROVED" || step === "REVIEW_READY" || step === "MANUAL_REVIEW") {
+              clearInterval(pollingInterval);
+              document.getElementById("btn-submit-contract").disabled = false;
+              tickerLog("Compliance routing run complete. Check final certificate artifact.", "green");
+            }
+          } catch(err) {
+            console.error("Polling check aborted", err);
+          }
+        }, 1000);
+      }
+
+      function updateCaseMetadata(caseData) {
+        renderHandoff(caseData);
+
+        // Sync Visual Ribbon States
+        const step = caseData.current_step;
+        
+        document.getElementById("node-ingested").className = "step-node completed";
+        
+        if (step === "INGESTED") {
+          document.getElementById("node-extracted").className = "step-node active";
+          tickerLog("Subagent active: Extractor specialist compiling params...", "agent");
+          animateSpanTrack("span-upload", true, 100, "success");
+          animateSpanTrack("span-extract", true, networkLatencyVal * 150);
+        }
+        
+        else if (step === "EXTRACTED") {
+          document.getElementById("node-extracted").className = "step-node completed";
+          document.getElementById("div-extracted").className = "step-divider completed";
+          document.getElementById("node-pending").className = "step-node active";
+          
+          tickerLog("Legal parameters parsed and saved successfully. Risk tier calculated.", "agent");
+          animateSpanTrack("span-extract", true, 100, "success");
+          animateSpanTrack("span-discover", true, networkLatencyVal * 200);
+        }
+        
+        else if (step === "COMPLIANCE_PENDING") {
+          document.getElementById("node-extracted").className = "step-node completed";
+          document.getElementById("div-extracted").className = "step-divider completed";
+          document.getElementById("node-pending").className = "step-node active";
+          document.getElementById("div-pending").className = "step-divider active";
+          
+          tickerLog("Python ran RemoteA2aAgent and dispatched A2A SendMessage to the Go agent.", "amber");
+          animateSpanTrack("span-discover", true, 100, "success");
+          animateSpanTrack("span-tasks", true, 50, "warning");
+        }
+        
+        else if (step === "COMPLIANCE_COMPLETE" || step === "REVIEW_READY" || step === "APPROVED" || step === "MANUAL_REVIEW") {
+          document.getElementById("node-extracted").className = "step-node completed";
+          document.getElementById("node-pending").className = "step-node completed";
+          document.getElementById("node-completed").className = "step-node completed";
+          
+          document.getElementById("div-extracted").className = "step-divider completed";
+          document.getElementById("div-pending").className = "step-divider completed";
+          document.getElementById("div-complete").className = "step-divider completed";
+          
+          // Complete timeline traces
+          animateSpanTrack("span-upload", true, 100, "success");
+          animateSpanTrack("span-extract", true, 100, "success");
+          animateSpanTrack("span-discover", true, 100, "success");
+          
+          if (step === "MANUAL_REVIEW") {
+            document.getElementById("node-completed").className = "step-node manual-alert active";
+            animateSpanTrack("span-tasks", true, 100, "error");
+            animateSpanTrack("span-go-validate", false, 0, "error");
+            tickerLog("Connection limits hit: Fail-safe manual routing triggered.", "red");
+          } else {
+            animateSpanTrack("span-tasks", true, 100, "success");
+            animateSpanTrack("span-go-validate", true, 100, caseData.passed ? "success" : "error");
+            tickerLog("Go compliance agent returned a typed verdict to the Python orchestrator.", caseData.passed ? "green" : "red");
+          }
+          
+          if (simulationMode === "delayed") {
+            document.getElementById("span-delay").style.display = "flex";
+            animateSpanTrack("span-delay", true, 100, "delay");
+          }
+          
+          // Render status badges
+          if (caseData.passed) {
+            setCaseStatusBadge("Passed", "passed");
+          } else if (step === "MANUAL_REVIEW") {
+            setCaseStatusBadge("Timeout / Review", "review");
+          } else {
+            setCaseStatusBadge("Violations Found", "error");
+          }
+          
+          // Show artifacts previews
+          if (caseData.artifacts.length > 0) {
+            document.getElementById("viewport-empty-box").style.display = "none";
+            document.getElementById("artifact-frame").style.display = "block";
+            switchStageTab("cert"); // default show cert
+          }
+        }
+
+        // Hydrate events streams log
+        const list = document.getElementById("events-stream-list");
+        list.replaceChildren(); // Safe clean empty
+        
+        caseData.events.forEach(ev => {
+          const row = document.createElement("div");
+          row.className = "event-row";
+          
+          const dot = document.createElement("div");
+          dot.className = "event-indicator " + ev.kind;
+          
+          const details = document.createElement("div");
+          details.className = "event-details";
+          
+          const strong = document.createElement("strong");
+          strong.textContent = ev.title;
+          
+          const span = document.createElement("span");
+          span.textContent = ev.detail;
+          
+          details.appendChild(strong);
+          details.appendChild(span);
+          
+          const time = document.createElement("div");
+          time.className = "event-time";
+          time.textContent = ev.time;
+          
+          row.appendChild(dot);
+          row.appendChild(details);
+          row.appendChild(time);
+          
+          list.appendChild(row);
+        });
+      }
+
+      // Tracing timeline bar helpers
+      function animateSpanTrack(id, isWorking, finalVal = 100, colorType = "") {
+        const span = document.getElementById(id);
+        const bar = span.querySelector(".trace-bar-fill");
+        const duration = span.querySelector(".trace-duration");
+        
+        if (isWorking) {
+          bar.className = "trace-bar-fill " + colorType;
+          bar.style.width = finalVal + "%";
+          
+          let count = 0;
+          let randomInc = setInterval(() => {
+            if (bar.style.width === "100%") {
+              clearInterval(randomInc);
+              duration.textContent = parseInt(finalVal * 12) + "ms";
+            } else {
+              count += 45;
+              duration.textContent = count + "ms";
+            }
+          }, 100);
+        } else {
+          bar.className = "trace-bar-fill " + colorType;
+          bar.style.width = "100%";
+        }
+      }
+
+      function resetSpanTrack(id) {
+        const span = document.getElementById(id);
+        const bar = span.querySelector(".trace-bar-fill");
+        const duration = span.querySelector(".trace-duration");
+        bar.style.width = "0%";
+        bar.className = "trace-bar-fill";
+        duration.textContent = "0ms";
+      }
+
+      // Safe JSON serialize prevents cyclic loops
+      function jsonStringifySecure(obj, replacer = null, space = 0) {
+        return JSON.stringify(obj, replacer, space);
+      }
+
+      // Viewports Navbar Tabs controls
+      function switchStageTab(tab) {
+        const tabParam = document.getElementById("tab-extracted-sheet");
+        const tabCert = document.getElementById("tab-compliance-cert");
+        const frame = document.getElementById("artifact-frame");
+        
+        tabParam.classList.remove("selected");
+        tabCert.classList.remove("selected");
+        
+        let targetId = "parameters-sheet";
+        if (tab === "param") {
+          tabParam.classList.add("selected");
+          targetId = "parameters-sheet";
+        } else {
+          tabCert.classList.add("selected");
+          targetId = "compliance-cert";
+        }
+        
+        if (activeCaseId) {
+          frame.src = apiUrl(`/api/compliance/cases/${activeCaseId}/artifacts/${targetId}`);
+        }
+      }
+
+    </script>
+  </body>
+</html>

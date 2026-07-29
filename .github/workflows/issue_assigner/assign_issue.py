@@ -33,7 +33,8 @@ def main() -> None:
     repo = g.get_repo(repo_name)
     issue = repo.get_issue(number=issue_number)
 
-    file_match = re.search(r"\b([\w-]+\.ipynb)\b", issue.body, re.IGNORECASE)
+    # Regex to find any file with an extension
+    file_match = re.search(r"\b([\w-]+\.[\w]+)\b", issue.body, re.IGNORECASE)
 
     if not file_match:
         print("No file found in issue.")
@@ -48,17 +49,44 @@ def main() -> None:
             print(f"No files found for {file_name}")
             return
 
-    print(result[0])
-    file = str(base64.b64decode(result[0].content))[:10000]
-    match = re.search(r"Author.+https://github\.com/([^/\)]+)", file, flags=re.DOTALL)
+    file_path = result[0].path
 
-    if not match:
-        print(f"No User Found for {file_name}")
-        return
+    # Get the commits for the file
+    commits = repo.get_commits(path=file_path)
 
-    username = match.group(1)
-    print(f"Assigning {username} to Issue #{issue_number} for File {result[0].path}")
-    issue.add_to_assignees(username)
+    # Try to get the author of the first commit
+    if commits.totalCount > 0:
+        # The last commit in the list is the first commit
+        first_commit = commits[commits.totalCount - 1]
+        if first_commit.author:
+            username = first_commit.author.login
+            print(
+                f"Assigning {username} to Issue #{issue_number} for File {file_path} based on the first commit."
+            )
+            issue.add_to_assignees(username)
+            return
+
+    # If the file is a notebook and the first commit author wasn't found,
+    # check the notebook metadata as a fallback.
+    if file_name.endswith(".ipynb"):
+        print(
+            "Could not determine the first commit author, checking the notebook metadata."
+        )
+        file_content_encoded = repo.get_contents(file_path).content
+        file_content = str(base64.b64decode(file_content_encoded))[:10000]
+        match = re.search(
+            r"Author.+https://github\.com/([^/\)]+)", file_content, flags=re.DOTALL
+        )
+
+        if match:
+            username = match.group(1)
+            print(
+                f"Assigning {username} to Issue #{issue_number} for File {file_path} based on notebook metadata."
+            )
+            issue.add_to_assignees(username)
+            return
+
+    print(f"No User Found for {file_name}")
 
 
 if __name__ == "__main__":

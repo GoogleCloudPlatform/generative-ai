@@ -1,0 +1,21 @@
+[
+  { "beginRendering": { "surfaceId": "ranking-surface", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "ranking-surface", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "subtitle", "div1", "rank1", "rank2", "rank3", "rank4", "rank5", "div2", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "🏆 Donation Ranking TOP 5" }, "usageHint": "h2" } } },
+    { "id": "subtitle", "component": { "Text": { "text": { "literalString": "FY2024 — Cumulative Donations" }, "usageHint": "caption" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "rank1", "component": { "Text": { "text": { "literalString": "🥇 #1  Taro Tanaka (Engineering)  [CURRENCY]1,200,000  Score: 92" }, "usageHint": "body" } } },
+    { "id": "rank2", "component": { "Text": { "text": { "literalString": "🥈 #2  Hanako Sato (Law)  [CURRENCY]980,000  Score: 88" }, "usageHint": "body" } } },
+    { "id": "rank3", "component": { "Text": { "text": { "literalString": "🥉 #3  Ichiro Suzuki (Medicine)  [CURRENCY]750,000  Score: 85" }, "usageHint": "body" } } },
+    { "id": "rank4", "component": { "Text": { "text": { "literalString": "   #4  Misaki Yamada (Economics)  [CURRENCY]520,000  Score: 76" }, "usageHint": "body" } } },
+    { "id": "rank5", "component": { "Text": { "text": { "literalString": "   #5  Kenta Takahashi (Economics)  [CURRENCY]50,000  Score: 45" }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnDetail", "btnExport"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnDetail", "component": { "Button": { "child": "lblDetail", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Analyze #1 Taro Tanaka in detail" } }] } } } },
+    { "id": "lblDetail", "component": { "Text": { "text": { "literalString": "🔍 Deep-Dive #1" }, "usageHint": "body" } } },
+    { "id": "btnExport", "component": { "Button": { "child": "lblExport", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Show the full alumni ranking" } }] } } } },
+    { "id": "lblExport", "component": { "Text": { "text": { "literalString": "📊 Show All" }, "usageHint": "body" } } }
+  ] } }
+]

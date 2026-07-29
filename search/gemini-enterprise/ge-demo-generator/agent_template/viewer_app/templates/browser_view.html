@@ -1,0 +1,99 @@
+<!--
+Copyright 2026 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Browser Session - Live View</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0b0f17; color: #e5e7eb; font-family: -apple-system, Segoe UI, Roboto, sans-serif; }
+        .bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #111827; border-bottom: 1px solid #1f2937; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .dot.idle { background: #6b7280; box-shadow: none; }
+        .url { flex: 1; font-family: monospace; font-size: 13px; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .status { font-size: 12px; color: #93c5fd; text-transform: uppercase; letter-spacing: .05em; }
+        .stage { padding: 16px; }
+        .frame { max-width: 1200px; margin: 0 auto; border: 1px solid #1f2937; border-radius: 10px; overflow: hidden; background: #000; }
+        img { display: block; width: 100%; height: auto; }
+        .intent { max-width: 1200px; margin: 10px auto 0; font-size: 13px; color: #9ca3af; }
+        .empty { max-width: 1200px; margin: 40px auto; text-align: center; color: #6b7280; }
+        .confirm { max-width: 1200px; margin: 12px auto 0; padding: 14px 16px; background: #3f2d10; border: 1px solid #b45309; border-radius: 10px; display: none; }
+        .confirm h3 { margin: 0 0 6px; font-size: 14px; color: #fbbf24; }
+        .confirm p { margin: 0 0 10px; font-size: 13px; color: #fde68a; }
+        .btns { display: flex; gap: 10px; }
+        button { border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .approve { background: #059669; color: #fff; }
+        .reject { background: #b91c1c; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="bar">
+        <span class="dot idle" id="dot"></span>
+        <span class="url" id="url">Waiting for session...</span>
+        <span class="status" id="status">idle</span>
+    </div>
+    <div class="stage">
+        <div class="confirm" id="confirm">
+            <h3 id="confirmTitle">Action requires confirmation</h3>
+            <p id="confirmBody"></p>
+            <div class="btns">
+                <button class="approve" onclick="decide('approved')">Approve</button>
+                <button class="reject" onclick="decide('rejected')">Reject</button>
+            </div>
+        </div>
+        <div class="frame"><img id="shot" alt="browser screenshot" style="display:none;" /></div>
+        <div class="intent" id="intent"></div>
+        <div class="empty" id="empty">No screenshot yet. The browser session will appear here.</div>
+    </div>
+    <script>
+        var SID = "{{ session_id }}";
+        function decide(dec) {
+            fetch('/api/browser/' + SID + '/decision', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({decision: dec})
+            }).then(function(){ document.getElementById('confirm').style.display = 'none'; }).catch(function(){});
+        }
+        function poll() {
+            if (!SID) return;
+            fetch('/api/browser/' + SID).then(function(r){ return r.json(); }).then(function(d){
+                var st = d.status || 'idle';
+                document.getElementById('status').textContent = st;
+                document.getElementById('url').textContent = d.url || ('Session ' + SID);
+                document.getElementById('dot').className = (st === 'working' || st === 'awaiting_confirmation') ? 'dot' : 'dot idle';
+                if (d.screenshot_b64) {
+                    var img = document.getElementById('shot');
+                    img.src = 'data:image/jpeg;base64,' + d.screenshot_b64;
+                    img.style.display = 'block';
+                    document.getElementById('empty').style.display = 'none';
+                }
+                document.getElementById('intent').textContent = d.intent ? ('Step ' + (d.step || 0) + ': ' + d.intent) : '';
+                var c = document.getElementById('confirm');
+                if (st === 'awaiting_confirmation') {
+                    document.getElementById('confirmBody').textContent = (d.confirm_category ? ('[' + d.confirm_category + '] ') : '') + (d.confirm_action || 'The agent wants to perform a sensitive action.');
+                    c.style.display = 'block';
+                } else {
+                    c.style.display = 'none';
+                }
+            }).catch(function(){});
+        }
+        setInterval(poll, 1000);
+        poll();
+    </script>
+</body>
+</html>

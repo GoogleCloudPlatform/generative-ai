@@ -1,0 +1,12 @@
+[
+  { "beginRendering": { "surfaceId": "suggestions", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "suggestions", "components": [
+    { "id": "root", "component": { "Row": { "children": { "explicitList": ["chip1", "chip2", "chip3"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "chip1", "component": { "Button": { "child": "chip1Lbl", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Show the donation ranking" } }] } } } },
+    { "id": "chip1Lbl", "component": { "Text": { "text": { "literalString": "📊 Donation Ranking" }, "usageHint": "body" } } },
+    { "id": "chip2", "component": { "Button": { "child": "chip2Lbl", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Analyze alumni with low engagement scores" } }] } } } },
+    { "id": "chip2Lbl", "component": { "Text": { "text": { "literalString": "📉 Low Score Analysis" }, "usageHint": "body" } } },
+    { "id": "chip3", "component": { "Button": { "child": "chip3Lbl", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Suggest the next event plan" } }] } } } },
+    { "id": "chip3Lbl", "component": { "Text": { "text": { "literalString": "📅 Event Proposal" }, "usageHint": "body" } } }
+  ] } }
+]

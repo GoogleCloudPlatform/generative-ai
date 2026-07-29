@@ -1,0 +1,3 @@
+google-adk[vertexai]
+google-cloud-aiplatform[agent_engines,adk]
+python-dotenv

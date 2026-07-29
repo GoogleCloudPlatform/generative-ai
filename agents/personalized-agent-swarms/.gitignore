@@ -1,0 +1,20 @@
+# Generated artifacts
+history/
+swarms/
+evaluation_output/
+eval_pool/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# ADK
+.adk/
+
+# OS
+.DS_Store
+
+# Environment (keep .env.example template, ignore real .env)
+.env
+*.env.local

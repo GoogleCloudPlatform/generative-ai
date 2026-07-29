@@ -1,0 +1,218 @@
+[
+  { "beginRendering": { "surfaceId": "batch-editor", "root": "root" } },
+  {
+    "dataModelUpdate": {
+      "surfaceId": "batch-editor",
+      "path": "/form",
+      "contents": [
+        { "key": "item_0_selected_sku", "valueMap": [{ "key": "0", "valueString": "SKU_A" }] },
+        { "key": "item_0_qty", "valueNumber": 2 },
+        { "key": "item_1_selected_sku", "valueMap": [{ "key": "0", "valueString": "SKU_B" }] },
+        { "key": "item_1_qty", "valueNumber": 5 }
+      ]
+    }
+  },
+  {
+    "surfaceUpdate": {
+      "surfaceId": "batch-editor",
+      "components": [
+        { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+        {
+          "id": "mainCol",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "title",
+                  "divider1",
+                  "companyHeader1",
+                  "row_container_0",
+                  "dividerRow1",
+                  "row_container_1",
+                  "divider2",
+                  "actionRow"
+                ]
+              },
+              "distribution": "start",
+              "alignment": "stretch"
+            }
+          }
+        },
+        { "id": "title", "component": { "Text": { "text": { "literalString": "📝 Bulk Mapping & Editing Editor" }, "usageHint": "h2" } } },
+        { "id": "divider1", "component": { "Divider": {} } },
+        { "id": "companyHeader1", "component": { "Text": { "text": { "literalString": "🏢 Kansai Air Conditioning Services Co., Ltd." }, "usageHint": "h3" } } },
+        {
+          "id": "row_container_0",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["main_row_0", "reason_text_0"]
+              }
+            }
+          }
+        },
+        {
+          "id": "main_row_0",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": ["left_stack_0", "sku_select_0", "qty_field_0"]
+              },
+              "distribution": "spaceBetween",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "left_stack_0",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["orig_name_0", "orig_qty_0"]
+              },
+              "distribution": "start",
+              "alignment": "start"
+            }
+          }
+        },
+        { "id": "orig_name_0", "component": { "Text": { "text": { "literalString": "エアコン5馬力 (SZRC140BC)" }, "usageHint": "body" } } },
+        { "id": "orig_qty_0", "component": { "Text": { "text": { "literalString": "Original Qty: 2" }, "usageHint": "caption" } } },
+        {
+          "id": "sku_select_0",
+          "component": {
+            "MultipleChoice": {
+              "options": [
+                { "value": "SKU_A", "label": { "literalString": "SKU_A (Recommended)" } },
+                { "value": "SKU_B", "label": { "literalString": "SKU_B (Alternative)" } }
+              ],
+              "maxAllowedSelections": 1,
+              "variant": "chips",
+              "selections": { "path": "/form/item_0_selected_sku" }
+            }
+          }
+        },
+        {
+          "id": "qty_field_0",
+          "component": {
+            "TextField": {
+              "label": { "literalString": "Qty" },
+              "text": { "path": "/form/item_0_qty" },
+              "textFieldType": "shortText"
+            }
+          }
+        },
+        { "id": "reason_text_0", "component": { "Text": { "text": { "literalString": "💡 Recommended because SKU_A is direct replacement of legacy model" }, "usageHint": "caption" } } },
+        { "id": "dividerRow1", "component": { "Divider": {} } },
+        {
+          "id": "row_container_1",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["main_row_1", "reason_text_1"]
+              }
+            }
+          }
+        },
+        {
+          "id": "main_row_1",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": ["left_stack_1", "sku_select_1", "qty_field_1"]
+              },
+              "distribution": "spaceBetween",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "left_stack_1",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["orig_name_1", "orig_qty_1"]
+              },
+              "distribution": "start",
+              "alignment": "start"
+            }
+          }
+        },
+        { "id": "orig_name_1", "component": { "Text": { "text": { "literalString": "エアコン3馬力 (PROD012)" }, "usageHint": "body" } } },
+        { "id": "orig_qty_1", "component": { "Text": { "text": { "literalString": "Original Qty: 4" }, "usageHint": "caption" } } },
+        {
+          "id": "sku_select_1",
+          "component": {
+            "MultipleChoice": {
+              "options": [
+                { "value": "SKU_C", "label": { "literalString": "SKU_C (Recommended)" } },
+                { "value": "SKU_D", "label": { "literalString": "SKU_D (Alternative)" } }
+              ],
+              "maxAllowedSelections": 1,
+              "variant": "chips",
+              "selections": { "path": "/form/item_1_selected_sku" }
+            }
+          }
+        },
+        {
+          "id": "qty_field_1",
+          "component": {
+            "TextField": {
+              "label": { "literalString": "Qty" },
+              "text": { "path": "/form/item_1_qty" },
+              "textFieldType": "shortText"
+            }
+          }
+        },
+        { "id": "reason_text_1", "component": { "Text": { "text": { "literalString": "💡 Matches master catalog with 95% confidence" }, "usageHint": "caption" } } },
+        { "id": "divider2", "component": { "Divider": {} } },
+        {
+          "id": "actionRow",
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": ["btnSubmit", "btnCancel"]
+              },
+              "distribution": "spaceEvenly",
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "btnSubmit",
+          "component": {
+            "Button": {
+              "child": "lblSubmit",
+              "primary": true,
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Submit proposed changes" } },
+                  { "key": "item_0_selected_sku", "value": { "path": "/form/item_0_selected_sku" } },
+                  { "key": "item_0_qty", "value": { "path": "/form/item_0_qty" } },
+                  { "key": "item_1_selected_sku", "value": { "path": "/form/item_1_selected_sku" } },
+                  { "key": "item_1_qty", "value": { "path": "/form/item_1_qty" } }
+                ]
+              }
+            }
+          }
+        },
+        { "id": "lblSubmit", "component": { "Text": { "text": { "literalString": "💾 Save Changes" }, "usageHint": "body" } } },
+        {
+          "id": "btnCancel",
+          "component": {
+            "Button": {
+              "child": "lblCancel",
+              "action": {
+                "name": "sendText",
+                "context": [
+                  { "key": "text", "value": { "literalString": "Cancel editing" } }
+                ]
+              }
+            }
+          }
+        },
+        { "id": "lblCancel", "component": { "Text": { "text": { "literalString": "🚫 Cancel" }, "usageHint": "body" } } }
+      ]
+    }
+  }
+]

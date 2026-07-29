@@ -4,6 +4,7 @@ This repository explores various techniques and use-cases for embedding in Machi
 
 ## Notebooks
 
+- [Vertex AI Vector Search Introduction](vector-search-2-intro.ipynb): An introduction to setting up and using Vertex AI Vector Search 2.0.
 - [Import from BigQuery into Vector Search](bigquery-import.ipynb): Learn how to import vector embedding data from a BigQuery data source into a Vector Search index.
 - [Use Gemini and OSS Text-Embedding Models Against Your BigQuery Data](bigquery_ml_gemini_and_oss_text_embedding.ipynb): Learn how to generate text embeddings using BigQuery in conjunction with both Gemini and OSS text embedding models.
 - [Vertex AI Vector Search Quickstart](vector-search-quickstart.ipynb): A quickstart guide to setting up and using Vertex AI Vector Search.

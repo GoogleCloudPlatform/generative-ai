@@ -31,7 +31,7 @@ Sample screenshots and video demos of the application are shown below:
 
 To run the Mesop application locally (on Cloud Shell), we need to perform the following steps:
 
-1. Setup the Python virtual environment and install the dependencies:
+1. Set up the Python virtual environment and install the dependencies:
 
    In Cloud Shell, execute the following commands:
 
@@ -63,7 +63,7 @@ To run the Mesop application locally (on Cloud Shell), we need to perform the fo
    mesop --port 8080 main.py
    ```
 
-The application will startup and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.
+The application will start up and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.
 
 ## Build and Deploy the Application to Cloud Run
 

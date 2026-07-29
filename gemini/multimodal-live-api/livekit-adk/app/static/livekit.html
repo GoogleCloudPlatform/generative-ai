@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADK Gemini Live API Toolkit Demo (LiveKit)</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Include LiveKit JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+    <script src="/static/js/livekit_app.js" defer></script>
+  </head>
+
+  <body>
+    <header>
+      <h1>ADK Gemini Live API Toolkit Demo (LiveKit)</h1>
+      <div class="subtitle">Real-time bidirectional streaming via LiveKit WebRTC</div>
+      <div class="connection-status">
+        <span class="status-indicator" id="statusIndicator"></span>
+        <span id="statusText">Disconnected</span>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div class="container">
+        <div id="messages"></div>
+
+        <div class="input-container">
+          <div class="input-wrapper">
+            <button type="button" id="startAudioButton">Connect & Start Audio</button>
+            <button type="button" id="stopAudioButton" style="display:none;">Disconnect</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="console-panel">
+        <div class="console-header">
+          <h2>Event Console</h2>
+          <div class="console-controls">
+            <button id="clearConsole" class="console-clear-btn">Clear</button>
+          </div>
+        </div>
+        <div id="consoleContent" class="console-content"></div>
+      </div>
+    </div>
+  </body>
+</html>
