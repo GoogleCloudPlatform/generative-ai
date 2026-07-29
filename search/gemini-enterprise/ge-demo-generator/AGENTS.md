@@ -67,6 +67,10 @@ Keep that pattern — do not reintroduce generation-time code selection.
 Dockerfile assembly, deployment). Inside those JS template literals:
 
 - Emit a literal bash `${VAR}` as `\${VAR}`; a literal backtick as `` \` ``.
+  This applies to *prose* inside an emitted Python heredoc too — a comment
+  written in Markdown style ends the enclosing template literal, and the
+  resulting `SyntaxError` points at whatever token follows, never at the
+  backtick. Reword rather than escape.
 - `\` + newline inside a JS template literal is a line continuation (the
   newline disappears from the output). Use it only intentionally.
 - Quoted heredocs (`cat <<'X'`) pass content through verbatim; unquoted
@@ -237,16 +241,35 @@ imports, so every generated container died at import. `google-adk` does declare
 Two things to know before editing a requirement:
 
 - **Cap at the next major above the currently RESOLVED version, not above the
-  floor.** Several bands deliberately span two majors (`google-adk` 1→2,
-  `google-genai` 1→2, `google-cloud-storage` 2→3) because the resolver needs
-  that room to backtrack.
-- **A cap can be a silent downgrade.** `a2a-sdk<1.0.0` looks like containment,
-  but `a2a-sdk` already resolves to 1.1.2 under current ADK — that cap would
-  have pulled it back to 0.3.26.
+  floor** — unless the resolved version is known not to work. Several bands
+  deliberately span two majors (`google-adk` 1→2, `google-genai` 1→2,
+  `google-cloud-storage` 2→3) because the resolver needs that room to
+  backtrack.
+- **What the resolver picks is not evidence that it works.** `a2a-sdk` is
+  capped at `<0.4.0`, below what resolves. `google-adk` 2.5.0 widened its own
+  bound from `a2a-sdk<0.4` to `a2a-sdk<2`, which let 1.x in for the first time;
+  1.x removed `a2a.types.DataPart`, `a2a.server.apps` and
+  `a2a.utils.constants.EXTENDED_AGENT_CARD_PATH`, breaking the a2ui interface
+  check and `fast_api_app.py` at once. ADK 2.5.0 runs fine on 0.3.26, so the
+  cap contains `a2a-sdk` without holding ADK back. Only a build that passes
+  justifies a bound.
 
 `agent_template/pyproject.toml` repeats four of these requirements verbatim and
 is copied into the build context, so it must carry the same caps.
 `check_deps.py` fails if it drifts.
+
+A cap in `requirements.txt` only binds the install *we* issue. When a demo
+imports a custom MCP server, the Dockerfile clones that repo and runs its own
+`uv pip install` into the same site-packages — with bounds we did not write. So
+the script also emits a `constraints.txt` (upper bounds only, derived from the
+same `PINNED_DEPS`) and passes `-c /app/constraints.txt` to both branches of
+that install. Upper bounds only is deliberate: a floor in a constraints file
+can force an *upgrade* inside a resolution we are not steering, including into
+a pre-release; a cap can only ever prevent one. Constraint files may not carry
+extras or direct references, so `[a2a]` / `[agent_engines]` are stripped and
+the a2ui git pin is excluded. Duplicate names are a hard error for pip, which
+is why dropping the floors usefully collapses the two `google-genai` entries
+into one line.
 
 ### 8.2 The build fails on a broken import, not the container
 
@@ -263,6 +286,15 @@ startup probe retrying forever, and the setup script appears to hang at
 2.0.0 incident, the smoke test names two breaks — the runtime traceback only
 ever reached the first. `uv pip freeze` runs immediately before it so the
 installed versions are in the build log when it fails.
+
+**This test must never be the reason a build fails.** It has failed builds on
+its own bugs twice, and both presented as the same endless "Deploying…" as a
+real dependency break — strictly worse than not having the test. A file it
+cannot parse is warned about and skipped, not raised. Its import pairs are
+sorted with `key=lambda pair: (pair[0], pair[1] or "")`, because a plain import
+yields `None` for the symbol and a from-import yields a string; the default
+tuple ordering compares those two against each other the moment both forms
+exist for one module, which is every real agent.
 
 ### 8.3 Auditing
 

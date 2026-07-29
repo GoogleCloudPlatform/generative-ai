@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.39-public',
+  APP_VERSION: 'v11.41-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2361,9 +2361,25 @@ function generateSetupScript(params) {
     // floor-only line resolved to 2.0.0. Keep the cap until ADK supports mcp 2.x.
     mcp: 'mcp>=1.24.0,<2.0.0',
     genai: 'google-genai>=1.27.0,<3.0.0',
-    // <2.0.0, not <1.0.0: a2a-sdk already resolves to 1.1.2 under adk 2.5.0, so
-    // a 1.x cap would be a silent DOWNGRADE to 0.3.26, not containment.
-    a2a: 'a2a-sdk>=0.2.0,<2.0.0',
+    // a2a-sdk <0.4.0 (v11.41). google-adk 2.5.0 (2026-07-16) widened its own
+    // bound from `a2a-sdk<0.4` to `a2a-sdk<2`, which let a2a-sdk 1.x into the
+    // build for the first time. a2a-sdk 1.x is not backward compatible and
+    // breaks three things at once:
+    //   a2a.types.DataPart                    removed -> a2ui@ade478f fails to
+    //                                         import (the Dockerfile's a2ui
+    //                                         interface check catches this)
+    //   a2a.server.apps                       removed -> fast_api_app.py cannot
+    //                                         import A2AFastAPIApplication
+    //   a2a.utils.constants.EXTENDED_AGENT_CARD_PATH  removed
+    // Verified 2026-07-29 against a2a-sdk 1.1.2. adk 2.5.0 still runs fine on
+    // a2a-sdk 0.3.26, so the cap contains a2a without holding back adk.
+    //
+    // v11.39 wrote <2.0.0 here on the reasoning that 1.1.2 was already
+    // resolving and a 1.x cap would be a "silent downgrade". That was backwards:
+    // the downgrade to 0.3.26 is the CORRECT outcome, because 1.x does not work
+    // at all. "Already resolving" is not evidence that a version works -- only
+    // a build that passes is. See AGENTS.md section 8.1.
+    a2a: 'a2a-sdk>=0.3.4,<0.4.0',
 
     // Google Cloud SDKs -- stable, but majors do land (storage crossed 2.x -> 3.x
     // unnoticed under the old floor-only policy).
@@ -2411,7 +2427,50 @@ function generateSetupScript(params) {
     cuOtelGcpResourceDetector: 'opentelemetry-resourcedetector-gcp>=1.12.0a0,<2.0.0',
   };
 
-  
+  // == constraints.txt (v11.40) ==
+  // Caps in requirements.txt only bind the install WE issue. Cloned custom MCP
+  // server repos run their own `uv pip install` inside the same image (see the
+  // __DOCKER_MCP_INSTALL_*__ layers), and a vendored `mcp>=2` in someone else's
+  // requirements.txt would upgrade straight past our cap and reintroduce the
+  // exact ModuleNotFoundError the cap exists to prevent -- in a layer we do not
+  // control and did not write. Passing -c makes the caps apply image-wide.
+  //
+  // UPPER BOUNDS ONLY. A floor in a constraints file can force an upgrade --
+  // including into a pre-release, the trap the cuOtelGcp* comment above
+  // describes -- inside a resolution we are not steering. A cap can only ever
+  // prevent one, so the file is purely protective and cannot make a
+  // third-party install fail in a way our own build would not. Dropping the
+  // floors also collapses the two
+  // google-genai entries (>=1.27.0 and the computer-use >=2.7.0) to one line;
+  // duplicate names in a constraints file are a hard error for pip.
+  //
+  // Constraint files may not carry extras or direct references, so the a2ui git
+  // pin is excluded and `[a2a]` / `[agent_engines]` are stripped. A constraint
+  // on a package that is never installed is a no-op, so listing the
+  // computer-use entries unconditionally is safe and keeps the file identical
+  // across feature-flag combinations.
+  const CONSTRAINT_KEYS = [
+    'adk', 'mcp', 'genai', 'a2a', 'aiplatform', 'storage', 'scheduler',
+    'pubsub', 'firestore', 'logging', 'dotenv', 'dbDtypes', 'otel',
+    'playwright', 'genaiComputerUse', 'cuOtelGcpLogging', 'cuOtelGcpResourceDetector',
+  ];
+  const constraintLines = [];
+  CONSTRAINT_KEYS.forEach(key => {
+    const spec = PINNED_DEPS[key];
+    if (!spec || spec.indexOf(' @ ') !== -1) return;
+    const parsed = spec.match(/^([A-Za-z0-9._-]+)(?:\[[^\]]*\])?(.*)$/);
+    if (!parsed) return;
+    const name = parsed[1];
+    const bounds = (parsed[2] || '').split(',')
+      .map(part => part.trim())
+      .filter(part => part.charAt(0) === '<' || part.substring(0, 2) === '==');
+    if (!bounds.length) return;
+    if (constraintLines.some(line => line.name === name)) return;
+    constraintLines.push({ name: name, text: name + bounds.join(',') });
+  });
+  const constraintsTxt = constraintLines.map(line => line.text).join('\n');
+
+
   const escapedInstruction = systemInstruction
     .replace(/\\/g, '\\\\\\\\')
     .replace(/'/g, "'\\''")
@@ -4364,6 +4423,12 @@ ${PINNED_DEPS.otel}
 ${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}\n${PINNED_DEPS.cuOtelGcpLogging}\n${PINNED_DEPS.cuOtelGcpResourceDetector}` : '' }
 __REQ_EOF__
 
+# Generate constraints.txt -- applied to third-party installs inside the image
+# (cloned MCP server repos) so their own requirements cannot break our caps.
+cat <<'__CONSTRAINTS_EOF__' > constraints.txt
+${constraintsTxt}
+__CONSTRAINTS_EOF__
+
 # Generate pyproject.toml required for adk project type
 cp "$GE_TPL/pyproject.toml" pyproject.toml
 
@@ -4379,7 +4444,7 @@ FROM ${PINNED_DEPS.pythonImage}
 COPY --from=${PINNED_DEPS.uvImage} /uv /uvx /bin/
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY requirements.txt pyproject.toml ./
+COPY requirements.txt constraints.txt pyproject.toml ./
 RUN uv pip install --system -r requirements.txt
 __DOCKER_EOF__
 
@@ -4411,7 +4476,14 @@ LOCAL_ROOTS = ('adk_agent', 'app')
 def collect(path):
     """Return (module, symbol_or_None) pairs for non-optional third-party imports."""
     with open(path, 'r', encoding='utf-8') as handle:
-        tree = ast.parse(handle.read(), filename=path)
+        source = handle.read()
+    try:
+        tree = ast.parse(source, filename=path)
+    except SyntaxError as exc:
+        # A file we cannot parse is not a dependency problem. Warn and move on:
+        # this test must never be the reason a build fails.
+        print('  ! skipped ' + path + ' (unparseable: ' + str(exc) + ')')
+        return set()
 
     optional = set()
     for node in ast.walk(tree):
@@ -4457,7 +4529,10 @@ def main():
                 pairs |= collect(os.path.join(root, name))
 
     failures = []
-    for module, symbol in sorted(pairs):
+    # Sort on (module, symbol or '') -- a plain import yields symbol None and a
+    # from-import yields a str, and the default tuple ordering compares the two
+    # against each other the moment both forms exist for one module.
+    for module, symbol in sorted(pairs, key=lambda pair: (pair[0], pair[1] or '')):
         try:
             resolve(module, symbol)
         except Exception as exc:
@@ -4513,7 +4588,11 @@ RUN git clone ${mcp.github_url} ${mcpDir}
 __DOCKER_MCP_CLONE_${idx}_EOF__
 `;
     let installStep;
-    const pipCmd = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then uv pip install --system . 2>/dev/null || true; elif [ -f requirements.txt ]; then uv pip install --system -r requirements.txt; fi)`;
+    // -c /app/constraints.txt (v11.40): this installs a repo we did not write,
+    // with dependency bounds we did not choose, into the same site-packages the
+    // agent imports from. Without the constraints file a vendored `mcp>=2` here
+    // silently upgrades past our cap and the container dies at import.
+    const pipCmd = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then uv pip install --system -c /app/constraints.txt . 2>/dev/null || true; elif [ -f requirements.txt ]; then uv pip install --system -c /app/constraints.txt -r requirements.txt; fi)`;
     const npmCmd = `(npm install && npm run build 2>/dev/null || true)`;
     const ign = mcp.npm_ignore_scripts ? 'ENV NPM_CONFIG_IGNORE_SCRIPTS=true\n' : '';
     if (isNodejs) {
