@@ -61,8 +61,8 @@
       "intent": "refactor_legacy_code",
       "expected_swarm_agent": "advanced_docker_configuration",
       "should_trigger_swarm": true,
-      "goal_definition": "AI provides a Python logging configuration that outputs JSON formatted logs compatible with Google Cloud Cloud Logging, replacing custom print statements.",
-      "opening_message": "Codebase has hundreds of custom print() statements for logging. Need to replace them with standard Python logging outputting JSON for Google Cloud Cloud Logging. Show the formatter setup.",
+      "goal_definition": "AI provides a Python logging configuration that outputs JSON formatted logs compatible with Google Cloud Logging, replacing custom print statements.",
+      "opening_message": "Codebase has hundreds of custom print() statements for logging. Need to replace them with standard Python logging outputting JSON for Google Cloud Logging. Show the formatter setup.",
       "follow_up_strategy": "deep_dive",
       "max_turns": 3
     },

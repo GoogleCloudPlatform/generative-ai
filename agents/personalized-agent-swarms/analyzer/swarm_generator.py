@@ -2325,7 +2325,8 @@ def _expand_domains_for_user(triggers: dict, user_persona: str) -> dict:
     if any(
         kw in persona_lower
         for kw in (
-            "data scien",
+            "data scientist",
+            "data science",
             "ml",
             "machine learning",
             "analytics",

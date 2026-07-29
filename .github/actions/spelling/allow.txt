@@ -470,6 +470,7 @@ ein
 Einhalt
 EIP
 ekg
+ekw
 Eleuther
 elinks
 Eliquis
@@ -864,6 +865,7 @@ ivfflat
 ixed
 ized
 J'aime
+jaccard
 JAISH
 Jaival
 japonicum
@@ -1267,6 +1269,7 @@ OMR
 onesie
 onesies
 Onone
+ood
 OOD
 OOM
 Oort
@@ -1341,6 +1344,7 @@ Pharma
 phellos
 Photoshop
 Pichai
+pidx
 pietra
 pii
 pilates
@@ -1893,6 +1897,7 @@ VLM
 VLMs
 VMAF
 VMs
+vname
 vnc
 voiceover
 Volodymyr
@@ -1901,6 +1906,7 @@ VOS
 votre
 VQA
 VRAM
+vreason
 VREDRAW
 vrtx
 VSC
