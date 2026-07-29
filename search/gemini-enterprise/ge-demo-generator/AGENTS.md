@@ -90,6 +90,41 @@ does NOT escape.
 `[BRACKET]` and `<angle_bracket>` notations are safe. This is why the
 instruction pipeline uses `[PROJECT_ID]`-style tokens with `str.replace`.
 
+### 2.4 Do not ask a model to detect a language the UI already knows
+
+Prompts here stay language-agnostic — no hardcoded Japanese or English
+examples, so the model answers in the user's language. That is about not
+*biasing* the choice; it is not a licence to make the model *guess* it.
+
+`optimizeGoalWithMagicWand` used to open with a four-clause "CRITICAL
+MULTILINGUAL RULE" that enumerated candidate languages ("English, Japanese,
+German, French, Spanish, Chinese, Korean, etc.") and leaned on negations ("you
+MUST NOT output in that associated language unless..."). Measured against
+`gemini-3.5-flash-lite`, an **English** Manhattan retail scenario came back
+**fully German in 2 of 5 runs**, with a third mixed. Handed a menu of
+languages, the model sometimes picks one off it.
+
+The frontend already knows the intended language — the Template Hub selector,
+or the research language while research is in play — so `getOptimizeLanguage()`
+passes it in `capabilityOpts.language` and the prompt states it once,
+positively: `**OUTPUT LANGUAGE (MANDATORY)**: Write the entire output in
+<Language>.` English then held in 8 of 8 runs.
+`resolveOutputLanguage_()` accepts both vocabularies the UI has to hand
+(Template Hub codes like `en`, research names like `Deutsch`) and returns `''`
+for anything else, which leaves the caller on a detection-only fallback.
+
+Two things worth keeping in mind if you touch this:
+
+- **The stated language wins outright.** A draft added "unless the input is
+  written in another language, then use that instead" as a safety net. It was
+  measured: the model ignored it in 6 of 6 runs, so it was removed rather than
+  kept as a clause that reads like coverage and provides none. The consequence
+  is real — a scenario typed in Japanese with the selector on English comes
+  back in English. The selector is the control for that.
+- **Test language behaviour by sampling, not once.** The original bug
+  reproduced in 2 of 5 runs; a single green run would have "confirmed" a prompt
+  that was broken 40% of the time.
+
 ## 3. Managed Autonomous Agent (`enableManagedAgent`)
 
 Optional feature (default ON in the UI) that provisions a Pre-GA **Managed
@@ -216,6 +251,9 @@ branch tip). Delete both properties after the upstream merge.
 
 - `python3 validate_examples.py` — template JSON + Python compile checks.
 - `python3 check_deps.py` — dependency cap audit (see section 8).
+- `python3 canary.py --out /tmp/canary --run-venv` — resolve today's
+  requirements and actually run the imports (see section 8.4);
+  `docker build /tmp/canary` for the full image.
 - `bash -n` any generated setup script before running it.
 - After deploy: Cloud Run startup logs, `✅ N/N MCP sidecars ready`,
   `/.well-known/agent.json` responds, model name shows in the thinking
@@ -309,3 +347,79 @@ resolved / latest per requirement:
 - **FLOOR DRIFT** — informational, the band spans two majors on purpose.
 
 Add `--offline` to skip the PyPI latest-version lookups.
+
+### 8.4 Proving today's resolution builds — `canary.py`
+
+`check_deps.py` audits the bounds. It cannot answer the question the bounds
+do not settle: *does today's resolution actually build and import?* Both real
+outages — `mcp` 2.0.0 and `a2a-sdk` 1.x — passed the caps and were caught only
+by running the imports. Until this script existed, the first execution of any
+new resolution was a customer-facing demo build.
+
+`canary.py` reconstructs the build context out of the repo — the requirements
+for a variant, `constraints.txt`, the `__DEP_SMOKE_EOF__` heredoc verbatim, and
+a module holding every import statement in `agent_template/adk_agent/` — into a
+directory that can be run in a venv or built with Docker:
+
+```bash
+python3 canary.py --out /tmp/canary --run-venv     # fast path, no Docker
+python3 canary.py --out /tmp/canary --variant computer-use
+docker build -t ge-canary /tmp/canary              # the real image
+```
+
+Because the import surface is read out of the template with `ast`, it needs no
+maintenance when the agent changes, and it is a *superset across feature
+flags*: the template branches on environment variables at run time, so one run
+covers configurations no single demo produces.
+
+Two properties worth preserving if you edit it:
+
+- Imports inside `try/except` are excluded, matching `dep_smoke_test.py`'s own
+  semantics — that is also what keeps the superset installable, since Computer
+  Use, the viewer and the OpenTelemetry exporters are all optional at import.
+- Verify a change to it against a *known-bad* resolution, not just a green one.
+  Setting the `a2a` cap back to `<2.0.0` must reproduce all three 1.x breaks.
+  A canary that cannot go red is worse than no canary, because it reads as
+  coverage.
+
+**Not fixed by any of this:** there is still no lockfile. `requirements.txt` is
+regenerated and re-resolved on every deploy, so the same setup script run on
+two different days can produce different transitive sets within the capped
+bands. Caps bound that drift; the canary tells you when the drift breaks
+something; neither makes two runs reproducible.
+
+### 8.5 Cloned MCP installs must fail the build
+
+For every non-remote entry in the imported MCP list, the generated Dockerfile
+clones the repo and installs it. Each branch of that install used to end in
+`2>/dev/null || true`. Three defects, in ascending order of nastiness:
+
+1. `2>/dev/null` discarded the stderr that names the cause.
+2. A failed install produced a **green image**. Nothing else in the build
+   imports the cloned server, so the failure resurfaced as a sidecar that came
+   up and could not serve a tool call — at demo time, with no build log left.
+3. `( … || true )` always exits 0, so **`|| npm` was unreachable code**. The
+   documented Python→Node fallback had never once run for a repo carrying
+   `pyproject.toml` or `setup.py`.
+
+Adding `-c /app/constraints.txt` (section 8.1) made (2) *more* likely, not
+less: a cloned server demanding `mcp>=2` now fails resolution, and that
+failure — the one the constraints file exists to produce — was the one being
+swallowed. A guard whose alarm is wired to `/dev/null` is worse than no guard.
+
+The install is now built from three pieces, chosen by position:
+
+| Piece | Where | On failure |
+|-------|-------|------------|
+| `pipStrict` | primary, Python repos | fails → hands over to the Node fallback; no Python manifest at all also counts as failure, so the fallback is reachable |
+| `npmCmd` | primary on Node repos, last resort on Python repos | fails → fails the build |
+| `pipBonus` | trailing extra on Node repos, for hybrid servers | prints `WARNING:`, build continues |
+
+`npm run build` is skipped when `npm pkg get scripts.build` returns `{}`, and
+fatal when the repo declares one and it fails — a half-built TypeScript server
+is precisely the image that starts and then cannot answer a tool call.
+
+This is deliberately breaking: builds that used to go green now stop. Every one
+of them was producing an image with its MCP dependencies missing. If you touch
+this block, re-check the shell cases against stubbed `uv`/`npm` — the failure
+mode it guards against is invisible in a passing build by construction.

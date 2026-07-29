@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.41-public',
+  APP_VERSION: 'v11.44-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -4592,15 +4592,36 @@ __DOCKER_MCP_CLONE_${idx}_EOF__
     // with dependency bounds we did not choose, into the same site-packages the
     // agent imports from. Without the constraints file an `mcp>=2` pinned in
     // that repo upgrades past our cap and the container dies at import.
-    const pipCmd = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then uv pip install --system -c /app/constraints.txt . 2>/dev/null || true; elif [ -f requirements.txt ]; then uv pip install --system -c /app/constraints.txt -r requirements.txt; fi)`;
-    const npmCmd = `(npm install && npm run build 2>/dev/null || true)`;
+    //
+    // v11.43: every branch below used to end in `2>/dev/null || true`. Three
+    // consequences, all of which shipped: a failed install produced a green
+    // image whose sidecar then died at runtime with its dependencies missing;
+    // the stderr naming the cause was discarded; and because `( ... || true )`
+    // always exits 0, the `|| npm` fallback in the Python path was unreachable
+    // code. Adding the constraints file made the first one likelier, not less
+    // -- a cloned server that demands mcp>=2 now fails resolution, which is
+    // precisely the failure that was being swallowed. Each position below
+    // either fails the build or prints a warning; nothing is silent.
+    const pipInstall = `uv pip install --system -c /app/constraints.txt`;
+    // Primary position. No Python manifest at all is a failure here too, so
+    // that the Node fallback actually gets its turn.
+    const pipStrict = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then ${pipInstall} .; elif [ -f requirements.txt ]; then ${pipInstall} -r requirements.txt; else echo "MCP install: no pyproject.toml, setup.py or requirements.txt" >&2; false; fi)`;
+    // Trailing position on a Node repo: a bonus attempt for hybrid servers, so
+    // a failure stays non-fatal -- but it is announced rather than hidden.
+    const pipBonus = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then ${pipInstall} . || echo "WARNING: optional Python install failed, see above" >&2; elif [ -f requirements.txt ]; then ${pipInstall} -r requirements.txt || echo "WARNING: optional Python install failed, see above" >&2; fi)`;
+    // A declared build script that fails is fatal: a half-built TypeScript
+    // server is exactly the image that starts and then cannot serve a tool
+    // call. A repo that declares no build script is skipped, not failed.
+    const npmCmd = `(npm install && { if [ "$(npm pkg get scripts.build)" = "{}" ]; then echo "MCP install: no build script declared, skipping" >&2; else npm run build; fi; })`;
     const ign = mcp.npm_ignore_scripts ? 'ENV NPM_CONFIG_IGNORE_SCRIPTS=true\n' : '';
     if (isNodejs) {
-      // Primary: Node.js install. Fallback: Python install if npm fails.
-      installStep = `${ign}RUN cd ${mcpDir} && ${npmCmd} && ${pipCmd}`;
+      // Primary: Node.js install, fatal on failure. Then a best-effort Python
+      // install for servers that ship both.
+      installStep = `${ign}RUN cd ${mcpDir} && ${npmCmd} && ${pipBonus}`;
     } else {
-      // Primary: Python install. Fallback: Node.js install if pip fails.
-      installStep = `RUN cd ${mcpDir} && ${pipCmd} || ${npmCmd}`;
+      // Primary: Python install. Fallback: Node.js install if pip fails. If
+      // both fail the build stops here rather than at the customer's demo.
+      installStep = `RUN cd ${mcpDir} && ( ${pipStrict} || ${npmCmd} )`;
     }
     dockerSteps += `
 cat <<'__DOCKER_MCP_INSTALL_${idx}_EOF__' >> Dockerfile
@@ -5592,6 +5613,32 @@ ${params.importedMcpList.map((mcp, idx) => {
 // membership check doubles as sanitization: only these strings are ever
 // interpolated into prompts.
 const SUPPORTED_RESEARCH_LANGS_ = ['日本語', 'English', 'Deutsch', 'Français', 'Español', 'Italiano', '中文', '한국어', 'Português', 'Русский', 'Nederlands', 'Svenska', 'Suomi'];
+
+// Template Hub language codes -> the English name used when instructing a model.
+// Shared by translateTemplates() and the Magic Wand optimizer.
+const TEMPLATE_LANGS_ = {
+  en: 'English', ja: 'Japanese', de: 'German', fr: 'French', es: 'Spanish',
+  it: 'Italian', zh: 'Simplified Chinese', ko: 'Korean', pt: 'Portuguese',
+  ru: 'Russian', nl: 'Dutch', sv: 'Swedish', fi: 'Finnish'
+};
+
+/**
+ * Normalizes whichever language identifier the frontend had to hand.
+ * The Template Hub selector emits codes ('en'); the research selector and
+ * researchCompanyByDomain's detectedLanguage emit native names ('Deutsch').
+ * Returns '' for anything unrecognized, which leaves the caller on its
+ * detect-from-the-input fallback.
+ * @param {string} lang
+ * @returns {string} A language name safe to put in a prompt, or ''.
+ */
+function resolveOutputLanguage_(lang) {
+  if (typeof lang !== 'string') return '';
+  const t = lang.trim();
+  if (!t) return '';
+  if (TEMPLATE_LANGS_[t]) return TEMPLATE_LANGS_[t];
+  if (SUPPORTED_RESEARCH_LANGS_.indexOf(t) !== -1) return t;
+  return '';
+}
 
 function sanitizePersonaText_(persona) {
   if (!persona || typeof persona !== 'object') return '';
@@ -6632,6 +6679,28 @@ function optimizeGoalWithMagicWand(rawGoal, capabilityOpts) {
     ? '**Header 2 (Role)**: MUST be a single specific, professional job title matching this target persona: ' + _personaDesc + '. Do NOT keep or invent a different role, even if the input already names one.'
     : '**Header 2 (Role)**: Identify a specific, professional job title appropriate to the role.';
 
+  // Output language. This used to be a four-clause "detect the input language"
+  // rule that enumerated candidate languages and leaned on negations ("you MUST
+  // NOT output in that associated language unless..."). Measured against
+  // gemini-3.5-flash-lite with an English Manhattan-retail scenario, it
+  // returned fully German output in 2 of 5 runs and a German/English mix in a
+  // third: handed a menu of languages, the model occasionally picks one off it.
+  // The caller now states the language, so there is nothing to detect. Stating
+  // it positively and once holds English in 8 of 8 runs.
+  //
+  // Note the language given here wins outright. An earlier draft added "unless
+  // the input is written in another language, then use that" as a safety net;
+  // it was measured and the model ignored it in 6 of 6 runs, so it is left out
+  // rather than kept as a clause that reads like coverage and provides none.
+  // The frontend is responsible for passing the right language: the Template
+  // Hub selector normally, the research language while research is in play.
+  const _outLang = resolveOutputLanguage_(_caps.language);
+  const languageRule = _outLang
+    ? `**OUTPUT LANGUAGE (MANDATORY)**: Write the entire output in ${_outLang}. This includes the four section headers, which must be the natural, professional ${_outLang} equivalents of Title / Target Role / Business Scenario / Operational Challenge. Company names, place names, currency units, and business terminology must all suit the ${_outLang} business context.
+`
+    : `**OUTPUT LANGUAGE (MANDATORY)**: Write the entire output in the same language the sentences of the \"Input to Optimize\" are written in, headers included. Company names, brands, and place names appearing in the input do not decide this - only the language those sentences are written in does.
+`;
+
   const prompt = `You are an expert prompt engineer and business analyst.
 Your task is to take a raw, simple, or loosely defined business scenario, OR a partially structured business scenario (which might contain company details and selected target workflows from prior research), and optimize/expand it into a **perfectly structured, high-density professional Business Scenario prompt** in Markdown format.
 
@@ -6640,14 +6709,9 @@ Input to Optimize:
 ${rawGoal}
 \"\"\"
 
-**CRITICAL MULTILINGUAL RULE (MANDATORY)**: 
-1. **Language Detection**: Analyze the \"Input to Optimize\" above and detect its primary language (e.g., English, Japanese, German, French, Spanish, Chinese, Korean, etc.).
-2. **Output Language Consistency**: You MUST generate the entire optimized Markdown output in the EXACT SAME language and script as the input. Even if the companies, brands, or locations mentioned in the input are culturally or geographically associated with a specific country or language, you MUST NOT output in that associated language unless the actual input text itself is written using that language's script. Always strictly match the literal language and script of the input text.
-3. **Header Translation**: You MUST translate the four standard section headers (Title, Target Role, Business Scenario, Operational Challenge) to match the detected language naturally and professionally. Do NOT leave headers in English if the input is in another language, and do NOT translate them to Japanese/English if the input is in a third language.
-4. **Examples Localization**: Locally adapt all names, currency units, and business terminology in the instructions to match the detected language's cultural context (e.g., use JPY/Japanese names for Japanese, EUR/European names for German/French, USD/English names for English).
-
+${languageRule}
 Requirements for the Structured Output:
-1.  **Structure Integrity**: Ensure the output contains exactly the four translated Markdown headers defined above.
+1.  **Structure Integrity**: Ensure the output contains exactly the four Markdown headers named above, in the output language.
     - **Header 1 (Title)**: If the input already has a company name and industry (e.g., '# SMCC (Finance)'), KEEP and preserve it. If not, create a realistic company name and vertical appropriate to the language context.
     - ${header2Instruction}
     - **Header 3 (Scenario)**: Provide a rich, realistic business context. If the input already has a scenario, expand it with realistic domain details, KPIs, and background.
@@ -6725,12 +6789,7 @@ Return ONLY the raw Markdown text in the detected language. Do not include any c
  * @returns {Object} { success, items } same length/order translated; originals on failure.
  */
 function translateTemplates(lang, items) {
-  const LANGS = {
-    en: 'English', ja: 'Japanese', de: 'German', fr: 'French', es: 'Spanish',
-    it: 'Italian', zh: 'Simplified Chinese', ko: 'Korean', pt: 'Portuguese',
-    ru: 'Russian', nl: 'Dutch', sv: 'Swedish', fi: 'Finnish'
-  };
-  const target = LANGS[lang];
+  const target = TEMPLATE_LANGS_[lang];
   if (!target || lang === 'en') return { success: true, items: items || [] };
   if (!items || !items.length) return { success: true, items: [] };
 
