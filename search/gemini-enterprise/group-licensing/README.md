@@ -1,4 +1,4 @@
-# Gemini Box Office
+# Gemini Enterprise Group Licensing
 
 A Cloud Run Job that automates Gemini Enterprise license lifecycle management through scheduled batch reconciliation. It bridges the gap between Google Cloud Identity group membership and Discovery Engine license assignment, providing group-based SKU mapping, automatic provisioning, and stale-license cleanup.
 

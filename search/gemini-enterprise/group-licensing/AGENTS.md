@@ -1,5 +1,10 @@
 # Gemini Enterprise Group Licensing — Agent Context
 
+## Mandatory First Step: Read the Service TDD
+
+> [!IMPORTANT]
+> **Before making any code changes, architectural decisions, or refactoring in this codebase**, any skill, agent, or subagent **MUST first read the service Technical Design Document (TDD)** located at [docs/TDD.md](file:///usr/local/google/home/williamsmt/Projects/development/generative-ai/search/gemini-enterprise/group-licensing/docs/TDD.md) (in the `docs/` subdirectory). This document contains the definitive architectural requirements, data flows, and design rationale for the service.
+
 ## Project identity
 
 - **Module:** `github.com/cloud-gtm/gemini-box-office`
@@ -46,6 +51,8 @@ Add this to any new adapter you write.
 
 | File | Role |
 |---|---|
+| `docs/TDD.md` | **Technical Design Document (MUST READ FIRST before any changes)** — definitive service architecture, data flows, and requirements |
+| `docs/PRD.md` | Product Requirements Document — background and user stories |
 | `cmd/job/main.go` | Entry point. 8-step startup: logger → config → settings → logger enrichment → project sharding → client init → workflow dispatch → exit |
 | `internal/ports/gemini.go` | `GeminiClient` interface (Discovery Engine) |
 | `internal/ports/idp.go` | `IdpClient` interface (Cloud Identity) |
@@ -53,10 +60,16 @@ Add this to any new adapter you write.
 | `internal/services/joiner.go` | Joiner workflow business logic |
 | `internal/services/gc.go` | GC workflow business logic + `chunkLicenseUpdates` (shared) |
 | `internal/services/mocks_test.go` | `testify/mock` implementations of all three ports (package-internal) |
+| `internal/models/types.go` | Domain data structures: `Member`, `UserLicense`, `LicenseUpdate`, `LicenseConfigKey`, `LicenseConfigEntry`, `LicenseConfigIndex` |
 | `internal/models/enums.go` | All typed-string enums: `SKU`, `WorkflowType`, `LicenseState`, `LicenseAction`, `Location`, `MemberType` |
 | `internal/models/errors.go` | All sentinel errors — use `errors.Is` against these |
 | `internal/models/constants.go` | `MaxBatchSize=100`, `MembersListPageSize=200`, `MaxPagesPerGroup=500`, `ConfigFilePath` |
+| `internal/models/dto/sync.go` | Request and response DTOs (`SyncAddRequest`/`Response`, `SyncRemoveRequest`/`Response`) |
+| `internal/config/config.go` | JSON config parsing and validation rules for entitlement configuration |
+| `internal/config/job_settings.go` | Parses and validates Cloud Run Job runtime environment variables (`JOB_TYPE`, `DRY_RUN`, etc.) |
 | `internal/adapters/discoveryengine/adapter.go` | Most complex adapter — see Known Constraints below |
+| `internal/adapters/cloudidentity/adapter.go` | Cloud Identity Admin SDK adapter implementation |
+| `internal/adapters/resourcemanager/adapter.go` | Cloud Resource Manager API v3 adapter implementation |
 
 ## Ports (interfaces)
 
@@ -143,7 +156,7 @@ Validation rules enforced at startup (`internal/config/config.go`):
 - Each project must have at least one entry with a valid SKU, a valid location (`global`/`us`/`eu`), and at least one group email
 - `staleness_threshold_days` must be `>= 0` (0 = disabled)
 
-Environment variables:
+Environment variables (`internal/config/job_settings.go`):
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
@@ -212,3 +225,29 @@ OAuth scopes used:
 All logs are structured JSON emitted to stdout via `log/slog` (`slog.NewJSONHandler`). Every log line automatically carries `workflow` and `task_index` (set once in `main.go` step 4). Retrieve the logger in service/adapter code via `middleware.LoggerFromContext(ctx)` — never call `slog.Default()` directly from library code.
 
 Required fields on summary log lines: `duration_ms`, workflow-specific counts (`licenses_granted`, `licenses_revoked`, `licenses_soft_failed`, `groups_processed`, `users_evaluated`), `dry_run`.
+
+## Available Subagents & Delegation
+
+When working on complex tasks in this repository, you can delegate work to specialized subagents using `invoke_subagent`.
+
+### Built-in Subagents
+
+| Subagent | Capabilities | Best Used For |
+|---|---|---|
+| `research` | Read-only codebase exploration, file reading, and web search | Running broad codebase surveys, searching documentation, or investigating multi-package patterns without cluttering the primary conversation context. |
+| `self` | Full inheritance of parent agent's configuration, read/write/execute tools, and model | Running independent implementation tasks, refactoring isolated adapters, or executing comprehensive test suites in a separate conversation context. |
+| `owl` | Multi-agent orchestrator with deep strategic planning and verification | Solving complex architectural tasks, large-scale refactoring, or difficult bugs requiring multi-perspective analysis and rigorous verification. |
+
+### Custom Subagents
+
+You can also define custom subagents using `define_subagent` and invoke them with `invoke_subagent`. Subagent workspaces can be configured as:
+- `inherit`: Uses the same workspace as the parent agent (default).
+- `branch`: Creates an isolated workspace branched or cloned from the parent.
+- `share`: Creates a new workspace sharing the underlying repository directory (similar to a git worktree) for independent branching without storage duplication.
+
+### Delegation Guidelines for this Repository
+
+- **Mandatory TDD Review:** When delegating any task that involves modifying code or architecture, explicitly instruct the invoked subagent or skill to read [docs/TDD.md](file:///usr/local/google/home/williamsmt/Projects/development/generative-ai/search/gemini-enterprise/group-licensing/docs/TDD.md) before making any changes.
+- **Research & Exploration:** For tasks requiring exploration across multiple adapters (`discoveryengine`, `cloudidentity`, `resourcemanager`), delegate investigation to a `research` subagent.
+- **Isolated Adapter Refactoring:** When modifying an individual adapter or adding a new port/adapter implementation, delegate to a `self` subagent in a `branch` or `share` workspace to keep changes isolated and test them cleanly before merging back.
+- **Direct Implementation:** For focused, single-package edits (e.g., updating a sentinel error in `models/errors.go` or modifying a service test), perform the work directly in the main conversation.

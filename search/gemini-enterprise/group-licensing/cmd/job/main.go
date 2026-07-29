@@ -87,7 +87,7 @@ func main() {
 
 	ctx := context.Background()
 
-	// Step 6: wire adapters — identical to cmd/server/main.go.
+	// Step 6: wire adapters.
 	adminSvc, err := admin.NewService(ctx, option.WithScopes(admin.AdminDirectoryGroupMemberReadonlyScope))
 	if err != nil {
 		slog.Error("failed to create admin SDK client", slog.Any("error", err))

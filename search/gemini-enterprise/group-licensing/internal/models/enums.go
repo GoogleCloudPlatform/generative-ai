@@ -56,7 +56,7 @@ var skuPrecedence = map[SKU]int{
 	SKUEduEmerging:        1,
 }
 
-// IsValid reports whether s is one of the four recognized SKU values.
+// IsValid reports whether s is one of the recognized SKU values.
 func (s SKU) IsValid() bool {
 	_, ok := skuPrecedence[s]
 	return ok
