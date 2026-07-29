@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.38-public',
+  APP_VERSION: 'v11.39-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2335,25 +2335,49 @@ function generateSetupScript(params) {
     //   Constraint: a2ui@ade478f requires google-genai>=1.27.0, google-adk>=1.28.1
     a2ui: 'a2ui-agent-sdk @ git+https://github.com/google/A2UI.git@ade478faf8dcad611b5efb6b864dcbfbc4a51f68#subdirectory=agent_sdks/python',
 
-    // Python SDKs -- floor-only (>=) to avoid pip resolution conflicts
-    // Upper bounds are NOT set unless a package has caused a breaking change.
-    adk: 'google-adk[a2a]>=1.31.1',
-    mcp: 'mcp>=1.24.0',
-    genai: 'google-genai>=1.27.0',
-    a2a: 'a2a-sdk>=0.2.0,<1.0.0',
+    // == MAJOR-CAP POLICY (v11.39) ==
+    // EVERY pip requirement below carries an upper bound at the next major.
+    // The old policy ("upper bounds are NOT set unless a package has caused a
+    // breaking change") is what let mcp 2.0.0 into a build the day it shipped
+    // and crash every container at import -- see AGENTS.md section 8.
+    // Rationale: these demos are built live, minutes before a customer meeting.
+    // A cap turns an unpredictable upstream break into a predictable freeze we
+    // lift on our own schedule. Never remove a cap without a full smoke deploy.
+    //
+    // Caps are placed at the next major ABOVE THE CURRENTLY RESOLVED version,
+    // not above the floor. Where the two differ (adk 1->2, genai 1->2,
+    // storage 2->3) the band deliberately spans both majors: the resolver
+    // needs that room to backtrack, which is load-bearing for the non-
+    // computer-use build path (see the cuOtelGcp* comment below).
+    //
+    // Run `python3 check_deps.py` to see floor / cap / resolved / latest and
+    // which caps have gone stale.
+    adk: 'google-adk[a2a]>=1.31.1,<3.0.0',
+    // mcp <2.0.0 cap (v11.39): mcp 2.0.0 (2026-07-28) removed mcp.shared.session,
+    // which google-adk still imports (mcp_toolset.py: from mcp.shared.session
+    // import ProgressFnT) -> container crashes at import with ModuleNotFoundError.
+    // google-adk declares mcp<2,>=1.24 itself, but only under the mcp/all/test
+    // extras -- we install google-adk[a2a], so that cap never applies and our
+    // floor-only line resolved to 2.0.0. Keep the cap until ADK supports mcp 2.x.
+    mcp: 'mcp>=1.24.0,<2.0.0',
+    genai: 'google-genai>=1.27.0,<3.0.0',
+    // <2.0.0, not <1.0.0: a2a-sdk already resolves to 1.1.2 under adk 2.5.0, so
+    // a 1.x cap would be a silent DOWNGRADE to 0.3.26, not containment.
+    a2a: 'a2a-sdk>=0.2.0,<2.0.0',
 
-    // Google Cloud SDKs -- stable, floor-only
-    aiplatform: 'google-cloud-aiplatform[agent_engines]>=1.112.0',
-    storage: 'google-cloud-storage>=2.14.0',
-    scheduler: 'google-cloud-scheduler>=2.0.0',
-    pubsub: 'google-cloud-pubsub>=2.0.0',
-    firestore: 'google-cloud-firestore>=2.16.0',
-    logging: 'google-cloud-logging>=3.0.0',
+    // Google Cloud SDKs -- stable, but majors do land (storage crossed 2.x -> 3.x
+    // unnoticed under the old floor-only policy).
+    aiplatform: 'google-cloud-aiplatform[agent_engines]>=1.112.0,<2.0.0',
+    storage: 'google-cloud-storage>=2.14.0,<4.0.0',
+    scheduler: 'google-cloud-scheduler>=2.0.0,<3.0.0',
+    pubsub: 'google-cloud-pubsub>=2.0.0,<3.0.0',
+    firestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
+    logging: 'google-cloud-logging>=3.0.0,<4.0.0',
 
-    // Utilities -- floor-only
-    dotenv: 'python-dotenv>=1.0.0',
-    dbDtypes: 'db-dtypes>=1.0.0',
-    otel: 'opentelemetry-api>=1.20.0',
+    // Utilities
+    dotenv: 'python-dotenv>=1.0.0,<2.0.0',
+    dbDtypes: 'db-dtypes>=1.0.0,<2.0.0',
+    otel: 'opentelemetry-api>=1.20.0,<2.0.0',
 
     // Build tools -- exact pin (infrastructure, not pip-resolved)
     pythonImage: 'python:3.11.12-slim',
@@ -2361,10 +2385,10 @@ function generateSetupScript(params) {
     uvVersion: '0.11.17',
     supergateway: 'supergateway@3.4.3',
 
-    // Viewer app -- floor-only
-    viewerFunctionsFramework: 'functions-framework>=3.5.0',
-    viewerFlask: 'flask>=3.0.3',
-    viewerFirestore: 'google-cloud-firestore>=2.16.0',
+    // Viewer app
+    viewerFunctionsFramework: 'functions-framework>=3.5.0,<4.0.0',
+    viewerFlask: 'flask>=3.0.3,<4.0.0',
+    viewerFirestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
 
     // Computer Use (browser agent) -- only added when enableComputerUse is set.
     // playwright pin matches the official reference impl
@@ -2372,7 +2396,7 @@ function generateSetupScript(params) {
     // to the version exposing types.ComputerUse/types.Environment for the
     // generate_content computer_use tool config.
     playwright: 'playwright==1.55.0',
-    genaiComputerUse: 'google-genai>=2.7.0',
+    genaiComputerUse: 'google-genai>=2.7.0,<3.0.0',
     // (v11.36) google-genai>=2.7.0 is only satisfiable with recent
     // google-cloud-aiplatform releases (older ones cap google-genai<2.0.0),
     // and those releases depend on Google Cloud OTel packages whose satisfying
@@ -2383,8 +2407,8 @@ function generateSetupScript(params) {
     // explicit pre-release floors scopes pre-release resolution to exactly
     // these two packages (unlike --prerelease=allow, which would also pull
     // mcp/pydantic pre-releases).
-    cuOtelGcpLogging: 'opentelemetry-exporter-gcp-logging>=1.12.0a0',
-    cuOtelGcpResourceDetector: 'opentelemetry-resourcedetector-gcp>=1.12.0a0',
+    cuOtelGcpLogging: 'opentelemetry-exporter-gcp-logging>=1.12.0a0,<2.0.0',
+    cuOtelGcpResourceDetector: 'opentelemetry-resourcedetector-gcp>=1.12.0a0,<2.0.0',
   };
 
   
@@ -2514,7 +2538,7 @@ if __name__ == '__main__':
     init_data()
 __PY_EOF__\n`;
 
-    firestoreCommands += `uv run --with google-cloud-firestore python setup_fs.py\n`;
+    firestoreCommands += `uv run --no-project --with "${PINNED_DEPS.firestore}" python setup_fs.py\n`;
     firestoreCommands += `rm setup_fs.py\n\n`;
 
     firestoreCommands += `echo "🌐 Deploying Real-time Data Viewer Web App (Cloud Run Functions)..."\n`;
@@ -3471,7 +3495,7 @@ ${ enableManagedAgent ? `
     echo ""
     echo "🔥 Deleting Firestore Collection: ${fsCollection}..."
     if command -v uv >/dev/null 2>&1; then
-      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --with google-cloud-firestore python3 -c "from google.cloud import firestore; db=firestore.Client(); [d.reference.delete() for d in db.collection('${fsCollection}').stream()]" 2>/dev/null && echo "   ✅ Firestore documents in collection deleted." || echo "   ⚠️  Could not clear Firestore collection automatically."
+      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" python3 -c "from google.cloud import firestore; db=firestore.Client(); [d.reference.delete() for d in db.collection('${fsCollection}').stream()]" 2>/dev/null && echo "   ✅ Firestore documents in collection deleted." || echo "   ⚠️  Could not clear Firestore collection automatically."
     fi
 
     echo ""
@@ -3627,7 +3651,7 @@ ${ enableManagedAgent ? `
 
     echo ""
     echo "📁 Deleting Firestore task collections..."
-    GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with google-cloud-firestore python3 -c "
+    GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" python3 -c "
 from google.cloud import firestore
 db = firestore.Client()
 for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '${dirName}_task_push_configs']:
@@ -4359,6 +4383,103 @@ COPY requirements.txt pyproject.toml ./
 RUN uv pip install --system -r requirements.txt
 __DOCKER_EOF__
 
+# Generate the build-time dependency import smoke test (v11.39).
+# Self-maintaining: it derives what to check from the generated sources, so it
+# stays correct for every feature-flag combination without being updated.
+cat <<'__DEP_SMOKE_EOF__' > dep_smoke_test.py
+"""Dependency import smoke test, executed during the Docker build.
+
+Walks the generated agent package, collects every third-party module and
+symbol the code imports, and resolves each one. When a dependency changes its
+module layout under us -- e.g. mcp 2.0.0 removing mcp.shared.session, which
+google-adk imports -- the BUILD fails here naming the offending module,
+instead of the container dying on import and surfacing only as a Cloud Run
+startup probe that retries forever. See AGENTS.md section 8.
+
+Imports inside a try/except are treated as optional and skipped, so genuinely
+optional integrations do not break the build.
+"""
+import ast
+import importlib
+import os
+import sys
+
+PKG_ROOT = 'adk_agent'
+LOCAL_ROOTS = ('adk_agent', 'app')
+
+
+def collect(path):
+    """Return (module, symbol_or_None) pairs for non-optional third-party imports."""
+    with open(path, 'r', encoding='utf-8') as handle:
+        tree = ast.parse(handle.read(), filename=path)
+
+    optional = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Try):
+            for inner in ast.walk(node):
+                if isinstance(inner, (ast.Import, ast.ImportFrom)):
+                    optional.add(id(inner))
+
+    found = set()
+    for node in ast.walk(tree):
+        if id(node) in optional:
+            continue
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                found.add((alias.name, None))
+        elif isinstance(node, ast.ImportFrom):
+            # level > 0 is a relative import of our own package
+            if node.level or not node.module:
+                continue
+            for alias in node.names:
+                symbol = None if alias.name == '*' else alias.name
+                found.add((node.module, symbol))
+    return set(p for p in found if p[0].split('.')[0] not in LOCAL_ROOTS)
+
+
+def resolve(module, symbol):
+    obj = importlib.import_module(module)
+    if symbol is None or hasattr(obj, symbol):
+        return
+    # Submodule that has not been imported yet is not an attribute yet.
+    importlib.import_module(module + '.' + symbol)
+
+
+def main():
+    if not os.path.isdir(PKG_ROOT):
+        print('Dep smoke test SKIPPED: no ' + PKG_ROOT + ' directory')
+        return 0
+
+    pairs = set()
+    for root, _dirs, files in os.walk(PKG_ROOT):
+        for name in files:
+            if name.endswith('.py'):
+                pairs |= collect(os.path.join(root, name))
+
+    failures = []
+    for module, symbol in sorted(pairs):
+        try:
+            resolve(module, symbol)
+        except Exception as exc:
+            target = module if symbol is None else module + '.' + symbol
+            failures.append(target + ' -> ' + type(exc).__name__ + ': ' + str(exc))
+
+    if failures:
+        print('FAIL: dependency import smoke test (' + str(len(failures)) + ' broken)')
+        for line in failures:
+            print('  ' + line)
+        print('A dependency changed its module layout. Check PINNED_DEPS caps')
+        print('in Code.gs against the installed versions in /app/.dep-versions.')
+        return 1
+
+    print('Dep smoke test OK (' + str(len(pairs)) + ' imports resolved)')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+__DEP_SMOKE_EOF__
+
 ${ enableComputerUse ? `
 # -- Computer Use: install Chromium + OS libs for headless Playwright browsing --
 cat <<'__DOCKER_CU_EOF__' >> Dockerfile
@@ -4500,10 +4621,15 @@ __DOCKER_START_EOF__`;
 
 cat <<'__DOCKER_TAIL_EOF__' >> Dockerfile
 COPY . .
-# Dependency smoke test: fail build if critical interface missing
-RUN python -c "from a2ui.a2a.parts import create_a2ui_part; import inspect; assert 'version' in inspect.signature(create_a2ui_part).parameters, 'FAIL: a2ui version param missing'; print('Dep smoke test OK')"
-# Record installed versions for debugging
+# Record installed versions FIRST so they are in the build log even when the
+# smoke test below fails -- that pairing is what makes a break easy to trace.
 RUN uv pip freeze | grep -iE "^(google-adk|a2ui|mcp|google-genai|a2a-sdk)" | tee /app/.dep-versions
+# Dependency import smoke test (v11.39): resolves every third-party module and
+# symbol the generated code imports. Catches an upstream module-layout change
+# at BUILD time instead of as a stalled Cloud Run startup probe. AGENTS.md 8.
+RUN python dep_smoke_test.py
+# a2ui interface check: module import alone cannot see a dropped parameter.
+RUN python -c "from a2ui.a2a.parts import create_a2ui_part; import inspect; assert 'version' in inspect.signature(create_a2ui_part).parameters, 'FAIL: a2ui version param missing'; print('a2ui interface OK')"
 ENV PORT 8080
 ENV GOOGLE_GENAI_USE_VERTEXAI=1
 ENV PYTHONUNBUFFERED=1
@@ -4568,7 +4694,7 @@ export SANDBOX_OUT="/tmp/sandbox_result_$$.txt"
 # If Dockerfile/MCP files exist in CWD, the SDK tries to build them → hang.
 SANDBOX_TMPDIR=$(mktemp -d)
 pushd "$SANDBOX_TMPDIR" > /dev/null
-GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "google-cloud-aiplatform[agent_engines]>=1.112.0" python3 << '__SANDBOX_PROVISION_EOF__'
+GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.aiplatform}" python3 << '__SANDBOX_PROVISION_EOF__'
 import sys, os, warnings, time, vertexai
 from vertexai import types
 

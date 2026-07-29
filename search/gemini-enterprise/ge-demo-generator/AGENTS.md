@@ -211,7 +211,69 @@ branch tip). Delete both properties after the upstream merge.
 ## 7. Verification
 
 - `python3 validate_examples.py` — template JSON + Python compile checks.
+- `python3 check_deps.py` — dependency cap audit (see section 8).
 - `bash -n` any generated setup script before running it.
 - After deploy: Cloud Run startup logs, `✅ N/N MCP sidecars ready`,
   `/.well-known/agent.json` responds, model name shows in the thinking
   accordion.
+
+## 8. Dependency policy
+
+These demos are built live, often minutes before a customer meeting, from
+whatever the resolver picks that day. Two rules keep an upstream release from
+turning that into a failed demo.
+
+### 8.1 Every pip requirement carries a major cap
+
+`PINNED_DEPS` in `app/Code.gs` is the single source of every pip requirement
+the generated script emits. Each entry has an upper bound at the next major.
+
+The floor-only policy this replaced is what let `mcp` 2.0.0 into builds on the
+day it shipped: 2.0.0 removed `mcp.shared.session`, which `google-adk` still
+imports, so every generated container died at import. `google-adk` does declare
+`mcp<2,>=1.24` — but only under its `mcp`/`all`/`test` extras, and we install
+`google-adk[a2a]`, so that cap never applied.
+
+Two things to know before editing a requirement:
+
+- **Cap at the next major above the currently RESOLVED version, not above the
+  floor.** Several bands deliberately span two majors (`google-adk` 1→2,
+  `google-genai` 1→2, `google-cloud-storage` 2→3) because the resolver needs
+  that room to backtrack.
+- **A cap can be a silent downgrade.** `a2a-sdk<1.0.0` looks like containment,
+  but `a2a-sdk` already resolves to 1.1.2 under current ADK — that cap would
+  have pulled it back to 0.3.26.
+
+`agent_template/pyproject.toml` repeats four of these requirements verbatim and
+is copied into the build context, so it must carry the same caps.
+`check_deps.py` fails if it drifts.
+
+### 8.2 The build fails on a broken import, not the container
+
+The generated `dep_smoke_test.py` runs as a Docker build step. It walks the
+generated `adk_agent/` package with `ast`, collects every third-party module
+and symbol the code imports, and resolves each one; imports inside `try/except`
+are treated as optional and skipped. Because it derives its targets from the
+generated sources, it needs no maintenance as feature flags change.
+
+This exists because the failure mode it catches is nearly impossible to
+diagnose at run time: a `ModuleNotFoundError` at import surfaces only as a Cloud Run
+startup probe retrying forever, and the setup script appears to hang at
+"Deploying Main Agent to Cloud Run via Source". Replayed against the `mcp`
+2.0.0 incident, the smoke test names two breaks — the runtime traceback only
+ever reached the first. `uv pip freeze` runs immediately before it so the
+installed versions are in the build log when it fails.
+
+### 8.3 Auditing
+
+`python3 check_deps.py` resolves all three requirement variants (agent,
+agent + computer use, viewer) with the pinned `uv` and reports floor / cap /
+resolved / latest per requirement:
+
+- **MISSING CAP** — a requirement has no upper bound. Policy violation, exit 1.
+- **PYPROJECT** — `agent_template/pyproject.toml` disagrees. Exit 1.
+- **STALE CAP** — a newer major shipped above the cap. Not an error; evaluate
+  it, smoke-deploy, then either raise the cap or record why it stays.
+- **FLOOR DRIFT** — informational, the band spans two majors on purpose.
+
+Add `--offline` to skip the PyPI latest-version lookups.
