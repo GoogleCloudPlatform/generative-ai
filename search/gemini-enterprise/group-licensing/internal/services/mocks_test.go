@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
 // MockResourceManagerClient is a testify/mock implementation of ports.ResourceManagerClient.

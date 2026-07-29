@@ -28,13 +28,13 @@ import (
 	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v3"
 	"google.golang.org/api/option"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/adapters/cloudidentity"
-	"github.com/cloud-gtm/gemini-box-office/internal/adapters/discoveryengine"
-	"github.com/cloud-gtm/gemini-box-office/internal/adapters/resourcemanager"
-	"github.com/cloud-gtm/gemini-box-office/internal/config"
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
-	"github.com/cloud-gtm/gemini-box-office/internal/models/dto"
-	"github.com/cloud-gtm/gemini-box-office/internal/services"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/adapters/cloudidentity"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/adapters/discoveryengine"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/adapters/resourcemanager"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/config"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models/dto"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/services"
 )
 
 func main() {

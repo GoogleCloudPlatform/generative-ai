@@ -7,7 +7,7 @@
 
 ## Project identity
 
-- **Module:** `github.com/cloud-gtm/gemini-box-office`
+- **Module:** `github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing`
 - **Language:** Go 1.25.4
 - **Deployment:** Google Cloud Run Jobs (serverless batch — no HTTP server)
 - **Purpose:** Automates Gemini Enterprise license lifecycle management by reconciling Google Cloud Identity group membership with Discovery Engine user license state. Runs two independent workflows from a single binary: `joiner` (grant) and `garbage_collection` (revoke).

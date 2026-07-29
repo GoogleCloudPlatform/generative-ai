@@ -25,9 +25,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/config"
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
-	"github.com/cloud-gtm/gemini-box-office/internal/models/dto"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/config"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models/dto"
 )
 
 // boolPtr is a helper that returns a pointer to the given bool value.

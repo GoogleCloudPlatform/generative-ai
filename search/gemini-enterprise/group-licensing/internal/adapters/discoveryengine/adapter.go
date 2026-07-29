@@ -34,8 +34,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
-	"github.com/cloud-gtm/gemini-box-office/internal/ports"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/ports"
 )
 
 var _ ports.GeminiClient = (*Adapter)(nil)

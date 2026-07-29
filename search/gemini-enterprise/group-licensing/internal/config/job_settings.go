@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
 // JobSettings holds the Cloud Run Job execution parameters read from

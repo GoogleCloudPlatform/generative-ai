@@ -23,11 +23,11 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/config"
-	"github.com/cloud-gtm/gemini-box-office/internal/middleware"
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
-	"github.com/cloud-gtm/gemini-box-office/internal/models/dto"
-	"github.com/cloud-gtm/gemini-box-office/internal/ports"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/config"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/middleware"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models/dto"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/ports"
 )
 
 // GCService implements the "garbage_collection" workflow: for every configured

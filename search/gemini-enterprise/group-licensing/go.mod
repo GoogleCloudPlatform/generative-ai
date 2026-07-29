@@ -1,4 +1,4 @@
-module github.com/cloud-gtm/gemini-box-office
+module github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing
 
 go 1.25.4
 
