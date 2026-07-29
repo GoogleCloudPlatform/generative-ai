@@ -1,6 +1,7 @@
 aadd
 Aadila
 AALR
+AAVE
 aaxis
 ABG
 Abhishek
@@ -30,6 +31,7 @@ agentic
 agg
 AGG
 aggfunc
+aglio
 agri
 aiko
 ainit
@@ -55,9 +57,11 @@ Alok
 ALPHAFOLD
 ambiently
 AMNOSH
+amsmath
 amurensis
 Anant
 Andaz
+Ankarsrum
 antiword
 ANZ
 aoa
@@ -102,6 +106,7 @@ Asis
 ASML
 Aspeed
 astype
+ation
 ATitle
 atleast
 atms
@@ -122,6 +127,7 @@ autosxs
 AUVs
 avec
 Avenir
+avgs
 aworkflow
 AWT
 axs
@@ -133,6 +139,8 @@ backticks
 bagchi
 Bakkali
 bargap
+barista
+baristas
 barmode
 barpolar
 BARSAC
@@ -140,12 +148,14 @@ baxis
 bayes
 bbc
 bbq
+Beehiiv
 beir
 Bengaluru
 BENGALURU
 bennett
 Benno
 bert
+BERTa
 Bettes
 betulus
 Beyonce
@@ -210,6 +220,7 @@ BYOM
 byor
 BYOR
 Byzance
+cacio
 cais
 CALIPSO
 campestre
@@ -295,6 +306,7 @@ colurna
 colvis
 colwidth
 Cómo
+Condesa
 Connectez
 CONOUT
 constexpr
@@ -317,6 +329,7 @@ Cpath
 cpb
 cpet
 cpg
+Creuset
 crewai
 CRF
 cristo
@@ -336,6 +349,7 @@ CTHH
 CTitle
 CUAD
 CUCUONAR
+Cuisinart
 cupertino
 curating
 cusagt
@@ -410,6 +424,7 @@ DOCDB
 docstore
 docstores
 doi
+DOIs
 Donen
 Doogler
 dotprompt
@@ -457,6 +472,7 @@ EDB
 edgecolor
 edgelist
 edoc
+edtech
 edu
 Edu
 EDU
@@ -470,6 +486,8 @@ ein
 Einhalt
 EIP
 ekg
+ekw
+ELBO
 Eleuther
 elinks
 Eliquis
@@ -554,6 +572,7 @@ FILEOS
 filestem
 fillmode
 fillna
+fintech
 Finvest
 fiqa
 firestore
@@ -614,6 +633,7 @@ gamified
 gapic
 Gatace
 gauff
+Gaussians
 gbif
 gboolean
 GBP
@@ -685,6 +705,9 @@ googleapi
 googlecar
 googler
 goooooood
+gotcha
+Gotcha
+gotchas
 gozo
 gpg
 gpp
@@ -720,6 +743,7 @@ GWLP
 gws
 HACCP
 hacer
+hackathon
 hadolint
 hahaha
 Haichao
@@ -844,6 +868,7 @@ Iosif
 iostream
 ipd
 iphoneos
+Ippudo
 ipycanvas
 ipykernel
 ipynb
@@ -863,8 +888,11 @@ ivf
 IVF
 ivfflat
 ixed
+izakaya
+ize
 ized
 J'aime
+jaccard
 JAISH
 Jaival
 japonicum
@@ -904,8 +932,10 @@ JSONs
 Junzhe
 jupyter
 jvm
+JWST
 Kaelen
 kaggle
+Kaizen
 Kaku
 Kalai
 Kalamang
@@ -918,6 +948,7 @@ Kawagoe
 kawai
 kde
 Keanu
+keigo
 kendall
 kenleejr
 kenta
@@ -1026,6 +1057,8 @@ LSTATUS
 LSTM
 LSum
 LTRB
+luhrmann
+Luhrmann
 Lumet
 Lumi
 LUVBPTK
@@ -1110,7 +1143,9 @@ Minato
 Mirai
 miranda
 Misaki
+misroutes
 Mitani
+Miyabi
 MLB
 mlit
 MLIT
@@ -1146,6 +1181,7 @@ MSGSEND
 msmarco
 msr
 MTL
+MTurk
 multiline
 multitool
 mundo
@@ -1171,6 +1207,7 @@ Napisz
 NARI
 Narnia
 nas
+natbib
 Navneet
 nbconvert
 nbfmt
@@ -1189,8 +1226,11 @@ NDEBUG
 ndocs
 nec
 neering
+neil
+Nemar
 nemri
 neq
+NER
 netif
 newaxis
 newaxisngram
@@ -1209,11 +1249,14 @@ Nihonga
 Niitsuma
 nin
 Nith
+NLG
 nlp
+NLU
 nmade
 nmilitary
 NMT
 nmy
+NNN
 noaa
 noabe
 nobserved
@@ -1235,6 +1278,7 @@ nprint
 npx
 NREL
 nrows
+nslookup
 ntheory
 NTILE
 ntry
@@ -1252,6 +1296,7 @@ Ohashi
 ohlcv
 OHLCV
 Ohtani
+OIDC
 oitems
 Okame
 Olá
@@ -1259,6 +1304,7 @@ OLAP
 oldboy
 Oldboy
 Olgivanna
+olifei
 ollama
 Ollama
 olleh
@@ -1269,6 +1315,8 @@ OMR
 onesie
 onesies
 Onone
+onsen
+ood
 OOD
 OOM
 Oort
@@ -1303,6 +1351,7 @@ Palya
 pancetta
 pandoc
 pantarba
+pao
 Paquete
 paracord
 Parag
@@ -1328,6 +1377,7 @@ PDFs
 PEFT
 PEGI
 Pengyu
+pepe
 Persero
 petabytes
 pevt
@@ -1344,11 +1394,13 @@ Pharma
 phellos
 Photoshop
 Pichai
+pidx
 pietra
 pii
 pilates
 Pilates
 pincodes
+Pipedrive
 Pistorius
 pixmap
 pjson
@@ -1383,12 +1435,13 @@ Pranav
 praw
 prcntg
 PRD
-proc
 Pré
 PREBROWSE
 preds
 preflight
 pregel
+Priya
+proc
 produc
 programar
 projectid
@@ -1498,6 +1551,7 @@ retryable
 returncode
 ribeye
 ricc
+Rimowa
 ringspun
 ripgrep
 Rivertown
@@ -1557,6 +1611,7 @@ scifact
 scifi
 scikit
 scm
+scorable
 Scorsese
 sdec
 sdetail
@@ -1564,6 +1619,7 @@ SDKROOT
 seabut
 sealife
 seatback
+Segfault
 SEK
 Selam
 selectbox
@@ -1580,6 +1636,7 @@ serrata
 serrulata
 Sestero
 setlocal
+sfn
 sft
 sfx
 Sha'carri
@@ -1621,6 +1678,7 @@ sittin
 Skaffold
 Sketchfab
 skillsets
+skincare
 sklearn
 sku
 SKUs
@@ -1636,8 +1694,10 @@ SNB
 SNE
 snowboard
 socketio
+softconf
 Sono
 sortant
+soujanyav
 sourced
 sourcing
 spamming
@@ -1758,6 +1818,8 @@ Tianli
 Tianxiang
 ticktext
 tickvals
+tiebreak
+Tik
 tiktoken
 timechart
 timecoded
@@ -1767,10 +1829,13 @@ titlebar
 TLDR
 TLDs
 tobytes
+Tojiro
 tok
 TOKENLIST
+tomate
 tomentosa
 Tongsheng
+tonkotsu
 toolcall
 toolsets
 toolu
@@ -1797,6 +1862,7 @@ TRK
 trl
 truncatum
 Trung
+TSA
 tscore
 tseslint
 TSLA
@@ -1824,6 +1890,7 @@ udf
 UDF
 UDFs
 Ufkes
+ufunc
 uids
 UIs
 Ukiyo
@@ -1865,6 +1932,7 @@ uvb
 uvicorn
 uvx
 UVX
+VAEs
 vais
 Valtteri
 Vandamm
@@ -1905,14 +1973,17 @@ VLM
 VLMs
 VMAF
 VMs
+vname
 vnc
 voiceover
 Volodymyr
 vos
 VOS
 votre
+VPs
 VQA
 VRAM
+vreason
 VREDRAW
 vrtx
 VSC
@@ -1939,6 +2010,7 @@ weaviate
 webcam
 webclient
 webfonts
+webinar
 webpage
 webpages
 webrtc

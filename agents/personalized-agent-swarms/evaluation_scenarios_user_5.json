@@ -1,0 +1,215 @@
+{
+  "metadata": {
+    "description": "Auto-generated evaluation scenarios for user_5.",
+    "total_scenarios": 18,
+    "similar_scenarios": 10,
+    "different_scenarios": 8,
+    "user_id": "user_5",
+    "persona": "Travel enthusiast + home cook. Casual, likes lists.",
+    "generated_from_pool": true,
+    "llm_reviewed": true,
+    "seed": 42
+  },
+  "scenarios": [
+    {
+      "scenario_id": "eval_u5_sim_001",
+      "category": "similar",
+      "intent": "travel_packing",
+      "expected_swarm_agent": "cultural_etiquette_guidance",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user receives clear guidelines on TSA rules for traveling with various food items and spices, along with packing tips.",
+      "opening_message": "I'm flying to visit my family for the holidays and I'm in charge of cooking the big dinner. I want to bring my own custom spice blends, some fancy finishing salts, and maybe a few homemade sauces in my carry-on. What are the actual TSA rules for bringing food ingredients and spices through security? I need a list of what's allowed, what will get flagged, and how I should pack them to avoid a hassle.",
+      "follow_up_strategy": "correct",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u5_sim_002",
+      "category": "similar",
+      "intent": "meal_prep",
+      "expected_swarm_agent": "recipe_and_meal_planning",
+      "should_trigger_swarm": true,
+      "goal_definition": "Assistant provides 3 recommendations for grains that store well or specific techniques to keep prepped grains moist.",
+      "opening_message": "I need some advice on prepping carbs. Whenever I make a big batch of rice or quinoa for the week, it gets super dry and crunchy in the fridge by day 3. Are there specific grains that hold their moisture better for meal prep? Or do you have a foolproof trick for storing and reheating them so they taste fresh? Give me your top 3 recommendations.",
+      "follow_up_strategy": "correct",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u5_sim_003",
+      "category": "similar",
+      "intent": "find_recipe",
+      "expected_swarm_agent": "recipe_and_meal_planning",
+      "should_trigger_swarm": true,
+      "goal_definition": "User gets a list of authentic Korean-inspired recipes using kimchi and pork belly, explicitly excluding fried rice.",
+      "opening_message": "I'm doing a fridge cleanout and I've got half a jar of really fermented kimchi, a small block of pork belly, and some leftover jasmine rice. I traveled to Seoul last year and miss the food so much! What can I make with this that isn't just standard kimchi fried rice? Give me a list of a few authentic-leaning options.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u5_sim_004",
+      "category": "similar",
+      "intent": "restaurant_recommendations",
+      "expected_swarm_agent": "travel_dining_recommendations",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI provides a list of authentic Roman eateries, specifically covering trattorias for cacio e pepe, gelato shops, and a standing espresso bar, while avoiding tourist traps.",
+      "opening_message": "I'm doing 4 days in Rome and need a master list of places to eat. I want to avoid the tourist traps near the Colosseum. Give me a list of authentic trattorias for cacio e pepe, the absolute best gelato spots, and a classic standing espresso bar. I make a lot of pasta at home, so I'm looking for the real deal to get inspired!",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_sim_005",
+      "category": "similar",
+      "intent": "meal_prep",
+      "expected_swarm_agent": "recipe_and_meal_planning",
+      "should_trigger_swarm": true,
+      "goal_definition": "Assistant provides 4 globally-inspired, hearty soup or stew recipes that are freezer-friendly.",
+      "opening_message": "Winter is coming and I want to stock my freezer with some killer soups and stews. I love trying flavors from around the world, so I don't just want basic chicken noodle. Can you give me a list of 4 globally-inspired soups that freeze beautifully and reheat without the ingredients turning to mush? Bonus points if they are hearty enough to be a full meal on their own.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u5_sim_006",
+      "category": "similar",
+      "intent": "plan_trip",
+      "expected_swarm_agent": "travel_dining_recommendations",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user gets a 4-day Miami to Key West road trip itinerary highlighting EV charging logistics and top local seafood shacks.",
+      "opening_message": "doing a mini road trip from Miami down to Key West! I have 4 days to take it slow. I'm driving an EV so I need to be a little mindful of charging stops. mostly I just want to eat at the best hole-in-the-wall seafood shacks and find some quiet beaches. can you give me a bulleted list of stops?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_sim_007",
+      "category": "similar",
+      "intent": "compare_products",
+      "expected_swarm_agent": "recipe_and_meal_planning",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user's goal is met when the assistant provides a breakdown of the three noise-canceling headphones specifically for sleeping on long-haul flights.",
+      "opening_message": "I need new over-ear headphones for long haul flights. torn between Sony WH-1000XM5, Bose QuietComfort Ultra, and Apple AirPods Max. I care most about noise cancellation and comfort when sleeping on planes. is the apple one too heavy for a 12 hour flight?",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3,
+      "_validation_warning": "Expected recipe_and_meal_planning but embedding best match is cultural_etiquette_guidance (score=0.356)"
+    },
+    {
+      "scenario_id": "eval_u5_sim_008",
+      "category": "similar",
+      "intent": "find_recipe",
+      "expected_swarm_agent": "recipe_and_meal_planning",
+      "should_trigger_swarm": true,
+      "goal_definition": "User receives a curated list of 3-4 visually appealing Spanish tapas recipes that can be prepped ahead of time.",
+      "opening_message": "I'm throwing a Spanish tapas-themed party for about 10 people next weekend. I want to do a spread of 5-6 different dishes. I've got a tortilla española and pan con tomate on my list already, but I need ideas for the rest. Looking for things that look gorgeous on the table but won't have me stuck at the stove the whole night.",
+      "follow_up_strategy": "correct",
+      "max_turns": 3,
+      "_validation_warning": "Expected recipe_and_meal_planning but embedding best match is beverage_pairing_advice (score=0.460)"
+    },
+    {
+      "scenario_id": "eval_u5_sim_009",
+      "category": "similar",
+      "intent": "cultural_etiquette",
+      "expected_swarm_agent": "cultural_etiquette_guidance",
+      "should_trigger_swarm": true,
+      "goal_definition": "The AI explains traditional dining etiquette in Jordan, specifically focusing on eating with hands and communal dining rules.",
+      "opening_message": "i'm traveling to jordan in the fall and booked a traditional bedouin dinner experience in wadi rum. i know you're supposed to eat with your hands, but what are the actual rules for that? i've heard you only use your right hand. can you give me a list of dining etiquette basics for eating communal meals there so i don't embarrass myself?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_sim_010",
+      "category": "similar",
+      "intent": "budget_travel",
+      "expected_swarm_agent": "budget_travel_planning",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides a realistic daily budget breakdown for a $40/day trip to Peru, specifically factoring in grocery costs for cooking.",
+      "opening_message": "planning a 3-week trip to Peru and trying to keep it under $40 a day. i love hitting up local markets and cooking my own meals, so i won't be eating out much. can you give me a list breakdown of how that $40 should be split between hostels, groceries, transport, and activities? i really want to make sure this is realistic before i book my flights.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u5_diff_001",
+      "category": "different",
+      "intent": "home_improvement",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a practical DIY plan with materials and steps.",
+      "opening_message": "I want to repaint my bedroom. The walls have some nail holes and a few small cracks. What's the right prep work and what type of paint should I use? I've never painted a room before.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_002",
+      "category": "different",
+      "intent": "astronomy",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a clear explanation of an astronomy concept.",
+      "opening_message": "My kid asked me why the moon changes shape during the month. I know it has to do with the sun but I can't explain it clearly. Can you help me understand lunar phases so I can explain it to a 7-year-old?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_003",
+      "category": "different",
+      "intent": "fitness",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a beginner workout plan.",
+      "opening_message": "I want to start exercising but I'm completely out of shape. I can't run for more than 2 minutes. What's a realistic plan to build up fitness over the next 3 months? I have no gym membership.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_004",
+      "category": "different",
+      "intent": "gardening",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical gardening advice with a planting plan.",
+      "opening_message": "I want to start growing vegetables in my backyard. I have a 10x10 patch that gets about 6 hours of sun. What should I plant for a beginner? I'm in Zone 6.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_005",
+      "category": "different",
+      "intent": "pet_care",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical pet care advice.",
+      "opening_message": "I'm thinking about getting a cat. I've never had a pet before. What are the basics I need to know — costs, supplies, vet visits? I live in a small apartment.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_006",
+      "category": "different",
+      "intent": "parenting",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical advice for the described parenting situation.",
+      "opening_message": "My 10-year-old has been struggling with math and is starting to say he hates school. His teacher says he's capable but just doesn't try. How do I motivate him without adding pressure?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_007",
+      "category": "different",
+      "intent": "python_programming",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get help with a basic programming question.",
+      "opening_message": "My nephew asked me to help with his Python homework. He needs to write a program that sorts a list of numbers. I have no idea about coding. Can you explain it simply?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u5_diff_008",
+      "category": "different",
+      "intent": "car_repair",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get advice on whether to repair or replace and approximate costs.",
+      "opening_message": "My car has been making a weird rattling noise from the engine area when I accelerate. It's a 2016 Honda Civic with 95K miles. Should I be worried? Is this something I can check myself?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    }
+  ]
+}

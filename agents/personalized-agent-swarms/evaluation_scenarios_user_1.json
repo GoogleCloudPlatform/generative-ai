@@ -1,0 +1,213 @@
+{
+  "metadata": {
+    "description": "Auto-generated evaluation scenarios for user_1.",
+    "total_scenarios": 18,
+    "similar_scenarios": 10,
+    "different_scenarios": 8,
+    "user_id": "user_1",
+    "persona": "Senior software engineer, Python + Google Cloud. Terse, wants code examples.",
+    "generated_from_pool": true,
+    "llm_reviewed": true,
+    "seed": 42
+  },
+  "scenarios": [
+    {
+      "scenario_id": "eval_u1_sim_001",
+      "category": "similar",
+      "intent": "write_dockerfile",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user receives a docker-compose.yml setting up an Airflow environment with Postgres and a custom Python worker, including volume mounts for DAG development.",
+      "opening_message": "Docker Compose for local Airflow dev. Need Postgres, Airflow webserver, scheduler, and a custom Python worker. Mount local ./dags folder into the containers. Keep it concise.",
+      "follow_up_strategy": "pivot",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u1_sim_002",
+      "category": "similar",
+      "intent": "refactor_legacy_code",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "AI provides a code example showing how to replace requests.Session with httpx.AsyncClient, including connection pooling configuration.",
+      "opening_message": "Swapping out requests for httpx to support async. We rely heavily on requests.Session for connection pooling and custom adapters. Show me the httpx equivalent setup.",
+      "follow_up_strategy": "correct",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u1_sim_003",
+      "category": "similar",
+      "intent": "explain_library_api",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant explains the chunking and memory differences between GCS upload_from_filename and upload_from_file, providing a code snippet for optimal large file uploads.",
+      "opening_message": "What is the internal difference between `upload_from_filename` and `upload_from_file` in the `google-cloud-storage` Python client? I am dealing with 50GB+ video files and seeing massive memory spikes on my Cloud Run instances. How does the library handle chunking under the hood for file objects versus file paths? Provide a code example showing the optimal way to stream these large uploads directly to a bucket without OOMing.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u1_sim_004",
+      "category": "similar",
+      "intent": "troubleshoot_networking",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user receives instructions on configuring Pub/Sub ack deadlines and handling long-running push requests, including any necessary Python code.",
+      "opening_message": "Pub/Sub push subscription targeting a Cloud Run service is constantly retrying messages. The Cloud Run container runs a Python data processing script that takes about 12 minutes to complete. Cloud Run timeout is set to 3600s, but Pub/Sub seems to drop the connection and retry after 10 minutes, causing duplicate processing. Need to know how to properly configure the push endpoint or handle the ack deadline extension in Python for long-running push requests. Provide the necessary configuration or code.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_sim_005",
+      "category": "similar",
+      "intent": "refactor_legacy_code",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "AI provides a Python logging configuration that outputs JSON formatted logs compatible with Google Cloud Logging, replacing custom print statements.",
+      "opening_message": "Codebase has hundreds of custom print() statements for logging. Need to replace them with standard Python logging outputting JSON for Google Cloud Logging. Show the formatter setup.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_sim_006",
+      "category": "similar",
+      "intent": "review_pull_request",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user receives an explanation of the performance/validation penalties of mixing Pydantic v1 and v2, with code examples demonstrating the issue.",
+      "opening_message": "Reviewing a massive PR upgrading Pydantic v1 to v2. They used the `v1` namespace fallback (`pydantic.v1`) for half the models to save time. I want to enforce full v2 migration. What's the most critical performance or validation gotcha if we mix v1 and v2 models in the same FastAPI app? Give examples.",
+      "follow_up_strategy": "correct",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u1_sim_007",
+      "category": "similar",
+      "intent": "debug_python_code",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant explains how to properly handle asyncio.CancelledError in background tasks and provides a code snippet demonstrating graceful shutdown.",
+      "opening_message": "FastAPI background tasks aren't respecting asyncio cancellation during pod shutdown in GKE. The SIGTERM hits the container, but my long-running async worker just gets killed mid-flight instead of catching CancelledError. How do I trap this properly so I can clean up database connections before the pod dies? Provide a code example.",
+      "follow_up_strategy": "correct",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_sim_008",
+      "category": "similar",
+      "intent": "explain_library_api",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant explains the execution order and error handling differences between pytest yield fixtures and addfinalizer, with a code example.",
+      "opening_message": "What is the exact difference in execution and error handling between using a `yield` statement in a pytest fixture versus using `request.addfinalizer()`? I have a complex test suite spinning up ephemeral Google Cloud Spanner emulators. If the setup phase throws an exception, the teardown isn't happening with `yield`, leaving orphaned processes. Show a code example fixing this with `addfinalizer`.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_sim_009",
+      "category": "similar",
+      "intent": "deploy_gcp_service",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "Provide gcloud commands to set up Workload Identity Federation for GitLab CI to authenticate with GKE.",
+      "opening_message": "I am setting up Workload Identity Federation for GitLab CI to deploy workloads to a GKE cluster. I need the gcloud commands to create the workload identity pool, the OIDC provider for GitLab, and the command to bind it to a specific Kubernetes service account in the 'production' namespace. Just the commands, no console instructions.",
+      "follow_up_strategy": "pivot",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u1_sim_010",
+      "category": "similar",
+      "intent": "configure_ci_cd",
+      "expected_swarm_agent": "advanced_docker_configuration",
+      "should_trigger_swarm": true,
+      "goal_definition": "The goal is met when the user receives a complete `cloudbuild.yaml` that builds a Docker image, pushes it to Artifact Registry, and deploys to GKE via Helm using Workload Identity, with path-based triggers.",
+      "opening_message": "Need a Cloud Build pipeline for a monorepo containing 2 Python microservices. Provide the `cloudbuild.yaml`. The steps must: run pytest, build the Docker images, push them to Google Cloud Artifact Registry, and deploy to a GKE cluster using Helm. I need to authenticate with Workload Identity, not service account keys. Only trigger the build and deploy steps for a specific microservice if its respective directory paths have changed. Show me the exact YAML configuration required to achieve this.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u1_diff_001",
+      "category": "different",
+      "intent": "home_improvement",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a practical DIY plan with materials and steps.",
+      "opening_message": "I want to repaint my bedroom. The walls have some nail holes and a few small cracks. What's the right prep work and what type of paint should I use? I've never painted a room before.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_002",
+      "category": "different",
+      "intent": "astronomy",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a clear explanation of an astronomy concept.",
+      "opening_message": "My kid asked me why the moon changes shape during the month. I know it has to do with the sun but I can't explain it clearly. Can you help me understand lunar phases so I can explain it to a 7-year-old?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_003",
+      "category": "different",
+      "intent": "fitness",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a beginner workout plan.",
+      "opening_message": "I want to start exercising but I'm completely out of shape. I can't run for more than 2 minutes. What's a realistic plan to build up fitness over the next 3 months? I have no gym membership.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_004",
+      "category": "different",
+      "intent": "gardening",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical gardening advice with a planting plan.",
+      "opening_message": "I want to start growing vegetables in my backyard. I have a 10x10 patch that gets about 6 hours of sun. What should I plant for a beginner? I'm in Zone 6.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_005",
+      "category": "different",
+      "intent": "pet_care",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical pet care advice.",
+      "opening_message": "I'm thinking about getting a cat. I've never had a pet before. What are the basics I need to know — costs, supplies, vet visits? I live in a small apartment.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_006",
+      "category": "different",
+      "intent": "parenting",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical advice for the described parenting situation.",
+      "opening_message": "My 10-year-old has been struggling with math and is starting to say he hates school. His teacher says he's capable but just doesn't try. How do I motivate him without adding pressure?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_007",
+      "category": "different",
+      "intent": "python_programming",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get help with a basic programming question.",
+      "opening_message": "My nephew asked me to help with his Python homework. He needs to write a program that sorts a list of numbers. I have no idea about coding. Can you explain it simply?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u1_diff_008",
+      "category": "different",
+      "intent": "car_repair",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get advice on whether to repair or replace and approximate costs.",
+      "opening_message": "My car has been making a weird rattling noise from the engine area when I accelerate. It's a 2016 Honda Civic with 95K miles. Should I be worried? Is this something I can check myself?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    }
+  ]
+}

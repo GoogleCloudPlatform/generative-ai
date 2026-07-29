@@ -1,0 +1,215 @@
+{
+  "metadata": {
+    "description": "Auto-generated evaluation scenarios for user_3.",
+    "total_scenarios": 18,
+    "similar_scenarios": 10,
+    "different_scenarios": 8,
+    "user_id": "user_3",
+    "persona": "ML grad student, NLP research. Wants deep technical explanations.",
+    "generated_from_pool": true,
+    "llm_reviewed": true,
+    "seed": 42
+  },
+  "scenarios": [
+    {
+      "scenario_id": "eval_u3_sim_001",
+      "category": "similar",
+      "intent": "summarize_ml_concept",
+      "expected_swarm_agent": "debug_model_training",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user's goal is met when the assistant explains the statistical differences between BatchNorm, LayerNorm, and RMSNorm, specifically correcting the user's assumption about RMSNorm's representational capacity.",
+      "opening_message": "Can you summarize the differences between BatchNorm, LayerNorm, and RMSNorm? I get confused about which dimensions the statistics are computed over in NLP contexts. Also, I thought RMSNorm was just LayerNorm without the mean centering, but doesn't that strictly reduce its representational capacity? Why has it become the default in architectures like LLaMA?",
+      "follow_up_strategy": "correct",
+      "max_turns": 4,
+      "_validation_warning": "Expected debug_model_training but embedding best match is nlp_statistical_evaluation (score=0.546)"
+    },
+    {
+      "scenario_id": "eval_u3_sim_002",
+      "category": "similar",
+      "intent": "explain_statistical_test",
+      "expected_swarm_agent": "nlp_statistical_evaluation",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant explains the Mann-Whitney U test and its application for comparing two independent, non-normally distributed samples.",
+      "opening_message": "We had two disjoint groups of annotators rate the toxicity of generated text. Group A (expert linguists, n=30) and Group B (crowd workers, n=150). The scores are ordinal (0 to 3). Since the samples are independent and different sizes, and the data is ordinal, I'm leaning towards a Mann-Whitney U test rather than an independent t-test. Can you walk me through the math of how the U statistic is calculated and whether the unequal sample sizes will break the test?",
+      "follow_up_strategy": "correct",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u3_sim_003",
+      "category": "similar",
+      "intent": "design_experiment",
+      "expected_swarm_agent": "nlp_experiment_design",
+      "should_trigger_swarm": true,
+      "goal_definition": "The goal is met when the assistant outlines a rigorous ablation study and baseline comparison for integrating knowledge graph embeddings into a document-level relation extraction model.",
+      "opening_message": "I need to design an experiment to test whether injecting Wikidata knowledge graph embeddings via a cross-attention mechanism improves document-level relation extraction on the DocRED dataset. Reviewers often complain about weak baselines in this area. How should I structure my baseline comparisons and ablations? Specifically, I need to isolate the impact of the graph attention layers versus just the added parameter count, and I want to ensure my data splits don't leak entity types.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u3_sim_004",
+      "category": "similar",
+      "intent": "help_with_latex",
+      "expected_swarm_agent": "nlp_experiment_design",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user's goal is met when they receive a technical solution for preventing long URLs in the bibliography from causing margin violations in the EMNLP template.",
+      "opening_message": "I'm finalizing my camera-ready submission for EMNLP, but the automated softconf checker is flagging margin violations. It looks like long URLs and DOIs in my bibliography aren't wrapping correctly. What's the most robust way to force line breaks in bibliography URLs using the standard ACL/EMNLP style files without manually editing the .bbl file?",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u3_sim_005",
+      "category": "similar",
+      "intent": "explain_statistical_test",
+      "expected_swarm_agent": "nlp_statistical_evaluation",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides a statistically sound method for calculating and reporting confidence intervals from 10-fold cross-validation results.",
+      "opening_message": "I just finished running a 10-fold cross-validation for a low-resource NER task. My exact match scores across the folds are: 62.4, 65.1, 61.8, 68.3, 63.5, 64.2, 60.9, 66.7, 63.1, and 65.0. Because the training sets overlap across folds, I know the standard error calculation for a normal confidence interval is biased. How should I properly calculate and report the confidence interval for my paper's results table?",
+      "follow_up_strategy": "pivot",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_sim_006",
+      "category": "similar",
+      "intent": "find_datasets",
+      "expected_swarm_agent": "dataset_discovery",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant provides datasets containing text or speech from specific dialects like AAVE with linguistic annotations.",
+      "opening_message": "I'm doing a fairness evaluation on current LLMs and need datasets that specifically capture dialectal variations, particularly African American Vernacular English (AAVE) or Appalachian English. I'm looking for text corpora that aren't just scraped Twitter data, but ideally have some level of linguistic annotation, POS tagging, or parallel 'Standard American English' translations to evaluate semantic preservation during style transfer. What are the most reliable datasets for this kind of dialectal NLP research?",
+      "follow_up_strategy": "correct",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_sim_007",
+      "category": "similar",
+      "intent": "debug_training_loop",
+      "expected_swarm_agent": "debug_model_training",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant explains why the cyclic learning rate is causing loss oscillations at convergence and suggests a decay strategy.",
+      "opening_message": "My training loss is oscillating wildly now that I'm approaching convergence on my RoBERTa-based sequence tagger. I'm using a cyclic learning rate schedule (triangular2) with a base_lr of 1e-5 and max_lr of 5e-5. The model seems to jump out of the local minima every time the learning rate cycles back up. Should I be applying a decay to the amplitude of the cycles, or is there a better way to anneal this so it actually settles?",
+      "follow_up_strategy": "pivot",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_sim_008",
+      "category": "similar",
+      "intent": "design_experiment",
+      "expected_swarm_agent": "nlp_experiment_design",
+      "should_trigger_swarm": true,
+      "goal_definition": "The goal is met when the assistant recommends a balanced set of math and logic datasets to evaluate the reasoning capabilities of a 7B LLM.",
+      "opening_message": "I am evaluating the multi-step reasoning capabilities of a custom-trained 7B parameter LLM using different Chain-of-Thought prompting strategies. To make the evaluation rigorous for a top-tier conference, what specific combination of math, logic, and algorithmic reasoning datasets should I include? I'm currently thinking of GSM8K and MATH, but I need a broader set that tests different types of reasoning without overlapping too much in their underlying distributions.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4,
+      "_validation_warning": "Expected nlp_experiment_design but embedding best match is dataset_discovery (score=0.616)"
+    },
+    {
+      "scenario_id": "eval_u3_sim_009",
+      "category": "similar",
+      "intent": "derive_math_proof",
+      "expected_swarm_agent": "ml_technical_and_math_deep_dive",
+      "should_trigger_swarm": true,
+      "goal_definition": "The user's goal is met when the assistant provides a formal mathematical proof that the standard 2D convolution operation is translation equivariant.",
+      "opening_message": "I'm currently contrasting the inductive biases of Vision Transformers and Convolutional Neural Networks for my thesis. I need a rigorous mathematical proof showing that the standard discrete 2D convolution operation is translation equivariant. Please define the translation operator formally in mathematical terms and show exactly how it commutes with the convolution operation step-by-step.",
+      "follow_up_strategy": "correct",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_sim_010",
+      "category": "similar",
+      "intent": "compare_model_architectures",
+      "expected_swarm_agent": "ml_technical_and_math_deep_dive",
+      "should_trigger_swarm": true,
+      "goal_definition": "The assistant successfully explains the mathematical differences between retention and softmax attention, detailing the parallel and recurrent dual forms of RetNet.",
+      "opening_message": "I'm looking into linear-time alternatives to standard softmax attention for a new language modeling project. Can you compare Retention Networks (RetNet) with standard Transformers? Specifically, I need a deep dive into how the retention mechanism achieves parallel training while maintaining O(1) inference complexity, and what the theoretical tradeoffs are regarding context recall compared to standard KV caching.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 4
+    },
+    {
+      "scenario_id": "eval_u3_diff_001",
+      "category": "different",
+      "intent": "home_improvement",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a practical DIY plan with materials and steps.",
+      "opening_message": "I want to repaint my bedroom. The walls have some nail holes and a few small cracks. What's the right prep work and what type of paint should I use? I've never painted a room before.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_002",
+      "category": "different",
+      "intent": "astronomy",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a clear explanation of an astronomy concept.",
+      "opening_message": "My kid asked me why the moon changes shape during the month. I know it has to do with the sun but I can't explain it clearly. Can you help me understand lunar phases so I can explain it to a 7-year-old?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_003",
+      "category": "different",
+      "intent": "fitness",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get a beginner workout plan.",
+      "opening_message": "I want to start exercising but I'm completely out of shape. I can't run for more than 2 minutes. What's a realistic plan to build up fitness over the next 3 months? I have no gym membership.",
+      "follow_up_strategy": "deep_dive",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_004",
+      "category": "different",
+      "intent": "gardening",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical gardening advice with a planting plan.",
+      "opening_message": "I want to start growing vegetables in my backyard. I have a 10x10 patch that gets about 6 hours of sun. What should I plant for a beginner? I'm in Zone 6.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_005",
+      "category": "different",
+      "intent": "pet_care",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical pet care advice.",
+      "opening_message": "I'm thinking about getting a cat. I've never had a pet before. What are the basics I need to know — costs, supplies, vet visits? I live in a small apartment.",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_006",
+      "category": "different",
+      "intent": "parenting",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get practical advice for the described parenting situation.",
+      "opening_message": "My 10-year-old has been struggling with math and is starting to say he hates school. His teacher says he's capable but just doesn't try. How do I motivate him without adding pressure?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_007",
+      "category": "different",
+      "intent": "python_programming",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get help with a basic programming question.",
+      "opening_message": "My nephew asked me to help with his Python homework. He needs to write a program that sorts a list of numbers. I have no idea about coding. Can you explain it simply?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    },
+    {
+      "scenario_id": "eval_u3_diff_008",
+      "category": "different",
+      "intent": "car_repair",
+      "expected_swarm_agent": null,
+      "should_trigger_swarm": false,
+      "goal_definition": "Get advice on whether to repair or replace and approximate costs.",
+      "opening_message": "My car has been making a weird rattling noise from the engine area when I accelerate. It's a 2016 Honda Civic with 95K miles. Should I be worried? Is this something I can check myself?",
+      "follow_up_strategy": "clarify",
+      "max_turns": 3
+    }
+  ]
+}
