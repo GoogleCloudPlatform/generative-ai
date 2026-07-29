@@ -302,6 +302,7 @@ ge-demo-generator/
 ├── AGENTS.md                # AI agent development guide
 ├── deploy.sh                # Clasp deployment orchestrator script
 ├── validate_examples.py     # Validates agent_template JSON + Python files
+├── check_deps.py            # Audits the PINNED_DEPS major caps (AGENTS.md 8)
 ├── ge-demo-generator-lite/  # (Subproject) GE Demo Generator Lite — Workspace
 │                            #  demo-data generator for Gemini Enterprise
 │                            #  editions without custom-agent support
@@ -448,7 +449,14 @@ If sub-agents fail to modify Firestore or pull from BigQuery:
   - `roles/bigquery.dataViewer` & `roles/bigquery.jobUser`
   - `roles/aiplatform.user`
  
-#### 6. Endless "The agent requires additional authorization" Prompt
+#### 6. Setup Appears to Hang at "Deploying Main Agent to Cloud Run via Source"
+If the deploy step never returns, the container is almost certainly crashing at import and Cloud Run is retrying the startup probe forever — which produces no obvious error in the script output.
+- **Cause**: a dependency changed its module layout in a new release. Every pip requirement is capped at the next major in `PINNED_DEPS` (`app/Code.gs`) precisely to prevent this, but a package can still break within a major.
+- **Detection**: the Docker build runs `dep_smoke_test.py`, which resolves every third-party module and symbol the generated code imports and **fails the build** naming the offending one. Check the Cloud Build log for `FAIL: dependency import smoke test`; the `uv pip freeze` output printed just above it shows the versions actually installed.
+- **Fix**: cap the offending package below the breaking release in `PINNED_DEPS` and re-run. `python3 check_deps.py` shows the current floor / cap / resolved / latest for every requirement. Note that a cap belongs below the last version that is known to *work*, which is not always the newest one the resolver can reach -- `a2a-sdk` is held at `<0.4.0` for exactly this reason.
+- **Imported MCP servers**: cloned MCP server repos install their own dependencies into the same image. The build passes them a generated `constraints.txt` so a third-party requirement cannot upgrade past these caps.
+ 
+#### 7. Endless "The agent requires additional authorization" Prompt
 If every message comes back with the Gemini Enterprise authorization card, you complete consent, and the very next turn asks again — with no error anywhere in the UI, in Cloud Run, or in the agent logs:
 - **Cause**: Consent only validates the `client_id` and the redirect URI, so it succeeds even when the code-to-token exchange that Gemini Enterprise performs afterwards fails. The usual reason is a stored OAuth client secret that no longer matches the client (rotated or deleted). Because every demo in a project shares one OAuth client, this breaks **all** Workspace-authorization demos at once.
 - **Detection**: The setup script now probes the token endpoint with a throwaway code before wiring the credentials into Gemini Enterprise. `invalid_grant` means the credentials are good (only the fake code was rejected); `invalid_client` means the secret is stale.
