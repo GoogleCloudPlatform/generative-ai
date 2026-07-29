@@ -1894,17 +1894,25 @@ limitations under the License.
                 <p class="flex-1 text-[11px] text-indigo-300 leading-relaxed">⚠️ The Target Persona changed after this scenario was optimized. Re-run Optimize Prompt so the Target Role and scenario reflect the new persona.</p>
                 <button onclick="optimizeGoalWithMagicWand()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all active:scale-[0.97] whitespace-nowrap">🪄 Re-run Optimize Prompt</button>
               </div>
-              <!-- Edit Tab -->
-              <textarea id="userGoal" rows="10" oninput="localStorage.setItem('ge_generator_input', this.value); updateOptimizeRerunHint()"
-                class="w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-4 text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all shadow-inner leading-relaxed resize-y min-h-[160px] font-mono text-xs"
-                placeholder="Example: How to help a retail chain in London optimize seasonal stock based on demographic shifts and regional foot traffic trends?"></textarea>
-              <!-- Preview Tab -->
-              <div id="goalPreview"
-                class="hidden w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-5 text-gray-100 min-h-[160px] max-h-[500px] overflow-y-auto prose-sm leading-relaxed">
-              </div>
-              
+              <!-- Positioning context for the loader overlay. It has to be exactly
+                   these two panes: anchoring the overlay to the outer block needed a
+                   hardcoded top offset, which only lined up with the textarea while
+                   #optimizeRerunHint was hidden. With the hint shown the overlay
+                   started ~70px too high, so its rounded border and the textarea's
+                   own (blurred by backdrop-filter into a white-looking halo) read as
+                   two mismatched frames. -->
+              <div class="relative">
+                <!-- Edit Tab -->
+                <textarea id="userGoal" rows="10" oninput="localStorage.setItem('ge_generator_input', this.value); updateOptimizeRerunHint()"
+                  class="block w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-4 text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all shadow-inner leading-relaxed resize-y min-h-[160px] font-mono text-xs"
+                  placeholder="Example: How to help a retail chain in London optimize seasonal stock based on demographic shifts and regional foot traffic trends?"></textarea>
+                <!-- Preview Tab -->
+                <div id="goalPreview"
+                  class="hidden w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-5 text-gray-100 min-h-[160px] max-h-[500px] overflow-y-auto prose-sm leading-relaxed">
+                </div>
+
               <!-- Magic Wand Loader Overlay (Sleek & Minimalist) -->
-              <div id="magicWandOverlay" class="hidden absolute inset-x-0 bottom-0 top-[40px] flex flex-col items-center justify-center backdrop-blur-md bg-slate-950/85 rounded-2xl border border-white/5 transition-all duration-300 z-20">
+              <div id="magicWandOverlay" class="hidden absolute inset-0 flex-col items-center justify-center backdrop-blur-md bg-slate-950/85 rounded-2xl border border-gray-700 transition-all duration-300 z-20">
                 <div class="relative flex items-center justify-center mb-5">
                   <!-- Soft Sleek Pulse Glow -->
                   <span class="absolute inline-flex h-16 w-16 rounded-full bg-indigo-500/5 border border-indigo-500/10 animate-pulse opacity-70"></span>
@@ -1928,6 +1936,7 @@ limitations under the License.
                   <p id="magicWandStatus" class="text-xs font-semibold text-gray-200 tracking-wide font-sans transition-all duration-300">Analyzing business goal...</p>
                 </div>
                 <p class="text-[10px] text-gray-600 mt-1.5 font-inter">Optimizing scenario with Gemini Flash Lite</p>
+              </div>
               </div>
             </div>
           </div>
@@ -2967,6 +2976,21 @@ limitations under the License.
 
     let magicWandActiveRequest = null;
 
+    // Which language the optimized scenario should come back in. The optimizer
+    // used to detect this from the scenario text, and flash-lite got it wrong:
+    // an English Manhattan-retail template came back in German in 2 of 5 runs.
+    // Telling it the language outright removes the guess.
+    // Research wins while it is in play, because researchCompanyByDomain wrote
+    // the box in the research language, which need not match the hub selector.
+    function getOptimizeLanguage() {
+      if (cachedResearchData) {
+        var r = getResearchLangOverride() || cachedResearchData.detectedLanguage;
+        if (r) return r;
+      }
+      var sel = document.getElementById('langSelector');
+      return (sel && sel.value) || 'en';
+    }
+
     function optimizeGoalWithMagicWand() {
       const el = document.getElementById('userGoal');
       const rawGoal = el.value.trim();
@@ -3031,7 +3055,8 @@ limitations under the License.
           enableManagedAgent: document.getElementById('enableManagedAgent') ? document.getElementById('enableManagedAgent').checked : true,
           enableWorkspaceMcp: window.workspaceMcpIncluded || false,
           enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false,
-          persona: getSelectedPersona()
+          persona: getSelectedPersona(),
+          language: getOptimizeLanguage()
         });
     }
 
