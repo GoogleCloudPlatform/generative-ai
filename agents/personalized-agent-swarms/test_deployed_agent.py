@@ -203,7 +203,7 @@ SINGLE_TURN_TESTS: list[SingleTurnTest] = [
     # ── Multilingual ───────────────────────────────────────────────────
     SingleTurnTest(
         name="Multilingual — Spanish greeting",
-        user_message="Hola, ¿cuál es la capital de Francia?",
+        user_message="Hola, dime la capital de Francia.",
         expected_keywords=["París", "paris"],
     ),
 ]
