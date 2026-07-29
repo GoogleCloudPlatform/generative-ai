@@ -875,6 +875,7 @@ ipynb
 ipywebrtc
 IRAs
 isa
+isdir
 isess
 itable
 itables
@@ -1181,6 +1182,7 @@ msmarco
 msr
 MTL
 MTurk
+multiline
 multitool
 mundo
 Mvar
@@ -1359,6 +1361,7 @@ parseable
 passwort
 pastiched
 Pastra
+pathlib
 payslip
 paystub
 PBA
@@ -1432,6 +1435,7 @@ Pranav
 praw
 prcntg
 PRD
+proc
 Pré
 PREBROWSE
 preds
@@ -1465,6 +1469,7 @@ PYINK
 pymupdf
 pyo
 pypdf
+pypi
 pyplot
 pysftp
 pytorch
@@ -1543,6 +1548,7 @@ resil
 Resona
 retriable
 retryable
+returncode
 ribeye
 ricc
 Rimowa
@@ -1700,6 +1706,7 @@ Sparkline
 spearmanr
 SPII
 SPLADE
+splitlines
 sqkm
 sqm
 SRE
@@ -1731,6 +1738,8 @@ stt
 stuffie
 subclip
 SUBLANG
+submodule
+subprocess
 subviews
 subword
 suis
@@ -1777,6 +1786,7 @@ tcd
 TCEHY
 telework
 tema
+tempfile
 tencel
 Tencent
 terabyte
@@ -1894,9 +1904,11 @@ Unimicron
 Uniquify
 unlabel
 unmarshal
+unparseable
 unrtf
 unsloth
 Unsloth
+unterminated
 upsamples
 upsell
 Upserting
