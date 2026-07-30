@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.44-public',
+  APP_VERSION: 'v11.45-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -3376,6 +3376,16 @@ for tool in jq curl gcloud bq make uv git python3; do
   fi
 done
 
+# git must also be recent enough for the pinned agent-template fetch further
+# down: "git sparse-checkout" arrived in 2.25 and partial clone needs 2.19.
+# Without this gate an old git fails much later, inside the template fetch,
+# where the error is far harder to read.
+if ! git --version | awk '{split(\$3, gv, "."); exit !(gv[1] > 2 || (gv[1] == 2 && gv[2] >= 25))}'; then
+  echo "❌ Error: git \$(git --version | awk '{print \$3}') is too old; 2.25 or newer is required."
+  echo "   Cloud Shell is the supported environment for this script and ships a recent git."
+  exit 1
+fi
+
 # --- Network resiliency for package installation ---
 echo "⚙️  Configuring robust network timeouts for package resolution..."
 export UV_HTTP_TIMEOUT=600
@@ -4232,13 +4242,40 @@ GE_TPL_ROOT="$(pwd)/_ge_template"
 rm -rf "$GE_TPL_ROOT"
 git init -q "$GE_TPL_ROOT"
 git -C "$GE_TPL_ROOT" remote add origin "${CONFIG.TEMPLATE_REPO}"
-git -C "$GE_TPL_ROOT" sparse-checkout set --cone "${CONFIG.TEMPLATE_SUBDIR}" 2>/dev/null || true
-if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${templateRef}"; then
-  echo "❌ Could not fetch agent template ref '${templateRef}'"
-  echo "   from ${CONFIG.TEMPLATE_REPO}."
-  echo "   The pinned template version is unreachable. Ask the demo creator to"
-  echo "   regenerate this script (the app's TEMPLATE_REF may need updating)."
-  exit 1
+git -C "$GE_TPL_ROOT" sparse-checkout set --cone "${CONFIG.TEMPLATE_SUBDIR}"
+# The fetch runs in two tiers and keeps git's own message. A blob:none partial
+# clone is only an optimization, so a client or proxy that cannot do one falls
+# back to a plain shallow fetch instead of failing the whole setup. Keeping the
+# error output lets a real failure report what actually went wrong: every
+# non-zero exit here used to be reported as an unreachable pinned ref, which
+# sent users off to regenerate a script whose pin was perfectly fine.
+if ! GE_TPL_ERR=$(git -C "$GE_TPL_ROOT" fetch --depth 1 --filter=blob:none origin "${templateRef}" 2>&1); then
+  if ! GE_TPL_ERR=$(git -C "$GE_TPL_ROOT" fetch --depth 1 origin "${templateRef}" 2>&1); then
+    echo "❌ Could not fetch the agent template from ${CONFIG.TEMPLATE_REPO}"
+    echo "   at ref '${templateRef}'. git reported:"
+    echo "$GE_TPL_ERR" | sed 's/^/     /'
+    case "$GE_TPL_ERR" in
+      *"not our ref"*|*"couldn't find remote ref"*|*"unadvertised"*)
+        echo "   → That template version no longer exists in the repository."
+        echo "     Ask the demo creator to regenerate this script."
+        ;;
+      *"Could not resolve host"*|*"Failed to connect"*|*"Connection timed out"*|*"SSL"*|*"certificate"*|*"proxy"*)
+        echo "   → github.com is not reachable from this machine (network policy,"
+        echo "     proxy, or TLS interception). Run this script in Cloud Shell,"
+        echo "     which is the supported environment."
+        ;;
+      *"No space left"*)
+        echo "   → The disk is full. Free up space in $HOME and re-run."
+        ;;
+      *)
+        echo "   → Re-run this script in Cloud Shell, which is the supported"
+        echo "     environment. If it fails there too, please report the git"
+        echo "     output above."
+        ;;
+    esac
+    exit 1
+  fi
+  echo "    ⚠️  Partial clone is unsupported here; used a plain shallow fetch."
 fi
 git -C "$GE_TPL_ROOT" -c advice.detachedHead=false checkout -q FETCH_HEAD
 GE_TPL="$GE_TPL_ROOT/${CONFIG.TEMPLATE_SUBDIR}"

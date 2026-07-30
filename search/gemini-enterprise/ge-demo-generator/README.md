@@ -471,7 +471,23 @@ When you are done with the demo, see [Section 12: Cleanup](#12-cleanup) for inst
 ---
  
 ### Need Help?
-Refer to the sections above for comprehensive documentation, system architecture, and the developer guide.
+
+The sections above cover the documentation, the system architecture, and the developer guide. If they do not answer your question, use the table below.
+
+**Before you report a failing setup script:** the script prints the underlying error immediately _above_ the ❌ summary line. Those lines usually identify the cause on their own, so always include them.
+
+| What you need | Where to go |
+| --- | --- |
+| A bug or a question about **this sample** | [Open an issue](https://github.com/GoogleCloudPlatform/generative-ai/issues/new?template=bug-report.yml) in this repository. Enter `AGENTS.md` in the **File Name** field so the issue is routed to the owner of this sample automatically, and prefix the title with `[ge-demo-generator]`. |
+| A **Google Cloud product** problem (Gemini Enterprise, Cloud Run, BigQuery) | [Google Cloud Support](https://cloud.google.com/support). If you have a support contract, this is faster than GitHub. |
+| An **Agent Platform API** defect | [Google Issue Tracker](https://issuetracker.google.com/issues/new?component=1130925) |
+
+When you open an issue, please include:
+
+- the `Version:` line printed at the end of the setup script (for example, `v11.45-public`)
+- the agent-template ref the script printed (`📥 Fetching agent template (ref ...)`)
+- the output of `git --version`
+- whether you ran the script in **Cloud Shell**, which is the supported environment for the setup script
 
 ---
 
