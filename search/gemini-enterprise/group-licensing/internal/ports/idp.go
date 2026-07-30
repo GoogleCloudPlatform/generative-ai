@@ -19,7 +19,7 @@ package ports
 import (
 	"context"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
 // IdpClient is the port through which the service layer interacts

@@ -23,7 +23,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
 // validProjectID matches GCP project IDs: 6–30 chars, starts with a lowercase
