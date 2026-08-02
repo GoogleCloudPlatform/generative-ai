@@ -189,7 +189,7 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 |---|---|---|
 | `LOCATION` | `global` | Vertex AI Agent Platform API location (e.g., `us-central1`, `global`) |
 | `MODEL` | `gemini-3.6-flash` | Gemini model name for data generation |
-| `TEMPLATE_REPO` | this repository | Git URL the generated setup script fetches `agent_template/` from at run time |
+| `TEMPLATE_REPO` | this repository | Git **clone** URL the generated setup script fetches `agent_template/` from at run time, e.g. `https://github.com/GoogleCloudPlatform/generative-ai.git`. A GitHub browse URL (one containing `/tree/` or `/blob/`) is a web page, not a repository; such a value is reduced to the clone URL of the same repo |
 | `TEMPLATE_REF` | `main` | Branch, tag, or commit SHA of the agent template. A branch/tag is resolved to a concrete commit SHA at script-generation time (each generated script is pinned to that SHA); set a 40-hex SHA to hard-pin |
 | `TEMPLATE_SUBDIR` | `search/gemini-enterprise/ge-demo-generator/agent_template` | Repo path of the template directory |
 | `GITHUB_TOKEN` | (unset) | GitHub personal access token used for GitHub API calls when importing custom MCP servers from a repository URL. Only needed for private repos or to avoid unauthenticated rate limits |

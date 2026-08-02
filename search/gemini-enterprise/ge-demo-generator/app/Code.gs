@@ -74,6 +74,25 @@ function forceAuthorize() {
   return '✅ Authorization verified. Refresh the browser and try generating a demo!';
 }
 
+/**
+ * Reduces a GitHub URL to the clone URL that git can actually fetch from.
+ *
+ * TEMPLATE_REPO is set by hand in the Script Properties, and the URL a person
+ * has on screen at that moment is the browse URL of the template directory
+ * (https://github.com/OWNER/REPO/tree/main/path/to/agent_template). That is not
+ * a git remote: the fetch in the generated setup script dies with "repository
+ * not found" long after generation, on someone else's machine. Everything after
+ * OWNER/REPO is dropped so both forms work. Non-GitHub and SSH remotes are
+ * returned untouched.
+ */
+function normalizeGitRemoteUrl_(url) {
+  if (!url) return url;
+  const trimmed = String(url).trim();
+  const match = trimmed.match(
+    /^https?:\/\/(?:www\.)?github\.com\/([^\/\s]+)\/([^\/\s#?]+?)(?:\.git)?(?:[\/#?].*)?$/i);
+  return match ? 'https://github.com/' + match[1] + '/' + match[2] + '.git' : trimmed;
+}
+
 const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 const CONFIG = {
   PROJECT_ID: SCRIPT_PROPS.getProperty('PROJECT_ID'),
@@ -82,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.45-public',
+  APP_VERSION: 'v11.46-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -90,8 +109,9 @@ const CONFIG = {
   // each generated script, so scripts stay reproducible without this file
   // ever committing its own merge SHA. Set the TEMPLATE_REF Script Property
   // to a 40-hex SHA to hard-pin, or point TEMPLATE_REPO/TEMPLATE_REF at a
-  // fork/branch for pre-merge testing.
-  TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/GoogleCloudPlatform/generative-ai.git',
+  // fork/branch for pre-merge testing. TEMPLATE_REPO is normalized to a clone
+  // URL so that pasting a GitHub browse URL still produces a working script.
+  TEMPLATE_REPO: normalizeGitRemoteUrl_(SCRIPT_PROPS.getProperty('TEMPLATE_REPO')) || 'https://github.com/GoogleCloudPlatform/generative-ai.git',
   TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || 'main',
   TEMPLATE_SUBDIR: SCRIPT_PROPS.getProperty('TEMPLATE_SUBDIR') || 'search/gemini-enterprise/ge-demo-generator/agent_template',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
@@ -4258,6 +4278,13 @@ if ! GE_TPL_ERR=$(git -C "$GE_TPL_ROOT" fetch --depth 1 --filter=blob:none origi
       *"not our ref"*|*"couldn't find remote ref"*|*"unadvertised"*)
         echo "   → That template version no longer exists in the repository."
         echo "     Ask the demo creator to regenerate this script."
+        ;;
+      *"not found"*|*"Authentication failed"*|*"could not read Username"*)
+        echo "   → That URL is not a git remote this machine can clone."
+        echo "     A GitHub browse URL (one containing /tree/ or /blob/) is a web"
+        echo "     page, not a repository; the clone URL ends in .git. Ask the demo"
+        echo "     creator to check the TEMPLATE_REPO Script Property of the app"
+        echo "     and regenerate this script."
         ;;
       *"Could not resolve host"*|*"Failed to connect"*|*"Connection timed out"*|*"SSL"*|*"certificate"*|*"proxy"*)
         echo "   → github.com is not reachable from this machine (network policy,"
