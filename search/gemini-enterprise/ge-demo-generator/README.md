@@ -174,6 +174,8 @@ These are already declared in `appsscript.json` and will be auto-enabled when th
 
 This codebase contains **no hardcoded parameters**. All configuration is managed via **Script Properties**.
 
+A complete setup is **two properties**: `PROJECT_ID` and `LOG_SHEET_URL`. Everything in §6.2 has a working default and should be left unset.
+
 ### 6.1 Mandatory Properties
 
 | Property | Description |
@@ -184,6 +186,8 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 > **Important**: Both properties are checked at startup. If any are missing, the app displays a `SetupError.html` page with instructions instead of the main UI.
 
 ### 6.2 Optional Properties
+
+**You do not need to set any of these.** Every property below has a working default, and leaving it unset is the supported configuration — it is what a normal deployment looks like. Set one only when you specifically want the behaviour it describes, and remove it again once you no longer do.
 
 | Property | Default | Description |
 |---|---|---|
@@ -198,8 +202,7 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 > **Note**: The three `TEMPLATE_*` properties override the defaults baked into
 > `Code.gs`. Setting them lets a deployed app switch template sources (for
 > example to a fork during development, or to this repository's latest release
-> commit) without redeploying the Apps Script code. Leaving all three unset is
-> the normal configuration.
+> commit) without redeploying the Apps Script code.
 
 `TEMPLATE_REPO` is a git **clone** URL — the string you would hand to
 `git clone`, ending in `.git`. Browsing to `agent_template/` on github.com
