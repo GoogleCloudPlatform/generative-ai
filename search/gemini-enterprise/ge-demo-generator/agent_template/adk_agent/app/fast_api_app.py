@@ -676,6 +676,72 @@ def _has_populated_suggestions(parts) -> bool:
     return False
 
 
+def _iter_begin_renderings(parts):
+    # Yields every beginRendering dict found in a list of a2a Parts.
+    for _p in parts:
+        try:
+            _root = getattr(_p, 'root', None)
+            if not (_root and isinstance(_root, a2a_types.DataPart)):
+                continue
+            _data = _root.data
+            _items = _data if isinstance(_data, list) else [_data]
+            for _item in _items:
+                if isinstance(_item, dict) and isinstance(_item.get('beginRendering'), dict):
+                    yield _item['beginRendering']
+        except Exception:
+            continue
+
+
+def _orphan_card_surface_ids(parts):
+    # Surface ids that were OPENED with beginRendering but never populated by a
+    # surfaceUpdate anywhere in the same artifact. GE renders such a surface as
+    # nothing, so the card silently disappears and only the prose survives - the
+    # exact failure mode when a model emits [beginRendering, dataModelUpdate] and
+    # then moves straight on to the next block. Suggestions are excluded: they
+    # have their own dedicated recovery path (_chips_ok / [chip_reprompt]).
+    _opened, _filled = [], set()
+    for _br in _iter_begin_renderings(parts):
+        _sid = _br.get('surfaceId') or ''
+        if _sid and not _sid.startswith('suggestions') and _sid not in _opened:
+            _opened.append(_sid)
+    for _su in _iter_surface_updates(parts):
+        _filled.add(_su.get('surfaceId') or '')
+    return [_s for _s in _opened if _s not in _filled]
+
+
+def _is_surface_part(part, surface_ids) -> bool:
+    # True iff EVERY a2ui message carried by this part targets one of surface_ids
+    # (so dropping the part cannot take an unrelated surface down with it).
+    try:
+        _root = getattr(part, 'root', None)
+        if not (_root and isinstance(_root, a2a_types.DataPart)):
+            return False
+        _data = _root.data
+        _items = _data if isinstance(_data, list) else [_data]
+        _seen = False
+        for _item in _items:
+            if not isinstance(_item, dict):
+                continue
+            for _k in ('beginRendering', 'surfaceUpdate', 'dataModelUpdate', 'deleteSurface'):
+                _m = _item.get(_k)
+                if isinstance(_m, dict):
+                    _seen = True
+                    if (_m.get('surfaceId') or '') not in surface_ids:
+                        return False
+        return _seen
+    except Exception:
+        return False
+
+
+def _has_populated_card(parts) -> bool:
+    # True iff some NON-suggestions surface carries a surfaceUpdate with at least
+    # one component (i.e. a card that will actually render).
+    for _su in _iter_surface_updates(parts):
+        if not (_su.get('surfaceId') or '').startswith('suggestions') and (_su.get('components') or []):
+            return True
+    return False
+
+
 def _has_interactive_card(parts) -> bool:
     # True iff some NON-suggestions surface contains Button components.
     # Mirrors the prompt's A2UI CARD INTERACTION EXCEPTION: when a card carries
@@ -847,6 +913,26 @@ _A2UI_CHILD_PROP_LIFT = {
     'List': ('direction', 'alignment'),
 }
 
+_A2UI_COMPONENT_PROPS = {}
+
+def _a2ui_component_props():
+    # Lazily index the selected catalog's per-component property names so the
+    # healer can prune model-invented properties instead of losing the card.
+    global _A2UI_COMPONENT_PROPS
+    if _A2UI_COMPONENT_PROPS:
+        return _A2UI_COMPONENT_PROPS
+    try:
+        _cs = getattr(a2ui_selected_catalog, 'catalog_schema', None)
+        _comps = _cs.get('components') if isinstance(_cs, dict) else None
+        if isinstance(_comps, dict):
+            for _cn, _csch in _comps.items():
+                if (isinstance(_csch, dict) and isinstance(_csch.get('properties'), dict)
+                        and _csch.get('additionalProperties') is False):
+                    _A2UI_COMPONENT_PROPS[_cn] = set(_csch['properties'].keys())
+    except Exception:
+        _A2UI_COMPONENT_PROPS = {}
+    return _A2UI_COMPONENT_PROPS
+
 def _normalize_a2ui_shapes(msg):
     if not isinstance(msg, dict):
         return msg
@@ -885,6 +971,28 @@ def _normalize_a2ui_shapes(msg):
                     _v = _ch.pop(_k)
                     if _k in _allowed and _k not in _spec:
                         _spec[_k] = _v
+            # (d) prune model-invented top-level properties (v11.50).
+            # Confirmed live on a batch-editor turn: MultipleChoice with a
+            # top-level 'label' (legal on TextField/CheckBox/Slider, NOT on
+            # MultipleChoice in the 0.8 catalog) fails validation with
+            # "Additional properties are not allowed" and the gate then
+            # drops the WHOLE surfaceUpdate - the user gets prose plus
+            # chips and no card, on the original turn AND on every
+            # re-prompt, because the model keeps making the same mistake.
+            # The stray property is decoration; the card is not. Schema
+            # driven: only prunes when the selected catalog declares the
+            # component with additionalProperties=false, so a legal
+            # property can never be stripped.
+            _known = _a2ui_component_props().get(_cname)
+            if _known:
+                _extras = [_k for _k in _spec.keys() if _k not in _known]
+                for _k in _extras:
+                    _spec.pop(_k, None)
+                if _extras:
+                    try:
+                        logger.log_text('[a2ui_heal] pruned unknown prop(s) ' + ', '.join(sorted(_extras)) + ' from ' + _cname)
+                    except Exception:
+                        pass
     return msg
 
 def _a2ui_msg_schema_ok(msg):
@@ -1094,6 +1202,14 @@ _MA_PLANNER_OVERRIDE = (
     "by the remaining rules (usually ANALYSIS or QUICK) unless the message ALSO contains a "
     "genuine autonomous signal (live web research, a downloadable office/PDF file, a Workspace "
     "action, or a computed what-if SIMULATOR whose model coefficients must be derived by code). "
+    "EXCLUSION - READING AN ATTACHED IMAGE OR DOCUMENT IS NOT AUTONOMOUS: when the starting "
+    "point is content the user attached to THIS chat - a photo, screenshot, scanned form, fax, "
+    "receipt, invoice, order sheet, or any uploaded document to be read, transcribed, matched "
+    "against internal data, or turned into a quote / order / record - the assistant handles it "
+    "NATIVELY and INLINE, because only the assistant can see the attachment; the autonomous "
+    "agent runs in a separate sandbox with NO access to it, so delegating guarantees a wrong "
+    "answer. Such a request is NEVER AUTONOMOUS - classify it by the remaining rules (usually "
+    "QUICK or ANALYSIS) even if a later step would produce a file or a Workspace action. "
     + _MA_CU_BROWSER_EXCLUSION +
     "FOR AUTONOMOUS, return these ADDITIONAL keys instead of the analysis fields: "
     "card_title (a SHORT card heading of 3 to 6 words, e.g. the localized form of "
@@ -1204,6 +1320,27 @@ def _extract_user_text(run_args):
         return (" ".join(_typed)).strip()
     except Exception:
         return ""
+
+def _message_has_attachment(run_args):
+    # True when the turn carries a non-text part the user attached in chat - an
+    # image, screenshot, scanned form, PDF, and so on. Only THIS process can see
+    # such an attachment: the autonomous sandbox never receives it, and the
+    # pre-flight classifier is text-only, so an attached turn must never be
+    # delegated no matter how the classifier read the words around it.
+    try:
+        _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
+        if _nm is None:
+            return False
+        for _p in (getattr(_nm, "parts", None) or []):
+            if getattr(_p, "text", None):
+                continue
+            for _attr in ("inline_data", "file_data"):
+                _d = getattr(_p, _attr, None)
+                if _d is not None and (getattr(_d, "mime_type", None) or getattr(_d, "file_uri", None) or getattr(_d, "data", None)):
+                    return True
+    except Exception:
+        return False
+    return False
 
 def _is_preflight_passthrough(text):
     # Messages that must reach the agent unchanged (already a user choice).
@@ -1401,7 +1538,13 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         key server-side with path references already resolved to data-model
         values, so Start sends the original scope (literal) plus q<i>/a<i>/s<i>
         keys and the server composes the final brief deterministically in the
-        ra-press SYSTEM NOTE."""
+        ra-press SYSTEM NOTE.
+
+        v11.45: a context key that collides with a component id comes back from the
+        GE client as the literal key "[object Object]" (the client resolves the key
+        against its component registry and stringifies the match), silently losing
+        that entry. The question label therefore travels as bq<i> while the question
+        Text component keeps id qt<i> - no key/id pair may ever be equal."""
         try:
             def _g(_k, _d):
                 _v = plan.get(_k)
@@ -1457,7 +1600,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     # chips bound to /form/a<i>. No pre-selection (the chip data-model
                     # shape is client-managed); an untouched question falls back to
                     # its suggestion server-side via the s<i> context key.
-                    _qid = "q" + str(_qi)
+                    _qid = "qt" + str(_qi)
                     _children.append(_qid)
                     _comps.append({"id": _qid, "component": {"Text": {"text": {"literalString": _q}, "usageHint": "body"}}})
                     _oitems = []
@@ -1472,7 +1615,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     _comps.append({"id": _fid, "component": {"TextField": {"label": {"literalString": _q}, "text": {"path": "/form/" + _ak}}}})
                     if _s:
                         _dm.append({"key": _ak, "valueString": _s})
-                _start_ctx.append({"key": "q" + str(_qi), "value": {"literalString": _q}})
+                _start_ctx.append({"key": "bq" + str(_qi), "value": {"literalString": _q}})
                 _start_ctx.append({"key": _ak, "value": {"path": "/form/" + _ak}})
                 if _s:
                     _start_ctx.append({"key": "s" + str(_qi), "value": {"literalString": _s}})
@@ -1497,11 +1640,18 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             return None
 
     def _extract_briefing_answers(run_args):
-        # Harvests the q<i>/a<i>/s<i> keys a Start press carried in its userAction
-        # context: q<i> is the question (literal), a<i> the user's answer (path
+        # Harvests the bq<i>/a<i>/s<i> keys a Start press carried in its userAction
+        # context: bq<i> is the question (literal), a<i> the user's answer (path
         # reference, resolved client-side at press time), s<i> the classifier's
         # suggested default. Empty answers fall back to the suggestion; chips may
         # deliver the selection as a JSON array string, which is normalized here.
+        #
+        # The loop is driven by the ANSWER, never by the question label. Until
+        # v11.45 the label travelled as q<i>, which collides with the question Text
+        # component id and reached the server as "[object Object]" - gating on it
+        # discarded every answer the user had just picked. The label is now optional
+        # (legacy q<i> is still accepted) and a missing one only costs the wording
+        # of the recap line, not the answer itself.
         _pairs = []
         try:
             _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
@@ -1516,9 +1666,6 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 except Exception:
                     continue
                 for _i in range(3):
-                    _q = _ctx.get("q" + str(_i))
-                    if not (isinstance(_q, str) and _q.strip()):
-                        continue
                     _a = _ctx.get("a" + str(_i))
                     if isinstance(_a, list):
                         _a = ", ".join(str(_x) for _x in _a)
@@ -1530,11 +1677,17 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                         except Exception:
                             pass
                     _a = _a.strip() if isinstance(_a, str) else ""
+                    _s = _ctx.get("s" + str(_i))
+                    _s = _s.strip() if isinstance(_s, str) else ""
                     if not _a:
-                        _s = _ctx.get("s" + str(_i))
-                        _a = _s.strip() if isinstance(_s, str) else ""
-                    if _a:
-                        _pairs.append((_q.strip(), _a))
+                        _a = _s
+                    if not _a:
+                        continue
+                    _q = _ctx.get("bq" + str(_i))
+                    if not (isinstance(_q, str) and _q.strip()):
+                        _q = _ctx.get("q" + str(_i))
+                    _q = _q.strip() if (isinstance(_q, str) and _q.strip()) else ("Clarification " + str(_i + 1))
+                    _pairs.append((_q, _a))
                 if _pairs:
                     break
         except Exception:
@@ -2403,6 +2556,18 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             if not _gate_skip and any(_gate_l.startswith(_p) for _p in _CMD_CHIP_PREFIXES):
                 _gate_skip = True
                 logger.log_text("[preflight_gate] command-chip passthrough: " + _gate_l[:80])
+            # v11.45: a turn carrying an attachment (photo, screenshot, scanned
+            # form, fax, PDF) always goes STRAIGHT to the agent. The classifier is
+            # text-only, so it reads only the words around the attachment and
+            # reliably mis-fires: a fax-to-quote request was classified AUTONOMOUS
+            # and short-circuited into the briefing card, when the user expected
+            # the root agent to read the image inline and answer with a card. No
+            # card the gate can render is right here - background delegation
+            # cannot see the attachment at all, and an inline plan card only adds
+            # a click to work the agent was already going to do inline.
+            if not _gate_skip and _message_has_attachment(run_args):
+                _gate_skip = True
+                logger.log_text("[preflight_gate] attachment present - inline passthrough, no gate card")
             if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 # Autonomous Briefing card press (context ra=1): skip re-carding
                 # and pin the delegation deterministically via a system note.
@@ -3956,11 +4121,43 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             _tp, _mp = [], []
             _found = False
             _sp = A2uiStreamParser(catalog=a2ui_selected_catalog)
+            _parse_failed = False
             try:
                 _chunk = _sanitize_a2ui_text_icons(_text) if '<a2ui-json>' in _text else _text
                 _rps = _sp.process_chunk(_chunk)
-            except Exception:
+            except Exception as _pe:
+                # v11.49: mirror the main loop's CRITICAL FALLBACK instead of
+                # swallowing the error. Confirmed in logs: a card re-prompt
+                # returned a complete tagged card, but the parser raised the
+                # same schema ValueError as the sibling turns ('alignment',
+                # 'distribution' unexpected), _rps became [] silently, and the
+                # tagged block was unreachable by the untagged net below (it
+                # requires '<a2ui-json>' NOT in text) - so the recovery run
+                # ended "no usable card" and the user got prose without the
+                # editor. Healing must run on the extracted JSON here exactly
+                # as it does in the main loop.
+                logger.log_text("[report_extract] A2UI stream parse error (" + type(_pe).__name__ + "): " + str(_pe))
                 _rps = []
+                _parse_failed = True
+            if _parse_failed and '<a2ui-json>' in _text:
+                import re as _re
+                _tag_re = _re.compile(r'<a2ui-json>(.*?)</a2ui-json>', _re.DOTALL)
+                _plain_txt = _tag_re.sub('', _text).strip()
+                if _plain_txt and not (
+                        (_plain_txt.startswith('{') or _plain_txt.startswith('['))
+                        and ("'content':" in _plain_txt or "'parts':" in _plain_txt)):
+                    _tp.append(a2a_types.Part(root=a2a_types.TextPart(text=_plain_txt)))
+                for _blk in _tag_re.findall(_text):
+                    _pobj = _parse_loose_json(_blk)
+                    if _pobj is None:
+                        continue
+                    _pitems = _pobj if isinstance(_pobj, list) else [_pobj]
+                    for _pit in _heal_a2ui_message_list(_pitems):
+                        if isinstance(_pit, dict):
+                            _mp.extend(create_a2ui_parts(_pit))
+                            _found = True
+                if _found:
+                    logger.log_text("[report_extract] fallback recovered " + str(len(_mp)) + " part(s) from tagged block")
             for _rp in _rps:
                 if _rp.text and _rp.text.strip():
                     _stripped = _rp.text.strip()
@@ -4055,6 +4252,18 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             "conversation. Do NOT repeat the report, do NOT output any other text, "
             "cards, or tool calls. Write the button labels in the SAME language you "
             "have been using with the user."
+        )
+        # v11.45: card-only re-prompt for the orphan-surface recovery below.
+        _SYNTH_CARD_MSG = (
+            "Your previous response opened an A2UI surface with beginRendering but "
+            "never sent its surfaceUpdate, so the card rendered as nothing and the "
+            "user saw only your text. Output ONLY that card now, complete, in a "
+            "single <a2ui-json> block: the beginRendering message, the "
+            "dataModelUpdate message if the card binds form values, AND the "
+            "surfaceUpdate message whose components array defines the full "
+            "component tree including the root id. Do NOT repeat the report, do NOT "
+            "output suggestion chips, other text, or tool calls. Write any labels "
+            "in the SAME language you have been using with the user."
         )
         _MAX_SYNTH_RETRIES = 3
         _synth_try = 0
@@ -4249,6 +4458,84 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 logger.log_text("[ui_only_guard] promoted prior model text to prevent blank UI-only render (len=" + str(len(_promoted)) + ")")
             else:
                 logger.log_text("[ui_only_guard] UI-only artifact (text=0) and no reusable model text captured - turn may render blank")
+
+        # =============================================================================
+        # Card recovery (v11.45): the mirror image of the chip recovery below, for
+        # ordinary card surfaces. Confirmed in logs on a batch-editor turn: the
+        # model emitted [beginRendering, dataModelUpdate] and then moved straight
+        # on to the suggestions block, never sending the surfaceUpdate. GE opened
+        # an empty surface, so the user got prose plus chips and no card at all.
+        # (a) Drop the orphan parts - an unpopulated surface can only render blank
+        # and, being a real surfaceId, it would also pin that id for later turns.
+        # (b) Run ONE card-only re-prompt and keep only the card parts it returns.
+        # Runs BEFORE the chip recovery so a recovered card with its own buttons
+        # correctly suppresses the chip re-prompt, and before the G1/H1 caches so
+        # replays and GE "Regenerate" serve the card-complete version.
+        # =============================================================================
+        _orphan_cards = _orphan_card_surface_ids(_normal_media)
+        if _orphan_cards and (not _timed_out) and (not _inline_converted):
+            _oc_ids = set(_orphan_cards)
+            _oc_dropped = [p for p in _normal_media if _is_surface_part(p, _oc_ids)]
+            if _oc_dropped:
+                _normal_media = [p for p in _normal_media if not _is_surface_part(p, _oc_ids)]
+                artifact_media_parts = [p for p in artifact_media_parts if not _is_surface_part(p, _oc_ids)]
+                artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
+            logger.log_text(
+                "[card_reprompt] orphan surface(s) opened without surfaceUpdate: "
+                + ", ".join(_orphan_cards) + " - dropped " + str(len(_oc_dropped)) + " part(s)"
+            )
+            if (not _auth_flow) and (not _fatal_config_error):
+                logger.log_text("[card_reprompt] one card-only re-prompt")
+                _cd_args = dict(run_args)
+                _cd_args['new_message'] = genai_types.Content(role='user', parts=[genai_types.Part(text=_SYNTH_CARD_MSG)])
+                _cd_media = []
+                try:
+                    async for _cd_event in _run_with_auto_continue(initial_args=_cd_args):
+                        if _timed_out or _inline_converted:
+                            break
+                        _cd_content = getattr(_cd_event, 'content', None)
+                        if not (_cd_content and hasattr(_cd_content, 'parts')):
+                            continue
+                        for _cd_part in _cd_content.parts:
+                            if getattr(_cd_part, 'text', None):
+                                _cd_tp, _cd_mp = _extract_report_parts(_cd_part.text)
+                                _cd_media.extend(_cd_mp)
+                except Exception as _cd_err:
+                    logger.log_text("[card_reprompt] error during card re-prompt: " + str(_cd_err))
+                # Keep ONLY card parts, and only if they are populated AND free of
+                # fresh orphans - a re-prompt that repeats the same mistake must
+                # not reintroduce a blank surface.
+                _recovered_cards = [p for p in _cd_media if not _is_suggestions_part(p)]
+                if (_recovered_cards and _has_populated_card(_recovered_cards)
+                        and (not _orphan_card_surface_ids(_recovered_cards))
+                        and (not _inline_converted)):
+                    # Stream as a WORKING event so GE renders the surface from the
+                    # live stream, mirroring the chip recovery below.
+                    try:
+                        _cd_evt = TaskStatusUpdateEvent(
+                            task_id=context.task_id,
+                            context_id=context.context_id,
+                            status=TaskStatus(
+                                state=TaskState.working,
+                                message=Message(
+                                    message_id=str(uuid.uuid4()),
+                                    role=Role.agent,
+                                    parts=_recovered_cards,
+                                ),
+                                timestamp=datetime.now(timezone.utc).isoformat(),
+                            ),
+                            final=False,
+                        )
+                        task_result_aggregator.process_event(_cd_evt)
+                        await event_queue.enqueue_event(_cd_evt)
+                    except Exception as _cd_stream_err:
+                        logger.log_text("[card_reprompt] streaming recovered card failed: " + str(_cd_stream_err))
+                    artifact_media_parts.extend(_recovered_cards)
+                    _normal_media = _normal_media + _recovered_cards
+                    artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
+                    logger.log_text("[card_reprompt] recovered " + str(len(_recovered_cards)) + " card part(s)")
+                else:
+                    logger.log_text("[card_reprompt] re-prompt yielded no usable card - leaving turn as-is")
 
         # =============================================================================
         # Chip recovery (v10.70): intermittently the model omits the Next Actions

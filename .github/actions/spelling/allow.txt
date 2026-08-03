@@ -86,6 +86,7 @@ Arborio
 archiv
 Arepa
 aretrieve
+argjson
 argmax
 arguana
 arize
@@ -339,6 +340,7 @@ Crossbody
 CROSSORG
 crosstab
 csa
+csch
 cse
 Csvg
 cta
@@ -375,6 +377,7 @@ dbln
 dcg
 dcl
 DCR
+dcr
 ddata
 ddbb
 ddl
@@ -580,6 +583,7 @@ firewalls
 Fishburne
 FITNESSS
 fixmycar
+fixup
 flac
 Flahs
 Flatform
@@ -1137,6 +1141,7 @@ mic
 MICOA
 microsite
 mics
+middot
 Milito
 millis
 Minato
@@ -1323,6 +1328,7 @@ Oort
 OOTB
 openai
 openfda
+openssl
 Oppo
 opsz
 oraw
@@ -1402,8 +1408,10 @@ Pilates
 pincodes
 Pipedrive
 Pistorius
+pitems
 pixmap
 pjson
+pkce
 pkl
 playlists
 PLLu
@@ -1414,6 +1422,7 @@ plpgsql
 plt
 pmb
 PNGs
+pobj
 podcast
 podcasts
 podes
@@ -1435,6 +1444,7 @@ Pranav
 praw
 prcntg
 PRD
+prm
 Pré
 PREBROWSE
 preds
@@ -1560,6 +1570,7 @@ Rizzoli
 RLHF
 rlines
 rlog
+rmcp
 RMSE
 rmsg
 RNN
@@ -1740,6 +1751,8 @@ subclip
 SUBLANG
 submodule
 subprocess
+subschema
+subschemas
 subviews
 subword
 suis
@@ -1906,6 +1919,7 @@ Uniquify
 unlabel
 unmarshal
 unparseable
+unquote
 unrtf
 unsloth
 Unsloth

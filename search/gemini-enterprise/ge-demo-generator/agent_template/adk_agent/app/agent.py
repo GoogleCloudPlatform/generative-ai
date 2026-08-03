@@ -174,12 +174,34 @@ def _safe_dereference_schema(schema: dict) -> dict:
                 elif node[key]:
                     del node[key]
                     node.setdefault("type", "string")
-        # Process children recursively
-        for k, v in list(node.items()):
-            if isinstance(v, dict):
-                node[k] = _ensure_types(v)
-            elif isinstance(v, list):
-                node[k] = [_ensure_types(i) if isinstance(i, dict) else i for i in v]
+        # Recurse into the positions that actually hold subschemas (v11.48).
+        # The previous version walked EVERY dict value, so it also walked the
+        # "properties" MAP as if the map itself were a schema node. For a tool
+        # with a property literally named "properties" (Notion create-pages /
+        # update-page) that map then looked like a node whose "properties" key
+        # held the real subschema, and the shorthand fixup below rewrote that
+        # subschema's own "type": "object" and "description": "..." strings
+        # into {"type": "object"} / {"type": "<the description>"} dicts. The
+        # declaration then failed _ExtendedJSONSchema validation and every
+        # turn died with "Dynamic node root_agent failed" -- no agent reply.
+        # Same hazard for a property named "items", "enum" or "default": the
+        # type inference at the end of this function would fire on the map.
+        for _map_key in ("properties", "$defs", "definitions", "patternProperties"):
+            _map_val = node.get(_map_key)
+            if isinstance(_map_val, dict):
+                for _sub_name, _sub in list(_map_val.items()):
+                    if isinstance(_sub, dict):
+                        _map_val[_sub_name] = _ensure_types(_sub)
+        for _one_key in ("items", "additionalProperties", "propertyNames", "not", "contains"):
+            _one_val = node.get(_one_key)
+            if isinstance(_one_val, dict):
+                node[_one_key] = _ensure_types(_one_val)
+            elif isinstance(_one_val, list):
+                node[_one_key] = [_ensure_types(i) if isinstance(i, dict) else i for i in _one_val]
+        for _list_key in ("anyOf", "oneOf", "allOf", "prefixItems"):
+            _list_val = node.get(_list_key)
+            if isinstance(_list_val, list):
+                node[_list_key] = [_ensure_types(i) if isinstance(i, dict) else i for i in _list_val]
         # Ensure every property in 'properties' is a valid schema dict
         if "properties" in node and isinstance(node["properties"], dict):
             for prop_name, prop_schema in list(node["properties"].items()):
@@ -233,6 +255,7 @@ bigquery_toolset = tools.get_bigquery_mcp_toolset()
 firestore_toolset = tools.get_firestore_mcp_toolset()
 knowledge_catalog_toolset = tools.get_knowledge_catalog_mcp_toolset()
 custom_mcp_toolsets = tools.get_custom_mcp_toolsets()
+remote_mcp_toolsets = tools.get_remote_mcp_toolsets()
 slack_mcp_toolset = tools.get_slack_mcp_toolset()
 
 
@@ -486,6 +509,8 @@ CRITICAL OPERATIONAL RULES:
     * For database updates in BigQuery or Firestore (insert/update/delete/merge): You MUST present a confirmation card with <a2ui-json> tags showing before/after data and approve/reject Buttons. NEVER ask for confirmation in plain text.
     * BATCH APPROVAL SELECTION (CRITICAL): When the confirmation covers MULTIPLE proposed items (e.g. a batch of draft orders), the card MUST let the user choose WHICH items to approve — use a MultipleChoice (variant: "checkbox", maxAllowedSelections = item count, selections bound to a /form path) or per-row CheckBox components, with the confirm Button's action context carrying the selected values. All-or-nothing batch confirmations are FORBIDDEN when the items are independently actionable.
     * At the END of EVERY response, you MUST append suggestion chips in a separate <a2ui-json> block with surfaceId "suggestions" containing 3-4 contextual follow-up Buttons. The chip block MUST be COMPLETE: include BOTH the beginRendering message AND the surfaceUpdate message with all Button components in the SAME block — never emit beginRendering alone. NEVER write any plain text or markdown headers (like "Next Actions", "💡 Next Actions", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. NEVER nest components inside a Button's 'child' property; 'child' MUST always be a flat string pointing to the ID of a separately defined Text component, and that Text component MUST be included in the SAME surfaceUpdate components array — a Button whose label Text is missing renders as a BLANK button.
+    * EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions): beginRendering only OPENS an empty surface; the components arrive via surfaceUpdate. EVERY <a2ui-json> block MUST contain BOTH the beginRendering message AND the surfaceUpdate message with the full component tree for that same surfaceId, in the SAME block. A dataModelUpdate is NOT a substitute — emitting [beginRendering, dataModelUpdate] and then moving on to the next block renders NOTHING and the user sees only your prose. This is the most common cause of a silently missing card: before closing any <a2ui-json> block, confirm it contains a surfaceUpdate whose components array defines the root id named in beginRendering.
+    * ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL): in a Button action's "context", every "key" MUST differ from every component "id" in the same card. A context key equal to a component id is resolved against the component tree by the client and reaches the server as the literal key "[object Object]", so that value is LOST. Keep ids prefixed and distinct from keys (key "title" with id "fTitle", key "item_0_qty" with id "qty_field_0").
     * If you are unsure whether to use A2UI, USE IT. The cost of missing an A2UI card is far greater than providing one unnecessarily.
     * CONTEXT-AWARE ELEMENT SELECTION (CRITICAL): Choose the most appropriate A2UI element for each piece of content. Refer to the A2UI schema examples provided in your system prompt. General guidelines:
       - Tabular data (query results, comparisons, rankings): Use DataTable or structured cards with rows and columns. Never dump raw text tables.
@@ -603,10 +628,21 @@ gen_instruction = "\n" + _read_generated_instruction()
 # --- Instruction sections for optional toolsets (replaced below) ---
 _custom_mcp_sections = ""
 for _mcp_i, _mcp in enumerate(tools.get_mcp_config()):
-    if _mcp.get("type") == "remote":
+    if _mcp.get("type") == "remote" and _mcp.get("auth_type") == "oauth2_slack":
         _custom_mcp_sections += (str(4 + _mcp_i) + ". **Slack MCP Toolset**: Search channels & messages, send messages, manage canvases, and access user profiles.\n"
                                  "   - Available Tools: Dynamically discovered at runtime from Slack MCP Server.\n"
                                  "   - Use this toolset for queries about Slack messages, channels, users, and canvases.\n")
+    elif _mcp.get("type") == "remote":
+        # Managed remote MCP server. Tool names are prefixed with the server
+        # slug so the model can tell several remote toolsets apart.
+        _rm_name = _mcp.get("name") or "Remote MCP"
+        _rm_caps = ", ".join(_mcp.get("capabilities") or []) or "Dynamically discovered at runtime."
+        _rm_desc = _mcp.get("description") or ("Access data and actions in the " + _rm_name + " MCP server.")
+        _custom_mcp_sections += (str(4 + _mcp_i) + ". **" + _rm_name + " MCP Toolset** (managed remote server at " +
+                                 _mcp.get("endpoint_url", "") + "): " + _rm_desc + "\n"
+                                 "   - Available Tools: " + _rm_caps + "\n"
+                                 "   - Tool names from this server are prefixed with " + _mcp.get("prefix", "") + "_\n"
+                                 "   - Use this toolset for queries that need data or actions inside " + _rm_name + ".\n")
     else:
         _custom_mcp_sections += (str(4 + _mcp_i) + ". **Custom MCP Toolset #" + str(_mcp_i + 1) + " (" + _mcp.get("repo_name", "custom") + ")**: Access data in the custom MCP server.\n"
                                  "   - Available Tools: Dynamically discovered at runtime.\n"
@@ -1043,7 +1079,7 @@ def _strip_part_metadata(callback_context, llm_request):
     return None
 
 # --- Shared tools list ---
-_all_tools = [maps_toolset, bigquery_toolset, firestore_toolset, knowledge_catalog_toolset, tools.generate_image, slack_mcp_toolset] + custom_mcp_toolsets
+_all_tools = [maps_toolset, bigquery_toolset, firestore_toolset, knowledge_catalog_toolset, tools.generate_image, slack_mcp_toolset] + custom_mcp_toolsets + remote_mcp_toolsets
 if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
     _all_tools += [tools.get_gmail_mcp_toolset(), tools.get_drive_mcp_toolset(), tools.get_calendar_mcp_toolset(), tools.get_chat_mcp_toolset(), tools.get_people_mcp_toolset()]
 _all_tools = [t for t in _all_tools if t is not None]
