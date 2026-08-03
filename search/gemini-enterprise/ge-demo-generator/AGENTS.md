@@ -273,7 +273,11 @@ Safety nets — keep all three working:
 
 Pre-merge testing: point the `TEMPLATE_REPO` / `TEMPLATE_REF` Script
 Properties at the fork/branch under review (resolution then pins the fork
-branch tip). Delete both properties after the upstream merge.
+branch tip). `TEMPLATE_REPO` is the clone URL of the fork
+(`https://github.com/OWNER/generative-ai.git`), never the browse URL of the
+template directory — the latter is a web page and every script generated while
+it is set dies at the template fetch. Delete both properties after the upstream
+merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
 
 ## 5. Release checklist
 

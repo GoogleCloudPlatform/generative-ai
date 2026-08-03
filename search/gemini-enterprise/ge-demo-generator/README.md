@@ -41,9 +41,9 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - [3. Apps Script Project Setup](#3-apps-script-project-setup)
 - [4. Deploying Code to Apps Script](#4-deploying-code-to-apps-script)
 - [5. Google Cloud Project Setup](#5-google-cloud-project-setup)
-- [6. Script Properties (Zero Hardcoding)](#6-script-properties-zero-hardcoding)
-- [7. Manual API Authorization (Required Once)](#7-manual-api-authorization-required-once)
-- [8. Prepare the Usage Log Spreadsheet](#8-prepare-the-usage-log-spreadsheet)
+- [6. Prepare the Usage Log Spreadsheet](#6-prepare-the-usage-log-spreadsheet)
+- [7. Script Properties (Zero Hardcoding)](#7-script-properties-zero-hardcoding)
+- [8. Manual API Authorization (Required Once)](#8-manual-api-authorization-required-once)
 - [9. Web App Deployment](#9-web-app-deployment)
 - [10. How the Generated Demo Works](#10-how-the-generated-demo-works)
 - [11. Project Structure](#11-project-structure)
@@ -170,11 +170,27 @@ These are already declared in `appsscript.json` and will be auto-enabled when th
 
 ---
 
-## 6. Script Properties (Zero Hardcoding)
+## 6. Prepare the Usage Log Spreadsheet
+
+1. Create a new Google Spreadsheet (or use an existing one).
+2. Create a sheet named **`Usage_Logs`** with the following header row:
+
+   | Timestamp | User Email | User Goal | AI Summary | Dataset ID | MCP Servers | Generation Time (s) |
+   |---|---|---|---|---|---|---|
+
+   > **Note**: The headers are automatically synced on each log write by `ensureLogSheetHeaders()`. You only need to create the sheet — the function will overwrite row 1 with the correct headers.
+
+3. Copy the spreadsheet URL — you will set it as the `LOG_SHEET_URL` Script Property in the next section.
+
+---
+
+## 7. Script Properties (Zero Hardcoding)
 
 This codebase contains **no hardcoded parameters**. All configuration is managed via **Script Properties**.
 
-### 6.1 Mandatory Properties
+A complete setup is **two properties**: `PROJECT_ID` and `LOG_SHEET_URL`. Everything in §7.2 has a working default and should be left unset.
+
+### 7.1 Mandatory Properties
 
 | Property | Description |
 |---|---|
@@ -183,16 +199,25 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 
 > **Important**: Both properties are checked at startup. If any are missing, the app displays a `SetupError.html` page with instructions instead of the main UI.
 
-### 6.2 Optional Properties
+### 7.2 Optional Properties
+
+**You do not need to set any of these.** Every property below has a working default, and leaving it unset is the supported configuration — it is what a normal deployment looks like. Set one only when you specifically want the behaviour it describes, and remove it again once you no longer do.
+
+**Tuning** — occasionally useful in a normal deployment:
 
 | Property | Default | Description |
 |---|---|---|
 | `LOCATION` | `global` | Vertex AI Agent Platform API location (e.g., `us-central1`, `global`) |
 | `MODEL` | `gemini-3.6-flash` | Gemini model name for data generation |
-| `TEMPLATE_REPO` | this repository | Git URL the generated setup script fetches `agent_template/` from at run time |
+| `GITHUB_TOKEN` | (unset) | GitHub personal access token used for GitHub API calls when importing custom MCP servers from a repository URL. Only needed for private repos or to avoid unauthenticated rate limits |
+
+**Development and administration** — for working on this sample, not for running it. If you are deploying the app to give demos, skip these entirely:
+
+| Property | Default | Description |
+|---|---|---|
+| `TEMPLATE_REPO` | this repository | Git **clone** URL (ending in `.git`) the generated setup script fetches `agent_template/` from at run time — see the note below |
 | `TEMPLATE_REF` | `main` | Branch, tag, or commit SHA of the agent template. A branch/tag is resolved to a concrete commit SHA at script-generation time (each generated script is pinned to that SHA); set a 40-hex SHA to hard-pin |
 | `TEMPLATE_SUBDIR` | `search/gemini-enterprise/ge-demo-generator/agent_template` | Repo path of the template directory |
-| `GITHUB_TOKEN` | (unset) | GitHub personal access token used for GitHub API calls when importing custom MCP servers from a repository URL. Only needed for private repos or to avoid unauthenticated rate limits |
 | `DISABLE_CROSSORG_PACK` | (unset) | Set to `1` to disable every cross-departmental prompt insertion (persona anchor, cross-department scenario fabric, process-state rules) at once — an admin rollback lever, not a user-facing option |
 
 > **Note**: The three `TEMPLATE_*` properties override the defaults baked into
@@ -200,7 +225,20 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 > example to a fork during development, or to this repository's latest release
 > commit) without redeploying the Apps Script code.
 
-### 6.3 Setting Properties
+`TEMPLATE_REPO` is a git **clone** URL — the string you would hand to
+`git clone`, ending in `.git`. Browsing to `agent_template/` on github.com
+gives you a different kind of URL: it contains `/tree/`, it already includes
+the path that belongs in `TEMPLATE_SUBDIR`, and git cannot fetch from it. An
+app configured that way still generates scripts, but they fail with
+`repository ... not found` for whoever runs them. A complete, correct set:
+
+```text
+TEMPLATE_REPO    https://github.com/GoogleCloudPlatform/generative-ai.git
+TEMPLATE_REF     main
+TEMPLATE_SUBDIR  search/gemini-enterprise/ge-demo-generator/agent_template
+```
+
+### 7.3 Setting Properties
 
 **Option A: Via Script Editor (Recommended for first-time setup)**
 
@@ -220,7 +258,7 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 
 ---
 
-## 7. Manual API Authorization (Required Once)
+## 8. Manual API Authorization (Required Once)
 
 Even with correct scopes in `appsscript.json`, you **must** manually authorize the script to access your data.
 
@@ -230,20 +268,6 @@ Even with correct scopes in `appsscript.json`, you **must** manually authorize t
    - You may need to click **"Advanced" → "Go to [project name] (unsafe)"** if prompted with an "unverified app" warning.
 
 > **Note**: The `forceAuthorizeSpreadsheet` function explicitly triggers authorization for Spreadsheet scopes by performing a safe read test.
-
----
-
-## 8. Prepare the Usage Log Spreadsheet
-
-1. Create a new Google Spreadsheet (or use an existing one).
-2. Create a sheet named **`Usage_Logs`** with the following header row:
-
-   | Timestamp | User Email | User Goal | AI Summary | Dataset ID | MCP Servers | Generation Time (s) |
-   |---|---|---|---|---|---|---|
-
-   > **Note**: The headers are automatically synced on each log write by `ensureLogSheetHeaders()`. You only need to create the sheet — the function will overwrite row 1 with the correct headers.
-
-3. Copy the spreadsheet URL and set it as the `LOG_SHEET_URL` Script Property.
 
 ---
 
