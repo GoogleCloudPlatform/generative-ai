@@ -913,6 +913,26 @@ _A2UI_CHILD_PROP_LIFT = {
     'List': ('direction', 'alignment'),
 }
 
+_A2UI_COMPONENT_PROPS = {}
+
+def _a2ui_component_props():
+    # Lazily index the selected catalog's per-component property names so the
+    # healer can prune model-invented properties instead of losing the card.
+    global _A2UI_COMPONENT_PROPS
+    if _A2UI_COMPONENT_PROPS:
+        return _A2UI_COMPONENT_PROPS
+    try:
+        _cs = getattr(a2ui_selected_catalog, 'catalog_schema', None)
+        _comps = _cs.get('components') if isinstance(_cs, dict) else None
+        if isinstance(_comps, dict):
+            for _cn, _csch in _comps.items():
+                if (isinstance(_csch, dict) and isinstance(_csch.get('properties'), dict)
+                        and _csch.get('additionalProperties') is False):
+                    _A2UI_COMPONENT_PROPS[_cn] = set(_csch['properties'].keys())
+    except Exception:
+        _A2UI_COMPONENT_PROPS = {}
+    return _A2UI_COMPONENT_PROPS
+
 def _normalize_a2ui_shapes(msg):
     if not isinstance(msg, dict):
         return msg
@@ -951,6 +971,28 @@ def _normalize_a2ui_shapes(msg):
                     _v = _ch.pop(_k)
                     if _k in _allowed and _k not in _spec:
                         _spec[_k] = _v
+            # (d) prune model-invented top-level properties (v11.50).
+            # Confirmed live on a batch-editor turn: MultipleChoice with a
+            # top-level 'label' (legal on TextField/CheckBox/Slider, NOT on
+            # MultipleChoice in the 0.8 catalog) fails validation with
+            # "Additional properties are not allowed" and the gate then
+            # drops the WHOLE surfaceUpdate - the user gets prose plus
+            # chips and no card, on the original turn AND on every
+            # re-prompt, because the model keeps making the same mistake.
+            # The stray property is decoration; the card is not. Schema
+            # driven: only prunes when the selected catalog declares the
+            # component with additionalProperties=false, so a legal
+            # property can never be stripped.
+            _known = _a2ui_component_props().get(_cname)
+            if _known:
+                _extras = [_k for _k in _spec.keys() if _k not in _known]
+                for _k in _extras:
+                    _spec.pop(_k, None)
+                if _extras:
+                    try:
+                        logger.log_text('[a2ui_heal] pruned unknown prop(s) ' + ', '.join(sorted(_extras)) + ' from ' + _cname)
+                    except Exception:
+                        pass
     return msg
 
 def _a2ui_msg_schema_ok(msg):
@@ -4079,11 +4121,43 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             _tp, _mp = [], []
             _found = False
             _sp = A2uiStreamParser(catalog=a2ui_selected_catalog)
+            _parse_failed = False
             try:
                 _chunk = _sanitize_a2ui_text_icons(_text) if '<a2ui-json>' in _text else _text
                 _rps = _sp.process_chunk(_chunk)
-            except Exception:
+            except Exception as _pe:
+                # v11.49: mirror the main loop's CRITICAL FALLBACK instead of
+                # swallowing the error. Confirmed in logs: a card re-prompt
+                # returned a complete tagged card, but the parser raised the
+                # same schema ValueError as the sibling turns ('alignment',
+                # 'distribution' unexpected), _rps became [] silently, and the
+                # tagged block was unreachable by the untagged net below (it
+                # requires '<a2ui-json>' NOT in text) - so the recovery run
+                # ended "no usable card" and the user got prose without the
+                # editor. Healing must run on the extracted JSON here exactly
+                # as it does in the main loop.
+                logger.log_text("[report_extract] A2UI stream parse error (" + type(_pe).__name__ + "): " + str(_pe))
                 _rps = []
+                _parse_failed = True
+            if _parse_failed and '<a2ui-json>' in _text:
+                import re as _re
+                _tag_re = _re.compile(r'<a2ui-json>(.*?)</a2ui-json>', _re.DOTALL)
+                _plain_txt = _tag_re.sub('', _text).strip()
+                if _plain_txt and not (
+                        (_plain_txt.startswith('{') or _plain_txt.startswith('['))
+                        and ("'content':" in _plain_txt or "'parts':" in _plain_txt)):
+                    _tp.append(a2a_types.Part(root=a2a_types.TextPart(text=_plain_txt)))
+                for _blk in _tag_re.findall(_text):
+                    _pobj = _parse_loose_json(_blk)
+                    if _pobj is None:
+                        continue
+                    _pitems = _pobj if isinstance(_pobj, list) else [_pobj]
+                    for _pit in _heal_a2ui_message_list(_pitems):
+                        if isinstance(_pit, dict):
+                            _mp.extend(create_a2ui_parts(_pit))
+                            _found = True
+                if _found:
+                    logger.log_text("[report_extract] fallback recovered " + str(len(_mp)) + " part(s) from tagged block")
             for _rp in _rps:
                 if _rp.text and _rp.text.strip():
                     _stripped = _rp.text.strip()

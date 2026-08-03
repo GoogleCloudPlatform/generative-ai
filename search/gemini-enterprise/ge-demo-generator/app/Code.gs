@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.46-public',
+  APP_VERSION: 'v11.50-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2785,7 +2785,20 @@ Requirements:
   const geLocalMcps = (params.importedMcpList || []).filter(m => m.type !== 'remote');
   const geMcpConfigJson = JSON.stringify({ mcpServers: (params.importedMcpList || []).map((mcp, geIdx) => {
     if (mcp.type === 'remote') {
-      return { idx: geIdx, type: 'remote', name: mcp.name || '', auth_type: mcp.auth_type || '' };
+      // Everything the static template needs for a managed remote server is
+      // precomputed here (slug, env var, secret name) so tools.py and agent.py
+      // stay free of per-demo logic — same contract as the local entries below.
+      const geIsGeneric = remoteMcpIsGeneric_(mcp);
+      return {
+        idx: geIdx, type: 'remote', name: mcp.name || '', auth_type: mcp.auth_type || '',
+        endpoint_url: mcp.endpoint_url || '',
+        description: String(mcp.description || '').replace(/\s+/g, ' ').trim(),
+        capabilities: (mcp.capabilities || []).slice(0, 12),
+        generic: geIsGeneric,
+        prefix: geIsGeneric ? remoteMcpSlug_(mcp, geIdx).replace(/-/g, '_') : '',
+        env_key: (geIsGeneric && remoteMcpUsesAuthBlob_(mcp)) ? remoteMcpEnvKey_(mcp, geIdx) : '',
+        secret: (geIsGeneric && remoteMcpUsesAuthBlob_(mcp)) ? remoteMcpSecretName_(dirName, mcp, geIdx) : ''
+      };
     }
     const geLocalIdx = geLocals_indexOf(geLocalMcps, mcp);
     return {
@@ -2955,18 +2968,201 @@ fi
 
 echo "  ✅ Slack MCP OAuth configured!"
 `;
-        } else {
-          // Generic remote MCP: prompt for env vars normally
-          mcp.required_env_vars.forEach(v => {
-            if (v.is_required) {
-              if (v.is_secret) {
-                mcpReads += `while true; do\n  read -s -p "▶ Enter ${v.key} (${v.description}): " ${v.key}\n  echo ""\n  if [ -n "$${v.key}" ]; then break; fi\n  echo "  ⚠️  ${v.key} is required. Please enter a value."\ndone\n`;
-              } else {
-                mcpReads += `while true; do\n  read -p "▶ Enter ${v.key} (${v.description}): " ${v.key}\n  if [ -n "$${v.key}" ]; then break; fi\n  echo "  ⚠️  ${v.key} is required. Please enter a value."\ndone\n`;
-              }
-            }
-          });
+        } else if (mcp.auth_type === 'oauth2_dcr' || mcp.auth_type === 'oauth2_manual') {
+          // ── Generic managed remote MCP: standards-based OAuth (v11.46) ──
+          // RFC 9728 discovery -> RFC 8414 metadata -> RFC 7591 dynamic client
+          // registration (skipped when the server has no registration_endpoint,
+          // in which case the operator supplies a client they registered) ->
+          // RFC 7636 PKCE authorization code, pasted back from the browser the
+          // same way the Slack flow above does it. The resulting tokens are
+          // stored as one JSON blob so the agent can refresh them at runtime.
+          const rmName = String(mcp.name || 'Remote MCP').replace(/["$\\]/g, '').split(String.fromCharCode(96)).join('');
+          const rmSecret = remoteMcpSecretName_(dirName, mcp, mcpIdx);
+          mcpReads += `
+echo ""
+echo "════════════════════════════════════════════════════════════"
+echo "  🔐 ${rmName} MCP Server — OAuth Setup"
+echo "════════════════════════════════════════════════════════════"
+echo ""
+RMCP_URL="${mcp.endpoint_url}"
+RMCP_SECRET="${rmSecret}"
+RMCP_CLIENT_NAME="GE Demo (${dirName})"
+RMCP_REDIRECT="https://localhost"
+RMCP_CLIENT_ID=""
+RMCP_CLIENT_SECRET=""
+RMCP_SKIP=false
+
+# Defensive: this block reads/writes Secret Manager, so ensure the API is on
+# even if it ever runs before the main API-enable batch. Idempotent.
+gcloud services enable secretmanager.googleapis.com --project="$PROJECT_ID" 2>/dev/null || true
+
+if gcloud secrets describe "$RMCP_SECRET" --project="$PROJECT_ID" >/dev/null 2>&1; then
+  echo "  ✅ Found existing ${rmName} credentials in Secret Manager."
+  read -p "  Reuse them and skip authorization? (Y/n): " RMCP_REUSE
+  if [[ ! "$RMCP_REUSE" =~ ^[Nn] ]]; then
+    RMCP_SKIP=true
+    echo "  ⏭️  Reusing stored credentials."
+  fi
+fi
+
+if [ "$RMCP_SKIP" = "false" ]; then
+  RMCP_ORIGIN=$(echo "$RMCP_URL" | sed -E 's#^(https://[^/]+).*#\\1#')
+  RMCP_PATH=$(echo "$RMCP_URL" | sed -E 's#^https://[^/]+##')
+
+  echo "  🔎 Discovering OAuth endpoints for $RMCP_URL ..."
+  RMCP_AS=$(curl -s -m 20 "$RMCP_ORIGIN/.well-known/oauth-protected-resource$RMCP_PATH" | jq -r '.authorization_servers[0] // empty') || true
+  if [ -z "$RMCP_AS" ]; then
+    RMCP_AS=$(curl -s -m 20 "$RMCP_ORIGIN/.well-known/oauth-protected-resource" | jq -r '.authorization_servers[0] // empty') || true
+  fi
+  if [ -z "$RMCP_AS" ]; then RMCP_AS="$RMCP_ORIGIN"; fi
+  RMCP_AS="\${RMCP_AS%/}"
+
+  RMCP_META=$(curl -s -m 20 "$RMCP_AS/.well-known/oauth-authorization-server$RMCP_PATH") || true
+  if [ -z "$(echo "$RMCP_META" | jq -r '.token_endpoint // empty' 2>/dev/null)" ]; then
+    RMCP_META=$(curl -s -m 20 "$RMCP_AS/.well-known/oauth-authorization-server") || true
+  fi
+  if [ -z "$(echo "$RMCP_META" | jq -r '.token_endpoint // empty' 2>/dev/null)" ]; then
+    RMCP_META=$(curl -s -m 20 "$RMCP_AS/.well-known/openid-configuration") || true
+  fi
+  RMCP_AUTH_EP=$(echo "$RMCP_META" | jq -r '.authorization_endpoint // empty' 2>/dev/null) || true
+  RMCP_TOKEN_EP=$(echo "$RMCP_META" | jq -r '.token_endpoint // empty' 2>/dev/null) || true
+  RMCP_REG_EP=$(echo "$RMCP_META" | jq -r '.registration_endpoint // empty' 2>/dev/null) || true
+
+  if [ -z "$RMCP_AUTH_EP" ] || [ -z "$RMCP_TOKEN_EP" ]; then
+    echo "  ❌ Could not discover OAuth endpoints for $RMCP_URL."
+    echo "     Setup continues; the agent will start without ${rmName} tools."
+  else
+    if [ -n "$RMCP_REG_EP" ]; then
+      echo "  📝 Registering an OAuth client automatically (RFC 7591)..."
+      RMCP_REG_BODY=$(jq -n --arg cn "$RMCP_CLIENT_NAME" --arg ru "$RMCP_REDIRECT" '{client_name:$cn,redirect_uris:[$ru],grant_types:["authorization_code","refresh_token"],response_types:["code"],token_endpoint_auth_method:"none"}')
+      RMCP_REG=$(curl -s -m 30 -X POST "$RMCP_REG_EP" -H 'Content-Type: application/json' -d "$RMCP_REG_BODY") || true
+      RMCP_CLIENT_ID=$(echo "$RMCP_REG" | jq -r '.client_id // empty' 2>/dev/null) || true
+      RMCP_CLIENT_SECRET=$(echo "$RMCP_REG" | jq -r '.client_secret // empty' 2>/dev/null) || true
+      if [ -n "$RMCP_CLIENT_ID" ]; then
+        echo "  ✅ Registered client: $RMCP_CLIENT_ID"
+      else
+        echo "  ⚠️  Dynamic registration did not return a client_id."
+        echo "     Response: $RMCP_REG"
+      fi
+    fi
+
+    if [ -z "$RMCP_CLIENT_ID" ]; then
+      echo ""
+      echo "  This server needs an OAuth app that you register yourself."
+      echo "  Create one with redirect URI: $RMCP_REDIRECT"
+      echo ""
+      while true; do
+        read -p "▶ Paste Client ID: " RMCP_CLIENT_ID
+        if [ -n "$RMCP_CLIENT_ID" ]; then break; fi
+      done
+      read -s -p "▶ Paste Client Secret (press Enter if the app is public): " RMCP_CLIENT_SECRET
+      echo ""
+    fi
+
+    RMCP_VERIFIER=$(openssl rand -hex 48)
+    RMCP_CHALLENGE=$(printf '%s' "$RMCP_VERIFIER" | openssl dgst -sha256 -binary | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+    RMCP_RED_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$RMCP_REDIRECT")
+    RMCP_RES_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$RMCP_URL")
+    RMCP_CID_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$RMCP_CLIENT_ID")
+    RMCP_AUTH_URL="\${RMCP_AUTH_EP}?response_type=code&client_id=\${RMCP_CID_ENC}&redirect_uri=\${RMCP_RED_ENC}&code_challenge=\${RMCP_CHALLENGE}&code_challenge_method=S256&state=gedemo&resource=\${RMCP_RES_ENC}"
+
+    echo ""
+    echo "  🌐 Open this URL in your browser and approve access:"
+    echo ""
+    echo "  $RMCP_AUTH_URL"
+    echo ""
+    echo "  After approving, the browser lands on a page that fails to load"
+    echo "  (https://localhost/?code=...). That is expected — copy that URL."
+    echo "  If your browser rewrites localhost (Cloud Workstations does), copy"
+    echo "  the address bar contents anyway, or paste just the code= value."
+    echo ""
+    while true; do
+      read -p "▶ Paste the FULL redirected URL here (or just the code): " RMCP_PASTE
+      RMCP_CODE_RAW=$(echo "$RMCP_PASTE" | sed -n 's/.*[?&]code=\\([^&]*\\).*/\\1/p')
+      if [ -z "$RMCP_CODE_RAW" ]; then
+        # Also accept a bare code: no URL punctuation, no whitespace.
+        case "$RMCP_PASTE" in
+          *://*|*" "*|"") ;;
+          *) RMCP_CODE_RAW="$RMCP_PASTE" ;;
+        esac
+      fi
+      if [ -n "$RMCP_CODE_RAW" ]; then
+        # The code is percent-encoded inside the URL (Notion codes contain ':').
+        # curl --data-urlencode would encode it a second time, so decode first.
+        RMCP_CODE=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.unquote(sys.argv[1]))' "$RMCP_CODE_RAW")
+        break
+      fi
+      echo "  ⚠️  No code= parameter found. Paste the whole redirected URL."
+    done
+
+    RMCP_TOKEN_ARGS=(--data-urlencode "grant_type=authorization_code" --data-urlencode "code=$RMCP_CODE" --data-urlencode "redirect_uri=$RMCP_REDIRECT" --data-urlencode "client_id=$RMCP_CLIENT_ID" --data-urlencode "code_verifier=$RMCP_VERIFIER" --data-urlencode "resource=$RMCP_URL")
+    if [ -n "$RMCP_CLIENT_SECRET" ]; then
+      RMCP_TOKEN_ARGS+=(--data-urlencode "client_secret=$RMCP_CLIENT_SECRET")
+    fi
+    RMCP_TOKEN_RES=$(curl -s -m 30 -X POST "$RMCP_TOKEN_EP" -H 'Content-Type: application/x-www-form-urlencoded' "\${RMCP_TOKEN_ARGS[@]}") || true
+    RMCP_ACCESS=$(echo "$RMCP_TOKEN_RES" | jq -r '.access_token // empty' 2>/dev/null) || true
+
+    if [ -z "$RMCP_ACCESS" ]; then
+      echo "  ❌ Token exchange failed: $RMCP_TOKEN_RES"
+      echo "     Setup continues; the agent will start without ${rmName} tools."
+    else
+      RMCP_BLOB=$(jq -n \\
+        --arg at "$RMCP_ACCESS" \\
+        --arg rt "$(echo "$RMCP_TOKEN_RES" | jq -r '.refresh_token // empty' 2>/dev/null)" \\
+        --arg ci "$RMCP_CLIENT_ID" \\
+        --arg cs "$RMCP_CLIENT_SECRET" \\
+        --arg te "$RMCP_TOKEN_EP" \\
+        --arg res "$RMCP_URL" \\
+        --argjson ei "$(echo "$RMCP_TOKEN_RES" | jq -r '.expires_in // 0' 2>/dev/null || echo 0)" \\
+        --argjson ia "$(date +%s)" \\
+        '{access_token:$at,refresh_token:$rt,client_id:$ci,client_secret:$cs,token_endpoint:$te,resource:$res,expires_in:$ei,issued_at:$ia}')
+      echo "💾 Saving ${rmName} credentials to Secret Manager..."
+      if gcloud secrets describe "$RMCP_SECRET" --project="$PROJECT_ID" >/dev/null 2>&1; then
+        echo -n "$RMCP_BLOB" | gcloud secrets versions add "$RMCP_SECRET" --data-file=- --project="$PROJECT_ID"
+      else
+        echo -n "$RMCP_BLOB" | gcloud secrets create "$RMCP_SECRET" --data-file=- --replication-policy="automatic" --project="$PROJECT_ID"
+      fi
+      echo "  ✅ ${rmName} MCP authorized!"
+    fi
+  fi
+fi
+`;
+        } else if (mcp.auth_type === 'bearer_token') {
+          // ── Generic managed remote MCP: static API token ──
+          const rmName = String(mcp.name || 'Remote MCP').replace(/["$\\]/g, '').split(String.fromCharCode(96)).join('');
+          const rmSecret = remoteMcpSecretName_(dirName, mcp, mcpIdx);
+          mcpReads += `
+echo ""
+echo "════════════════════════════════════════════════════════════"
+echo "  🔑 ${rmName} MCP Server — API Token"
+echo "════════════════════════════════════════════════════════════"
+echo ""
+RMCP_SECRET="${rmSecret}"
+RMCP_SKIP=false
+gcloud services enable secretmanager.googleapis.com --project="$PROJECT_ID" 2>/dev/null || true
+if gcloud secrets describe "$RMCP_SECRET" --project="$PROJECT_ID" >/dev/null 2>&1; then
+  echo "  ✅ Found an existing ${rmName} token in Secret Manager."
+  read -p "  Reuse it? (Y/n): " RMCP_REUSE
+  if [[ ! "$RMCP_REUSE" =~ ^[Nn] ]]; then RMCP_SKIP=true; fi
+fi
+if [ "$RMCP_SKIP" = "false" ]; then
+  while true; do
+    read -s -p "▶ Paste the ${rmName} API token: " RMCP_TOKEN
+    echo ""
+    if [ -n "$RMCP_TOKEN" ]; then break; fi
+    echo "  ⚠️  A token is required."
+  done
+  RMCP_BLOB=$(jq -n --arg at "$RMCP_TOKEN" '{access_token:$at}')
+  if gcloud secrets describe "$RMCP_SECRET" --project="$PROJECT_ID" >/dev/null 2>&1; then
+    echo -n "$RMCP_BLOB" | gcloud secrets versions add "$RMCP_SECRET" --data-file=- --project="$PROJECT_ID"
+  else
+    echo -n "$RMCP_BLOB" | gcloud secrets create "$RMCP_SECRET" --data-file=- --replication-policy="automatic" --project="$PROJECT_ID"
+  fi
+  echo "  ✅ ${rmName} token stored."
+fi
+`;
         }
+        // auth_type 'none': the endpoint is public, nothing to collect.
         return; // skip sidecar-specific credential_file handling
       }
 
@@ -3769,6 +3965,14 @@ for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '
       echo "   ⚠️  Please delete the Slack App manually at: https://api.slack.com/apps"
       echo "   Look for an app named 'GE-${dirName}' and delete it."
     fi
+${ (params.importedMcpList || []).some(m => m.type === 'remote' && m.auth_type === 'oauth2_dcr') ? `
+    echo ""
+    echo "🔗 Managed remote MCP authorizations (manual cleanup):"
+    echo "   Setup registered an OAuth client named 'GE Demo (${dirName})' with:"
+${params.importedMcpList.filter(m => m.type === 'remote' && m.auth_type === 'oauth2_dcr').map(m => `    echo "     • ${m.name || m.endpoint_url}"`).join('\n')}
+    echo "   Dynamically registered clients usually cannot be deleted via API."
+    echo "   Revoke the demo's access in each provider's connected-apps settings."
+` : '' }
 
     echo ""
     echo "========================================================="
@@ -5056,9 +5260,13 @@ gcloud services enable secretmanager.googleapis.com
 `;
 
     params.importedMcpList.forEach((mcp, mcpIdx) => {
-      // -- Remote Managed MCP (Slack): token already in Secret Manager from provisioning --
-      if (mcp.type === 'remote' && mcp.auth_type === 'oauth2_slack') {
-        // Slack token stored in Secret Manager during provisioning step
+      // -- Remote Managed MCP: credentials already in Secret Manager --
+      // The interactive setup block above wrote the Slack user token / generic
+      // OAuth blob / static API token before we got here, so there is nothing
+      // to provision. Returning also keeps remote entries out of the sidecar
+      // path below, which would otherwise derive secret names from github_url
+      // (a docs link for remote servers).
+      if (mcp.type === 'remote') {
         return;
       }
       // ── Sidecar MCP ──
@@ -5114,7 +5322,17 @@ gcloud services enable secretmanager.googleapis.com
     --member="serviceAccount:$COMPUTE_SA" \\
     --role="roles/secretmanager.secretAccessor" \\
     --condition=None --quiet >/dev/null 2>&1 || true
-
+${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type === 'oauth2_dcr' || m.auth_type === 'oauth2_manual')) ? `
+  # A managed remote MCP server may rotate its refresh token when the agent
+  # refreshes. Let the runtime write the new one back so it survives a cold
+  # start; without this the demo still runs, it just falls back to re-running
+  # the setup script after a restart that follows a rotation.
+  echo "🔐 Granting Secret Version Adder role (remote MCP token rotation)..."
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \\
+    --member="serviceAccount:$COMPUTE_SA" \\
+    --role="roles/secretmanager.secretVersionAdder" \\
+    --condition=None --quiet >/dev/null 2>&1 || true
+` : '' }
   SERVICE_NAME="${dirName}"
 
   # --- Pre-create Pub/Sub topics in background (no dependency on SERVICE_URL) ---
@@ -5161,10 +5379,21 @@ gcloud services enable secretmanager.googleapis.com
     
     if (params.importedMcpList && params.importedMcpList.length > 0) {
       params.importedMcpList.forEach((mcp, mcpIdx) => {
-        // ── Remote Managed MCP (Slack) ──
-        if (mcp.type === 'remote' && mcp.auth_type === 'oauth2_slack') {
-          // Slack MCP: static token from Secret Manager
-          secrets.push(`SLACK_ACCESS_TOKEN=${dirName}-slack-token:latest`);
+        // ── Remote Managed MCP ──
+        if (mcp.type === 'remote') {
+          if (mcp.auth_type === 'oauth2_slack') {
+            // Slack MCP: static token from Secret Manager
+            secrets.push(`SLACK_ACCESS_TOKEN=${dirName}-slack-token:latest`);
+          } else if (remoteMcpUsesAuthBlob_(mcp)) {
+            // Generic managed remote MCP: one JSON credential blob per server.
+            // Bound optionally so a demo still deploys when the operator
+            // skipped or failed the authorization step during setup.
+            optionalSecrets.push({
+              key: remoteMcpEnvKey_(mcp, mcpIdx),
+              secretName: remoteMcpSecretName_(dirName, mcp, mcpIdx)
+            });
+          }
+          // auth_type 'none' needs no credentials at all.
           return;
         }
         // ── Sidecar MCP ──
@@ -6504,6 +6733,241 @@ function parseGithubUrl(url) {
   const match = url.match(/github\.com\/([^/]+)\/([^/]+)/);
   if (!match) throw new Error("Invalid GitHub URL");
   return { owner: match[1], repo: match[2].replace(/\.git$/, "") };
+}
+
+// ===========================================
+// Managed remote MCP servers (v11.46)
+// ===========================================
+// A managed remote MCP server is reached over Streamable HTTP at a vendor URL
+// (https://mcp.notion.com/mcp) instead of being cloned and run as a sidecar.
+// Everything below keys off a short slug derived from the server name, so one
+// demo can carry several remote servers without Secret Manager / env var /
+// ADK tool-name collisions.
+//
+// auth_type values for type:'remote' entries:
+//   'none'          - endpoint answers unauthenticated, nothing to provision
+//   'bearer_token'  - user pastes a long-lived token during setup
+//   'oauth2_dcr'    - RFC 7591 dynamic client registration + RFC 7636 PKCE,
+//                     no manual app creation (Notion)
+//   'oauth2_manual' - OAuth but the server has no registration_endpoint, so the
+//                     user brings a client_id (+ secret) from a manually
+//                     created app
+//   'oauth2_slack'  - legacy Slack-specific flow, predates the generic path
+
+function remoteMcpSlug_(mcp, idx) {
+  let base = (mcp && mcp.name) ? String(mcp.name) : '';
+  if (!base && mcp && mcp.endpoint_url) {
+    base = String(mcp.endpoint_url).replace(/^https?:\/\//i, '').split('/')[0];
+  }
+  base = base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (!base) base = 'remote' + (idx || 0);
+  return base.substring(0, 24).replace(/-+$/, '');
+}
+
+function remoteMcpEnvKey_(mcp, idx) {
+  return 'RMCP_' + remoteMcpSlug_(mcp, idx).toUpperCase().replace(/-/g, '_') + '_AUTH';
+}
+
+function remoteMcpSecretName_(dirName, mcp, idx) {
+  return dirName + '-rmcp-' + remoteMcpSlug_(mcp, idx);
+}
+
+// Remote servers whose credentials the setup script writes to Secret Manager as
+// a single JSON blob, which the agent then reads from one env var.
+function remoteMcpUsesAuthBlob_(mcp) {
+  return !!mcp && mcp.type === 'remote' &&
+         (mcp.auth_type === 'oauth2_dcr' || mcp.auth_type === 'oauth2_manual' ||
+          mcp.auth_type === 'bearer_token');
+}
+
+// Remote servers handled by the generic get_remote_mcp_toolsets() in tools.py.
+// Slack keeps its own toolset function so the working flow stays untouched.
+function remoteMcpIsGeneric_(mcp) {
+  return !!mcp && mcp.type === 'remote' && mcp.auth_type !== 'oauth2_slack';
+}
+
+function remoteMcpJsonFetch_(url, options) {
+  try {
+    const resp = UrlFetchApp.fetch(url, Object.assign({
+      muteHttpExceptions: true,
+      followRedirects: true,
+      validateHttpsCertificates: true
+    }, options || {}));
+    const code = resp.getResponseCode();
+    const text = resp.getContentText();
+    let json = null;
+    if (text) {
+      // Streamable HTTP servers may answer with an SSE frame rather than plain
+      // JSON. Both carry the same JSON-RPC payload.
+      const sse = text.match(/^data:\s*(\{[\s\S]*)$/m);
+      try { json = JSON.parse(sse ? sse[1] : text); } catch (e) { json = null; }
+    }
+    return { code: code, text: text, json: json, headers: resp.getAllHeaders() };
+  } catch (e) {
+    return { code: 0, text: String(e), json: null, headers: {} };
+  }
+}
+
+/**
+ * Probes a managed remote MCP endpoint and reports how a generated demo can
+ * authenticate against it. Backs the "Remote MCP URL" import tab.
+ *
+ * Discovery order: unauthenticated initialize -> RFC 9728 protected resource
+ * metadata -> RFC 8414 authorization server metadata -> RFC 7591 registration
+ * endpoint. The result decides which credential flow the setup script emits.
+ */
+function probeRemoteMcpServer(endpointUrl) {
+  try {
+    const url = String(endpointUrl || '').trim().replace(/\/+$/, '');
+    const parts = url.match(/^(https:\/\/[^\/]+)(\/.*)?$/i);
+    if (!parts) {
+      return { success: false, message: 'Enter an https:// MCP endpoint URL (for example https://mcp.notion.com/mcp).' };
+    }
+    const origin = parts[1];
+    const path = parts[2] || '';
+    const host = origin.replace(/^https:\/\//i, '');
+
+    const skip = { mcp: 1, www: 1, api: 1, com: 1, io: 1, ai: 1, app: 1, net: 1, org: 1, dev: 1, co: 1 };
+    const labels = host.split('.').filter(function(p) { return !skip[p]; });
+    const rawName = labels.length ? labels[labels.length - 1] : host;
+    const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+
+    const out = {
+      is_supported: true,
+      type: 'remote',
+      name: name,
+      endpoint_url: url,
+      docs_url: origin,
+      language: 'managed',
+      transport_mode: 'streamable_http',
+      auth_type: 'none',
+      auth_summary: '',
+      registration_endpoint: '',
+      authorization_endpoint: '',
+      token_endpoint: '',
+      capabilities: [],
+      required_env_vars: [],
+      warnings: []
+    };
+
+    // 1. Does the endpoint answer without credentials?
+    const init = remoteMcpJsonFetch_(url, {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { 'Accept': 'application/json, text/event-stream' },
+      payload: JSON.stringify({
+        jsonrpc: '2.0', id: 1, method: 'initialize',
+        params: {
+          protocolVersion: '2025-06-18',
+          capabilities: {},
+          clientInfo: { name: 'ge-demo-generator', version: '1' }
+        }
+      })
+    });
+
+    if (init.code === 0) {
+      return { success: false, message: 'Could not reach ' + url + '. Check the URL and that the server is public. (' + init.text + ')' };
+    }
+
+    if (init.code >= 200 && init.code < 300) {
+      out.auth_type = 'none';
+      out.auth_summary = 'No authentication required - the server answered an unauthenticated initialize.';
+      const listed = remoteMcpProbeTools_(url, init);
+      if (listed.length) out.capabilities = listed;
+      return { success: true, data: out };
+    }
+
+    if (init.code !== 401 && init.code !== 403) {
+      out.warnings.push('The endpoint returned HTTP ' + init.code + ' for initialize. Continuing with OAuth discovery, but double-check the URL.');
+    }
+
+    // 2. RFC 9728 protected resource metadata. Prefer the location the server
+    //    advertised in WWW-Authenticate, then the path-scoped default.
+    const authenticateHeader = init.headers['WWW-Authenticate'] || init.headers['www-authenticate'] || '';
+    const advertised = String(authenticateHeader).match(/resource_metadata="([^"]+)"/);
+    const prmCandidates = [];
+    if (advertised) prmCandidates.push(advertised[1]);
+    prmCandidates.push(origin + '/.well-known/oauth-protected-resource' + path);
+    prmCandidates.push(origin + '/.well-known/oauth-protected-resource');
+
+    let authServer = origin;
+    for (let i = 0; i < prmCandidates.length; i++) {
+      const prm = remoteMcpJsonFetch_(prmCandidates[i]);
+      if (prm.json && prm.json.authorization_servers && prm.json.authorization_servers.length) {
+        authServer = String(prm.json.authorization_servers[0]).replace(/\/+$/, '');
+        if (prm.json.resource_name) out.name = prm.json.resource_name.replace(/\s*\(beta\)\s*$/i, '').trim() || out.name;
+        break;
+      }
+    }
+
+    // 3. RFC 8414 authorization server metadata.
+    const asCandidates = [
+      authServer + '/.well-known/oauth-authorization-server' + path,
+      authServer + '/.well-known/oauth-authorization-server',
+      authServer + '/.well-known/openid-configuration'
+    ];
+    let meta = null;
+    for (let i = 0; i < asCandidates.length; i++) {
+      const res = remoteMcpJsonFetch_(asCandidates[i]);
+      if (res.json && res.json.token_endpoint) { meta = res.json; break; }
+    }
+
+    if (!meta) {
+      out.auth_type = 'bearer_token';
+      out.auth_summary = 'The server requires a credential but publishes no OAuth metadata. You will paste a long-lived API token during setup.';
+      out.warnings.push('No RFC 8414 metadata found at ' + authServer + '. Falling back to a static bearer token.');
+      return { success: true, data: out };
+    }
+
+    out.authorization_endpoint = meta.authorization_endpoint || '';
+    out.token_endpoint = meta.token_endpoint || '';
+    out.registration_endpoint = meta.registration_endpoint || '';
+
+    const pkce = meta.code_challenge_methods_supported || [];
+    if (pkce.length && pkce.indexOf('S256') === -1) {
+      out.warnings.push('The server does not advertise PKCE S256; setup will still request it.');
+    }
+    if ((meta.grant_types_supported || []).indexOf('refresh_token') === -1) {
+      out.warnings.push('No refresh_token grant advertised - the demo may need re-authorization when the access token expires.');
+    }
+
+    if (out.registration_endpoint) {
+      out.auth_type = 'oauth2_dcr';
+      out.auth_summary = 'OAuth 2.1 with dynamic client registration. Setup registers a client automatically - no app to create by hand.';
+    } else {
+      out.auth_type = 'oauth2_manual';
+      out.auth_summary = 'OAuth 2.1 without dynamic client registration. You will need a client ID (and secret) from an app you register with the provider.';
+      out.required_env_vars = [
+        { key: 'OAUTH_CLIENT_ID', description: 'OAuth client ID from the provider', is_secret: false, is_required: true },
+        { key: 'OAUTH_CLIENT_SECRET', description: 'OAuth client secret (leave blank for a public client)', is_secret: true, is_required: false }
+      ];
+    }
+    return { success: true, data: out };
+
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: error.toString() };
+  }
+}
+
+// Best-effort tools/list against a server that needs no credentials. Returns
+// tool names for the demo plan summary; failure is not an error.
+function remoteMcpProbeTools_(url, init) {
+  try {
+    const sessionId = (init.headers && (init.headers['Mcp-Session-Id'] || init.headers['mcp-session-id'])) || '';
+    const headers = { 'Accept': 'application/json, text/event-stream' };
+    if (sessionId) headers['Mcp-Session-Id'] = sessionId;
+    const res = remoteMcpJsonFetch_(url, {
+      method: 'post',
+      contentType: 'application/json',
+      headers: headers,
+      payload: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} })
+    });
+    const tools = (res.json && res.json.result && res.json.result.tools) || [];
+    return tools.slice(0, 12).map(function(t) { return t.name; }).filter(Boolean);
+  } catch (e) {
+    return [];
+  }
 }
 
 function getGithubHeaders() {

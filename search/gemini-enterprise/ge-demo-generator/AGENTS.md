@@ -178,6 +178,41 @@ perfectly. Harvesting is now driven by the ANSWER (`a<i>`, falling back to
 `s<i>`); the label is optional and only affects the wording of the recap line.
 **Never gate a press handler on a decorative context key.**
 
+**The recovery harvest must not swallow parse errors.** On a later turn of the
+same workflow the `[card_reprompt]` above fired correctly and the re-prompt came
+back with a complete tagged card, yet the turn still ended `re-prompt yielded no
+usable card`. The harvest runs through `_extract_report_parts`, which had
+`except Exception: _rps = []` around `process_chunk` — no log, no fallback. The
+parser raised the same recurring schema `ValueError` (`'alignment',
+'distribution' were unexpected`) that the main loop heals through its CRITICAL
+FALLBACK, but here the exception was eaten silently, and the untagged safety net
+below it is explicitly gated on `'<a2ui-json>' not in _text`, so a *tagged*
+block was unreachable by any recovery path at all. `_extract_report_parts` now
+mirrors the main loop on parse failure: log `[report_extract] A2UI stream parse
+error`, regex-extract the tagged blocks, `_parse_loose_json` +
+`_heal_a2ui_message_list` + `create_a2ui_parts`, and keep the plain-text
+remainder (dict-repr guard still applied). That one function serves the synth
+retry, the card re-prompt AND the chip re-prompt — a silent `except` there turns
+every recovery path into a no-op precisely on the turns that need recovery most.
+
+**The healer must prune model-invented component properties, or the schema gate
+re-drops every re-prompt.** Next attempt on the same card: the fallback above
+fired and healing ran, but the card was *genuinely* schema invalid —
+`MultipleChoice` carrying a top-level `label` (`'label' was unexpected`).
+`label` is legal on `TextField` / `CheckBox` / `Slider` in the 0.8 catalog but
+NOT on `MultipleChoice`, which only has per-option labels; that asymmetry is one
+models trip on constantly. `_normalize_a2ui_shapes` could not repair it, so
+`_a2ui_msg_schema_ok` dropped the `surfaceUpdate` on the original turn AND on
+the re-prompt (the model repeats its own mistake), leaving a `beginRendering` +
+`dataModelUpdate` orphan pair each time. Repair (d) in `_normalize_a2ui_shapes`
+now prunes unknown top-level component properties, driven by the selected
+catalog's own schema (`a2ui_selected_catalog.catalog_schema['components']`, and
+only for components that declare `additionalProperties: false`) — so a legal
+property can never be stripped, and no hand-maintained component allowlist is
+needed. Log marker: `[a2ui_heal] pruned unknown prop(s) ... from <Component>`.
+Verified both directions: the live failing card validates after pruning, and the
+canonical `interactive_form.json` example passes through byte-identical.
+
 ## 3. Managed Autonomous Agent (`enableManagedAgent`)
 
 Optional feature (default ON in the UI) that provisions a Pre-GA **Managed
@@ -495,3 +530,159 @@ This is deliberately breaking: builds that used to go green now stop. Every one
 of them was producing an image with its MCP dependencies missing. If you touch
 this block, re-check the shell cases against stubbed `uv`/`npm` — the failure
 mode it guards against is invisible in a passing build by construction.
+
+## 9. Managed remote MCP servers
+
+Before this feature landed, "remote MCP" meant Slack and only Slack. The generic
+rail existed on paper — `mcp.type === 'remote'` had an `else` branch in the
+setup script — but it was dead code: `tools.py` filtered every remote entry out
+of the toolset list, the system instruction described any remote server as
+Slack, the catalog's `addCatalogServer()` stamped
+`SLACK_CLIENT_ID` / `SLACK_CLIENT_SECRET` onto every remote entry, and secret
+binding fell through to the sidecar path, which derives secret names from
+`github_url` — a docs link for a managed server. The rail is now real, with
+Notion in the catalog as its first user.
+
+### 9.1 Auth modes are discovered, not hardcoded
+
+`probeRemoteMcpServer(url)` (Code.gs) classifies an endpoint by protocol
+discovery alone. It POSTs an unauthenticated `initialize`; a `2xx` means
+`auth_type: 'none'`. A `401` sends it through RFC 9728 (`WWW-Authenticate:
+resource_metadata=`, then `/.well-known/oauth-protected-resource{path}`, then
+the bare path) to find the authorization server, and RFC 8414
+(`/.well-known/oauth-authorization-server{path}`, bare, then
+`/.well-known/openid-configuration`) to find its endpoints.
+
+| `auth_type` | Trigger | What setup does |
+|---|---|---|
+| `none` | unauthenticated `initialize` succeeds | nothing |
+| `oauth2_dcr` | AS metadata has `registration_endpoint` | RFC 7591 registration + PKCE authorization |
+| `oauth2_manual` | AS metadata, no `registration_endpoint` | prompts for a client ID/secret, then PKCE |
+| `bearer_token` | credential required, no OAuth metadata | prompts for a long-lived token |
+| `oauth2_slack` | catalog entry only, never probed | the pre-existing Slack flow |
+
+**Do not try to fold Slack into the generic path.** Slack publishes no
+`registration_endpoint` and requires `client_secret_post`, so it needs a
+hand-created app either way. `oauth2_slack` is a legacy branch left deliberately
+untouched; changing it risks a working flow for no gain.
+
+### 9.2 One JSON blob per server, one env var, one secret
+
+Each generic remote server gets exactly one secret, `<dirName>-rmcp-<slug>`,
+bound to one env var, `RMCP_<SLUG_UPPER>_AUTH` (see `remoteMcpSlug_`,
+`remoteMcpEnvKey_`, `remoteMcpSecretName_` in Code.gs). The blob is
+`{access_token, refresh_token, client_id, client_secret, token_endpoint,
+resource, expires_in, issued_at}`. It is pushed through `optionalSecrets` so a
+skipped or failed authorization still deploys — the agent logs the missing
+server and starts without it, rather than failing the whole deploy.
+
+At run time `get_remote_mcp_toolsets()` builds one `McpToolset` per server with
+`tool_name_prefix=<slug>` (so several remote servers cannot collide) and a
+`header_provider` that refreshes 120 s before expiry. Rotated refresh tokens are
+written back with the Secret Manager REST `:addVersion` endpoint using
+`google.auth` + `httpx` — both already imported in `tools.py`. **Do not add
+`google-cloud-secret-manager` for this**; a new pip dependency in the agent
+image is a much bigger cost than a 15-line REST call, and section 8 explains why
+every added dependency is a build-break risk.
+
+Servers with no `expires_in` but a refresh token get `_RMCP_DEFAULT_TTL = 2700`,
+so a provider's silence does not turn into a token that is never refreshed.
+
+### 9.3 Per-demo variation stays in `mcp_config.json`
+
+`agent_template/` is static (section 2.1), so nothing about a specific server may
+be generated into `tools.py`. Code.gs precomputes everything the template needs
+into the `mcp_config.json` entry — `generic`, `prefix`, `env_key`, `secret`,
+`endpoint_url`, `auth_type`, `description`, `capabilities` — exactly the same
+contract the local (sidecar) entries already use for `safe_name` / `port` /
+`local_idx`. `get_remote_mcp_configs()` derives the runtime list from that file
+and skips Slack, which keeps its own toolset function. If you add a field the
+toolset needs, add it in the Code.gs `geMcpConfigJson` remote branch — never as
+a lookup table inside `tools.py`.
+
+### 9.4 Escaping notes for the DCR bash block
+
+The whole flow is bash inside a JS template literal, so:
+
+- Build every JSON body with `jq -n --arg`, never with `-d "{\"k\":\"v\"}"`.
+  A single backslash inside a template literal is eaten before bash ever sees it.
+- `tr -d '\n'` does not survive the template literal (the `\n` becomes a real
+  newline). Use `openssl base64 -A` instead.
+- Keep backticks out of anything spliced into the generated system instruction —
+  section 2.2 explains why a stray backtick ends the enclosing template literal,
+  and the instruction text is not a heredoc, so nothing protects it.
+  `remoteMcpSlug_`-derived text is safe by construction, but `mcp.description`
+  comes from a probe and is stripped of quotes, backslashes and backticks before
+  use.
+
+### 9.5 The authorization code arrives percent-encoded
+
+`sed -n 's/.*[?&]code=\([^&]*\).*/\1/p'` pulls the code straight out of the
+redirect URL, so it is still percent-encoded. Notion's codes contain `:`, which
+shows up as `%3A`. Handing that to `curl --data-urlencode` encodes it a second
+time (`%253A`) and the token endpoint answers
+`invalid_grant / Invalid authorization code format`. Decode with
+`urllib.parse.unquote` before the exchange. The Slack flow never hit this
+because Slack codes are alphanumeric, but any new provider might.
+
+The paste step also accepts a bare code, not just the full redirect URL: some
+browser environments rewrite `https://localhost` in the address bar, so "copy
+the whole URL" is not always possible.
+
+### 9.6 Dynamically registered clients cannot be cleaned up
+
+Notion returns `404` for `DELETE /register/<client_id>`, and this is normal for
+RFC 7591 servers — registration is anonymous, so there is no credential that
+authorizes deletion. Every setup run therefore leaves an orphaned client
+registration behind. The cleanup script cannot fix this and says so, pointing
+the user at the vendor's connected-apps settings to revoke access. Do not add a
+"delete the client" step that silently no-ops.
+
+### 9.7 `_ensure_types` must only recurse into subschema positions
+
+`agent.py` monkey-patches ADK's `_dereference_schema` with
+`_safe_dereference_schema`, whose `_ensure_types` walker repairs MCP input
+schemas Gemini would otherwise reject. The recursion step used to be:
+
+```python
+for k, v in list(node.items()):
+    if isinstance(v, dict):
+        node[k] = _ensure_types(v)
+```
+
+That walks the value of the `properties` **keyword** — a name-to-schema map — as
+if the map itself were a schema node. It usually looks harmless, because a map
+of schemas and a schema both recurse into dicts. It stops being harmless the
+moment a tool declares a property whose *name* collides with a JSON Schema
+keyword:
+
+- A property literally named `properties` (Notion `create-pages`, `update-page`)
+  makes the map look like a node with a `properties` keyword. The shorthand
+  fixup then iterates the real subschema's own entries as if they were
+  properties, and rewrites its `"type": "object"` and `"description": "..."`
+  **strings** into `{"type": "object"}` / `{"type": "<the description>"}` dicts.
+- The trailing type inference fires on the map too (`"properties" in node` →
+  `node["type"] = "object"`), injecting a phantom property named `type` into
+  every object that has properties. Seen on `create-database` and
+  `update-data-source`.
+
+The corrupted declaration fails `_ExtendedJSONSchema.model_validate` inside
+`_to_gemini_schema`, which raises during `_preprocess_async` — before the model
+is ever called. ADK surfaces it as `DynamicNodeFailError: Dynamic node
+root_agent failed`, the turn produces no event at all, and Gemini Enterprise
+shows the user "User action triggered." followed by silence. There is no
+`MALFORMED`, no retry, no partial text: an empty turn plus a pydantic
+`ValidationError` in the Cloud Run log is the signature.
+
+Recurse only into positions that actually hold schemas — `properties` / `$defs`
+/ `definitions` / `patternProperties` values, `items` / `additionalProperties` /
+`propertyNames` / `not` / `contains`, and the `anyOf` / `oneOf` / `allOf` /
+`prefixItems` lists. Note this is a *generic* bug, not a Notion one; `items`,
+`enum` and `default` are equally plausible property names and would have tripped
+the type inference the same way.
+
+Regression check before touching this function: run every tool schema from the
+target MCP server through `_to_gemini_schema` with the patch applied, and diff
+old-versus-new output on schemas that exercise `allOf` merging, 2-variant
+`anyOf`, rich (3+ object variant) `anyOf`, and `$ref` cycles — those four paths
+are what the walker exists for and must not change.

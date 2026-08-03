@@ -18,7 +18,7 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - **A2A Protocol Server**: The synthesized agent runs as a FastAPI-based A2A server on Cloud Run, compatible with Gemini Enterprise agent registration, and features a standalone `/execute_task` worker for background processing.
 - **Real-Time Persistence Layer**: The agent modifies Firestore via MCP, and a synthesized **Data Viewer** dashboard (Flask on Cloud Run Functions Gen2) watches Firestore collections and updates in real-time.
 - **Automated Cloud Run Deployment**: Containerized deployment to Cloud Run (with `--min-instances 0` to control standby costs) and automated Discovery Engine registration for Gemini Enterprise compatibility.
-- **Custom & Managed MCP Import**: Import third-party MCP servers from GitHub (bridged via `supergateway` stdio→StreamableHTTP) or integrate managed remote MCP servers (e.g., Slack with automated OAuth2 flow).
+- **Custom & Managed MCP Import**: Import third-party MCP servers from GitHub (bridged via `supergateway` stdio→StreamableHTTP), pick a managed remote server from the catalog (Slack, Notion), or paste **any** remote MCP URL (`https://mcp.yourservice.com/mcp`). The generator probes the endpoint, detects its auth mode from RFC 9728 / RFC 8414 metadata, and — where the server supports dynamic client registration (RFC 7591) — registers an OAuth client and runs the PKCE authorization for you, with no app to create by hand.
 - **Image Generation**: Built-in `generate_image` tool produces professional infographics and business summary visuals via `gemini-3.1-flash-image-preview`.
 - **Interactive Dashboards**: The agent can dynamically author and publish complete, interactive HTML dashboards (featuring responsive sorting tables, search filtering, Chart.js graphs, light/dark themes, and pure-JS tabs) via the `publish_dashboard` tool, hosted securely on Cloud Storage via signed URLs.
 - **Context Caching**: `ContextCacheConfig` aggressively caches system instructions and A2UI schemas to reduce time-to-first-token.
@@ -355,8 +355,9 @@ This removes:
 - Firestore collection documents
 - Dashboards Google Cloud Storage (GCS) Bucket (and all uploaded dashboard HTML snapshots)
 - Gemini Enterprise agent registration & authorization resource
-- Secret Manager secrets (for custom MCP and Slack OAuth tokens)
+- Secret Manager secrets (for custom MCP, Slack, and remote MCP OAuth tokens)
 - Slack App notification (manual deletion at api.slack.com required)
+- Remote MCP notification (dynamically registered OAuth clients cannot be deleted via API; revoke access in the vendor's connected-apps settings)
 - Local directories and uv caches
 
 ---
@@ -731,6 +732,7 @@ The frontend includes a curated MCP catalog with servers organized into categori
 | **Government & Legal** | US Government Open Data, US Legal & Legislation |
 | **Finance & Markets** | Yahoo Finance |
 | **Social & Communication** | LINE Bot, Slack (managed remote) |
+| **Productivity** | Notion (managed remote, OAuth via dynamic client registration) |
 | **Japan-Specific** | MLIT Data Platform, Japanese Tax Law, Japanese Labor Law, National Diet Proceedings |
 | **Environment & Weather** | Weather Data |
 | **Google Official** | Google Workspace MCP (Gmail, Drive, Calendar, People) |
@@ -743,15 +745,38 @@ The catalog also includes **recipe bundles** — pre-configured combinations of 
 |---|---|---|
 | **Sidecar (GitHub)** | `supergateway` stdio→StreamableHTTP (`--sessionStateless`) | Cloned into Docker image, bridged via `supergateway` on a per-port basis |
 | **Remote Managed (Slack)** | StreamableHTTP direct | OAuth2 flow during setup; token stored in Secret Manager |
+| **Remote Managed (generic)** | StreamableHTTP direct | Auth mode probed at import time; credentials stored as one JSON blob per server in Secret Manager and refreshed at run time |
 | **Google Workspace** | StreamableHTTP direct | MCP OAuth with token passthrough from Gemini Enterprise |
 
-#### Custom MCP Import (URL)
+#### Custom MCP Import (GitHub URL)
 
 Users can import any GitHub-hosted MCP server by providing the repository URL. The system:
 1. Fetches repository contents via Gemini-powered analysis (`gemini-3.5-flash-lite`)
 2. Identifies the entrypoint, language, required environment variables, and capabilities
 3. Generates the Dockerfile sidecar configuration and `supergateway` bridge commands
 4. Supports deduplication to prevent adding the same server twice
+
+#### Remote MCP Import (endpoint URL)
+
+Users can also paste the URL of any managed remote MCP server (for example
+`https://mcp.notion.com/mcp`). The generator probes the endpoint and derives the
+auth mode from the protocol itself, rather than from a hardcoded per-vendor list:
+
+| Detected `auth_type` | How it is detected | What setup does |
+|---|---|---|
+| `none` | an unauthenticated `initialize` succeeds | nothing — the server is called directly |
+| `oauth2_dcr` | RFC 9728 / RFC 8414 metadata advertises a `registration_endpoint` | registers an OAuth client (RFC 7591) and runs the PKCE authorization (RFC 7636) during setup |
+| `oauth2_manual` | OAuth metadata, but no dynamic registration | prompts for a client ID/secret you created yourself, then runs PKCE |
+| `bearer_token` | a credential is required, but no OAuth metadata is published | prompts for a long-lived token |
+
+Each server gets one Secret Manager secret holding a single JSON blob
+(`access_token`, `refresh_token`, `client_id`, `client_secret`, `token_endpoint`,
+`resource`, `expires_in`, `issued_at`), bound to one `RMCP_<SERVER>_AUTH`
+environment variable. At run time the agent refreshes the access token shortly
+before it expires and writes rotated refresh tokens back as a new secret version.
+Authorization is optional at deploy time: if you skip it, the demo still deploys
+and the agent simply starts without that toolset. Tool names are prefixed per
+server, so several remote servers can be attached without colliding.
 
 ---
 

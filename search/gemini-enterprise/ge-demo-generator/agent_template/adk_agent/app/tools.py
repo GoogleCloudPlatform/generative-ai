@@ -1784,6 +1784,193 @@ def get_slack_mcp_toolset():
 
 
 # =============================================================================
+# Managed remote MCP servers
+# =============================================================================
+# Vendor-hosted MCP endpoints reached over Streamable HTTP instead of being
+# cloned and run as a sidecar. The setup script provisioned each server's
+# credentials into Secret Manager, and Cloud Run binds them to one JSON env var
+# per server:
+#   {"access_token", "refresh_token", "client_id", "client_secret",
+#    "token_endpoint", "resource", "expires_in", "issued_at"}
+# Servers that need no authentication carry no env var at all. The per-server
+# slug, env var name and secret name are precomputed in mcp_config.json so this
+# module stays fully static.
+
+_RMCP_STATE = {}
+
+# Refresh this many seconds before an access token is due to expire.
+_RMCP_REFRESH_SKEW = 120
+# Fallback lifetime when the token endpoint reported no expires_in but did hand
+# back a refresh token: refresh periodically rather than never.
+_RMCP_DEFAULT_TTL = 2700
+
+
+def get_remote_mcp_configs():
+    """Returns the managed remote MCP servers handled by the generic path.
+
+    Slack keeps its own toolset function, so it is excluded here.
+    """
+    configs = []
+    for _m in get_mcp_config():
+        if _m.get("type") != "remote" or not _m.get("generic"):
+            continue
+        configs.append({
+            "name": _m.get("name") or _m.get("prefix") or "Remote MCP",
+            "url": _m.get("endpoint_url", ""),
+            "auth": _m.get("auth_type") or "none",
+            "env_key": _m.get("env_key", ""),
+            "secret": _m.get("secret", ""),
+            "prefix": _m.get("prefix", ""),
+        })
+    return [c for c in configs if c["url"]]
+
+
+def _rmcp_state(cfg):
+    """Loads and caches the credential blob for one remote MCP server."""
+    import logging
+    key = cfg.get("env_key")
+    if not key:
+        return None
+    state = _RMCP_STATE.get(key)
+    if state is not None:
+        return state
+    raw = os.environ.get(key, "")
+    if not raw:
+        return None
+    try:
+        blob = json.loads(raw)
+    except Exception:
+        # A bare token (no JSON wrapper) is still usable.
+        blob = {"access_token": raw}
+    issued = float(blob.get("issued_at") or 0)
+    ttl = float(blob.get("expires_in") or 0)
+    if not ttl and blob.get("refresh_token"):
+        ttl = _RMCP_DEFAULT_TTL
+    state = {
+        "blob": blob,
+        "access_token": blob.get("access_token", ""),
+        "expires_at": (issued + ttl) if (issued and ttl) else 0.0,
+    }
+    _RMCP_STATE[key] = state
+    logging.warning("[REMOTE_MCP] " + cfg["name"] + ": credentials loaded from " + key)
+    return state
+
+
+def _rmcp_persist(cfg, blob):
+    """Stores a rotated refresh token as a new Secret Manager version.
+
+    Best effort. If the runtime service account lacks secretVersionAdder the
+    demo keeps working on the in-memory token; only a cold start after a
+    rotation would need the setup script re-run.
+    """
+    import base64, logging
+    secret = cfg.get("secret")
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if not secret or not project:
+        return
+    try:
+        creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        creds.refresh(google.auth.transport.requests.Request())
+        url = ("https://secretmanager.googleapis.com/v1/projects/" + project +
+               "/secrets/" + secret + ":addVersion")
+        body = {"payload": {"data": base64.b64encode(json.dumps(blob).encode()).decode()}}
+        resp = httpx.post(url, json=body, timeout=30.0,
+                          headers={"Authorization": "Bearer " + creds.token})
+        if resp.status_code >= 300:
+            logging.warning("[REMOTE_MCP] " + cfg["name"] + ": could not persist rotated token (HTTP " +
+                            str(resp.status_code) + ")")
+        else:
+            logging.warning("[REMOTE_MCP] " + cfg["name"] + ": rotated refresh token persisted")
+    except Exception as e:
+        logging.warning("[REMOTE_MCP] " + cfg["name"] + ": token persist skipped: " + str(e))
+
+
+def _rmcp_refresh(cfg, state):
+    """Exchanges the stored refresh token for a fresh access token."""
+    import logging
+    blob = state["blob"]
+    refresh_token = blob.get("refresh_token")
+    token_endpoint = blob.get("token_endpoint")
+    if not refresh_token or not token_endpoint:
+        return False
+    data = {"grant_type": "refresh_token", "refresh_token": refresh_token}
+    for src, dst in (("client_id", "client_id"), ("client_secret", "client_secret"), ("resource", "resource")):
+        if blob.get(src):
+            data[dst] = blob[src]
+    try:
+        resp = httpx.post(token_endpoint, data=data, timeout=30.0)
+    except Exception as e:
+        logging.error("[REMOTE_MCP] " + cfg["name"] + ": refresh request failed: " + str(e))
+        return False
+    if resp.status_code != 200:
+        logging.error("[REMOTE_MCP] " + cfg["name"] + ": refresh returned HTTP " +
+                      str(resp.status_code) + " " + resp.text[:200])
+        return False
+    try:
+        payload = resp.json()
+    except Exception:
+        return False
+    token = payload.get("access_token")
+    if not token:
+        return False
+    ttl = float(payload.get("expires_in") or 0) or _RMCP_DEFAULT_TTL
+    state["access_token"] = token
+    state["expires_at"] = time.time() + ttl
+    blob["access_token"] = token
+    blob["expires_in"] = payload.get("expires_in") or 0
+    blob["issued_at"] = int(time.time())
+    rotated = payload.get("refresh_token")
+    if rotated and rotated != refresh_token:
+        blob["refresh_token"] = rotated
+        _rmcp_persist(cfg, blob)
+    logging.warning("[REMOTE_MCP] " + cfg["name"] + ": access token refreshed")
+    return True
+
+
+def _rmcp_header_provider(cfg):
+    """Builds the per-request Authorization header for one remote MCP server."""
+    def _provider(context):
+        state = _rmcp_state(cfg)
+        if state is None:
+            return {}
+        if state["expires_at"] and state["expires_at"] <= time.time() + _RMCP_REFRESH_SKEW:
+            _rmcp_refresh(cfg, state)
+        token = state.get("access_token")
+        if not token:
+            return {}
+        return {"Authorization": "Bearer " + token}
+    return _provider
+
+
+def get_remote_mcp_toolsets():
+    """Returns McpToolset objects for this demo's managed remote MCP servers."""
+    import logging
+    toolsets = []
+    for cfg in get_remote_mcp_configs():
+        label = cfg["name"]
+        try:
+            needs_auth = cfg.get("auth") != "none"
+            if needs_auth:
+                state = _rmcp_state(cfg)
+                if state is None or not state.get("access_token"):
+                    logging.warning("[REMOTE_MCP] " + label + ": no credentials in " + cfg.get("env_key", "") +
+                                    " - tools unavailable. Re-run the setup script to authorize.")
+                    continue
+            kwargs = {}
+            if needs_auth:
+                kwargs["header_provider"] = _rmcp_header_provider(cfg)
+            toolsets.append(McpToolset(
+                connection_params=StreamableHTTPConnectionParams(url=cfg["url"], timeout=300),
+                tool_name_prefix=cfg["prefix"],
+                **kwargs
+            ))
+            logging.warning("[REMOTE_MCP] " + label + ": toolset created (" + cfg["url"] + ")")
+        except Exception as e:
+            logging.error("[REMOTE_MCP] " + label + ": failed to initialize: " + str(e), exc_info=True)
+    return toolsets
+
+
+# =============================================================================
 # Background Task Management (Long-Running Agent Orchestration)
 # =============================================================================
 import uuid as _task_uuid
