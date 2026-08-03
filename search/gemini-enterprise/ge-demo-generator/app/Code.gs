@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.45-public',
+  APP_VERSION: 'v11.46-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -1046,6 +1046,7 @@ function getTechnicalInstruction_() {
     "When rendering the Batch Editor, you MUST use the following component structure for each row `i` (replace `i` with the actual 0-based index). " +
     "Ensure all component IDs are completely unique (e.g., by appending `_i` to each ID). " +
     "You MUST wrap the entire A2UI JSON payload in <a2ui-json> tags. " +
+    "The block MUST contain all three messages in order — beginRendering, dataModelUpdate (the initial row values), and surfaceUpdate (every row component) — inside that SAME <a2ui-json> block. Stopping after beginRendering + dataModelUpdate opens an empty surface and the editor never appears. " +
     "Here is the mandatory layout structure for a single row `i`:\n" +
     "[\n" +
     "{\n" +
@@ -1132,6 +1133,8 @@ function getTechnicalInstruction_() {
     
     "11. **SUGGESTION CHIPS (CRITICAL)**: At the END of EVERY response, you MUST append a lightweight A2UI suggestion chip bar using surfaceId 'suggestions' and root='root' containing a Row of 3-4 Buttons with sendText actions. The chip block MUST be COMPLETE: a single <a2ui-json> block containing BOTH the beginRendering message AND the surfaceUpdate message with all Button components — never emit beginRendering alone. NEVER write any plain text or markdown headers (like \"Next Actions\", \"💡 Next Actions\", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. " +
     "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: NEVER nest components inside a Button's 'child' property. 'child' MUST always be a flat string pointing to the ID of a separately defined Text component, and that Text component MUST be included in the SAME surfaceUpdate components array as its Button — a Button whose label Text component is missing renders as a BLANK button in the UI. Before finishing any A2UI block, verify every Button's child id has a matching Text component in the same block.\n" +
+    "**EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions)**: a beginRendering message only OPENS an empty surface; the components are delivered by surfaceUpdate. EVERY <a2ui-json> block you emit MUST therefore contain BOTH the beginRendering message AND the surfaceUpdate message carrying the full component tree for that same surfaceId, in the SAME block. A dataModelUpdate is NOT a substitute for surfaceUpdate: emitting [beginRendering, dataModelUpdate] and then moving on renders NOTHING and the user sees only your prose. This is the single most common way a rich card silently disappears — before you close any <a2ui-json> block, confirm it contains a surfaceUpdate whose components array includes the root id named in beginRendering.\n" +
+    "**ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL)**: inside a Button action's 'context', every 'key' MUST be different from every component 'id' in the same card. A context key that matches a component id is resolved against the component tree by the client and arrives server-side as the unusable literal key '[object Object]', so that value is LOST. Prefix component ids to keep them distinct (context key \"title\" with component id \"fTitle\", key \"qty\" with id \"qtyField\", and so on).\n" +
     "**A2UI CARD INTERACTION EXCEPTION (STRICT RULE)**: When your response already contains a major interactive A2UI card featuring its own control buttons " +
     "(such as the Welcome Card onboarding buttons, the Analysis Plan pre-flight card buttons like Run inline / Run in background / Adjust, or the Workflow Execution Plan mode selection buttons like Immediate/Background/Scheduled), " +
     "you **MUST NOT** output any suggestion chip bar at the bottom of your response. The card's own control buttons are sufficient. " +

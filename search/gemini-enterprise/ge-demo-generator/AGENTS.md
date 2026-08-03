@@ -125,6 +125,59 @@ Two things worth keeping in mind if you touch this:
   reproduced in 2 of 5 runs; a single green run would have "confirmed" a prompt
   that was broken 40% of the time.
 
+### 2.5 A2UI card delivery and press context
+
+Two failure modes found together on one live turn (a scanned-fax-to-quote
+workflow): the card the model tried to draw never appeared, and the answers the
+user picked on the card that did appear never reached the agent.
+
+**A `beginRendering` without a `surfaceUpdate` renders nothing.**
+`beginRendering` only OPENS a surface; the component tree arrives in
+`surfaceUpdate`. The model emitted `[beginRendering, dataModelUpdate]` and moved
+straight on to the suggestions block, so the client opened an empty surface and
+the user saw prose plus chips and no card. Nothing was dropped server-side. The
+"emit begin AND update in the SAME block" rule existed, but only inside the
+SUGGESTION CHIPS bullet, so it read as a chips rule; it is now stated as a
+general A2UI rule at both prompt sites and in the Pattern (J) batch-editor
+template, with `dataModelUpdate` called out explicitly as *not* a substitute.
+The server-side guard was suggestions-only in the same way
+(`_chips_ok` → `[chip_reprompt]`). `_orphan_card_surface_ids()` now reports any
+non-suggestions surface that was opened but never populated; the executor drops
+those parts (an unpopulated surface can only render blank, and it would also pin
+that surfaceId for later turns) and runs ONE card-only re-prompt, keeping the
+result only if it is populated and orphan-free. Logged as `[card_reprompt]`, and
+it runs BEFORE the chip recovery so a recovered card with its own buttons
+suppresses the chip re-prompt, and before the idempotency/artifact caches so
+replays serve the complete version.
+
+**An action context key must never equal a component id.** A Start press on the
+autonomous briefing card arrived with every question collapsed into a single
+literal key:
+
+```json
+"context": {"[object Object]": "What is the preferred time range...?",
+            "a0": ["Store Management Group"], "a1": ["Last 90 days"],
+            "ra": "1", "s0": "..."}
+```
+
+`a<i>`, `s<i>`, `ra` and `text` all survived, and multi-key contexts work
+elsewhere (a batch-editor Submit delivers `item_0_qty`,
+`item_0_selected_sku`, … intact), so neither the message-prep chain nor the
+array-of-`{key, value}` shape is at fault — that shape matches the A2UI 0.8
+catalog. The one thing that distinguished `q<i>`: it was ALSO the component id
+of the question `Text`. A context key that collides with a component id is
+resolved against the client's component registry and stringified into the key,
+losing the value. Fix: the question `Text` keeps id `qt<i>` while the label
+travels as `bq<i>` — no key/id pair may ever be equal. The shipped few-shots
+were already safe by accident (`fTitle` vs key `title`); a prompt rule now makes
+that explicit so model-authored cards cannot reintroduce it.
+
+Independently, `_extract_briefing_answers` gated its per-question loop on
+`q<i>` being present, so a mangled label discarded answers that had arrived
+perfectly. Harvesting is now driven by the ANSWER (`a<i>`, falling back to
+`s<i>`); the label is optional and only affects the wording of the recap line.
+**Never gate a press handler on a decorative context key.**
+
 ## 3. Managed Autonomous Agent (`enableManagedAgent`)
 
 Optional feature (default ON in the UI) that provisions a Pre-GA **Managed
@@ -176,6 +229,21 @@ can delegate long-running autonomous work to over the **Interactions API**
   `ENABLE_COMPUTER_USE`-guarded splice fragments inside the Managed-Agent
   blocks (`_MA_CU_BROWSER_EXCLUSION`, `_MA_PREBROWSE_EXCEPTION` in
   fast_api_app.py and the CU-conditional fragments in agent.py).
+- **The pre-flight gate is text-only — attachments bypass it**: the classifier
+  reads text parts only, so "read this fax and prepare the quote" was judged on
+  its words alone, returned AUTONOMOUS, and short-circuited into the briefing
+  card before the agent ran. The "IMAGE/VISION WORK IS YOURS ALONE" rule lives
+  in `agent.py`, which never executed. Two changes: a READING AN ATTACHED IMAGE
+  OR DOCUMENT exclusion in `PREFLIGHT_CLASSIFIER_PROMPT`, and — because a
+  text-only classifier cannot be trusted with a question about a non-text part —
+  a structural `_message_has_attachment()` check that sets `_gate_skip` for ANY
+  turn carrying an `inline_data`/`file_data` part. No gate card is right there:
+  the sandbox cannot see the attachment at all, and an inline plan card only
+  adds a click to work the agent was already going to do inline. Note also that
+  the confirmed-press SYSTEM NOTE pinning `delegate_autonomous_task` as the
+  first action is not reliable — on that turn ADK sticky-routed into
+  `deep_analysis_agent` and ran the work inline anyway. Keep gates structural,
+  not advisory.
 - **Workspace token freshness (v11.6+)**: `session.state` only ever holds the
   CREATE-time OAuth token (ADK's InMemorySessionService returns copies), so
   the runtime keeps two always-fresh sources — the process-global
