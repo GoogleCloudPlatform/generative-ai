@@ -58,7 +58,7 @@ func TestLoad_ValidConfig(t *testing.T) {
 		}
 	}`)
 
-	cfg, err := Load(path)
+	cfg, err := Load(path, false)
 	require.NoError(t, err)
 
 	assert.Equal(t, "ABCDE-12345-FGHIJ", cfg.BillingAccountID)
@@ -118,7 +118,7 @@ func TestLoad_MultiProjectConfig(t *testing.T) {
 		}
 	}`)
 
-	cfg, err := Load(path)
+	cfg, err := Load(path, false)
 	require.NoError(t, err)
 
 	assert.Len(t, cfg.Projects, 3)
@@ -149,14 +149,14 @@ func TestLoad_StalenessThresholdZeroMeansDisabled(t *testing.T) {
 		}
 	}`)
 
-	cfg, err := Load(path)
+	cfg, err := Load(path, false)
 	require.NoError(t, err)
 
 	assert.Equal(t, 0, cfg.Settings.StalenessThresholdDays)
 }
 
 func TestLoad_FileNotFound(t *testing.T) {
-	_, err := Load(filepath.Join(t.TempDir(), "does-not-exist.json"))
+	_, err := Load(filepath.Join(t.TempDir(), "does-not-exist.json"), false)
 	assert.ErrorIs(t, err, models.ErrConfigNotFound)
 }
 
@@ -167,14 +167,14 @@ func TestLoad_FileUnreadable(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = os.Chmod(path, 0600) })
 
-	_, err := Load(path)
+	_, err := Load(path, false)
 	assert.ErrorIs(t, err, models.ErrConfigUnreadable)
 }
 
 func TestLoad_MalformedJSON(t *testing.T) {
 	path := writeFixture(t, `{ this is not valid json }`)
 
-	_, err := Load(path)
+	_, err := Load(path, false)
 	assert.ErrorIs(t, err, models.ErrConfigInvalid)
 }
 
@@ -276,8 +276,81 @@ func TestLoad_ValidationFailures(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			path := writeFixture(t, tc.json)
-			_, err := Load(path)
+			_, err := Load(path, false)
 			assert.ErrorIs(t, err, tc.wantErr)
+		})
+	}
+}
+
+func TestLoad_ValidConfig_DirectLaw(t *testing.T) {
+	// A valid configuration under direct_law must contain a subscription_id
+	path := writeFixture(t, `{
+		"billing_account_id": "ABCDE-12345-FGHIJ",
+		"projects": {
+			"acme-prod": [
+				{
+					"subscription_tier": "SUBSCRIPTION_TIER_ENTERPRISE",
+					"subscription_id": "sub-uuid-abc-123",
+					"location": "global",
+					"groups": ["eng@acme.com"]
+				}
+			]
+		},
+		"settings": {
+			"staleness_threshold_days": 45
+		}
+	}`)
+
+	cfg, err := Load(path, true) // directLaw = true
+	require.NoError(t, err)
+	assert.Equal(t, "sub-uuid-abc-123", *cfg.Projects["acme-prod"][0].SubscriptionID)
+}
+
+func TestLoad_InvalidConfig_DirectLaw_MissingSubscriptionID(t *testing.T) {
+	// Under direct_law mode, if subscription_id is omitted or empty,
+	// it must fail validation with models.ErrConfigInvalid.
+	tests := []struct {
+		name string
+		json string
+	}{
+		{
+			name: "missing subscription_id key entirely",
+			json: `{
+				"billing_account_id": "ABCDE-12345-FGHIJ",
+				"projects": {
+					"acme-prod": [
+						{
+							"subscription_tier": "SUBSCRIPTION_TIER_ENTERPRISE",
+							"location": "global",
+							"groups": ["eng@acme.com"]
+						}
+					]
+				}
+			}`,
+		},
+		{
+			name: "empty subscription_id string value",
+			json: `{
+				"billing_account_id": "ABCDE-12345-FGHIJ",
+				"projects": {
+					"acme-prod": [
+						{
+							"subscription_tier": "SUBSCRIPTION_TIER_ENTERPRISE",
+							"subscription_id": "",
+							"location": "global",
+							"groups": ["eng@acme.com"]
+						}
+					]
+				}
+			}`,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			path := writeFixture(t, tc.json)
+			_, err := Load(path, true) // directLaw = true
+			assert.ErrorIs(t, err, models.ErrConfigInvalid)
 		})
 	}
 }

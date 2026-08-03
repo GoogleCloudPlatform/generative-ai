@@ -61,8 +61,8 @@ type MockGeminiClient struct {
 }
 
 // FetchLicenseConfigIndex satisfies ports.GeminiClient.
-func (m *MockGeminiClient) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error) {
-	args := m.Called(ctx, billingAccountID)
+func (m *MockGeminiClient) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string, directLaw bool) (models.LicenseConfigIndex, error) {
+	args := m.Called(ctx, billingAccountID, directLaw)
 	index, _ := args.Get(0).(models.LicenseConfigIndex)
 	return index, args.Error(1)
 }

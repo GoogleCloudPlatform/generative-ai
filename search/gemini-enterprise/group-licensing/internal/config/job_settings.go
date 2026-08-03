@@ -13,6 +13,7 @@ import (
 type JobSettings struct {
 	JobType   models.WorkflowType
 	DryRun    bool
+	DirectLaw bool
 	TaskIndex int
 	TaskCount int
 }
@@ -44,6 +45,16 @@ func LoadJobSettings() (*JobSettings, error) {
 		}
 	}
 
+	// DIRECT_LAW — optional, default false.
+	directLaw := false
+	if raw := os.Getenv("DIRECT_LAW"); raw != "" {
+		var err error
+		directLaw, err = strconv.ParseBool(raw)
+		if err != nil {
+			return nil, fmt.Errorf("DIRECT_LAW %q is not a valid boolean: %w", raw, models.ErrConfigInvalid)
+		}
+	}
+
 	// CLOUD_RUN_TASK_INDEX — optional, default 0.
 	taskIndex := 0
 	if raw := os.Getenv("CLOUD_RUN_TASK_INDEX"); raw != "" {
@@ -72,6 +83,7 @@ func LoadJobSettings() (*JobSettings, error) {
 	return &JobSettings{
 		JobType:   jobType,
 		DryRun:    dryRun,
+		DirectLaw: directLaw,
 		TaskIndex: taskIndex,
 		TaskCount: taskCount,
 	}, nil
