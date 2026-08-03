@@ -377,6 +377,7 @@ dbln
 dcg
 dcl
 DCR
+dcr
 ddata
 ddbb
 ddl
@@ -1421,6 +1422,7 @@ plpgsql
 plt
 pmb
 PNGs
+pobj
 podcast
 podcasts
 podes
@@ -1442,6 +1444,7 @@ Pranav
 praw
 prcntg
 PRD
+prm
 Pré
 PREBROWSE
 preds

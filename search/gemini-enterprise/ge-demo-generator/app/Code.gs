@@ -6821,7 +6821,7 @@ function probeRemoteMcpServer(endpointUrl) {
     const url = String(endpointUrl || '').trim().replace(/\/+$/, '');
     const parts = url.match(/^(https:\/\/[^\/]+)(\/.*)?$/i);
     if (!parts) {
-      return { success: false, message: 'Enter an https:// MCP endpoint URL (for example https://mcp.notion.com/mcp).' };
+      return { success: false, message: 'Enter a full https:// MCP endpoint URL (for example https://mcp.notion.com/mcp).' };
     }
     const origin = parts[1];
     const path = parts[2] || '';
