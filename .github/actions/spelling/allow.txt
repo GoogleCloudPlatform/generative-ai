@@ -8,6 +8,8 @@ Abhishek
 acall
 achat
 Achird
+acked
+acking
 AClient
 acomplete
 acs
@@ -149,6 +151,7 @@ baxis
 bayes
 bbc
 bbq
+bdt
 Beehiiv
 beir
 Bengaluru
@@ -241,6 +244,7 @@ CASP
 catus
 caudatus
 caxis
+cbody
 cbp
 ccc
 cce
@@ -279,6 +283,7 @@ clickable
 CLIs
 cloudrun
 CLOUDSDK
+cloudtasks
 cloudveil
 clsx
 cmap
@@ -511,6 +516,7 @@ endblock
 endlocal
 enf
 engi
+enqueuer
 ENU
 Envane
 envrc
@@ -1385,6 +1391,7 @@ PEGI
 Pengyu
 pepe
 Persero
+persistable
 petabytes
 pevt
 pfas
@@ -1490,7 +1497,10 @@ Pzk
 Qantas
 qas
 QEDC
+qjson
 QLo
+qlog
+qlogger
 qna
 QPM
 qqq
@@ -1627,6 +1637,7 @@ Scorsese
 sdec
 sdetail
 SDKROOT
+sdt
 seabut
 sealife
 seatback
@@ -1641,6 +1652,7 @@ SEMCONV
 seo
 SEO
 serde
+serialisable
 serper
 SERPER
 serrata
@@ -1921,6 +1933,7 @@ unmarshal
 unparseable
 unquote
 unrtf
+unserialisable
 unsloth
 Unsloth
 unterminated

@@ -1977,6 +1977,110 @@ import uuid as _task_uuid
 import datetime as _task_dt
 from google.adk.tools import LongRunningFunctionTool
 
+# --- Worker dispatch ---------------------------------------------------------
+# Two transports can start the /execute_task worker endpoint:
+#   1. Cloud Tasks (preferred). A durable, out-of-process HTTP call carrying an
+#      OIDC token. It outlives the request that created it, retries when the
+#      instance running it is recycled, and WAKES a scaled-to-zero service --
+#      which is what makes --min-instances 0 safe for background work.
+#   2. localhost self-call (fallback). The original in-container fire-and-forget
+#      on a daemon thread. Kept for demos whose queue could not be provisioned:
+#      it cannot wake a cold instance and dies with the process, so it only
+#      works while an instance is already serving.
+# Either way, never dial SELF_URL from inside the container: --ingress internal
+# rejects a request that leaves via the public URL and re-enters as "external".
+# Cloud Tasks is exempt for the same reason the Pub/Sub push subscription that
+# already targets this endpoint is -- it is a same-project Google-managed caller.
+_WORKER_QUEUE = os.environ.get("WORKER_QUEUE", "").strip()
+_WORKER_QUEUE_LOCATION = os.environ.get("WORKER_QUEUE_LOCATION", "us-central1").strip()
+
+
+def _enqueue_worker_task(_task_id, _demo_id, _force_run=False):
+    """Enqueue one /execute_task delivery on Cloud Tasks. True when queued."""
+    import logging as _qlog
+    _qlogger = _qlog.getLogger("bg_task")
+    _self_url = os.environ.get("SELF_URL", "").strip().rstrip("/")
+    _sa = os.environ.get("RUNTIME_SA_EMAIL", "").strip()
+    _project = os.environ.get("GOOGLE_CLOUD_PROJECT", "").strip()
+    if not (_WORKER_QUEUE and _self_url and _sa and _project):
+        return False
+    try:
+        from google.cloud import tasks_v2 as _tasks_v2
+        from google.protobuf import duration_pb2 as _duration_pb2
+        import json as _qjson
+        _client = _tasks_v2.CloudTasksClient()
+        _qs = "?task_id=" + _task_id + "&demo_id=" + _demo_id + ("&force_run=1" if _force_run else "")
+        _payload = {"task_id": _task_id, "demo_id": _demo_id}
+        if _force_run:
+            _payload["force_run"] = True
+        _created = _client.create_task(request={
+            "parent": _client.queue_path(_project, _WORKER_QUEUE_LOCATION, _WORKER_QUEUE),
+            "task": {
+                "http_request": {
+                    "http_method": _tasks_v2.HttpMethod.POST,
+                    "url": _self_url + "/execute_task" + _qs,
+                    "headers": {"Content-Type": "application/json"},
+                    "body": _qjson.dumps(_payload).encode("utf-8"),
+                    # audience == the bare service URL: Cloud Run validates the
+                    # OIDC token against the service, not against the path.
+                    "oidc_token": {"service_account_email": _sa, "audience": _self_url},
+                },
+                # The worker runs the whole task inline before responding, so
+                # the dispatch deadline has to match the Cloud Run request
+                # timeout (1800s, also the Cloud Tasks maximum). Anything
+                # shorter makes Cloud Tasks abandon and retry a live run.
+                "dispatch_deadline": _duration_pb2.Duration(seconds=1800),
+            },
+        })
+        _qlogger.warning("_enqueue_worker_task: queued task_id=%s name=%s", _task_id, getattr(_created, "name", ""))
+        return True
+    except Exception as _qe:
+        _qlogger.error(
+            "_enqueue_worker_task: FAILED task_id=%s %s: %s - falling back to the localhost self-call",
+            _task_id, type(_qe).__name__, str(_qe)[:300])
+        return False
+
+
+def _fire_worker_localhost(_task_id, _demo_id, _force_run=False):
+    """Fallback dispatch: fire-and-forget self-call on a daemon thread."""
+    import threading as _threading
+    import requests as _requests
+    _port = os.environ.get("PORT", "8080")
+    _worker_url = "http://localhost:" + _port + "/execute_task"
+    _qs = "?task_id=" + _task_id + "&demo_id=" + _demo_id + ("&force_run=1" if _force_run else "")
+    _payload = {"task_id": _task_id, "demo_id": _demo_id}
+    if _force_run:
+        _payload["force_run"] = True
+
+    def _fire():
+        import logging as _log
+        _logger = _log.getLogger("bg_task")
+        _logger.warning("_fire: SENDING request worker_url=%s task_id=%s demo_id=%s", _worker_url, _task_id, _demo_id)
+        try:
+            # Short read timeout (0.5s): this is fire-and-forget. The endpoint
+            # runs the agent asynchronously; we only need the request accepted,
+            # not the result.
+            _resp = _requests.post(_worker_url + _qs, json=_payload,
+                                   headers={"Content-Type": "application/json"}, timeout=(5, 0.5))
+            _logger.warning("_fire: response status=%s body=%s", _resp.status_code, _resp.text[:300])
+        except _requests.exceptions.ReadTimeout:
+            # Expected: the worker is processing asynchronously.
+            _logger.warning("_fire: request accepted (ReadTimeout expected for async), task_id=%s", _task_id)
+        except _requests.exceptions.ConnectionError as _ce:
+            _logger.error("_fire CONNECTION_ERROR: server may not be ready. task_id=%s err=%s", _task_id, str(_ce)[:300])
+        except Exception as _e:
+            _logger.error("_fire FAILED: %s: %s", type(_e).__name__, str(_e)[:500])
+    _threading.Thread(target=_fire, daemon=True).start()
+
+
+def _dispatch_worker(_task_id, _demo_id, _force_run=False):
+    """Start /execute_task for a task. Returns the transport actually used."""
+    if _enqueue_worker_task(_task_id, _demo_id, _force_run):
+        return "cloud_tasks"
+    _fire_worker_localhost(_task_id, _demo_id, _force_run)
+    return "localhost"
+
+
 def register_background_task(
     task_name: str,
     task_description: str,
@@ -2137,37 +2241,9 @@ def submit_background_task_now(task_name: str, task_description: str, task_promp
             "message": "Failed to register task: Firestore write error. " + str(_fs_err)[:200],
         }
 
-    # Fire-and-forget: trigger worker endpoint via localhost
-    # IMPORTANT: Do NOT use SELF_URL (public *.run.app URL) for self-calls.
-    # Cloud Run --ingress internal blocks requests from the container's own
-    # public URL because they exit via the internet and re-enter as "external".
-    # Using localhost:PORT keeps the request inside the container.
-    import threading as _threading
-    import requests as _requests
-    _port = os.environ.get("PORT", "8080")
-    _worker_url = "http://localhost:" + _port + "/execute_task"
-
-    def _fire():
-        import logging as _log
-        _logger = _log.getLogger("bg_task")
-        _logger.warning("_fire: SENDING request worker_url=%s task_id=%s demo_id=%s", _worker_url, _task_id, _demo_id)
-        try:
-            _headers = {"Content-Type": "application/json"}
-            # Use short read timeout (0.5s): this is fire-and-forget.
-            # The execute_task endpoint runs the agent asynchronously;
-            # we only need to confirm the request was accepted, not wait for completion.
-            _resp = _requests.post(_worker_url + "?task_id=" + _task_id + "&demo_id=" + _demo_id, json={"task_id": _task_id, "demo_id": _demo_id}, headers=_headers, timeout=(5, 0.5))
-            _logger.warning("_fire: response status=%s body=%s", _resp.status_code, _resp.text[:300])
-        except _requests.exceptions.ReadTimeout:
-            # Expected: the worker is processing asynchronously.
-            _logger.warning("_fire: request accepted (ReadTimeout expected for async), task_id=%s", _task_id)
-        except _requests.exceptions.ConnectionError as _ce:
-            _logger.error("_fire CONNECTION_ERROR: server may not be ready. task_id=%s err=%s", _task_id, str(_ce)[:300])
-        except Exception as _e:
-            _logger.error("_fire FAILED: %s: %s", type(_e).__name__, str(_e)[:500])
-    _threading.Thread(target=_fire, daemon=True).start()
-
-
+    # Hand the run to the worker endpoint (Cloud Tasks, else localhost).
+    _bg_logger.warning("register_background_task: dispatched task_id=%s via %s",
+                       _task_id, _dispatch_worker(_task_id, _demo_id))
 
     _ret = {
         "status": "submitted",
@@ -2256,9 +2332,12 @@ def get_task_result(task_id: str, tool_context: ToolContext) -> dict:
             "log_tail": _d.get("log_tail", ""),
             "started_at": _d.get("started_at", ""),
             "completed_at": _d.get("completed_at", ""),
-            "_MANDATORY_ACTION": "YOU MUST present result_summary below as formatted markdown text in your response. "
-                "Output the result_summary content VERBATIM as text. Do NOT skip it. Do NOT output only suggestion chips. "
-                "If your response contains NO text and only A2UI JSON, you have FAILED.",
+            "_MANDATORY_ACTION": "THE USER CANNOT SEE THIS TOOL RESULT. Nothing you fail to copy into your "
+                "reply exists for them. Copy the ENTIRE result_summary VERBATIM into your reply as formatted "
+                "markdown. Never write that the report is shown 'above', 'attached' or 'already displayed' - "
+                "it is not, and saying so shows the user an empty promise. Reproducing it again in a later turn "
+                "is correct, not redundant. Do NOT summarise it, do NOT link to it, do NOT reply with only "
+                "suggestion chips. If your response contains NO text and only A2UI JSON, you have FAILED.",
         }
         if _d.get("status") == "completed":
             # Autonomous tasks share this collection, so this tool also gets
@@ -2352,6 +2431,9 @@ def update_task_progress(
         _update_data = {
             "progress_pct": _pct,
             "log_tail": _new_log,
+            # Doubles as a liveness heartbeat (see the abandoned-run sweep in
+            # _inject_completed_tasks and the in-flight guard in /execute_task).
+            "updated_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
         }
         if workflow_state and isinstance(workflow_state, dict):
             _update_data["workflow_state"] = workflow_state
@@ -2606,33 +2688,14 @@ def run_scheduled_task_now(
             "message": "This task is already executing. Use get_task_result to check progress.",
         }
 
-    # Fire-and-forget: trigger the /execute_task worker via localhost (same
-    # pattern as register_background_task; see the comment there for why the
-    # public SELF_URL must NOT be used for self-calls). force_run lets the
-    # worker re-run a task whose single per-definition execution doc still
-    # holds a terminal status from a previous run.
-    import threading as _threading
-    import requests as _requests
-    _port = os.environ.get("PORT", "8080")
-    _worker_url = "http://localhost:" + _port + "/execute_task"
-
-    def _fire_now():
-        import logging as _log
-        _logger = _log.getLogger("sched_test_run")
-        try:
-            _resp = _requests.post(
-                _worker_url + "?task_id=" + task_id + "&demo_id=" + _demo_id + "&force_run=1",
-                json={"task_id": task_id, "demo_id": _demo_id, "force_run": True},
-                headers={"Content-Type": "application/json"},
-                timeout=(5, 0.5),
-            )
-            _logger.warning("run_now fire: status=%s task_id=%s", _resp.status_code, task_id)
-        except _requests.exceptions.ReadTimeout:
-            # Expected: the worker processes asynchronously.
-            _logger.warning("run_now fire: accepted (ReadTimeout expected), task_id=%s", task_id)
-        except Exception as _e:
-            _logger.error("run_now fire FAILED: %s: %s", type(_e).__name__, str(_e)[:500])
-    _threading.Thread(target=_fire_now, daemon=True).start()
+    # Trigger the /execute_task worker (Cloud Tasks, else the localhost
+    # self-call; see _dispatch_worker for why SELF_URL is unusable in-process).
+    # force_run lets the worker re-run a task whose single per-definition
+    # execution doc still holds a terminal status from a previous run.
+    import logging as _log
+    _log.getLogger("sched_test_run").warning(
+        "run_now: dispatched task_id=%s via %s", task_id,
+        _dispatch_worker(task_id, _demo_id, True))
 
     return {
         "status": "triggered",
@@ -2784,15 +2847,27 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     # Hybrid execution: stream synchronously for up to MANAGED_AGENT_SYNC_WAIT_S,
     # then hand off to the existing background-task infrastructure (Firestore
     # task_executions doc + _inject_completed_tasks announcement) while a daemon
-    # thread keeps consuming the SSE stream. Cloud Run runs with min-instances=1
-    # and no CPU throttling, so the thread survives after the turn returns.
-    # CAVEAT (v11.32, observed live 2026-07-22): min-instances keeps AN instance
-    # warm but Cloud Run still RECYCLES instances at will (SIGTERM mid-task); the
-    # daemon threads die with the process and the task doc freezes at 'working'.
+    # thread keeps consuming the SSE stream. Cloud Run runs with no CPU throttling,
+    # so the thread keeps running after the turn returns - for as long as the
+    # instance lives.
+    # CAVEAT (v11.32, observed live 2026-07-22): Cloud Run RECYCLES instances at
+    # will (SIGTERM mid-task); the daemon threads die with the process and the task
+    # doc freezes at 'working'. At the default --min-instances 0 that is no longer
+    # an occasional event: an idle service is torn down on purpose, so a long
+    # autonomous task WILL usually outlive the instance that launched it.
     # Monitoring is therefore best-effort push + guaranteed pull: every status
     # check and every turn's _inject_completed_tasks sweep can finalize an
     # orphaned doc directly from the persisted interaction (see
-    # _ma_recover_orphaned_task).
+    # _ma_recover_orphaned_task). The pull path is what actually delivers the
+    # result, and it runs on the user's next turn - which is also when they would
+    # see the announcement anyway. Deploy with MIN_INSTANCES=1 if a demo needs the
+    # monitor thread to keep streaming through long idle gaps.
+    # NOT a cause of the above (measured 2026-08-04): deploying a new revision.
+    # Cloud Run drains the old instance, so an in-flight /execute_task runs to
+    # completion first - two attempts to kill a running task by swapping revisions
+    # both lost the race to the task itself, and the traffic switch took 155s
+    # because it was waiting on the 88s request. Recycles come from idle
+    # scale-down or infrastructure churn, never from a deploy.
     # =============================================================================
     _MANAGED_AGENT_ID = os.environ.get("MANAGED_AGENT_ID", "").strip()
     _MANAGED_AGENT_LOCATION = "global"  # the Managed Agents API is global-only

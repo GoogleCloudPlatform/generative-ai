@@ -51,7 +51,7 @@ AGENT_SRC = HERE / "agent_template" / "adk_agent"
 # constraints.txt is byte-comparable with the generated one.
 CONSTRAINT_KEYS = [
     "adk", "mcp", "genai", "a2a", "aiplatform", "storage", "scheduler",
-    "pubsub", "firestore", "logging", "dotenv", "dbDtypes", "otel",
+    "tasks", "pubsub", "firestore", "logging", "dotenv", "dbDtypes", "otel",
     "playwright", "genaiComputerUse", "cuOtelGcpLogging",
     "cuOtelGcpResourceDetector",
 ]

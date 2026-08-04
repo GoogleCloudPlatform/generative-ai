@@ -125,6 +125,20 @@ Two things worth keeping in mind if you touch this:
   reproduced in 2 of 5 runs; a single green run would have "confirmed" a prompt
   that was broken 40% of the time.
 
+The same rule has a runtime twin. Some turns are answered by the executor
+WITHOUT running the agent -- the deterministic `Run in Background:` press, for
+one -- so nothing in the reply matches the conversation language by itself.
+`_localize_ui_strings` translates those fixed strings with a small model call,
+and it needs a *language sample* to do it. The sample must come from the SAME
+turn that answers. Sampling `_last_typed_user_text(session)` looks right and is
+structurally empty here: the press always follows a plan card, and that card
+turn short-circuits too, so ADK never appended the typed message to the session.
+The sample is now the press payload's own scope text, which carries the user's
+wording. Related: **every fail-open branch has to log.** The empty-sample early
+return was the branch that actually fired in the first live test and it returned
+English without a trace -- the only way to tell it apart from a successful no-op
+was that the emit landed 1 ms after the call.
+
 ### 2.5 A2UI card delivery and press context
 
 Two failure modes found together on one live turn (a scanned-fax-to-quote
@@ -212,6 +226,35 @@ property can never be stripped, and no hand-maintained component allowlist is
 needed. Log marker: `[a2ui_heal] pruned unknown prop(s) ... from <Component>`.
 Verified both directions: the live failing card validates after pruning, and the
 canonical `interactive_form.json` example passes through byte-identical.
+
+**A clean dangling-ref check is not a clean render.** Live 2026-08-04, the model
+emitted three suggestion chips whose `Button.child` ids it then defined as `Row`
+components with an empty `explicitList`. Every reference resolved, so the
+dangling-ref diagnostic stayed clean and the healer passed the payload straight
+through; the client rendered three blank pills the user could press but not
+read. Reference integrity is not the property worth checking -- *reachability*
+is. `_a2ui_is_blank` walks a button's child subtree and returns True only when it
+provably renders nothing (missing id, empty spec, empty `Text`, or a container
+whose every child is blank); anything it does not recognise counts as
+renderable, so `_heal_blank_buttons` can never erase a label it merely failed to
+parse. The replacement label is taken from the button's own `sendText` literal --
+model-written, therefore already in the conversation language (section 2.4).
+Inventing "Option 1" would hardcode English into a non-English conversation. A
+button with no text payload is left alone rather than guessed at.
+
+**Injected system notes ride the user's own message part list.** Completed
+background tasks are announced by appending a `SYSTEM NOTE (auto-generated;
+the user did NOT type this): ...` part to the SAME message the user typed into
+-- deliberately, for maximum salience to whichever agent answers the turn. Any
+helper that joins the message's text parts therefore picks it up.
+`_extract_user_text` did, so the pre-flight gate's scope became "the user's
+sentence + the note + the first 400 chars of the finished report": the plan
+card's editable *adjust your request* box rendered the raw note, and the `Run in
+Background:` chip carried it forward as its `sendText`. A sibling helper
+(`_last_typed_user_text`) had filtered `SYSTEM NOTE` parts for a long time,
+which is exactly why this looked handled -- **a filter on one reader is not a
+filter on the class.** When an injection targets the user's own message, audit
+every function that reads `new_message.parts`.
 
 ## 3. Managed Autonomous Agent (`enableManagedAgent`)
 
@@ -686,3 +729,136 @@ target MCP server through `_to_gemini_schema` with the patch applied, and diff
 old-versus-new output on schemas that exercise `allOf` merging, 2-variant
 `anyOf`, rich (3+ object variant) `anyOf`, and `$ref` cycles — those four paths
 are what the walker exists for and must not change.
+
+## 10. Scale-to-zero (`--min-instances 0`)
+
+An idle demo used to bill for a warm 8Gi/2vCPU instance around the clock. The
+deploy defaults to `--min-instances 0 --max-instances 1`, with `MIN_INSTANCES=1`
+exported before the setup script as the escape hatch for a live presentation.
+Three pieces of runtime work make that safe; each removes something that
+silently depended on "an instance is always there".
+
+### 10.1 A localhost self-call cannot survive a scale-to-zero
+
+Background work used to start a daemon thread that POSTed
+`http://localhost:$PORT/execute_task` and disconnected after a 0.5s read
+timeout. That transport can only reach an instance that is *already serving*, it
+dies with the process, and it has no retry.
+
+`tools._dispatch_worker` prefers **Cloud Tasks** and keeps the self-call only as
+a fallback for demos whose queue could not be provisioned. Cloud Tasks holds the
+request open for the whole run (so Cloud Run will not scale the instance down
+mid-task), retries when the instance carrying it is recycled, and *wakes* a cold
+service. Load-bearing constraints:
+
+- **Never dial `SELF_URL` from inside the container.** The service runs with
+  `--ingress internal`; a request that leaves via the public URL and re-enters
+  is classified as external and rejected. Cloud Tasks is exempt for the same
+  reason the existing Pub/Sub push subscription to `/execute_task` is — a
+  same-project Google-managed caller.
+- **`audience` is the bare service URL**, not the URL with the path. Cloud Run
+  validates the OIDC token against the service.
+- **`dispatch_deadline` must be 1800s**, matching the Cloud Run request timeout
+  (and the Cloud Tasks maximum). The worker runs the task inline before
+  responding; anything shorter makes Cloud Tasks abandon and retry a live run.
+- **Enqueuing needs `iam.serviceAccounts.actAs`.** The runtime service account
+  names *itself* in the `oidc_token`, so this is a resource-level
+  `roles/iam.serviceAccountUser` self-binding on the SA — it cannot go through
+  the project-level role grant. Missing it makes every enqueue fail and the demo
+  silently drops to the self-call.
+- **Cleanup PURGES the queue, it does not delete it.** Cloud Tasks tombstones a
+  deleted queue name for 7 days and refuses to recreate it; a re-setup inside
+  that window would silently downgrade the demo to the self-call. An empty queue
+  costs nothing.
+
+### 10.2 A heartbeat is what separates a duplicate from a recovery
+
+Retries mean `/execute_task` can receive a second delivery for a task that is
+already `working`. Re-running would duplicate the work and race two writers on
+one doc; refusing forever would freeze the doc at `working` whenever the first
+runner died. The runner writes `updated_at` at most every
+`WORKER_HEARTBEAT_EVERY_S` (30s) from inside `_bg_consume`, and the guard uses
+its age to choose.
+
+The heartbeat alone is **not sufficient**, and this is the subtle part. If the
+instance dies at t=100s, Cloud Tasks retries ~15s later while the heartbeat is
+still only ~115s old — well inside the 600s stale window — so a purely
+heartbeat-based guard would ack the recovery as a duplicate and lose the run.
+The guard therefore also reads `X-CloudTasks-TaskRetryCount`: **Cloud Tasks
+never retries an attempt that is still in flight**, so a non-zero count is
+positive proof that the previous runner terminated, however fresh its last
+heartbeat looks. The stale-heartbeat branch then only has to cover the localhost
+fallback, which has no retries and leaves no other trace of a dead runner.
+
+Duplicates are acked with 2xx on purpose — a 5xx would make Cloud Tasks retry a
+perfectly healthy run.
+
+A matching sweep in `_inject_completed_tasks` fails any `working` doc whose
+heartbeat is older than `WORKER_ABANDON_AFTER_S` (default 1800s, the Cloud Run
+request timeout, so nothing healthy is ever swept). Without it a run whose Cloud
+Tasks retries were all exhausted sits at `working` forever and the in-flight
+guard keeps telling the user the task "is already executing". Autonomous tickets
+(`interaction_id`) are skipped — they have their own recovery path,
+`_ma_recover_orphaned_task`.
+
+### 10.3 `InMemorySessionService` dies with the instance
+
+ADK keeps the whole conversation in the process. At min-instances 1 one warm
+instance answered nearly every turn, so this was invisible; at 0, an idle gap
+ends the process and the next message starts from a blank history mid-demo.
+
+`fast_api_app.py` mirrors each turn's session into `{demo}_adk_sessions`
+(gzipped `events` + `state`) in the `finally` of `_process_request`, and
+`_process_request_body` rehydrates on an in-memory miss before creating a blank
+session. The flush runs **inside the per-session lock**, so a concurrent turn
+cannot interleave a half-written history, and it runs even when the turn failed
+— a failed turn still moved the conversation forward.
+
+Deliberate limits, do not "fix" these without thinking:
+
+- **Only the conversation is persisted.** `_session_last_artifact` and
+  `builtins._ws_session_tokens` are process-local by design: the token is
+  re-sent on every request, and losing the regenerate cache costs one replay.
+- **The OAuth token is stripped** from the persisted state
+  (`_session_persistable_state` skips the `GEMINI_AUTHORIZATION_ID` key). It is
+  short-lived and re-supplied per request; it has no business in Firestore.
+- **The blob is stamped with the ADK version that wrote it** and discarded on
+  mismatch. ADK owns the `Event` schema; feeding a blob from another version to
+  `Event.model_validate` is not worth the crash.
+- **Firestore caps a document at 1 MiB.** The flush halves the event list until
+  the gzipped blob fits under 800 KB, and skips the write if it still does not.
+
+### 10.4 Why `--max-instances 1`
+
+The runtime still assumes single-instance process-local state —
+`_get_session_lock`, `_session_last_artifact`, `builtins._ws_session_tokens`,
+`_WORKER_SEMAPHORE`. Capping at 1 makes that assumption true. It also avoids a
+hazard the Firestore mirror would *not* catch: with two instances, turn N+2 can
+land on a warm instance whose in-memory session predates turn N+1, and a warm
+hit never consults Firestore. One instance serves up to 80 concurrent requests,
+so this is not a throughput ceiling at demo scale.
+
+### 10.5 What genuinely regresses, and what cannot be tested
+
+- **First message after an idle gap costs a cold start.** Measured after a ~17
+  min idle: ~20s to "Application startup complete", 37s for the whole turn
+  against 9–13s warm, so about +25s on that one message.
+- **Autonomous tasks now usually outlive their instance.** The SSE monitor
+  thread was always best-effort, but at min-instances 0 an idle service is torn
+  down *on purpose*. Pull recovery (`_ma_recover_orphaned_task` from the
+  persisted interaction) stops being a safety net and becomes the primary
+  delivery path. It fires on the user's next turn, which is also when they would
+  have seen the announcement anyway.
+- **The takeover branch of section 10.2 has no on-demand trigger.** The obvious
+  lever does not work: swapping revisions **drains** the old instance — Cloud
+  Run waits for in-flight requests before sending SIGTERM, and `/execute_task`
+  holds its request open for the entire run. Measured twice; firing the kill one
+  second after the task started still lost the race, and the traffic switch took
+  155s precisely because it spent 88s waiting for the request it was meant to
+  interrupt. Two things follow. Instances are recycled by idle scale-down and
+  infrastructure churn, **not by deploys**, so a rollout during a demo will not
+  orphan a running task. And testing this path means faking the *state*, not the
+  failure: plant a `working` execution doc with a heartbeat older than
+  `_WORKER_HEARTBEAT_STALE_S` and deliver `/execute_task` for it. That writes
+  synthetic documents into a live demo's Firestore, so it is a deliberate
+  decision, not something to do casually while testing something else.

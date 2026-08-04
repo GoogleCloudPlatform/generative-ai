@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.50-public',
+  APP_VERSION: 'v11.55-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2409,6 +2409,7 @@ function generateSetupScript(params) {
     aiplatform: 'google-cloud-aiplatform[agent_engines]>=1.112.0,<2.0.0',
     storage: 'google-cloud-storage>=2.14.0,<4.0.0',
     scheduler: 'google-cloud-scheduler>=2.0.0,<3.0.0',
+    tasks: 'google-cloud-tasks>=2.13.0,<3.0.0',
     pubsub: 'google-cloud-pubsub>=2.0.0,<3.0.0',
     firestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
     logging: 'google-cloud-logging>=3.0.0,<4.0.0',
@@ -2474,7 +2475,7 @@ function generateSetupScript(params) {
   // across feature-flag combinations.
   const CONSTRAINT_KEYS = [
     'adk', 'mcp', 'genai', 'a2a', 'aiplatform', 'storage', 'scheduler',
-    'pubsub', 'firestore', 'logging', 'dotenv', 'dbDtypes', 'otel',
+    'tasks', 'pubsub', 'firestore', 'logging', 'dotenv', 'dbDtypes', 'otel',
     'playwright', 'genaiComputerUse', 'cuOtelGcpLogging', 'cuOtelGcpResourceDetector',
   ];
   const constraintLines = [];
@@ -3923,6 +3924,18 @@ ${ enableManagedAgent ? `
     done
 
     echo ""
+    echo "📥 Purging Cloud Tasks queue..."
+    # PURGED, not deleted, on purpose: Cloud Tasks tombstones a deleted queue
+    # name for 7 days and refuses to recreate it. Re-running setup inside that
+    # window would silently drop the demo back to the in-container dispatch,
+    # which cannot survive a scale-to-zero. An empty queue costs nothing and is
+    # reused as-is by the next setup run.
+    gcloud tasks queues purge "${dirName}-worker" --location=us-central1 \\
+      --project="$PROJECT_ID" --quiet 2>/dev/null \\
+      && echo "   ✅ Queue purged: ${dirName}-worker (kept: the name is reserved for 7 days after a delete)" \\
+      || echo "   ⚠️  Queue not found: ${dirName}-worker"
+
+    echo ""
     echo "⏰ Deleting Cloud Scheduler jobs..."
     SCHED_JOBS=$(gcloud scheduler jobs list --location=us-central1 --project="$PROJECT_ID" \\
       --format="value(name)" 2>/dev/null | grep "${dirName}-sched-" || true)
@@ -3942,7 +3955,7 @@ ${ enableManagedAgent ? `
     GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" python3 -c "
 from google.cloud import firestore
 db = firestore.Client()
-for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '${dirName}_task_push_configs']:
+for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '${dirName}_task_push_configs', '${dirName}_adk_sessions']:
     docs = list(db.collection(coll_name).stream())
     for doc in docs:
         doc.reference.delete()
@@ -4414,7 +4427,7 @@ grant_roles_fast "$PROJECT_ID" "serviceAccount" "\$COMPUTE_SA" \
   "roles/mcp.toolUser" "roles/bigquery.jobUser" "roles/bigquery.dataEditor" \
   "roles/serviceusage.serviceUsageConsumer" "roles/aiplatform.user" "roles/logging.logWriter" \
   "roles/datastore.user" "roles/storage.objectViewer" "roles/storage.objectAdmin" "roles/artifactregistry.admin" "roles/run.invoker" \
-  "roles/pubsub.publisher" "roles/cloudscheduler.admin" "roles/dataplex.catalogViewer"
+  "roles/pubsub.publisher" "roles/cloudscheduler.admin" "roles/cloudtasks.enqueuer" "roles/dataplex.catalogViewer"
 
 # Background task infra: Cloud Scheduler SA needs pubsub.publisher
 echo "🔐 Configuring IAM for Cloud Scheduler Service Agent..."
@@ -4437,6 +4450,22 @@ if gcloud iam service-accounts add-iam-policy-binding "\$COMPUTE_SA" \
   echo "  ✅ signBlob self-binding granted."
 else
   echo "  ⚠️  Failed to grant signBlob self-binding (V4 signed URLs may fail)."
+fi
+
+# --- Cloud Tasks: actAs self-binding ---
+# Enqueueing a task whose http_request carries an oidc_token requires
+# iam.serviceAccounts.actAs on the impersonated SA. The runtime names ITSELF in
+# the token, so the binding is again resource-level on the SA and cannot go
+# through grant_roles_fast. Without it every enqueue fails and the worker
+# silently falls back to the localhost self-call.
+echo "🔐 Granting actAs (serviceAccountUser) on the runtime SA to itself..."
+if gcloud iam service-accounts add-iam-policy-binding "\$COMPUTE_SA" \
+    --member="serviceAccount:\$COMPUTE_SA" \
+    --role="roles/iam.serviceAccountUser" \
+    --project="$PROJECT_ID" --quiet >/dev/null 2>&1; then
+  echo "  ✅ actAs self-binding granted."
+else
+  echo "  ⚠️  Failed to grant actAs self-binding (background tasks fall back to the in-container dispatch)."
 fi
 
 echo "🪣 Creating non-public dashboards bucket: \$DASH_BUCKET ..."
@@ -4640,6 +4669,7 @@ gcloud beta services mcp enable firestore.googleapis.com --project="$PROJECT_ID"
 gcloud beta services mcp enable dataplex.googleapis.com --project="$PROJECT_ID" 2>/dev/null &
 gcloud services enable aiplatform.googleapis.com --project="$PROJECT_ID" 2>/dev/null &
 gcloud services enable cloudscheduler.googleapis.com --project="$PROJECT_ID" 2>/dev/null &
+gcloud services enable cloudtasks.googleapis.com --project="$PROJECT_ID" 2>/dev/null &
 gcloud services enable pubsub.googleapis.com --project="$PROJECT_ID" 2>/dev/null &
 wait
 echo "  ✅ MCP services enabled"
@@ -4687,6 +4717,7 @@ ${PINNED_DEPS.storage}
 ${PINNED_DEPS.a2ui}
 ${PINNED_DEPS.a2a}
 ${PINNED_DEPS.scheduler}
+${PINNED_DEPS.tasks}
 ${PINNED_DEPS.pubsub}
 ${PINNED_DEPS.firestore}
 ${PINNED_DEPS.logging}
@@ -5342,6 +5373,29 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
   gcloud pubsub topics create "$SCHED_TOPIC" --project="$PROJECT_ID" 2>/dev/null &
   gcloud pubsub topics create "$RESULT_TOPIC" --project="$PROJECT_ID" 2>/dev/null &
 
+  # --- Cloud Tasks queue for background work ---
+  # The runtime enqueues here instead of calling itself over localhost, so a
+  # background run survives the turn that started it, retries when the instance
+  # is recycled, and can wake a service that has scaled to zero.
+  # max-concurrent-dispatches matches _WORKER_SEMAPHORE (2) so the queue, not
+  # the container, is the place work waits. max-attempts leaves room for a few
+  # genuine recoveries without re-running a task forever.
+  WORKER_QUEUE="${dirName}-worker"
+  WORKER_QUEUE_LOCATION="us-central1"
+  echo "📥 Creating Cloud Tasks queue $WORKER_QUEUE (parallel with deploy)..."
+  (
+    gcloud tasks queues create "$WORKER_QUEUE" \\
+      --location="$WORKER_QUEUE_LOCATION" \\
+      --max-attempts=5 \\
+      --max-concurrent-dispatches=2 \\
+      --max-dispatches-per-second=5 \\
+      --min-backoff=15s \\
+      --max-backoff=300s \\
+      --project="$PROJECT_ID" >/dev/null 2>&1 \\
+    || gcloud tasks queues resume "$WORKER_QUEUE" \\
+      --location="$WORKER_QUEUE_LOCATION" --project="$PROJECT_ID" >/dev/null 2>&1
+  ) &
+
   DEPLOY_LOG=$(mktemp /tmp/deploy-XXXXXX.log)
   trap "rm -f \$DEPLOY_LOG" EXIT
   echo "🤖 Deploying Main Agent to Cloud Run via Source..."
@@ -5363,7 +5417,11 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
       `ENABLE_MANAGED_AGENT=${enableManagedAgent ? '1' : '0'}`,
       `ENABLE_WORKSPACE_AUTH=${enableWorkspaceAuth ? '1' : '0'}`,
       "DASHBOARDS_BUCKET=\$DASH_BUCKET",
-      "RUNTIME_SA_EMAIL=\$COMPUTE_SA"
+      "RUNTIME_SA_EMAIL=\$COMPUTE_SA",
+      // Background worker dispatch. Unset (or a queue that cannot be reached)
+      // makes the runtime fall back to the in-container localhost self-call.
+      "WORKER_QUEUE=\$WORKER_QUEUE",
+      "WORKER_QUEUE_LOCATION=\$WORKER_QUEUE_LOCATION"
     ];
     let secrets = [];
     let optionalSecrets = [];
@@ -5433,6 +5491,27 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
     
     let deployCmd = '';
 
+    // Scale-to-zero by default. An idle demo used to bill for a warm 8Gi/2vCPU
+    // instance around the clock; it now costs nothing between conversations.
+    // Three pieces of work made that safe (see the runtime comments):
+    //   - background runs go through Cloud Tasks, so they survive the turn that
+    //     started them and a cold service is woken to take them;
+    //   - ADK sessions are mirrored to Firestore and rehydrated on a cold start,
+    //     so an idle gap no longer wipes the conversation;
+    //   - a worker heartbeat plus an abandoned-run sweep finalize anything that
+    //     dies with a recycled instance.
+    // max-instances 1 makes the process-local state this design still relies on
+    // (per-session locks, the regenerate cache, the worker semaphore) actually
+    // true; one instance serves up to 80 concurrent requests, so it is not a
+    // throughput ceiling at demo scale.
+    // The cost is a cold start on the first message after an idle gap: measured
+    // live 2026-08-04 after a ~17 min idle, the container took ~20s to reach
+    // "Application startup complete" and the turn took 37s end to end against
+    // 9-13s warm, i.e. roughly +25s on that first message only. Export
+    // MIN_INSTANCES=1 before running the script to keep a warm instance for a
+    // live presentation.
+    deployCmd += `\n# Scale-to-zero unless the operator asked for a warm instance\nMIN_INSTANCES="\${MIN_INSTANCES:-0}"\n`;
+
     if (optionalSecrets.length > 0) {
       deployCmd += `\n# Discover provisioned optional secrets\nOPTIONAL_SECRETS=""\n`;
       optionalSecrets.forEach(os => {
@@ -5458,7 +5537,8 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
     --cpu 2 \
     --no-cpu-throttling \
     --cpu-boost \
-    --min-instances 0 \
+    --min-instances "\$MIN_INSTANCES" \
+    --max-instances 1 \
     --timeout 1800 \
     --no-allow-unauthenticated \
     --ingress internal \
@@ -5468,13 +5548,14 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
     --region us-central1 \
     --quiet > "\$DEPLOY_LOG" 2>&1 &`;
     } else {
-      deployCmd = `CR_ENV_VARS="${envVars.join(",")}"\nif [ "\$VIEWER_DEPLOYED" = "true" ]; then\n  CR_ENV_VARS="\$CR_ENV_VARS,DATA_VIEWER_URL=\$VIEWER_URL"\nfi\nCR_ENV_VARS="\$CR_ENV_VARS,SANDBOX_RESOURCE_NAME=\$SANDBOX_RESOURCE_NAME"\n${enableManagedAgent ? `CR_ENV_VARS="\$CR_ENV_VARS,MANAGED_AGENT_ID=\$MANAGED_AGENT_ID,MANAGED_AGENT_SKILLS_SOURCE=\$MA_SKILLS_SOURCE"\n` : ''}gcloud run deploy "\$SERVICE_NAME" \
+      deployCmd += `CR_ENV_VARS="${envVars.join(",")}"\nif [ "\$VIEWER_DEPLOYED" = "true" ]; then\n  CR_ENV_VARS="\$CR_ENV_VARS,DATA_VIEWER_URL=\$VIEWER_URL"\nfi\nCR_ENV_VARS="\$CR_ENV_VARS,SANDBOX_RESOURCE_NAME=\$SANDBOX_RESOURCE_NAME"\n${enableManagedAgent ? `CR_ENV_VARS="\$CR_ENV_VARS,MANAGED_AGENT_ID=\$MANAGED_AGENT_ID,MANAGED_AGENT_SKILLS_SOURCE=\$MA_SKILLS_SOURCE"\n` : ''}gcloud run deploy "\$SERVICE_NAME" \
     --source .. \
     --memory "8Gi" \
     --cpu 2 \
     --no-cpu-throttling \
     --cpu-boost \
-    --min-instances 0 \
+    --min-instances "\$MIN_INSTANCES" \
+    --max-instances 1 \
     --timeout 1800 \
     --no-allow-unauthenticated \
     --ingress internal \
