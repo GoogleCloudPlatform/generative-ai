@@ -1128,6 +1128,12 @@ _code_executor = AgentEngineSandboxCodeExecutor(
 )
 
 # --- Before-Agent Callback: Inject completed background task results ---
+# A 'working' task doc this far past its last heartbeat is abandoned. The
+# default sits at the Cloud Run request timeout: no worker run can legitimately
+# outlive that, so nothing healthy is ever swept.
+_WORKER_ABANDON_AFTER_S = float(os.environ.get("WORKER_ABANDON_AFTER_S", "1800"))
+
+
 def _inject_completed_tasks(callback_context):
     """Checks Firestore for completed tasks not yet reported and injects results."""
     import builtins, logging as _logging
@@ -1136,23 +1142,63 @@ def _inject_completed_tasks(callback_context):
     if not _fs or not _demo_id:
         callback_context.state["_bg_task_results"] = ""
         return None
-    # Orphan recovery sweep (v11.32), BEFORE the completed-tasks query so a
-    # task recovered here is announced in this same turn. Autonomous tasks
-    # are monitored by in-process daemon threads; a Cloud Run instance
-    # recycle kills them and freezes the doc at status 'working' (observed
-    # live 2026-07-22: SIGTERM 16 min into a task, doc stuck at 90% while
-    # the sandbox finished server-side 30 min later). The sweep only touches
-    # docs whose monitor heartbeat is stale - see _ma_recover_orphaned_task.
+    # Stuck-run sweep, BEFORE the completed-tasks query so anything finalized
+    # here is announced in this same turn.
     try:
+        import datetime as _sdt
         _wdocs = _fs.collection(_demo_id + "_task_executions").where(
             "status", "==", "working").limit(5).stream()
         for _wdoc in _wdocs:
             _wd = _wdoc.to_dict()
+            # Autonomous tickets (v11.32) are monitored by in-process daemon
+            # threads; a Cloud Run instance recycle kills them and freezes the
+            # doc at 'working' (observed live 2026-07-22: SIGTERM 16 min in,
+            # doc stuck at 90% while the sandbox finished server-side 30 min
+            # later). _ma_recover_orphaned_task finalizes such a doc from the
+            # persisted interaction, and only when its heartbeat is stale.
+            # BACKSTOP ONLY since v11.56: this callback never runs when ADK
+            # resumes into a sticky sub-agent, so the primary sweep now sits at
+            # the A2A request entry (_ma_sweep_orphaned_tasks). Kept here for
+            # the /execute_task and non-A2A paths; it costs nothing when the
+            # entry sweep already refreshed the heartbeat.
             if _wd.get("interaction_id"):
-                try:
-                    tools._ma_recover_orphaned_task(_wdoc.reference, _wd, False)
-                except Exception:
-                    pass
+                if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+                    try:
+                        tools._ma_recover_orphaned_task(_wdoc.reference, _wd, False)
+                    except Exception:
+                        pass
+                continue
+            # Abandoned worker run: /execute_task heartbeats updated_at every
+            # ~30s for as long as it is alive. Silence far past that means the
+            # instance carrying it died AND Cloud Tasks exhausted its retries
+            # (or the localhost fallback was in use, which has no retries at
+            # all). Left alone the doc sits at 'working' forever, the in-flight
+            # guard in /execute_task keeps refusing to re-run it, and the user
+            # is told the task "is already executing". Fail it so it can be
+            # started again, and let the normal announcement report it.
+            _raw_beat = _wd.get("updated_at") or _wd.get("started_at") or ""
+            if not _raw_beat:
+                continue
+            try:
+                _beat = _sdt.datetime.fromisoformat(str(_raw_beat).replace("Z", "+00:00"))
+                if _beat.tzinfo is None:
+                    _beat = _beat.replace(tzinfo=_sdt.timezone.utc)
+                _age = (_sdt.datetime.now(_sdt.timezone.utc) - _beat).total_seconds()
+            except Exception:
+                continue
+            if _age < _WORKER_ABANDON_AFTER_S:
+                continue
+            _logging.warning("Abandoned background task " + str(_wd.get("task_id", ""))
+                             + ": no heartbeat for " + str(int(_age)) + "s - marking failed.")
+            _wdoc.reference.update({
+                "status": "failed",
+                "result_summary": ("The worker running this task stopped responding about "
+                                   + str(max(1, int(_age // 60))) + " minutes ago, so the run was "
+                                   "abandoned. Nothing was lost that had already been reported; "
+                                   "the task can simply be started again."),
+                "completed_at": _sdt.datetime.now(_sdt.timezone.utc).isoformat(),
+                "reported_to_user": False,
+            })
     except Exception:
         pass
     try:
