@@ -2503,6 +2503,25 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         user_id = run_args['user_id']
 
         if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+            # Orphan-recovery sweep (v11.56). At the default --min-instances 0 an
+            # idle instance is torn down on purpose, so a long autonomous task
+            # usually outlives the daemon thread monitoring it and its doc freezes
+            # at 'working'. Recovery is pull-based and MUST run here, at the
+            # request entry: the equivalent sweep in root_agent's
+            # before_agent_callback is skipped whenever ADK resumes the session
+            # into a sticky sub-agent (see _ma_sweep_orphaned_tasks). It also has
+            # to run BEFORE the completed-task query below, so a ticket finalized
+            # now is announced in this same turn.
+            # Off-thread: the sweep does a blocking Firestore read plus an
+            # interaction GET, and this is the event loop.
+            try:
+                _ma_healed = await asyncio.to_thread(_agent_tools._ma_sweep_orphaned_tasks)
+                if _ma_healed:
+                    logger.log_text('[ma_sweep] finalized ' + str(_ma_healed)
+                                    + ' orphaned autonomous ticket(s) at request entry')
+            except Exception as _ma_sweep_err:
+                logger.log_text('[ma_sweep] sweep skipped: ' + str(_ma_sweep_err)[:200])
+
             # Deterministic completion delivery (v11.0): the state-based
             # {_bg_task_results} injection proved too weak on busy turns - a
             # "Run Inline" press transfers to deep_analysis (whose instruction has

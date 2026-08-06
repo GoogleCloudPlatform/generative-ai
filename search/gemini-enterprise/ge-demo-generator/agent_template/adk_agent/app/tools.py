@@ -2943,7 +2943,19 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         interactions tools override does NOT accept type 'filesystem' (supported:
         google_maps, mcp_server, code_execution, computer_use, function,
         url_context, google_search). The sandbox keeps its built-in bash +
-        file_system abilities regardless, so filesystem is simply omitted here."""
+        file_system abilities regardless, so filesystem is simply omitted here.
+
+        NOTE (verified live 2026-08-06): with base_agent antigravity-preview-05-2026
+        this override is a NO-OP and the MCP servers never reach the model. Two
+        probes: (1) sending ONLY [google_search] still left the model holding the
+        agent's full registered tool set, so the override is ignored outright;
+        (2) registering mcp_server on the AGENT itself stores fine but the model
+        answers NO_MCP_TOOL when asked to call it. The sandbox agent has therefore
+        NEVER had BigQuery / Firestore / Knowledge Catalog access - see AGENTS.md
+        section 11. The brief no longer promises it and the root agent now
+        front-loads query results into input_data. This function is kept as-is so
+        the attachment starts working the day the API supports it; do not build on
+        it until a probe says otherwise."""
         tools = [
             {"type": "code_execution"},
             {"type": "google_search"},
@@ -3603,6 +3615,46 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         _merged.update(_update)
         return _merged
 
+    def _ma_sweep_orphaned_tasks(mark_reported=False, limit=5):
+        """Finalizes every autonomous ticket whose in-process monitor died.
+
+        v11.56: this sweep used to exist ONLY inside root_agent's
+        before_agent_callback (_inject_completed_tasks). ADK resumes a session
+        straight into a sticky sub-agent - observed live as 'Starting Agent:
+        root_agent' followed 34ms later by 'Agent Name: deep_analysis_agent'
+        with no LLM call in between - and then the ROOT callback never fires.
+        So the sessions that delegate the most (heavy analysis runs inside
+        deep_analysis, which is exactly what leaves a sticky sub-agent behind)
+        were the ones where self-healing could never run: one ticket sat at
+        'working'/52% for 96 minutes while its interaction had already
+        completed server-side. The caller is now the A2A
+        request entry point, which no routing decision can skip.
+
+        Returns the number of docs finalized (0 also means 'nothing was stale')."""
+        import builtins
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        if not _fs or not _demo_id:
+            return 0
+        _healed = 0
+        try:
+            _docs = _fs.collection(_demo_id + "_task_executions").where(
+                "status", "==", "working").limit(limit).stream()
+            for _doc in _docs:
+                _d = _doc.to_dict()
+                # Only autonomous tickets: a worker-run doc has no interaction to
+                # recover from, and its abandon sweep lives in the agent callback.
+                if not _d.get("interaction_id"):
+                    continue
+                try:
+                    if _ma_recover_orphaned_task(_doc.reference, _d, mark_reported):
+                        _healed += 1
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        return _healed
+
     if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
         def _ma_refresh_token_object(_tid, _tok):
             # Rotating token object: the sandbox re-fetches the CURRENT user
@@ -3630,7 +3682,7 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                        + "- Before any Google Workspace operation, run: export GOOGLE_WORKSPACE_CLI_TOKEN=" + ws_auth[7:] + chr(10)
                        + "- This user access token expires in about an hour: do Workspace operations EARLY in the task." + chr(10)
                        + "- ADMIN LIMITS: this token carries USER-level scopes only. Admin SDK APIs (Directory, Reports / audit logs, license management) and org-wide admin exports WILL fail with 401/403 - that is expected, not an error to fix. Do NOT retry, poll, or grind on them: derive what you can from user-level APIs (Drive / Gmail / Calendar data this user can see), state the limitation clearly in your report, and continue with the rest of the task." + chr(10)
-                       + "- Use the gws CLI for ALL Workspace reads/writes (see the gws-* skills under /.agent/skills). It is usually pre-installed at $HOME/bin/gws - call it by that absolute path. If missing: mkdir -p $HOME/bin && curl -sL https://github.com/googleworkspace/cli/releases/latest/download/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz | tar xz -C $HOME/bin ./gws && chmod +x $HOME/bin/gws (do NOT use npm - its Linux binary needs GLIBC 2.39 which this sandbox lacks)." + chr(10)
+                       + "- Use the gws CLI for ALL Workspace reads/writes (see the gws-* skills under /workspace/.agent/skills). It is usually pre-installed at $HOME/bin/gws - call it by that absolute path. If missing: mkdir -p $HOME/bin && curl -sL https://github.com/googleworkspace/cli/releases/latest/download/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz | tar xz -C $HOME/bin ./gws && chmod +x $HOME/bin/gws (do NOT use npm - its Linux binary needs GLIBC 2.39 which this sandbox lacks)." + chr(10)
                        + "- GUARDRAILS: NEVER send email - create Gmail drafts only, unless the task explicitly says to send. NEVER delete anything in Workspace. Post Chat messages ONLY to spaces the task explicitly names - and if the named space does not exist yet, CREATE it with that exact name first, then post (expected in demo environments; mention the creation in your report). Create Calendar events only when the task asks for them." + chr(10)
                        + "- Non-ASCII email headers (Subject etc.) MUST be RFC 2047 MIME-encoded; read the draft back to verify the subject is not garbled, and recreate it if needed." + chr(10)
                        + "- Report created drafts as ALREADY EXISTING in Gmail (subject + link https://mail.google.com/mail/u/0/#drafts), never as text to copy manually." + chr(10)
@@ -3653,7 +3705,14 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     def _ma_build_task_message(task_description, input_data, upload_urls):
         _msg = task_description.strip()
         if input_data and input_data.strip():
-            _msg = _msg + chr(10) + chr(10) + "INPUT DATA (provided by the requesting assistant):" + chr(10) + input_data.strip()
+            # v11.56: the "authoritative and sufficient" framing is deliberate. Without
+            # it the sandbox agent treats INPUT DATA as a hint and goes hunting for the
+            # source database - observed live, where a full run was spent on
+            # bq / gcloud auth / metadata-server probes and zero deliverables
+            # were produced. See AGENTS.md section 11.
+            _msg = (_msg + chr(10) + chr(10)
+                    + "INPUT DATA (provided by the requesting assistant - pulled from the internal systems moments ago; authoritative and sufficient: build directly from these figures, do NOT search for the source database or shell credentials to re-derive them):"
+                    + chr(10) + input_data.strip())
         if upload_urls:
             _lines = []
             for _name, _mime, _label, _url in upload_urls:
@@ -3672,8 +3731,14 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
     ) -> dict:
         """Delegates a long-running, multi-step task to the fully autonomous cloud
         agent (isolated sandbox with bash, filesystem, code execution, pip/npm,
-        Google Search, web page reading, direct BigQuery/Firestore access, and
-        professional deliverable skills for decks / documents / PDFs / web pages).
+        Google Search, web page reading, and professional deliverable skills for
+        decks / documents / PDFs / web pages).
+
+        IT HAS NO DATABASE ACCESS. The autonomous agent cannot query BigQuery or
+        Firestore - only YOU can. Every internal figure it needs must be queried by
+        you FIRST and passed in input_data, or the deliverable will be built without
+        it.
+
 
         USE FOR: live web research combined with internal data, building and
         running code, producing downloadable business files (pptx/docx/pdf/html),
@@ -3694,8 +3759,11 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 Describe OUTCOMES only - NEVER reference this agent's own tool
                 names (publish_dashboard, save_deliverables_to_drive, ...): the
                 autonomous agent cannot call them and gets derailed trying.
-            input_data: Optional data to embed verbatim (query results, lists,
-                constraints) so the agent does not have to re-derive them.
+            input_data: REQUIRED whenever the task touches internal data. Run the
+                queries yourself and embed the results verbatim here (rows, totals,
+                baselines, lists, constraints). The autonomous agent cannot query
+                anything: whatever you leave out simply will not appear in the
+                deliverable. Over-provide rather than under-provide.
             deliverables_for_task_id: LEAVE EMPTY for normal tasks. Set it ONLY
                 when re-delegating an upload-only follow-up for a FINISHED task
                 whose files stayed in the sandbox: pass that original ticket-id

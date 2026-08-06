@@ -1156,6 +1156,11 @@ def _inject_completed_tasks(callback_context):
             # doc stuck at 90% while the sandbox finished server-side 30 min
             # later). _ma_recover_orphaned_task finalizes such a doc from the
             # persisted interaction, and only when its heartbeat is stale.
+            # BACKSTOP ONLY since v11.56: this callback never runs when ADK
+            # resumes into a sticky sub-agent, so the primary sweep now sits at
+            # the A2A request entry (_ma_sweep_orphaned_tasks). Kept here for
+            # the /execute_task and non-A2A paths; it costs nothing when the
+            # entry sweep already refreshed the heartbeat.
             if _wd.get("interaction_id"):
                 if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     try:

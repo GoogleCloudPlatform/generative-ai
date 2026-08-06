@@ -862,3 +862,100 @@ so this is not a throughput ceiling at demo scale.
   `_WORKER_HEARTBEAT_STALE_S` and deliver `/execute_task` for it. That writes
   synthetic documents into a live demo's Firestore, so it is a deliberate
   decision, not something to do casually while testing something else.
+
+## 11. Autonomous delegation: what actually reaches the sandbox agent
+
+Two failures found together while diagnosing one stuck ticket. The ticket froze
+at `working`/52%, and finalizing it would have delivered nothing anyway.
+
+### 11.1 A root-agent callback is not a per-turn hook
+
+Section 10 promotes pull recovery (`_ma_recover_orphaned_task`) to the *primary*
+delivery path for autonomous tasks: at `--min-instances 0` the SSE monitor
+thread usually dies with its instance. That recovery needs a driver that runs
+every turn, and `_inject_completed_tasks` — `root_agent`'s
+`before_agent_callback` — is not one. ADK resumes a session directly into
+whichever agent was active when it ended, so a turn that lands on a sticky
+`deep_analysis_agent` never enters `root_agent.run_async`:
+
+```
+04:14:01  last monitor heartbeat (12s cadence)
+04:14:12  Shutting down                     <- idle scale-down, monitor thread dies
+04:47:36  Starting Agent: root_agent
+04:47:36  Agent Name: deep_analysis_agent   (+34ms, no LLM call in between)
+```
+
+That 34 ms gap is ADK resumption, not a transfer. The interaction had already
+completed server-side; the doc sat at `working`/52% for 96 minutes.
+
+The selection effect is what makes this worse than a rare miss. A session
+becomes sticky on `deep_analysis_agent` by running a heavy analysis — which is
+also what precedes a delegation. **The sessions that create orphans are
+disproportionately the sessions that cannot heal them.**
+
+`tools._ma_sweep_orphaned_tasks` is now called from the A2A request entry in
+`fast_api_app.py` via `asyncio.to_thread`, before the completed-task query so a
+ticket finalized now is announced in the same turn. The callback keeps a copy as
+a backstop for the non-A2A paths. The general form: **anything that must run
+once per turn belongs at the request entry, not on an agent.** Agent callbacks
+fire per *agent run*, and which agents run is a routing decision the framework
+makes.
+
+### 11.2 The MCP servers were never reaching the sandbox agent
+
+`_ma_override_tools` attaches BigQuery / Firestore / Knowledge Catalog MCP
+servers to every delegation, and the agent brief told the sandbox agent it had
+"direct read access to the demo dataset". Probed live against `base_agent`
+`antigravity-preview-05-2026`:
+
+| probe | payload | model's tool list |
+|---|---|---|
+| per-turn override, MCP only | `tools:[bq, firestore, catalog]` | `google:browse, google:search, default_api:*` — no MCP |
+| per-turn override, one tool | `tools:[google_search]` | unchanged: the agent's **full** registered set |
+| agent-level registration | `mcp_server` in `agents.create` | stored fine; asked to call it, the model replies `NO_MCP_TOOL` |
+
+Row 2 is the decisive one: sending a single tool did not narrow anything, so the
+interactions `tools` override is **ignored outright**. Row 3 closes the escape
+hatch — registering MCP on the agent resource is accepted by the API and still
+never reaches the model.
+
+So the sandbox agent has never had database access. Believing the brief, it went
+looking for the access it had been promised, found `bq` on `PATH`, and spent an
+entire run trying to authenticate it — `gcloud auth list`, a metadata-server
+curl, a credential-file search, `sudo`. 133 steps, 3,743 output tokens, zero
+deliverables, while the task message already carried every figure the deck
+needed. The same pattern reproduces across demos.
+
+Nothing logged a warning: the override is accepted with a 200. **An ignored
+parameter and an honored one look identical from the caller.** The
+discriminating test is not "did the call succeed" but "does removing something
+change the outcome".
+
+What the brief and the delegation tool now say:
+
+- `DATA ACCESS` states the agent has no database access, names the dataset and
+  collection only to say they are unreachable, and declares the task message's
+  `INPUT DATA` block the only source of internal data — authoritative and
+  sufficient, in the same words `BROWSER FINDINGS` has always used.
+- The credential dead ends are named explicitly (`bq` / `gcloud` / `gsutil` are
+  on `PATH` but unauthenticated; no ADC, no metadata server, no `sudo`). Stating
+  the principle abstractly does not work; an agent with a shell will always find
+  something plausible to try.
+- Investigation is bounded to two failures, after which the agent builds from
+  what it has and states the gap. Missing figures go in the report so the
+  assistant can query them and re-delegate.
+- `delegate_autonomous_task` tells the *root* agent the same thing, and
+  `input_data` went from "Optional data to embed verbatim" to required whenever
+  the task touches internal data.
+
+`_ma_override_tools` still sends the MCP servers, documented as a no-op, so the
+attachment starts working the day the API supports it.
+
+### 11.3 Skill packs are mounted relative to the working directory
+
+The env spec's `target` is `/.agent/skills`, and the brief repeated that path
+verbatim. `find /.agent/skills -name SKILL.md` fails; `ls .agent/skills` from
+`/workspace` succeeds. The agent-facing text now says
+`/workspace/.agent/skills` and adds a "list it relative first, and build anyway
+if there are none" hedge. Leave the env spec `target` alone — the platform
+interprets it.

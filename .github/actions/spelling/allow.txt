@@ -1768,6 +1768,7 @@ subschema
 subschemas
 subviews
 subword
+sudo
 suis
 sunner
 supima
