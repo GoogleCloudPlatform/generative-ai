@@ -927,7 +927,7 @@ deliverables, while the task message already carried every figure the deck
 needed. The same pattern reproduces across demos.
 
 Nothing logged a warning: the override is accepted with a 200. **An ignored
-parameter and an honored one look identical from the caller.** The
+parameter and an obeyed one look identical from the caller.** The
 discriminating test is not "did the call succeed" but "does removing something
 change the outcome".
 
