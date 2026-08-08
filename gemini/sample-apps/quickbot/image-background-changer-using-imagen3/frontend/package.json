@@ -26,9 +26,9 @@
   "dependencies": {
     "@angular/animations": "^15.1.0",
     "@angular/cdk": "^15.2.9",
-    "@angular/common": "^15.1.0",
-    "@angular/compiler": "^15.1.0",
-    "@angular/core": "^15.1.0",
+    "@angular/common": "^20.3.27",
+    "@angular/compiler": "^20.3.27",
+    "@angular/core": "^20.3.25",
     "@angular/fire": "7.5",
     "@angular/flex-layout": "^15.0.0-beta.42",
     "@angular/forms": "^15.1.0",
