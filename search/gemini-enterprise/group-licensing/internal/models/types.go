@@ -54,7 +54,7 @@ type LicenseUpdate struct {
 	UserEmail         string
 	SKU               SKU
 	Location          Location
-	LicenseConfigPath string // revokes only: resource path from UserLicense
+	LicenseConfigPath string // revokes and direct_law join only: resource path from UserLicense
 	Action            LicenseAction
 }
 
@@ -64,9 +64,10 @@ type LicenseUpdate struct {
 // the human-readable project ID — the Discovery Engine API uses numbers in
 // licenseConfig resource paths.
 type LicenseConfigKey struct {
-	SKU           SKU
-	ProjectNumber string
-	Location      Location
+	SKU            SKU
+	SubscriptionID string // only used in direct_law join mode, admin-specifies the {uuid} in licenseConfigs/{uuid}
+	ProjectNumber  string
+	Location       Location
 }
 
 // LicenseConfigEntry holds the full licenseConfig resource path and the number
