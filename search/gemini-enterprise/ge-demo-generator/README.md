@@ -955,7 +955,7 @@ After running the setup script, the following directory structure is created:
 - **Ingress Org-Policy Graceful Failure**: Setup scripts detect and gracefully handle organization policies that block unauthenticated Cloud Run endpoints (e.g., `constraints/iam.allowedPolicyMemberDomains`).
 - **Static Agent Card**: The A2A server builds an `AgentCard` without connecting to MCP servers at startup, preventing hangs from slow/broken MCP connections. MCP tool connections happen lazily on first user request.
 - **Parallel BQ Loading**: BigQuery table loading uses `xargs -P 5` for parallel CSV uploads.
-- **Min Instances**: Cloud Run deployments use `--min-instances 0` to minimize standby costs for demo environments (users should expect occasional cold-start latency on the first request).
+- **Scale to Zero**: Cloud Run deployments use `--min-instances 0 --max-instances 1` so an idle demo costs nothing between conversations. Three mechanisms make that safe: background runs are dispatched through a **Cloud Tasks** queue (so they survive the turn that started them, retry if the instance is recycled, and wake a cold service), ADK sessions are mirrored to Firestore and rehydrated on a cold start, and a worker heartbeat plus an abandoned-run sweep finalize anything that dies with its instance. The cost is a cold start on the first message after an idle gap (measured: ~+25s on that one message). Export `MIN_INSTANCES=1` before running the setup script to keep a warm instance for a live presentation.
 - **Supergateway Stateless Sessions**: Custom MCP sidecars use `supergateway --sessionStateless` to prevent process accumulation from multiple client connections.
 
 ### Token Management
