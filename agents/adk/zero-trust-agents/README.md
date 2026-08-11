@@ -15,6 +15,8 @@ Giving an LLM agent autonomous access to databases, APIs, and code execution is 
 - **🔑 Secret Exfiltration**: An agent writes Python to "format logs," but a prompt injection makes it run `os.environ.get("STRIPE_API_KEY")` and exfiltrate billing credentials.
 - **🗄️ Database Tampering**: A rogue DBA modifies a `$149` refund to `$9,999,999` directly in the database — and no one knows, because there's no cryptographic audit trail.
 
+![alt text](images/zero-trust-agents.png)
+
 ## 🛡️ The Three Pillars
 
 This project demonstrates three security layers that must work **together** — no single layer is sufficient:
@@ -61,7 +63,7 @@ The web dashboard is a **JavaScript simulation** that mirrors the Python backend
 ```bash
 cd zero-trust-agents
 python3 -m http.server 8000
-# Open http://localhost:8000
+# Open http://127.0.0.1:8000
 ```
 
 **What to try:**
@@ -158,7 +160,7 @@ The local demo mocks can be replaced with fully-managed Google Cloud services:
 |------------|----------------------|
 | Python HMAC signing | **Cloud KMS** + **Cloud HSM** (FIPS 140-2 Level 3) |
 | Simulated gVisor containers | **GKE Sandbox** / **Cloud Run** + **VPC Service Controls** |
-| Python regex gateway | **Sensitive Data Protection (DLP)** + **Vertex AI Safety Settings** |
+| Python regex gateway | **Sensitive Data Protection (DLP)** + **Vertex AI Agent Platform Safety Settings** |
 
 → See [**TUTORIAL.md**](./TUTORIAL.md) for the full implementation guide, production `gcloud` commands, Terraform configs, and Cloud DLP code samples.
 
