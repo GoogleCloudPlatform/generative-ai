@@ -971,8 +971,8 @@ keras
 Ketamine
 keycap
 keychain
-Keypair
 keypair
+Keypair
 KFBI
 kfp
 Khanh
@@ -1798,8 +1798,8 @@ SWP
 sxs
 sylvatica
 SYMED
-Syscalls
 syscalls
+Syscalls
 SYSINSTR
 SYSROOT
 Syunik
