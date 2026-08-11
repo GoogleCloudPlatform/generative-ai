@@ -281,6 +281,7 @@ clearbox
 clf
 clickable
 CLIs
+CLOEXEC
 cloudrun
 CLOUDSDK
 cloudtasks
@@ -551,6 +552,7 @@ Eventarc
 EVs
 evse
 evt
+Exfil
 expl
 faa
 facecolor
@@ -564,6 +566,7 @@ fastmcp
 Fastmcp
 fastrtc
 fda
+FDCWD
 fea
 fect
 Feitian
@@ -770,6 +773,7 @@ hashtags
 Haumea
 Hawkins'll
 Hayao
+hazmat
 Hbf
 HBox
 hclient
@@ -967,6 +971,8 @@ keras
 Ketamine
 keycap
 keychain
+Keypair
+keypair
 KFBI
 kfp
 Khanh
@@ -990,6 +996,7 @@ Kraizt
 KSA
 kubectl
 Kubeflow
+KVM
 Kvyat
 Kwanzan
 kyc
@@ -1184,6 +1191,7 @@ mpga
 mpim
 mpld
 mpn
+Mqp
 mrag
 mrr
 mrtydi
@@ -1334,6 +1342,7 @@ OOM
 Oort
 OOTB
 openai
+openat
 openfda
 openssl
 Oppo
@@ -1542,6 +1551,7 @@ rbeat
 rbf
 rbm
 rdoc
+RDONLY
 recontext
 Recontext
 recrawl
@@ -1610,6 +1620,7 @@ Ruchika
 runjdwp
 RUnlock
 RUNPATH
+runsc
 Rupjit
 RVL
 RVR
@@ -1741,6 +1752,7 @@ sse
 ssh
 ssml
 ssn
+SSNs
 ssr
 SSRF
 sss
@@ -1786,6 +1798,8 @@ SWP
 sxs
 sylvatica
 SYMED
+Syscalls
+syscalls
 SYSINSTR
 SYSROOT
 Syunik
