@@ -687,3 +687,51 @@ func TestGCService_processProject_PageLimitReached(t *testing.T) {
 	require.NoError(t, err)
 	gemini.AssertNumberOfCalls(t, "ListUserLicenses", models.MaxPagesPerGroup)
 }
+
+func TestGCService_Run_DirectLaw(t *testing.T) {
+	// Under direct_law mode, the Garbage Collection workflow must run successfully,
+	// verifying entitlements correctly, and propagating the direct_law flag.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-dl"
+		group     = "grp-dl@example.com"
+		userEmail = "active-dl@example.com"
+	)
+
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -5),
+			},
+		}, "", nil)
+
+	idp.On("HasMember", mock.Anything, group, userEmail).Return(true, nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{
+				SubscriptionTier: models.SKUAgentspaceBusiness,
+				SubscriptionID:   func(s string) *string { return &s }("sub-uuid-abc"),
+				Location:         models.LocationGlobal,
+				Groups:           []string{group},
+			},
+		},
+	})
+
+	svc := NewGCService(idp, gemini)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{DirectLaw: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.True(t, resp.DirectLaw)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertExpectations(t)
+	gemini.AssertExpectations(t)
+}

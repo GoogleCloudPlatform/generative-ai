@@ -1,0 +1,18 @@
+[project]
+name = "zero-trust-agents"
+version = "1.0.0"
+description = "A developer blueprint for programmatically securing autonomous LLM agents at the identity, kernel, and semantic layers."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+
+# Zero external dependencies for the demo
+dependencies = []
+
+[project.optional-dependencies]
+# Install these for production mode with Google ADK + Cloud services
+production = [
+    "google-adk>=1.0.0",
+    "google-cloud-kms>=2.0.0",
+    "google-cloud-dlp>=3.0.0",
+]

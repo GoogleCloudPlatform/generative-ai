@@ -41,17 +41,17 @@ func main() {
 	// Step 1: plain JSON logger for startup errors, before settings are loaded.
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 
-	// Step 2: load entitlement config.
-	cfg, err := config.Load(models.ConfigFilePath)
-	if err != nil {
-		slog.Error("failed to load entitlement config", slog.Any("error", err))
-		os.Exit(1)
-	}
-
-	// Step 3: load job settings from Cloud Run Job environment variables.
+	// Step 2: load job settings from Cloud Run Job environment variables.
 	settings, err := config.LoadJobSettings()
 	if err != nil {
 		slog.Error("failed to load job settings", slog.Any("error", err))
+		os.Exit(1)
+	}
+
+	// Step 3: load entitlement config.
+	cfg, err := config.Load(models.ConfigFilePath, settings.DirectLaw)
+	if err != nil {
+		slog.Error("failed to load entitlement config", slog.Any("error", err))
 		os.Exit(1)
 	}
 
@@ -107,14 +107,14 @@ func main() {
 	// Step 7: run the workflow determined by JobType.
 	switch settings.JobType {
 	case models.WorkflowJoiner:
-		req := dto.SyncAddRequest{DryRun: &settings.DryRun}
+		req := dto.SyncAddRequest{DryRun: &settings.DryRun, DirectLaw: &settings.DirectLaw}
 		if _, err := services.NewJoinerService(idpAdapter, geminiAdapter, rmAdapter).Run(ctx, cfg, req); err != nil {
 			slog.Error("joiner workflow failed", slog.Any("error", err))
 			os.Exit(1)
 		}
 
 	case models.WorkflowGarbageCollection:
-		req := dto.SyncRemoveRequest{DryRun: &settings.DryRun}
+		req := dto.SyncRemoveRequest{DryRun: &settings.DryRun, DirectLaw: &settings.DirectLaw}
 		if _, err := services.NewGCService(idpAdapter, geminiAdapter).Run(ctx, cfg, req); err != nil {
 			slog.Error("garbage collection workflow failed", slog.Any("error", err))
 			os.Exit(1)
