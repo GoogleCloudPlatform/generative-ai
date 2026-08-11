@@ -1,3 +1,18 @@
+<!--
+  Copyright 2026 Google LLC
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,65 +20,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zero-Trust Agents: Sandboxes, Cryptographic Identity, & Semantic Security</title>
     <meta name="description" content="An interactive developer playground demonstrating how to secure autonomous LLM agents using cryptographic identity, sandboxes, and semantic gateways on Gemini Enterprise Agent Platform.">
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Google Sans & Roboto Family -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <!-- Main Style Sheet -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-light">
+    <!-- Google Multi-Color Signature Top Stripe Banner -->
+    <div class="google-brand-stripe"></div>
+
     <!-- App Container -->
     <div class="app-container">
         
-        <!-- Header / Status Bar (Google Cloud Console Navigation Mock) -->
+        <!-- Header / Status Bar (Google Cloud Console Navigation Header) -->
         <header class="app-header">
-            <div class="header-logo">
-                <span class="logo-icon">
-                    <svg viewBox="0 0 24 24" width="20" height="20" class="gemini-sparkle">
-                        <defs>
-                            <linearGradient id="geminiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#38bdf8" />
-                                <stop offset="30%" stop-color="#818cf8" />
-                                <stop offset="70%" stop-color="#c084fc" />
-                                <stop offset="100%" stop-color="#fb7185" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M12 2a1 1 0 0 1 .947.684l1.624 4.873 4.873 1.624a1 1 0 0 1 0 1.894l-4.873 1.624-1.624 4.873a1 1 0 0 1-1.894 0l-1.624-4.873-4.873-1.624a1 1 0 0 1 0-1.894l4.873-1.624 1.624-4.873A1 1 0 0 1 12 2z"/>
-                    </svg>
-                </span>
-                <div class="logo-text">
-                    <h1>Gemini Enterprise</h1>
-                    <span class="logo-subtitle">Trust-Shield Gateway</span>
+            <div class="header-left">
+                <div class="header-logo">
+                    <span class="logo-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" class="google-g-icon">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                    </span>
+                    <div class="logo-text">
+                        <h1>Google Cloud <span class="header-divider">|</span> Vertex AI Agent Platform Security</h1>
+                        <span class="logo-subtitle">Zero-Trust Autonomous Agent Gateway</span>
+                    </div>
                 </div>
-                
+
                 <!-- Google Cloud Project Selector Mock -->
-                <div class="gcp-project-selector" style="margin-left: 20px; padding-left: 16px; border-left: 1px solid var(--border); display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-size: 13px; color: var(--text-secondary);">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--blue);"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                    <span style="font-weight: 500;">gfd-prod-992</span>
-                    <span style="font-size: 10px; color: var(--text-muted);">▼</span>
+                <div class="gcp-project-selector">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" class="project-icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    <span class="project-id">agent-security-project-1</span>
+                    <span class="project-arrow">▼</span>
                 </div>
             </div>
+
+            <!-- Google Cloud Global Command / Search Bar -->
+            <div class="gcp-search-bar">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="gcp-command-search" placeholder="Search security policies, KMS keys, or run diagnostics..." />
+                <kbd class="shortcut-badge">⌘K</kbd>
+            </div>
             
-            <!-- System Stats Dashboard -->
-            <div class="system-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Gateway Status</span>
-                    <span class="stat-value text-success">
-                        <span class="pulse-dot bg-success"></span> ACTIVE / SECURE
-                    </span>
+            <div class="header-right">
+                <!-- System Stats Dashboard -->
+                <div class="system-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Gateway</span>
+                        <span class="stat-value text-success">
+                            <span class="pulse-dot bg-success"></span> ACTIVE
+                        </span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Sandboxes</span>
+                        <span class="stat-value" id="stat-sandboxes">0 Idle / 0 Run</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Signed Audits</span>
+                        <span class="stat-value" id="stat-signed-tx">1,402 Verified</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Threats Blocked</span>
+                        <span class="stat-value text-danger" id="stat-threats-blocked">297 Blocked</span>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Sandbox Runtimes</span>
-                    <span class="stat-value" id="stat-sandboxes">0 Idle / 0 Run</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Signed Audits</span>
-                    <span class="stat-value" id="stat-signed-tx">1,402 Verified</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Threats Blocked</span>
-                    <span class="stat-value text-danger" id="stat-threats-blocked">297 Attempts</span>
+
+                <!-- Google Light / Cloud Dark Theme Switcher Button -->
+                <button class="theme-toggle-btn" id="btn-toggle-theme" title="Switch between Google Light & Google Cloud Dark Theme">
+                    <span class="theme-icon-light">☀️ Light</span>
+                    <span class="theme-icon-dark">🌙 Dark</span>
+                </button>
+
+                <!-- Profile Avatar chip -->
+                <div class="gcp-user-profile" title="Signed in as security-admin@gcp-enterprise.io">
+                    <span class="user-avatar-circle">E</span>
                 </div>
             </div>
         </header>
@@ -183,7 +218,7 @@
                     </div>
                 </div>
                 
-                <!-- GCP Production Mapping Card -->
+                <!-- Google Cloud Production Mapping Card -->
                 <div class="card gcp-mapping-card">
                     <div class="card-header">
                         <span class="badge badge-primary">Gemini Enterprise Agent Platform Governance</span>
@@ -196,21 +231,21 @@
                             <span class="product-badge bg-blue-tint" style="color: var(--blue-light);">Pillar 1: Identity</span>
                             <h3>Google Cloud KMS & IAM Service Agents</h3>
                             <p><strong>Local Mock:</strong> Simulating asymmetric signing and manual key directories.</p>
-                            <p><strong>GCP Production Pattern:</strong> Provision asymmetric keys in <strong>Cloud Key Management Service (KMS)</strong> with Cloud HSM. Leverage <strong>Service-Specific Agent Identities</strong> to authenticate the agent platform securely via Application Default Credentials (ADC). Use <strong>Cloud Logging</strong> and <strong>Chronicle Security</strong> to aggregate cryptographic audit logs and trigger automated incident playbooks if signature verification fails.</p>
+                            <p><strong>Google Cloud Production Pattern:</strong> Provision asymmetric keys in <strong>Cloud Key Management Service (KMS)</strong> with Cloud HSM. Leverage <strong>Service-Specific Agent Identities</strong> to authenticate the agent platform securely via Application Default Credentials (ADC). Use <strong>Cloud Logging</strong> and <strong>Chronicle Security</strong> to aggregate cryptographic audit logs and trigger automated incident playbooks if signature verification fails.</p>
                         </div>
                         
                         <div class="gcp-product-item">
                             <span class="product-badge bg-purple-tint" style="color: var(--purple-light);">Pillar 2: Sandbox</span>
                             <h3>GKE Sandbox, Cloud Run, & VPC Service Controls</h3>
                             <p><strong>Local Mock:</strong> Running python calculations inside a custom seccomp-restricted container.</p>
-                            <p><strong>GCP Production Pattern:</strong> Execute AI-generated code workloads inside <strong>Google Kubernetes Engine (GKE) Sandbox</strong> or <strong>Cloud Run</strong>, which natively utilize <strong>gVisor (runsc)</strong> to intercept and virtualize container system calls. Apply <strong>VPC Service Controls (VPC-SC)</strong> to establish a secure network perimeter around your agent container, KMS keys, and Ledger database, completely blocking data exfiltration at the network boundary.</p>
+                            <p><strong>Google Cloud Production Pattern:</strong> Execute AI-generated code workloads inside <strong>Google Kubernetes Engine (GKE) Sandbox</strong> or <strong>Cloud Run</strong>, which natively utilize <strong>gVisor (runsc)</strong> to intercept and virtualize container system calls. Apply <strong>VPC Service Controls (VPC-SC)</strong> to establish a secure network perimeter around your agent container, KMS keys, and Ledger database, completely blocking data exfiltration at the network boundary.</p>
                         </div>
 
                         <div class="gcp-product-item">
                             <span class="product-badge bg-amber-tint" style="color: var(--amber-light);">Pillar 3: Gateway</span>
-                            <h3>Sensitive Data Protection & Vertex AI Safety</h3>
+                            <h3>Sensitive Data Protection & Vertex AI Agent Platform Safety</h3>
                             <p><strong>Local Mock:</strong> Executing custom regex filters and local embedding checks on inputs/outputs.</p>
-                            <p><strong>GCP Production Pattern:</strong> Replace regex filters with Google's <strong>Sensitive Data Protection (formerly Cloud DLP)</strong> API, using machine learning to automatically detect and redact over 150 sensitive data types (Stripe keys, card tokens, billing records, SSNs) with high precision. Enable <strong>Vertex AI Safety Settings</strong> at the Gemini API level to block dangerous content and prompt jailbreaks natively before processing.</p>
+                            <p><strong>Google Cloud Production Pattern:</strong> Replace regex filters with Google's <strong>Sensitive Data Protection (formerly Cloud DLP)</strong> API, using machine learning to automatically detect and redact over 150 sensitive data types (Stripe keys, card tokens, billing records, SSNs) with high precision. Enable <strong>Vertex AI Agent Platform Safety Settings</strong> at the Gemini API level to block dangerous content and prompt jailbreaks natively before processing.</p>
                         </div>
                     </div>
                 </div>
