@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
         agent: {
             id: 'support-refund-agent-04',
             // Google Cloud IAM Service Agent (Service-Specific Agent Identity)
-            gcpServiceAgent: 'service-7738291048@gcp-sa-aiplatform.iam.gserviceaccount.com',
-            kmsKeyResource: 'projects/gfd-prod-992/locations/global/keyRings/agent-keys/cryptoKeys/support-refund-agent-04-key',
+            gcpServiceAgent: 'SERVICE_ACCOUNT_ID@gcp-sa-aiplatform.iam.gserviceaccount.com',
+            kmsKeyResource: 'projects/PROJECT_ID/locations/global/keyRings/agent-keys/cryptoKeys/support-refund-agent-04-key',
             pubKey: '',
             privKey: '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDF8P2zL... (KMS SECURE STORAGE)\n-----END PRIVATE KEY-----'
         },
