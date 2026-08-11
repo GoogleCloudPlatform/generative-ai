@@ -381,8 +381,8 @@ dbadmin
 dbln
 dcg
 dcl
-DCR
 dcr
+DCR
 ddata
 ddbb
 ddl
@@ -1452,13 +1452,13 @@ Pranav
 praw
 prcntg
 PRD
-prm
 Pré
 PREBROWSE
 preds
 preflight
 pregel
 Priya
+prm
 proc
 produc
 programar
