@@ -1127,8 +1127,31 @@ limitations under the License.
       <!-- ============ TAB 2: IMPORT FROM URL ============ -->
       <div id="mcpTabUrl" class="hidden flex flex-col gap-5">
 
+        <!-- Import Mode Selector -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Import Mode</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="mcpModeGithubBtn" type="button" onclick="switchMcpImportMode('github')"
+                    class="flex items-start gap-2.5 text-left px-3.5 py-3 rounded-2xl border transition-all bg-sky-500/10 border-sky-500/30">
+              <svg class="w-4 h-4 mt-0.5 flex-shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold text-white">GitHub Repository</span>
+                <span class="block text-[10px] text-gray-400 leading-snug">Cloned and run as a sidecar next to the agent.</span>
+              </span>
+            </button>
+            <button id="mcpModeRemoteBtn" type="button" onclick="switchMcpImportMode('remote')"
+                    class="flex items-start gap-2.5 text-left px-3.5 py-3 rounded-2xl border transition-all bg-black/30 border-white/10 hover:border-white/20">
+              <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold text-white">Remote MCP URL</span>
+                <span class="block text-[10px] text-gray-400 leading-snug">Managed server hosted by the vendor. Nothing to deploy.</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
         <!-- Guidance Notice (collapsible) -->
-        <div class="bg-black/40 border border-white/10 rounded-2xl p-5 text-sm text-gray-300 space-y-4 font-inter">
+        <div id="mcpGuidanceSidecar" class="bg-black/40 border border-white/10 rounded-2xl p-5 text-sm text-gray-300 space-y-4 font-inter">
           <details class="group bg-black/20 border border-white/5 rounded-xl p-3 cursor-pointer transition-all hover:border-white/10">
             <summary class="flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-wider focus:outline-none">
               <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> How It Works</span>
@@ -1192,8 +1215,74 @@ limitations under the License.
           </details>
         </div>
 
+        <!-- Remote MCP Guidance -->
+        <div id="mcpGuidanceRemote" class="hidden bg-black/40 border border-white/10 rounded-2xl p-5 text-sm text-gray-300 space-y-4 font-inter">
+          <details class="group bg-black/20 border border-white/5 rounded-xl p-3 cursor-pointer transition-all hover:border-white/10">
+            <summary class="flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-wider focus:outline-none">
+              <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> How It Works</span>
+              <span class="text-gray-500 transition-transform group-open:rotate-180">&#9660;</span>
+            </summary>
+            <div class="flex flex-col gap-1 text-xs text-gray-300 bg-black/30 p-4 rounded-xl border border-white/5 mt-3">
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold flex-shrink-0 text-[10px]">1</div>
+                <div><strong>Probe:</strong> We call the endpoint and read its OAuth metadata (RFC 9728 / RFC 8414) to detect the auth mode.</div>
+              </div>
+              <div class="ml-2.5 h-2.5 border-l-2 border-dashed border-sky-500/30"></div>
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold flex-shrink-0 text-[10px]">2</div>
+                <div><strong>Register:</strong> If the server supports Dynamic Client Registration, the setup script creates an OAuth client for you. No app to create by hand.</div>
+              </div>
+              <div class="ml-2.5 h-2.5 border-l-2 border-dashed border-sky-500/30"></div>
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold flex-shrink-0 text-[10px]">3</div>
+                <div><strong>Authorize:</strong> The script prints a sign-in URL, you paste back the redirected URL, and it exchanges the code with PKCE.</div>
+              </div>
+              <div class="ml-2.5 h-2.5 border-l-2 border-dashed border-amber-500/30"></div>
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold flex-shrink-0 text-[10px]">4</div>
+                <div><strong>Connect:</strong> Tokens go to Secret Manager. The agent calls the vendor endpoint directly and refreshes tokens on its own.</div>
+              </div>
+            </div>
+          </details>
+
+          <details class="group bg-black/20 border border-white/5 rounded-xl p-3 cursor-pointer transition-all hover:border-white/10">
+            <summary class="flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-wider focus:outline-none">
+              <span class="flex items-center gap-1.5"><svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg> Warnings &amp; Constraints</span>
+              <span class="text-gray-500 transition-transform group-open:rotate-180">&#9660;</span>
+            </summary>
+            <ul class="list-disc pl-5 space-y-1 text-xs text-gray-400 mt-3">
+              <li>Streamable HTTP endpoints only (usually a URL ending in /mcp). Legacy SSE-only servers are not supported.</li>
+              <li>The tokens are bound to whoever signs in while running the setup script, so the agent acts as that user.</li>
+              <li>Servers without Dynamic Client Registration need a Client ID (and secret) that you create in the vendor's console first.</li>
+              <li>Dynamically registered OAuth clients usually cannot be deleted through an API. Revoke access from the vendor's connected-apps settings when you tear the demo down.</li>
+            </ul>
+          </details>
+        </div>
+
+        <!-- Remote MCP URL Input -->
+        <div id="mcpRemoteInputGroup" class="hidden flex flex-col gap-2">
+          <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Remote MCP Server URL</label>
+          <div class="flex gap-3">
+            <input type="text" id="mcpRemoteUrl" placeholder="https://mcp.yourservice.com/mcp"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();triggerRemoteMcpProbe();}"
+                   class="flex-1 bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
+            <button id="btnMcpProbe" onclick="triggerRemoteMcpProbe()"
+                    class="bg-sky-500 hover:bg-sky-600 text-white px-6 font-bold text-sm rounded-2xl transition-all flex items-center gap-2">
+              Probe
+            </button>
+          </div>
+          <p class="text-[10px] text-gray-500">Example: https://mcp.notion.com/mcp &middot; https://mcp.slack.com/mcp</p>
+        </div>
+
+        <div id="mcpRemoteLoading" class="hidden text-center py-4 flex flex-col items-center gap-3">
+          <div class="w-6 h-6 border-2 border-sky-500/20 border-t-sky-400 rounded-full animate-spin"></div>
+          <p class="text-sm text-sky-400">Probing the endpoint and reading its OAuth metadata...</p>
+        </div>
+
+        <div id="mcpRemoteResult" class="hidden border-t border-white/10 pt-4 mt-2 flex flex-col gap-4"></div>
+
         <!-- URL Input -->
-        <div class="flex flex-col gap-2">
+        <div id="mcpGithubInputGroup" class="flex flex-col gap-2">
           <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">GitHub Repository URL</label>
           <div class="flex gap-3">
             <input type="text" id="mcpRepoUrl" placeholder="https://github.com/owner/repo-name" 
@@ -1894,17 +1983,25 @@ limitations under the License.
                 <p class="flex-1 text-[11px] text-indigo-300 leading-relaxed">⚠️ The Target Persona changed after this scenario was optimized. Re-run Optimize Prompt so the Target Role and scenario reflect the new persona.</p>
                 <button onclick="optimizeGoalWithMagicWand()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all active:scale-[0.97] whitespace-nowrap">🪄 Re-run Optimize Prompt</button>
               </div>
-              <!-- Edit Tab -->
-              <textarea id="userGoal" rows="10" oninput="localStorage.setItem('ge_generator_input', this.value); updateOptimizeRerunHint()"
-                class="w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-4 text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all shadow-inner leading-relaxed resize-y min-h-[160px] font-mono text-xs"
-                placeholder="Example: How to help a retail chain in London optimize seasonal stock based on demographic shifts and regional foot traffic trends?"></textarea>
-              <!-- Preview Tab -->
-              <div id="goalPreview"
-                class="hidden w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-5 text-gray-100 min-h-[160px] max-h-[500px] overflow-y-auto prose-sm leading-relaxed">
-              </div>
-              
+              <!-- Positioning context for the loader overlay. It has to be exactly
+                   these two panes: anchoring the overlay to the outer block needed a
+                   hardcoded top offset, which only lined up with the textarea while
+                   #optimizeRerunHint was hidden. With the hint shown the overlay
+                   started ~70px too high, so its rounded border and the textarea's
+                   own (blurred by backdrop-filter into a white-looking halo) read as
+                   two mismatched frames. -->
+              <div class="relative">
+                <!-- Edit Tab -->
+                <textarea id="userGoal" rows="10" oninput="localStorage.setItem('ge_generator_input', this.value); updateOptimizeRerunHint()"
+                  class="block w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-4 text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all shadow-inner leading-relaxed resize-y min-h-[160px] font-mono text-xs"
+                  placeholder="Example: How to help a retail chain in London optimize seasonal stock based on demographic shifts and regional foot traffic trends?"></textarea>
+                <!-- Preview Tab -->
+                <div id="goalPreview"
+                  class="hidden w-full bg-gray-900/50 border border-gray-700 rounded-2xl p-5 text-gray-100 min-h-[160px] max-h-[500px] overflow-y-auto prose-sm leading-relaxed">
+                </div>
+
               <!-- Magic Wand Loader Overlay (Sleek & Minimalist) -->
-              <div id="magicWandOverlay" class="hidden absolute inset-x-0 bottom-0 top-[40px] flex flex-col items-center justify-center backdrop-blur-md bg-slate-950/85 rounded-2xl border border-white/5 transition-all duration-300 z-20">
+              <div id="magicWandOverlay" class="hidden absolute inset-0 flex-col items-center justify-center backdrop-blur-md bg-slate-950/85 rounded-2xl border border-gray-700 transition-all duration-300 z-20">
                 <div class="relative flex items-center justify-center mb-5">
                   <!-- Soft Sleek Pulse Glow -->
                   <span class="absolute inline-flex h-16 w-16 rounded-full bg-indigo-500/5 border border-indigo-500/10 animate-pulse opacity-70"></span>
@@ -1928,6 +2025,7 @@ limitations under the License.
                   <p id="magicWandStatus" class="text-xs font-semibold text-gray-200 tracking-wide font-sans transition-all duration-300">Analyzing business goal...</p>
                 </div>
                 <p class="text-[10px] text-gray-600 mt-1.5 font-inter">Optimizing scenario with Gemini Flash Lite</p>
+              </div>
               </div>
             </div>
           </div>
@@ -2967,6 +3065,21 @@ limitations under the License.
 
     let magicWandActiveRequest = null;
 
+    // Which language the optimized scenario should come back in. The optimizer
+    // used to detect this from the scenario text, and flash-lite got it wrong:
+    // an English Manhattan-retail template came back in German in 2 of 5 runs.
+    // Telling it the language outright removes the guess.
+    // Research wins while it is in play, because researchCompanyByDomain wrote
+    // the box in the research language, which need not match the hub selector.
+    function getOptimizeLanguage() {
+      if (cachedResearchData) {
+        var r = getResearchLangOverride() || cachedResearchData.detectedLanguage;
+        if (r) return r;
+      }
+      var sel = document.getElementById('langSelector');
+      return (sel && sel.value) || 'en';
+    }
+
     function optimizeGoalWithMagicWand() {
       const el = document.getElementById('userGoal');
       const rawGoal = el.value.trim();
@@ -3031,7 +3144,8 @@ limitations under the License.
           enableManagedAgent: document.getElementById('enableManagedAgent') ? document.getElementById('enableManagedAgent').checked : true,
           enableWorkspaceMcp: window.workspaceMcpIncluded || false,
           enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false,
-          persona: getSelectedPersona()
+          persona: getSelectedPersona(),
+          language: getOptimizeLanguage()
         });
     }
 
@@ -6309,6 +6423,12 @@ limitations under the License.
         },
 
         {
+          id: 'productivity', name: 'Productivity & Knowledge', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>',
+          servers: [
+            { id: 'notion-mcp', name: 'Notion', type: 'remote', endpoint_url: 'https://mcp.notion.com/mcp', auth_type: 'oauth2_dcr', github_url: null, docs_url: 'https://developers.notion.com/guides/mcp/get-started-with-mcp', description: 'Official Notion MCP server: search the workspace, read and create pages, query databases, and manage comments. No Notion app registration needed - the setup script registers a client automatically.', language: 'managed', tags: ['notion','knowledge-base','docs','wiki','productivity'], requires_api_key: 'oauth', capabilities: ['search','fetch','create-pages','update-page','move-pages','create-database','update-database','create-comment','get-comments','get-users','get-self','get-teams'], demo_tip: 'Great for knowledge-management demos: let the agent pull product specs or meeting notes out of Notion and cross-reference them with BigQuery data.' }
+          ]
+        },
+        {
           id: 'google-official', name: 'Google Official', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>',
           servers: [
             { id: 'google-workspace-mcp', name: 'Google Workspace MCP', type: 'workspace', dev_preview: true, github_url: null, docs_url: 'https://developers.google.com/workspace/guides/configure-mcp-servers', description: 'Official Google Workspace MCP servers: Gmail, Google Drive, Calendar, Chat, and People. Access emails, files, events, and contacts.', language: 'managed', tags: ['google','workspace','gmail','drive','calendar','chat'], requires_api_key: 'oauth', demo_tip: 'Powerful for enterprise demos needing email, calendar, and document integration. Requires a project where Workspace-API OAuth clients are allowed by org policy.' }
@@ -6395,6 +6515,8 @@ limitations under the License.
             ? '<span class="mcp-tag tag-apikey"><svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>API Key</span>'
             : server.requires_api_key === 'partial'
             ? '<span class="mcp-tag tag-apikey"><svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>Some APIs</span>'
+            : server.requires_api_key === 'oauth'
+            ? '<span class="mcp-tag tag-apikey"><svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>OAuth Sign-in</span>'
             : '<span class="mcp-tag tag-free"><svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>No Key</span>';
 
           const managedTag = (server.type === 'remote' || server.type === 'workspace') ? '<span class="mcp-tag" style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.25)">☁️ Managed</span>' : '';
@@ -6492,22 +6614,31 @@ limitations under the License.
 
       // ── Remote Managed Server: skip Gemini analysis, add directly ──
       if (server.type === 'remote') {
+        var authType = server.auth_type || 'oauth2_dcr';
+        // Slack predates the generic OAuth path and still needs a manually created app.
+        var envVars = server.required_env_vars || (authType === 'oauth2_slack'
+          ? [
+              { key: 'SLACK_CLIENT_ID', description: 'Slack App Client ID', is_secret: false, is_required: true },
+              { key: 'SLACK_CLIENT_SECRET', description: 'Slack App Client Secret', is_secret: true, is_required: true }
+            ]
+          : []);
+        var caps = server.capabilities || (authType === 'oauth2_slack'
+          ? ['search_messages', 'send_message', 'list_channels', 'manage_canvases']
+          : []);
         cachedImportedMcpList.push({
           name: server.name,
           type: 'remote',
           endpoint_url: server.endpoint_url,
-          auth_type: server.auth_type || 'bearer_token',
+          auth_type: authType,
           language: 'managed',
           transport_mode: 'streamable_http',
           is_supported: true,
-          required_env_vars: [
-            { key: 'SLACK_CLIENT_ID', description: 'Slack App Client ID', is_secret: false, is_required: true },
-            { key: 'SLACK_CLIENT_SECRET', description: 'Slack App Client Secret', is_secret: true, is_required: true }
-          ],
+          description: server.description || '',
+          required_env_vars: envVars,
           github_url: server.docs_url,
           docs_url: server.docs_url,
           entrypoint: null,
-          capabilities: ['search_messages', 'send_message', 'list_channels', 'manage_canvases'],
+          capabilities: caps,
         });
         renderMcpList();
         updateMcpCountBadge();
@@ -6821,11 +6952,163 @@ limitations under the License.
       btn.innerText = 'Analyze';
     }
 
+    // ========== REMOTE (MANAGED) MCP IMPORT ==========
+    var lastProbedRemoteMcp = null;
+
+    function rmcpEscape(text) {
+      return String(text == null ? '' : text)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Human-readable summary of what the setup script will have to do for this auth mode.
+    function rmcpAuthLabel(authType) {
+      if (authType === 'none') return { title: 'No authentication', detail: 'The endpoint answers unauthenticated requests. Nothing to provision.', tone: 'emerald' };
+      if (authType === 'oauth2_dcr') return { title: 'OAuth 2.0 with Dynamic Client Registration', detail: 'The setup script registers an OAuth client automatically, then walks you through a browser sign-in. Nothing to create by hand.', tone: 'emerald' };
+      if (authType === 'oauth2_manual') return { title: 'OAuth 2.0 (manual client)', detail: 'This server has no registration endpoint. Create an OAuth app in the vendor console first and have the Client ID (and secret) ready when you run the setup script.', tone: 'amber' };
+      if (authType === 'oauth2_slack') return { title: 'Slack OAuth (legacy path)', detail: 'Add Slack from the Catalog tab instead so it uses the dedicated Slack flow.', tone: 'amber' };
+      return { title: 'Bearer token', detail: 'No OAuth metadata was published. The setup script will ask you to paste a long-lived access token.', tone: 'amber' };
+    }
+
+    window.switchMcpImportMode = function(mode) {
+      var isRemote = (mode === 'remote');
+      var githubBtn = document.getElementById('mcpModeGithubBtn');
+      var remoteBtn = document.getElementById('mcpModeRemoteBtn');
+      var activeCls = ['bg-sky-500/10', 'border-sky-500/30'];
+      var idleCls = ['bg-black/30', 'border-white/10', 'hover:border-white/20'];
+      activeCls.forEach(function(c) { githubBtn.classList.toggle(c, !isRemote); remoteBtn.classList.toggle(c, isRemote); });
+      idleCls.forEach(function(c) { githubBtn.classList.toggle(c, isRemote); remoteBtn.classList.toggle(c, !isRemote); });
+
+      ['mcpGuidanceSidecar', 'mcpGithubInputGroup', 'mcpLoading', 'mcpResult'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (isRemote) { el.classList.add('hidden'); }
+        else if (id === 'mcpGuidanceSidecar' || id === 'mcpGithubInputGroup') { el.classList.remove('hidden'); }
+      });
+      ['mcpGuidanceRemote', 'mcpRemoteInputGroup'].forEach(function(id) {
+        document.getElementById(id).classList.toggle('hidden', !isRemote);
+      });
+      if (!isRemote) {
+        document.getElementById('mcpRemoteLoading').classList.add('hidden');
+        document.getElementById('mcpRemoteResult').classList.add('hidden');
+      }
+    }
+
+    window.triggerRemoteMcpProbe = function() {
+      var url = document.getElementById('mcpRemoteUrl').value.trim();
+      if (!url) { alert('Please enter the remote MCP server URL.'); return; }
+
+      var btn = document.getElementById('btnMcpProbe');
+      var loading = document.getElementById('mcpRemoteLoading');
+      var result = document.getElementById('mcpRemoteResult');
+      btn.disabled = true;
+      loading.classList.remove('hidden');
+      result.classList.add('hidden');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          loading.classList.add('hidden');
+          result.classList.remove('hidden');
+          if (!res || !res.success) {
+            result.innerHTML = '<div class="p-4 bg-red-950/30 border border-red-500/20 rounded-2xl text-sm text-red-400"><strong>Probe failed:</strong> ' + rmcpEscape(res && res.message ? res.message : 'Unknown error') + '</div>';
+            return;
+          }
+          renderRemoteProbeResult(res.data);
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          loading.classList.add('hidden');
+          result.classList.remove('hidden');
+          result.innerHTML = '<div class="p-4 bg-red-950/30 border border-red-500/20 rounded-2xl text-sm text-red-400"><strong>System failure:</strong> ' + rmcpEscape(err && err.message ? err.message : err) + '</div>';
+        })
+        .probeRemoteMcpServer(url);
+    }
+
+    function renderRemoteProbeResult(data) {
+      var result = document.getElementById('mcpRemoteResult');
+      lastProbedRemoteMcp = null;
+
+      if (!data || !data.is_supported) {
+        result.innerHTML = '<div class="p-4 bg-red-950/30 border border-red-500/20 rounded-2xl text-sm text-red-400">' +
+          '<strong>Not usable as a managed remote MCP server.</strong>' +
+          '<p class="mt-1 text-xs text-red-300/80">' + rmcpEscape((data && data.auth_summary) || 'The endpoint did not respond like a Streamable HTTP MCP server.') + '</p></div>';
+        return;
+      }
+
+      var auth = rmcpAuthLabel(data.auth_type);
+      var isDuplicate = cachedImportedMcpList.some(function(m) { return m.type === 'remote' && m.endpoint_url === data.endpoint_url; });
+      lastProbedRemoteMcp = data;
+
+      var html = '<div class="p-4 bg-emerald-950/30 border border-emerald-500/20 rounded-2xl text-sm text-emerald-400">' +
+        '<strong>Endpoint reachable.</strong> Streamable HTTP MCP server detected.</div>';
+
+      html += '<div class="bg-black/30 border border-white/5 rounded-2xl p-4 flex flex-col gap-3">' +
+        '<div><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Server</div>' +
+        '<div class="text-sm text-white font-bold">' + rmcpEscape(data.name) + '</div>' +
+        '<div class="text-[11px] text-gray-400 font-mono break-all">' + rmcpEscape(data.endpoint_url) + '</div></div>';
+
+      var toneText = auth.tone === 'emerald' ? 'text-emerald-400' : 'text-amber-400';
+      html += '<div><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Authentication</div>' +
+        '<div class="text-sm font-bold ' + toneText + '">' + rmcpEscape(auth.title) + '</div>' +
+        '<div class="text-[11px] text-gray-400 leading-snug mt-0.5">' + rmcpEscape(auth.detail) + '</div></div>';
+
+      if (data.capabilities && data.capabilities.length) {
+        var chips = data.capabilities.slice(0, 16).map(function(c) {
+          return '<span class="mcp-tag tag-lang">' + rmcpEscape(c) + '</span>';
+        }).join('');
+        html += '<div><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Tools discovered (' + data.capabilities.length + ')</div>' +
+          '<div class="flex flex-wrap gap-1.5">' + chips + '</div></div>';
+      } else {
+        html += '<div class="text-[11px] text-gray-500">Tool list is only readable after sign-in. The agent discovers it at runtime.</div>';
+      }
+
+      if (data.warnings && data.warnings.length) {
+        var items = data.warnings.map(function(w) { return '<li>' + rmcpEscape(w) + '</li>'; }).join('');
+        html += '<div class="p-3 bg-amber-950/30 border border-amber-500/20 rounded-xl">' +
+          '<div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">Heads up</div>' +
+          '<ul class="list-disc pl-4 space-y-0.5 text-[11px] text-amber-300/80">' + items + '</ul></div>';
+      }
+      html += '</div>';
+
+      if (data.auth_type === 'oauth2_slack') {
+        html += '<div class="p-3 bg-amber-950/30 border border-amber-500/20 rounded-xl text-xs text-amber-400">Slack needs its dedicated flow. Add it from the Catalog tab instead.</div>';
+      } else if (isDuplicate) {
+        html += '<div class="p-2 bg-amber-950/30 border border-amber-500/20 rounded-xl text-xs text-amber-400">This server is already in your demo plan.</div>' +
+          '<button disabled class="w-full bg-gray-700 text-gray-400 py-3 font-bold text-sm rounded-2xl cursor-not-allowed select-none">Already Added</button>';
+      } else {
+        html += '<button onclick="applyRemoteMcpImport()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 font-bold text-sm rounded-2xl transition-all select-none">Add to Demo Generation</button>';
+      }
+
+      result.innerHTML = html;
+    }
+
+    window.applyRemoteMcpImport = function() {
+      if (!lastProbedRemoteMcp) return;
+      var data = lastProbedRemoteMcp;
+      if (cachedImportedMcpList.some(function(m) { return m.type === 'remote' && m.endpoint_url === data.endpoint_url; })) {
+        alert('This MCP server is already added:\n' + data.name);
+        return;
+      }
+      cachedImportedMcpList.push(data);
+      lastProbedRemoteMcp = null;
+      renderMcpList();
+      updateMcpCountBadge();
+      updateMcpNextStepsBanner();
+      renderCatalogGrid(document.getElementById('mcpCatalogSearch').value.toLowerCase().trim());
+      renderRecipes();
+      document.getElementById('mcpRemoteUrl').value = '';
+      document.getElementById('mcpRemoteResult').classList.add('hidden');
+    }
+
     window.removeMcpFromPlan = function(index) {
       cachedImportedMcpList.splice(index, 1);
       renderMcpList();
       updateMcpCountBadge();
       updateMcpNextStepsBanner();
+      // Keep the catalog cards in sync: a catalog-sourced server must go back to "Add to Demo".
+      const search = document.getElementById('mcpCatalogSearch');
+      if (search) { renderCatalogGrid(search.value.toLowerCase().trim()); renderRecipes(); }
     }
 
     function renderMcpList() {

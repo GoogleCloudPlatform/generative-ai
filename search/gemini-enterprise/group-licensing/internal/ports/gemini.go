@@ -19,7 +19,7 @@ package ports
 import (
 	"context"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
 // GeminiClient is the port through which the service layer interacts
@@ -33,7 +33,7 @@ type GeminiClient interface {
 	// billing account and returns an index mapping (SKU, ProjectID, Location) to
 	// the full licenseConfig resource path. Call this once at startup and pass the
 	// result to SetLicenseConfigIndex before issuing any grant operations.
-	FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error)
+	FetchLicenseConfigIndex(ctx context.Context, billingAccountID string, directLaw bool) (models.LicenseConfigIndex, error)
 
 	// ListUserLicenses returns one page of licensed users for projectID at the
 	// given location. Pass an empty pageToken to start from the beginning. A

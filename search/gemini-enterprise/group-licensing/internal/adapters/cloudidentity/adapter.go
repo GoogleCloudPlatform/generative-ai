@@ -24,8 +24,8 @@ import (
 	admin "google.golang.org/api/admin/directory/v1"
 	"google.golang.org/api/googleapi"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
-	"github.com/cloud-gtm/gemini-box-office/internal/ports"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/ports"
 )
 
 var _ ports.IdpClient = (*Adapter)(nil)

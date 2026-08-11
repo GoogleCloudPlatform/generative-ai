@@ -23,7 +23,7 @@ import (
 
 	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v3"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/ports"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/ports"
 )
 
 var _ ports.ResourceManagerClient = (*Adapter)(nil)

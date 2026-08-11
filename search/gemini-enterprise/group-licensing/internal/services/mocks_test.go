@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloud-gtm/gemini-box-office/internal/models"
+	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
 // MockResourceManagerClient is a testify/mock implementation of ports.ResourceManagerClient.
@@ -61,8 +61,8 @@ type MockGeminiClient struct {
 }
 
 // FetchLicenseConfigIndex satisfies ports.GeminiClient.
-func (m *MockGeminiClient) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error) {
-	args := m.Called(ctx, billingAccountID)
+func (m *MockGeminiClient) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string, directLaw bool) (models.LicenseConfigIndex, error) {
+	args := m.Called(ctx, billingAccountID, directLaw)
 	index, _ := args.Get(0).(models.LicenseConfigIndex)
 	return index, args.Error(1)
 }

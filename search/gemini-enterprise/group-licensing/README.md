@@ -1,4 +1,4 @@
-# Gemini Box Office
+# Gemini Enterprise Group Licensing
 
 A Cloud Run Job that automates Gemini Enterprise license lifecycle management through scheduled batch reconciliation. It bridges the gap between Google Cloud Identity group membership and Discovery Engine license assignment, providing group-based SKU mapping, automatic provisioning, and stale-license cleanup.
 
@@ -96,7 +96,9 @@ The job's service account requires the following:
 - `roles/secretmanager.secretAccessor` — read the mounted configuration secret
 - `roles/billing.viewer` — read the purchased Gemini Enterprise subscription configurations
 - `roles/run.builder` - (Optional) When using Cloud Build to build the artifacts
-- `roles/storage.objectUser` - (Optional) When using Cloud Build, to store the built artifact
+- `roles/storage.admin` - (Optional) When using Cloud Build, to upload source code and stage the build
+- `roles/artifactregistry.createOnPushWriter` - (Optional) When using Cloud Build, to push the built artifact to Artifact Registry
+- `roles/logging.logWriter` - (Optional) When using Cloud Build, to write build logs
 
 **OAuth scopes:**
 - `https://www.googleapis.com/auth/cloud-platform`
@@ -151,10 +153,32 @@ All tests are unit tests and require no external services or credentials.
 
 ## Deploying to Cloud Run as Job
 
-An example command to deploy as a job on Cloud Run is below. For more information on creating Cloud Run jobs, reference documentation [here](https://docs.cloud.google.com/run/docs/create-jobs).
+An example single-command to build and deploy as a job on Cloud Run is below. For more information on creating Cloud Run jobs, reference documentation [here](https://docs.cloud.google.com/run/docs/create-jobs).
 ```bash
 gcloud run jobs deploy [name_of_job] \
   --source . \
+  --region [desired_cloud_run_region] \
+  --update-secrets=/run/secrets/entitlements.json=[name_of_secret_in_secret_manager]:latest \
+  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false \
+  --service-account [desired_service_account_email_address]
+```
+
+## Building the container with Cloud Build, saving to Artifact Registry, and deploying as Cloud Run Job
+
+To build the container image and save it to Artifact Registry for deployment later, reference the following example build command. For more information on Cloud Build, reference documentation [here](https://docs.cloud.google.com/build/docs/overview).
+```bash
+gcloud builds submit . \
+  --tag [desired_gcp_region]-docker.pkg.dev/[gcp_project_id]/[artifact_registry_repository]/[artifact_registry_package_name]:latest \
+  --service-account=projects/[gcp_project_id]/serviceAccounts/[desired_build_service_account_email_address] \
+  --default-buckets-behavior=regional-user-owned-bucket \
+  --region=[desired_gcp_region]
+```
+
+Once build is completed successfully, deploy as Cloud Run Job using the built image from Artifact Registry.
+
+```bash
+gcloud run jobs deploy [name_of_job] \
+  --image [desired_gcp_region]-docker.pkg.dev/[gcp_project_id]/[artifact_registry_repository]/[artifact_registry_package_name]:latest \
   --region [desired_cloud_run_region] \
   --update-secrets=/run/secrets/entitlements.json=[name_of_secret_in_secret_manager]:latest \
   --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false \
