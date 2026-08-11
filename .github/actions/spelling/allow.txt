@@ -8,6 +8,8 @@ Abhishek
 acall
 achat
 Achird
+acked
+acking
 AClient
 acomplete
 acs
@@ -149,6 +151,7 @@ baxis
 bayes
 bbc
 bbq
+bdt
 Beehiiv
 beir
 Bengaluru
@@ -241,6 +244,7 @@ CASP
 catus
 caudatus
 caxis
+cbody
 cbp
 ccc
 cce
@@ -277,8 +281,10 @@ clearbox
 clf
 clickable
 CLIs
+CLOEXEC
 cloudrun
 CLOUDSDK
+cloudtasks
 cloudveil
 clsx
 cmap
@@ -376,8 +382,8 @@ dbadmin
 dbln
 dcg
 dcl
-DCR
 dcr
+DCR
 ddata
 ddbb
 ddl
@@ -511,6 +517,7 @@ endblock
 endlocal
 enf
 engi
+enqueuer
 ENU
 Envane
 envrc
@@ -545,6 +552,7 @@ Eventarc
 EVs
 evse
 evt
+Exfil
 expl
 faa
 facecolor
@@ -558,6 +566,7 @@ fastmcp
 Fastmcp
 fastrtc
 fda
+FDCWD
 fea
 fect
 Feitian
@@ -764,6 +773,7 @@ hashtags
 Haumea
 Hawkins'll
 Hayao
+hazmat
 Hbf
 HBox
 hclient
@@ -961,6 +971,8 @@ keras
 Ketamine
 keycap
 keychain
+Keypair
+keypair
 KFBI
 kfp
 Khanh
@@ -984,6 +996,7 @@ Kraizt
 KSA
 kubectl
 Kubeflow
+KVM
 Kvyat
 Kwanzan
 kyc
@@ -1178,6 +1191,7 @@ mpga
 mpim
 mpld
 mpn
+Mqp
 mrag
 mrr
 mrtydi
@@ -1301,6 +1315,7 @@ Ohashi
 ohlcv
 OHLCV
 Ohtani
+oidc
 OIDC
 oitems
 Okame
@@ -1327,6 +1342,7 @@ OOM
 Oort
 OOTB
 openai
+openat
 openfda
 openssl
 Oppo
@@ -1385,6 +1401,7 @@ PEGI
 Pengyu
 pepe
 Persero
+persistable
 petabytes
 pevt
 pfas
@@ -1444,13 +1461,13 @@ Pranav
 praw
 prcntg
 PRD
-prm
 Pré
 PREBROWSE
 preds
 preflight
 pregel
 Priya
+prm
 proc
 produc
 programar
@@ -1490,7 +1507,10 @@ Pzk
 Qantas
 qas
 QEDC
+qjson
 QLo
+qlog
+qlogger
 qna
 QPM
 qqq
@@ -1531,6 +1551,7 @@ rbeat
 rbf
 rbm
 rdoc
+RDONLY
 recontext
 Recontext
 recrawl
@@ -1599,6 +1620,7 @@ Ruchika
 runjdwp
 RUnlock
 RUNPATH
+runsc
 Rupjit
 RVL
 RVR
@@ -1627,6 +1649,7 @@ Scorsese
 sdec
 sdetail
 SDKROOT
+sdt
 seabut
 sealife
 seatback
@@ -1641,6 +1664,7 @@ SEMCONV
 seo
 SEO
 serde
+serialisable
 serper
 SERPER
 serrata
@@ -1728,6 +1752,7 @@ sse
 ssh
 ssml
 ssn
+SSNs
 ssr
 SSRF
 sss
@@ -1755,6 +1780,7 @@ subschema
 subschemas
 subviews
 subword
+sudo
 suis
 sunner
 supima
@@ -1772,6 +1798,8 @@ SWP
 sxs
 sylvatica
 SYMED
+Syscalls
+syscalls
 SYSINSTR
 SYSROOT
 Syunik
@@ -1921,6 +1949,7 @@ unmarshal
 unparseable
 unquote
 unrtf
+unserialisable
 unsloth
 Unsloth
 unterminated

@@ -563,6 +563,112 @@ def _normalize_a2ui_icons_in_data(data):
         return {k: _normalize_a2ui_icons_in_data(v) for k, v in data.items()}
     return data
 
+_A2UI_CONTAINERS = ('Row', 'Column', 'Card', 'List', 'Box')
+
+
+def _a2ui_is_blank(_cid, _by_id, _depth=0):
+    """True only when the subtree at _cid PROVABLY puts nothing on screen.
+
+    Deliberately conservative: a component type this does not recognise counts
+    as renderable, so the repair below can never blank out a label it merely
+    failed to understand. Only a missing id, an empty spec, an empty Text, or a
+    container whose every child is itself blank returns True.
+    """
+    if _depth > 6:
+        return False
+    _entry = _by_id.get(_cid) if _cid else None
+    if _entry is None:
+        return True  # dangling child ref - there is nothing to render
+    _spec = _entry.get('component')
+    if not isinstance(_spec, dict) or not _spec:
+        return True
+    for _ctype, _cbody in _spec.items():
+        if _ctype in ('Text', 'Heading'):
+            if not isinstance(_cbody, dict):
+                return False
+            _tv = _cbody.get('text')
+            if isinstance(_tv, dict) and not str(_tv.get('literalString', '')).strip() and not _tv.get('path'):
+                continue
+            return False
+        if _ctype in _A2UI_CONTAINERS:
+            if not isinstance(_cbody, dict):
+                return False
+            _kids = _cbody.get('children')
+            if not isinstance(_kids, dict):
+                return False
+            if _kids.get('template'):
+                return False  # data-bound, cannot be judged statically
+            for _k in (_kids.get('explicitList') or []):
+                if not _a2ui_is_blank(_k, _by_id, _depth + 1):
+                    return False
+            continue
+        return False
+    return True
+
+
+def _heal_blank_buttons(_messages):
+    """Give a Button a readable label when its child subtree renders nothing.
+
+    v11.53, observed live 2026-08-04: the model emitted three suggestion chips
+    whose child ids ('loading_chip1Lbl' ...) it then defined as Row components
+    with an empty explicitList. Nothing dangled, so the dangling-ref diagnostic
+    stayed clean and the healer passed it straight through; GE rendered three
+    blank pills the user could press but not read.
+
+    The button's own sendText payload is the one piece of intent guaranteed to
+    be present, so derive the label from it instead of dropping the chip - a
+    long label is a far smaller failure than an unreadable one. Buttons with no
+    text payload are left alone for the a2ui_diag line to report.
+    """
+    _by_surface = {}
+    for _m in _messages:
+        _su = _m.get('surfaceUpdate') if isinstance(_m, dict) else None
+        if not isinstance(_su, dict) or not isinstance(_su.get('components'), list):
+            continue
+        _bucket = _by_surface.setdefault(str(_su.get('surfaceId', '')), {})
+        for _c in _su['components']:
+            if isinstance(_c, dict) and _c.get('id'):
+                _bucket[str(_c['id'])] = _c
+    for _sid, _by_id in _by_surface.items():
+        for _cid, _entry in list(_by_id.items()):
+            _spec = _entry.get('component')
+            if not isinstance(_spec, dict) or not isinstance(_spec.get('Button'), dict):
+                continue
+            _btn = _spec['Button']
+            _child = _btn.get('child')
+            if not _a2ui_is_blank(_child, _by_id):
+                continue
+            _label = ''
+            _act = _btn.get('action')
+            if isinstance(_act, dict):
+                for _ctx in (_act.get('context') or []):
+                    if isinstance(_ctx, dict) and _ctx.get('key') == 'text':
+                        _val = _ctx.get('value')
+                        if isinstance(_val, dict):
+                            _label = str(_val.get('literalString', '')).strip()
+                        break
+            if not _label:
+                continue
+            if len(_label) > 40:
+                _label = _label[:39].rstrip() + chr(0x2026)
+            _text_spec = {'Text': {'text': {'literalString': _label}, 'usageHint': 'body'}}
+            if _child and _child in _by_id:
+                _by_id[_child]['component'] = _text_spec
+            else:
+                _new_id = str(_cid) + '_healedLbl'
+                _btn['child'] = _new_id
+                _by_id[_new_id] = {'id': _new_id, 'component': _text_spec}
+                for _m in _messages:
+                    _su = _m.get('surfaceUpdate') if isinstance(_m, dict) else None
+                    if isinstance(_su, dict) and str(_su.get('surfaceId', '')) == _sid \
+                            and isinstance(_su.get('components'), list):
+                        _su['components'].append(_by_id[_new_id])
+                        break
+            logger.log_text("[healer] blank Button '" + str(_cid) + "' on surface '" + _sid
+                            + "' - labelled from its sendText payload")
+    return _messages
+
+
 def _heal_a2ui_message_list(messages):
     import json as _json
     try:
@@ -615,7 +721,12 @@ def _heal_a2ui_message_list(messages):
                                             _name_obj['literalString'] = _ICON_FALLBACK_MAP.get(_lit, 'info')
                 
         healed_messages.append(m)
-        
+
+    try:
+        healed_messages = _heal_blank_buttons(healed_messages)
+    except Exception as _bb_err:
+        logger.log_text("[healer] blank-button pass failed (non-fatal): " + str(_bb_err)[:200])
+
     try:
         logger.log_text("[healer_output] messages: " + _json.dumps(healed_messages))
     except Exception as _le:
@@ -1314,6 +1425,17 @@ def _extract_user_text(run_args):
                 except Exception:
                     pass
                 continue
+            # v11.55: auto-generated SYSTEM NOTE parts are NOT user intent. The
+            # managed-agent completion note and the briefing-confirmation note are
+            # appended to the SAME new_message the user typed into, so joining every
+            # text part put the whole note - and the first 400 chars of the finished
+            # background report - into _gate_text. Observed live 2026-08-04: the
+            # pre-flight card's editable "adjust your request" box showed the raw
+            # 'SYSTEM NOTE (auto-generated; the user did NOT type this): ...' block
+            # under the user's own sentence, and the Run in Background chip carried
+            # it forward as the scope (prompt_len 343 clean vs 1171 polluted).
+            if _t.lstrip().startswith("SYSTEM NOTE"):
+                continue
             _typed.append(_t)
         if _ua_text is not None:
             return _ua_text
@@ -1427,6 +1549,74 @@ async def _classify_for_preflight(text, prev_user_text=""):
     except Exception as _e:
         logger.log_text("[preflight_gate] classifier skipped (fail-open): " + str(_e)[:200])
         return None
+
+async def _localize_ui_strings(_defaults, _language_sample):
+    """Rewrite fixed UI strings in the language the user is speaking.
+
+    _defaults maps key -> the English source string; the return value has the
+    same keys. Almost every user-facing sentence in this runtime is written by
+    the agent, which matches the conversation language on its own. The few
+    paths that answer WITHOUT the agent in the loop (the Run-in-Background
+    short-circuit) have no such mechanism, and shipped fixed English into
+    otherwise Japanese conversations (observed live 2026-08-04). This calls a
+    model explicitly for those, instead of hardcoding a second language or a
+    branch per language.
+
+    Fails open to the English defaults on every path -- no sample, a failed or
+    slow call, an unparseable reply, a missing or empty key -- so the worst
+    case is exactly today's behaviour.
+    """
+    _out = dict(_defaults)
+    if not (_language_sample or "").strip():
+        # v11.53: log it. This was the one fail-open branch that returned
+        # English without a trace, and it is the branch that actually fired in
+        # the first live test - the only way to tell it apart from a successful
+        # no-op was that the emit landed 1 ms after the call.
+        logger.log_text("[localize] no language sample - keeping English defaults")
+        return _out
+    try:
+        from google.genai import client as _genai_client
+        _loc = os.environ.get("GOOGLE_CLOUD_LOCATION", "global")
+        _client = _genai_client.Client(
+            vertexai=True, location=_loc, project=project_id,
+            http_options={"api_version": "v1"},
+        )
+        _model = os.environ.get("AGENT_MODEL_LITE", "gemini-3.6-flash")
+        _prompt = (
+            "Rewrite every VALUE of the JSON object below in the SAME LANGUAGE as the SAMPLE MESSAGE, "
+            "keeping the meaning, the register and any leading emoji. Keep every {placeholder} "
+            "byte-identical and in a natural position. If the values are already in the sample's "
+            "language, return them unchanged. Reply with ONLY a JSON object using the SAME KEYS."
+            + chr(10) + chr(10) + "SAMPLE MESSAGE (language reference only - do not answer it):"
+            + chr(10) + (_language_sample or "")[:200]
+            + chr(10) + chr(10) + "JSON:" + chr(10) + json.dumps(_defaults, ensure_ascii=False)
+        )
+        _res = await asyncio.wait_for(
+            asyncio.to_thread(
+                _client.models.generate_content,
+                model=_model,
+                contents=[genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=_prompt)])],
+                config=genai_types.GenerateContentConfig(response_mime_type="application/json", temperature=0),
+            ),
+            timeout=8,
+        )
+        _obj = json.loads((getattr(_res, "text", None) or "").strip())
+        if not isinstance(_obj, dict):
+            logger.log_text("[localize] reply was not a JSON object - keeping English defaults")
+            return _out
+        _changed = 0
+        for _k in _defaults:
+            _v = _obj.get(_k)
+            if isinstance(_v, str) and _v.strip():
+                _out[_k] = _v.strip()
+                if _out[_k] != _defaults[_k]:
+                    _changed += 1
+        logger.log_text("[localize] rewrote " + str(_changed) + "/" + str(len(_defaults)) + " strings")
+        return _out
+    except Exception as _le:
+        logger.log_text("[localize] skipped (fail-open to English): " + str(_le)[:200])
+        return _out
+
 
 def _build_preflight_card_parts(plan, scope_text):
     try:
@@ -1958,6 +2148,152 @@ def _rescope_replay_parts(_parts, _suffix):
 
 
 # =============================================================================
+# Session persistence — survive a scale-to-zero
+# ADK's InMemorySessionService keeps the whole conversation in the process, so
+# it dies with the instance. That was invisible while the service ran at
+# --min-instances 1 and one warm instance answered nearly every turn; at
+# --min-instances 0 an idle gap ends the process and the next message would
+# start from a blank history mid-demo.
+#
+# So each turn's session is mirrored into Firestore and rehydrated on a miss.
+# Deliberate limits:
+#   - Only the conversation is persisted (events + state). Process-local caches
+#     -- _session_last_artifact, builtins._ws_session_tokens -- are not: the
+#     token is re-sent on every request anyway, and losing the regenerate cache
+#     costs one replay, not the conversation.
+#   - The OAuth token is STRIPPED from the persisted state. It is short-lived,
+#     re-supplied per request, and has no business sitting in Firestore.
+#   - The blob is version-stamped with the ADK version that wrote it. ADK owns
+#     the Event schema; a blob written by a different version is discarded
+#     rather than fed to a validator that may not understand it.
+# =============================================================================
+_SESSION_PERSIST = os.environ.get("SESSION_PERSIST", "1").strip().lower() not in ("0", "false", "no")
+_SESSION_MAX_EVENTS = int(os.environ.get("SESSION_MAX_EVENTS", "200"))
+# Firestore caps a document at 1 MiB; leave room for the metadata fields.
+_SESSION_BLOB_MAX_BYTES = 800000
+
+try:
+    import importlib.metadata as _sp_meta
+    _ADK_VERSION = _sp_meta.version("google-adk")
+except Exception:
+    _ADK_VERSION = "unknown"
+
+
+def _session_doc_ref(_session_id):
+    """Firestore ref for a persisted session, or None when unavailable."""
+    if not (_SESSION_PERSIST and _session_id):
+        return None
+    import builtins as _sp_builtins
+    _fs = getattr(_sp_builtins, '_firestore_client', None)
+    _demo_id = os.environ.get("DEMO_ID", "")
+    if not _fs or not _demo_id:
+        return None
+    # Firestore document ids may not contain '/'.
+    return _fs.collection(_demo_id + "_adk_sessions").document(str(_session_id).replace("/", "_"))
+
+
+def _session_persistable_state(_state):
+    """Session state minus the per-request OAuth token."""
+    _auth_id = os.environ.get("GEMINI_AUTHORIZATION_ID", "")
+    _out = {}
+    for _k, _v in (_state or {}).items():
+        if _auth_id and _k == _auth_id:
+            continue
+        try:
+            json.dumps(_v)
+        except Exception:
+            continue  # not JSON-serialisable: skip rather than fail the flush
+        _out[_k] = _v
+    return _out
+
+
+async def _persist_session(_session, _session_id, _user_id):
+    """Mirror a session's events + state into Firestore. Best-effort."""
+    _ref = _session_doc_ref(_session_id)
+    if _ref is None or _session is None:
+        return
+    try:
+        import gzip as _sp_gzip
+        _events = list(getattr(_session, "events", None) or [])
+        _payload_events = []
+        for _ev in _events[-_SESSION_MAX_EVENTS:]:
+            try:
+                _payload_events.append(_ev.model_dump(mode="json", exclude_none=True))
+            except Exception:
+                continue  # one unserialisable event must not lose the rest
+        _payload = {
+            "state": _session_persistable_state(getattr(_session, "state", None)),
+            "events": _payload_events,
+        }
+        _blob = _sp_gzip.compress(json.dumps(_payload, ensure_ascii=False).encode("utf-8"))
+        # Oversized history: drop the oldest events until it fits. Halving keeps
+        # this to a couple of passes even on a very long session.
+        while len(_blob) > _SESSION_BLOB_MAX_BYTES and len(_payload["events"]) > 1:
+            _payload["events"] = _payload["events"][len(_payload["events"]) // 2:]
+            _blob = _sp_gzip.compress(json.dumps(_payload, ensure_ascii=False).encode("utf-8"))
+        if len(_blob) > _SESSION_BLOB_MAX_BYTES:
+            logger.log_text("[session_persist] " + str(_session_id) + ": blob still "
+                            + str(len(_blob)) + " bytes after trimming - skipping flush")
+            return
+        _ref.set({
+            "session_id": str(_session_id),
+            "user_id": str(_user_id),
+            "app_name": runner.app_name,
+            "adk_version": _ADK_VERSION,
+            "event_count": len(_payload["events"]),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "blob": _blob,
+        })
+    except Exception as _pe:
+        logger.log_text("[session_persist] flush failed for " + str(_session_id) + ": " + str(_pe)[:300])
+
+
+async def _restore_session(_session_id, _user_id, _initial_state):
+    """Rebuild a session from Firestore. Returns the session, or None."""
+    _ref = _session_doc_ref(_session_id)
+    if _ref is None:
+        return None
+    try:
+        import gzip as _sp_gzip
+        _snap = _ref.get()
+        if not _snap.exists:
+            return None
+        _doc = _snap.to_dict() or {}
+        _stored_version = _doc.get("adk_version", "")
+        if _stored_version != _ADK_VERSION:
+            logger.log_text("[session_persist] " + str(_session_id) + ": discarding blob written by adk "
+                            + str(_stored_version) + " (running " + _ADK_VERSION + ")")
+            return None
+        _blob = _doc.get("blob")
+        if not _blob:
+            return None
+        _payload = json.loads(_sp_gzip.decompress(bytes(_blob)).decode("utf-8"))
+
+        _state = dict(_payload.get("state") or {})
+        _state.update(_initial_state or {})  # a fresh token beats the stored state
+        _session = await runner.session_service.create_session(
+            app_name=runner.app_name,
+            user_id=_user_id,
+            state=_state,
+            session_id=_session_id,
+        )
+        from google.adk.events import Event as _AdkEvent
+        _restored = 0
+        for _raw in _payload.get("events") or []:
+            try:
+                await runner.session_service.append_event(_session, _AdkEvent.model_validate(_raw))
+                _restored += 1
+            except Exception:
+                continue
+        logger.log_text("[session_persist] " + str(_session_id) + ": restored " + str(_restored)
+                        + "/" + str(len(_payload.get("events") or [])) + " events after a cold start")
+        return _session
+    except Exception as _re:
+        logger.log_text("[session_persist] restore failed for " + str(_session_id) + ": " + str(_re)[:300])
+        return None
+
+
+# =============================================================================
 # H1 (v10.66): Per-session last-deliverable cache for GE "Regenerate".
 # GE's "Regenerate response" re-sends the SAME request as a NEW invocation
 # (different idempotency key, so G1 replay does not catch it). The model, seeing
@@ -2167,6 +2503,25 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         user_id = run_args['user_id']
 
         if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+            # Orphan-recovery sweep (v11.56). At the default --min-instances 0 an
+            # idle instance is torn down on purpose, so a long autonomous task
+            # usually outlives the daemon thread monitoring it and its doc freezes
+            # at 'working'. Recovery is pull-based and MUST run here, at the
+            # request entry: the equivalent sweep in root_agent's
+            # before_agent_callback is skipped whenever ADK resumes the session
+            # into a sticky sub-agent (see _ma_sweep_orphaned_tasks). It also has
+            # to run BEFORE the completed-task query below, so a ticket finalized
+            # now is announced in this same turn.
+            # Off-thread: the sweep does a blocking Firestore read plus an
+            # interaction GET, and this is the event loop.
+            try:
+                _ma_healed = await asyncio.to_thread(_agent_tools._ma_sweep_orphaned_tasks)
+                if _ma_healed:
+                    logger.log_text('[ma_sweep] finalized ' + str(_ma_healed)
+                                    + ' orphaned autonomous ticket(s) at request entry')
+            except Exception as _ma_sweep_err:
+                logger.log_text('[ma_sweep] sweep skipped: ' + str(_ma_sweep_err)[:200])
+
             # Deterministic completion delivery (v11.0): the state-based
             # {_bg_task_results} injection proved too weak on busy turns - a
             # "Run Inline" press transfers to deep_analysis (whose instruction has
@@ -2432,7 +2787,21 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                             _winner_key = _idem_key_raw
                 except Exception as _claim_err:
                     logger.log_text("[idempotency] claim skipped (non-fatal): " + str(_claim_err)[:160])
-            await self._process_request_body(context, event_queue, runner, run_args, session_id, user_id, idem_key=_winner_key)
+            try:
+                await self._process_request_body(context, event_queue, runner, run_args, session_id, user_id, idem_key=_winner_key)
+            finally:
+                # Mirror the turn to Firestore whatever happened — a turn that
+                # failed still moved the conversation forward, and losing that
+                # is exactly the cold-start amnesia this exists to prevent.
+                # Runs before the session lock is released, so a concurrent
+                # turn cannot interleave a half-written history.
+                try:
+                    _flush_sess = await runner.session_service.get_session(
+                        app_name=runner.app_name, user_id=user_id, session_id=session_id,
+                    )
+                    await _persist_session(_flush_sess, session_id, user_id)
+                except Exception as _flush_err:
+                    logger.log_text("[session_persist] post-turn flush skipped: " + str(_flush_err)[:200])
         finally:
             if _y2_held:
                 try:
@@ -2492,6 +2861,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         if token and auth_id:
             initial_state[auth_id] = token
             
+        if session is None:
+          # Nothing in memory. Either this really is a new conversation, or the
+          # process that held it is gone (a scale-to-zero, a deploy, an instance
+          # recycle) — so look for a persisted copy before starting blank.
+          session = await _restore_session(session_id, user_id, initial_state)
         if session is None:
           session = await runner.session_service.create_session(
               app_name=runner.app_name,
@@ -2644,21 +3018,41 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         )
                     except Exception as _bg_reg_err:
                         _bg_reg = {'status': 'error', 'message': str(_bg_reg_err)[:200]}
+                    # This path answers WITHOUT the agent, so nothing here matches
+                    # the conversation language by itself. The sendText payloads
+                    # stay English on purpose - they are instructions to the agent
+                    # and GE never shows them ("User action triggered.").
+                    # v11.53: _bg_scope FIRST, session history only as a backstop.
+                    # The press that lands here always follows an analysis-plan
+                    # card, and that card turn ALSO short-circuits - the agent
+                    # never runs, so ADK never appends the typed message to the
+                    # session. On this path _last_typed_user_text is therefore
+                    # empty in the normal case, which silently fell back to
+                    # English (observed live 2026-08-04). _bg_scope carries the
+                    # user's own wording, which is the better sample anyway.
+                    _bg_lang_sample = (_bg_scope or "").strip() or _last_typed_user_text(session)
                     if _bg_reg.get('status') in ('submitted', 'already_active'):
                         _bg_ticket = str(_bg_reg.get('ticket-id', ''))
+                        _bg_ui = await _localize_ui_strings({
+                            "ack": chr(0x1F680) + " Got it - this analysis is now running as a background "
+                                   "task (ticket: {ticket}). It keeps running to completion; press the "
+                                   "button below to check progress and retrieve the full report.",
+                            "chip": chr(0x1F4CA) + " Check Task Status",
+                        }, _bg_lang_sample)
                         await _emit_bg_terminal(
-                            chr(0x1F680) + " Got it - this analysis is now running as a background task (ticket: "
-                            + _bg_ticket + "). It keeps running to completion; press the button below to "
-                            "check progress and retrieve the full report.",
-                            [("Check progress of task " + _bg_ticket, chr(0x1F4CA) + " Check Task Status")],
+                            _bg_ui["ack"].replace("{ticket}", _bg_ticket),
+                            [("Check progress of task " + _bg_ticket, _bg_ui["chip"])],
                         )
                         logger.log_text("[preflight_gate] Run in Background press -> direct registration (ticket " + _bg_ticket + "), bypassed agent")
                         return
+                    _bg_ui = await _localize_ui_strings({
+                        "ack": chr(0x26A0) + chr(0xFE0F) + " I could not start the background task "
+                               "({reason}). Please press the button to try again.",
+                        "chip": chr(0x1F501) + " Try again",
+                    }, _bg_lang_sample)
                     await _emit_bg_terminal(
-                        chr(0x26A0) + chr(0xFE0F) + " I could not start the background task ("
-                        + str(_bg_reg.get('message', 'unknown error'))[:160]
-                        + "). Please press the button to try again.",
-                        [("Run in Background: " + _bg_scope, chr(0x1F501) + " Try again")],
+                        _bg_ui["ack"].replace("{reason}", str(_bg_reg.get('message', 'unknown error'))[:160]),
+                        [("Run in Background: " + _bg_scope, _bg_ui["chip"])],
                     )
                     logger.log_text("[preflight_gate] bg direct-registration failed, emitted retry: " + str(_bg_reg.get('message', ''))[:160])
                     return
@@ -2810,6 +3204,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         # tokens right after transfer) has NO data to synthesize from, so recovery
         # must RE-EXECUTE with tools allowed instead of forcing a toolless synthesis.
         _turn_had_tool_results = False
+        # v11.52: the finished report a get_task_result call handed the model this
+        # turn, kept so the delivery guard below can tell whether the model
+        # actually reproduced it. See _MANDATORY_ACTION in the tool and the guard
+        # next to the final artifact assembly.
+        _pending_task_report = ""
         # Running capture of SHORT conversational text the model emitted this turn
         # (incl. text later cleared by a trailing tool call). Used only by the
         # UI-only render guard below to promote a real prior utterance into an
@@ -3874,6 +4273,22 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                               _is_transfer = _fr_name.startswith('transfer_to_') or _fr_name == 'transfer_to_agent'
                               if not _is_transfer and _fr_name != 'adk_request_credential':
                                   _turn_had_tool_results = True
+                                  if _fr_name == 'get_task_result':
+                                      # Remember the finished report this call handed
+                                      # the model, for the delivery guard below.
+                                      try:
+                                          _fr_payload = getattr(part.function_response, 'response', None)
+                                          # ADK passes a dict return through as-is but
+                                          # wraps anything else under 'result'; accept
+                                          # both so the guard cannot quietly go blind.
+                                          if isinstance(_fr_payload, dict) and 'status' not in _fr_payload:
+                                              _fr_payload = _fr_payload.get('result')
+                                          if isinstance(_fr_payload, dict) and _fr_payload.get('status') == 'completed':
+                                              _rs = _fr_payload.get('result_summary') or ''
+                                              if isinstance(_rs, str):
+                                                  _pending_task_report = _rs
+                                      except Exception:
+                                          pass  # guard is an extra, never a failure mode
                                   _fr_text_evt = TaskStatusUpdateEvent(
                                       task_id=context.task_id,
                                       context_id=context.context_id,
@@ -4055,6 +4470,38 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         # header between A2UI cards and suggestion buttons via text injection.
         # Spacing before buttons is now handled inside A2UI component tree by
         # _rewrite_suggestions_a2ui() which inserts a spacer Text component.
+
+        # =============================================================================
+        # Background-report delivery guard (v11.52)
+        # A get_task_result call on a FINISHED task is the moment the report is
+        # delivered -- there is no other channel, because a tool result is never
+        # shown to the user. Observed live 2026-08-04: on a "show the full report"
+        # press the model called get_task_result, received 5,519 chars, and replied
+        # with 570 tokens ending "...displayed in full above" -- a pointer to
+        # content that exists only in the tool result. The user saw a claim and no
+        # report, and had to type "the report is not displayed" to get it. The
+        # tool's _MANDATORY_ACTION already demands a verbatim copy; flash-lite
+        # ignored it, so the instruction alone cannot be the whole answer.
+        # Detect by LENGTH, which is language-neutral: a reply far shorter than the
+        # report it claims to be presenting did not contain it. Append the report
+        # verbatim rather than re-prompting -- the text is already in hand, so a
+        # second model round-trip would only add latency and another chance to
+        # paraphrase it away. A reply that did carry the report is comfortably over
+        # the threshold and is left untouched.
+        # =============================================================================
+        if _pending_task_report and len(_pending_task_report) >= 400:
+            _emitted_report_chars = sum(
+                len((getattr(getattr(_p, 'root', None), 'text', '') or ''))
+                for _p in artifact_text_parts
+            )
+            if _emitted_report_chars < int(len(_pending_task_report) * 0.4):
+                artifact_text_parts.append(
+                    a2a_types.Part(root=a2a_types.TextPart(text=_pending_task_report))
+                )
+                logger.log_text(
+                    "[task_report_guard] model emitted " + str(_emitted_report_chars)
+                    + " chars for a " + str(len(_pending_task_report))
+                    + "-char finished report - appended it verbatim")
 
         artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
 
@@ -4931,6 +5378,34 @@ from contextlib import nullcontext as _nullcontext
 # --- Mitigation #3: Concurrency limit for background tasks ---
 _WORKER_SEMAPHORE = _bg_asyncio.Semaphore(2)  # Max 2 concurrent background tasks
 
+# --- Duplicate-delivery / abandoned-run thresholds ---
+# Cloud Tasks retries a delivery whose HTTP call failed, which is exactly what
+# happens when the instance running the task is recycled. A retry that lands
+# while the first run is still alive must be dropped; a retry that lands after
+# the runner died must be allowed to take over. The runner's heartbeat
+# (updated_at, refreshed at most every _WORKER_HEARTBEAT_EVERY_S) separates the
+# two cases. Stale is generous because a single long tool call emits no events
+# and therefore no heartbeat.
+_WORKER_HEARTBEAT_EVERY_S = int(os.environ.get("WORKER_HEARTBEAT_EVERY_S", "30"))
+_WORKER_HEARTBEAT_STALE_S = int(os.environ.get("WORKER_HEARTBEAT_STALE_S", "600"))
+
+
+def _worker_beat_age_s(_doc):
+    """Seconds since a task doc's last heartbeat, or None if unknown."""
+    import datetime as _bdt
+    for _key in ("updated_at", "started_at"):
+        _raw = (_doc or {}).get(_key) or ""
+        if not _raw:
+            continue
+        try:
+            _when = _bdt.datetime.fromisoformat(str(_raw).replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if _when.tzinfo is None:
+            _when = _when.replace(tzinfo=_bdt.timezone.utc)
+        return (_bdt.datetime.now(_bdt.timezone.utc) - _when).total_seconds()
+    return None
+
 # --- Mitigation #4: OpenTelemetry tracing for worker visibility ---
 try:
     from opentelemetry import trace as _otel_trace
@@ -4972,6 +5447,16 @@ async def execute_task(request: Request):
     # stuck at 'submitted' (v10.98). Query params live on the request line and are
     # always available regardless of when this coroutine is scheduled. The body is
     # only needed for Pub/Sub push (Cloud Scheduler), which carries no query params.
+    # Cloud Tasks stamps every delivery it makes. A non-zero retry count means
+    # the previous attempt of THIS task already terminated (Cloud Tasks never
+    # retries an attempt still in flight), which is the one signal that lets the
+    # in-flight guard below distinguish "someone else is running it" from
+    # "the instance that was running it died".
+    try:
+        _ct_retry = int(request.headers.get("X-CloudTasks-TaskRetryCount", "0") or 0)
+    except Exception:
+        _ct_retry = 0
+
     _qp = request.query_params
     _qp_task = (_qp.get("task_id") or "") if _qp else ""
     _qp_demo = (_qp.get("demo_id") or "") if _qp else ""
@@ -5069,6 +5554,30 @@ async def execute_task(request: Request):
                 _wlogger.warning("execute_task: task %s already %s, skipping re-execution", _task_id, _current.get("status"))
                 return {"status": _current.get("status"), "task_id": _task_id}
 
+            # In-flight guard: a second delivery can arrive while the first is
+            # still running (a duplicate dispatch, or a Cloud Tasks retry).
+            # Re-running would duplicate the work and race two writers on one
+            # doc, so ack the duplicate. Two escapes:
+            #   - _ct_retry > 0 means Cloud Tasks is RETRYING this very task,
+            #     which it only does once the previous attempt has terminated —
+            #     so whatever wrote that heartbeat is provably gone and this
+            #     delivery is the recovery, however fresh the heartbeat looks.
+            #   - a stale heartbeat covers the localhost fallback, which has no
+            #     retries and leaves no other trace of a dead runner.
+            # Acking with 2xx is deliberate: a 5xx would make Cloud Tasks retry
+            # a perfectly healthy run. Autonomous tickets carry an
+            # interaction_id and have their own recovery path
+            # (_ma_recover_orphaned_task), so they are never taken over here.
+            if _current and _current.get("status") == "working" and not _force_run:
+                _beat_age = _worker_beat_age_s(_current)
+                _may_take_over = (_ct_retry > 0) or (_beat_age is None) or (_beat_age >= _WORKER_HEARTBEAT_STALE_S)
+                if _current.get("interaction_id") or not _may_take_over:
+                    _wlogger.warning("execute_task: task %s already working (heartbeat %ss old, ct_retry=%d), dropping duplicate delivery",
+                                     _task_id, "?" if _beat_age is None else int(_beat_age), _ct_retry)
+                    return {"status": "working", "task_id": _task_id, "skipped": "duplicate_delivery"}
+                _wlogger.warning("execute_task: taking over 'working' task %s (heartbeat=%s, ct_retry=%d)",
+                                 _task_id, "unknown" if _beat_age is None else str(int(_beat_age)) + "s", _ct_retry)
+
             # Scheduled AUTONOMOUS fire (v11.33): delegate to the sandbox
             # agent instead of running the background worker. Each fire
             # creates its own per-run autonomous ticket; the SCHEDULE's
@@ -5111,6 +5620,8 @@ async def execute_task(request: Request):
                 "definition_id": _task_id,
                 "status": "working",
                 "started_at": _now,
+                # Heartbeat seed — see _worker_beat_age_s / the in-flight guard.
+                "updated_at": _now,
                 "progress_pct": 10,
                 "log_tail": "",
                 "result_summary": "",
@@ -5249,6 +5760,11 @@ async def execute_task(request: Request):
                             continue
                         return
 
+                # Monotonic timestamp of the last heartbeat write, boxed so the
+                # nested consumer can update it without a nonlocal chain.
+                import time as _hb_time
+                _hb_last = [_hb_time.monotonic()]
+
                 async def _bg_consume(_gen):
                     # Shared consumption: tool tracking, cancellation, text capture.
                     # Returns True if the task was cancelled mid-run.
@@ -5282,6 +5798,18 @@ async def execute_task(request: Request):
                                     return True
                             except Exception:
                                 pass  # Check failure should not stop task execution
+
+                        # Liveness heartbeat: proves this run is still alive to
+                        # the in-flight guard (a Cloud Tasks retry) and to the
+                        # abandoned-run sweep in _inject_completed_tasks.
+                        # Rate-limited by time, not by event count, so a chatty
+                        # turn does not hammer Firestore.
+                        if _hb_time.monotonic() - _hb_last[0] >= _WORKER_HEARTBEAT_EVERY_S:
+                            _hb_last[0] = _hb_time.monotonic()
+                            try:
+                                _exec_ref.update({"updated_at": _dt.datetime.now(_dt.timezone.utc).isoformat()})
+                            except Exception:
+                                pass  # Heartbeat is best-effort
 
                         if event.is_final_response() and event.content and event.content.parts:
                             for _p in event.content.parts:
