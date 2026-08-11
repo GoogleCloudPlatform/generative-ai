@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 #!/usr/bin/env python3
 """
 Semantic Gateway Guard & Deterministic Unit Tester
@@ -102,20 +116,20 @@ def run_test_suite():
 
     print("\n\033[94mRUNNING GATEWAY POLICY UNIT TESTS\033[0m")
     print("=" * 80)
-    
+
     passed_count = 0
-    
+
     for tc in test_cases:
         result = inspect_payload(tc["type"], tc["payload"])
         actual = result["action"]
-        
+
         passed = (actual == tc["expected"])
         if passed:
             passed_count += 1
             status_badge = "\033[92mPASS\033[0m"
         else:
             status_badge = "\033[91mFAIL\033[0m"
-            
+
         print(f"{status_badge} | {tc['id']} - {tc['name']}")
         print(f"       Payload:  {tc['payload']}")
         print(f"       Expected: {tc['expected']:<5} | Actual: {actual:<5} | Reason: {result['reason']}")
@@ -123,7 +137,7 @@ def run_test_suite():
 
     total_tests = len(test_cases)
     compliance_score = int((passed_count / total_tests) * 100)
-    
+
     print("\n\033[1mTEST SUITE RUNNER SUMMARY\033[0m")
     print("=" * 40)
     print(f"Tests Run:        {total_tests}")
@@ -131,7 +145,7 @@ def run_test_suite():
     print(f"Tests Failed:     " + ("\033[91m0\033[0m" if passed_count == total_tests else f"\033[91m{total_tests - passed_count}\033[0m"))
     print(f"Compliance:       {compliance_score}%")
     print("=" * 40)
-    
+
     if passed_count != total_tests:
         sys.exit(1)
 
@@ -141,7 +155,7 @@ def main():
         sys.exit(1)
 
     command = sys.argv[1]
-    
+
     if command == "run-tests":
         run_test_suite()
     elif command == "check":

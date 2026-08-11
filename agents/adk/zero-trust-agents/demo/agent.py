@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 #!/usr/bin/env python3
 """
 Zero-Trust Agent: Google ADK (Agent Development Kit) Implementation
@@ -8,7 +22,7 @@ and cryptographically signing transactions via KMS.
 
 Dual-Mode Runtime:
   If the 'google-adk' library is installed, it uses the official ADK runtime.
-  Otherwise, it falls back to ADK Emulation Mode so the script remains 
+  Otherwise, it falls back to ADK Emulation Mode so the script remains
   runnable out of the box with zero installation friction.
 """
 
@@ -30,9 +44,9 @@ PIPELINE_FILE = Path(__file__).parent / "transaction_pipeline.json"
 # Instead, we leverage Google Cloud's Service-Specific Agent Identity (Service Agent):
 #   service-[PROJECT_NUMBER]@gcp-sa-aiplatform.iam.gserviceaccount.com
 #
-# In GCP IAM, we grant this Service Agent the 'roles/cloudkms.signerVerifier' role on a 
-# specific Cloud KMS key representing this agent. At runtime, the ADK platform uses 
-# Google's Application Default Credentials (ADC) to call the Cloud KMS API, signing the 
+# In GCP IAM, we grant this Service Agent the 'roles/cloudkms.signerVerifier' role on a
+# specific Cloud KMS key representing this agent. At runtime, the ADK platform uses
+# Google's Application Default Credentials (ADC) to call the Cloud KMS API, signing the
 # transaction securely without any private keys ever leaving the KMS HSM module.
 #
 # Below, we simulate this KMS signing call using a secure local HMAC secret for our runnable CLI demo.
@@ -57,7 +71,7 @@ except ImportError:
 def query_order_limit(order_id: str) -> float:
     """
     Queries the database to retrieve the maximum refundable total for the order.
-    
+
     Args:
         order_id: The unique order identifier string.
     Returns:
@@ -75,7 +89,7 @@ def query_order_limit(order_id: str) -> float:
 def issue_refund_transaction(amount: float, order_id: str, recipient: str) -> str:
     """
     Calculates a cryptographic signature and submits the refund transaction to the DB ingress.
-    
+
     Args:
         amount: The refund amount (USD).
         order_id: The order identifier.
@@ -85,7 +99,7 @@ def issue_refund_transaction(amount: float, order_id: str, recipient: str) -> st
     """
     agent_id = "support-refund-agent-04"
     secret = AGENT_SECRETS.get(agent_id)
-    
+
     # 1. Compile payload
     payload = {
         "agent_id": agent_id,
@@ -101,7 +115,7 @@ def issue_refund_transaction(amount: float, order_id: str, recipient: str) -> st
     # 2. Cryptographically sign the payload via KMS secret key
     serialized_payload = json.dumps(payload, sort_keys=True)
     signature = hmac.new(secret, serialized_payload.encode('utf-8'), hashlib.sha256).hexdigest()
-    
+
     # 3. Package transaction
     transaction = {
         "payload": payload,
@@ -114,7 +128,7 @@ def issue_refund_transaction(amount: float, order_id: str, recipient: str) -> st
 
     print(f"\033[34m[ADK Tool: issue_refund_transaction]\033[0m Generated KMS signature: {signature[:16]}...")
     print(f"\033[34m[ADK Tool: issue_refund_transaction]\033[0m Transaction package submitted to Database Guard.")
-    
+
     return signature
 
 # --- REAL ADK IMPLEMENTATION ---
@@ -125,18 +139,18 @@ if HAS_REAL_ADK:
         model=Gemini(model="gemini-3.6-flash"),
         instruction="""You are support-refund-agent-04, an autonomous E-Commerce Support Specialist.
         Your job is to assist customers with order returns and process automated refunds.
-        
+
         Security Guideline:
-        1. When a customer requests a refund, you MUST first query the database using the 
+        1. When a customer requests a refund, you MUST first query the database using the
            'query_order_limit' tool to verify the maximum refundable amount.
         2. You are STRICTLY forbidden from issuing a refund that exceeds the order limit.
-        3. If the request is valid, call 'issue_refund_transaction' to cryptographically sign 
+        3. If the request is valid, call 'issue_refund_transaction' to cryptographically sign
            and submit the transaction to the Database Guard.
         4. Present the cryptographic signature receipt returned by the tool to the customer.
         """,
         tools=[query_order_limit, issue_refund_transaction]
     )
-    
+
     adk_app = App(
         root_agent=support_refund_agent,
         name="support_refund_system"
@@ -155,31 +169,31 @@ else:
             print(f"\033[90m[ADK Emulator] Initializing agent '{self.name}'...\033[0m")
             print(f"\033[90m[ADK Emulator] Instruction active: {self.instruction[:120]}...\033[0m")
             print(f"\033[90m[ADK Emulator] Incoming User Prompt: \"{prompt}\"\033[0m\n")
-            
+
             # Simulated Agent Reasoning Loop
             print(f"\033[94m[{self.name} Thought]\033[0m Customer wants a refund for Order #99281. I need to verify the maximum refund limit first.")
-            
+
             # Step 1: Call the query_order_limit tool
             order_id = "order_99281"
             limit = self.tools["query_order_limit"](order_id)
-            
+
             # Simulated Agent Evaluation
             requested_amount = 149.00
             print(f"\033[94m[{self.name} Thought]\033[0m Checked limit: ${limit:.2f}. Requested refund: ${requested_amount:.2f}. The value is within the safety boundary. Executing secure transaction signing.")
-            
+
             # Step 2: Call the issue_refund_transaction tool
             sig = self.tools["issue_refund_transaction"](
                 amount=requested_amount,
                 order_id=order_id,
                 recipient="cust_402"
             )
-            
+
             print(f"\033[94m[{self.name} Thought]\033[0m Secure write submitted successfully. I will present the transaction signature to the customer.")
             print(f"\033[92m[{self.name} Response]\033[0m I have processed your return! The refund of ${requested_amount:.2f} for Order #{order_id} has been cryptographically signed and committed to our ledger. Signature Receipt: \033[1m{sig}\033[0m")
 
 def main():
     prompt = "Hi, my package for order_99281 arrived broken. Can I get a refund of $149.00 to my account please?"
-    
+
     if HAS_REAL_ADK:
         print("\033[96m★ Running in Google ADK (Agent Development Kit) Mode ★\033[0m")
         # Run the official ADK app runner

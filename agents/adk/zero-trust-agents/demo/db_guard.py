@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 #!/usr/bin/env python3
 """
 Database Security Guard: Cryptographic Verification & Audit Trail
@@ -29,13 +43,13 @@ def verify_signature(payload, signature):
     """
     agent_id = payload.get("agent_id")
     secret = AGENT_KEYS.get(agent_id)
-    
+
     if not secret:
         return False
-        
+
     serialized_payload = json.dumps(payload, sort_keys=True)
     expected_sig = hmac.new(secret, serialized_payload.encode('utf-8'), hashlib.sha256).hexdigest()
-    
+
     # Secure constant-time comparison to prevent timing attacks
     return hmac.compare_digest(expected_sig, signature)
 
@@ -59,7 +73,7 @@ def process_ingress():
 
     if verify_signature(payload, signature):
         print(f"\033[92m[DB Guard] SUCCESS: Cryptographic signature verified! Row committed to ledger.\033[0m")
-        
+
         # Read existing ledger
         ledger = []
         if LEDGER_FILE.exists():
@@ -99,9 +113,9 @@ def audit_ledger():
 
     print("\033[94m[DB Auditor] Starting database ledger integrity scan...\033[0m")
     print("-" * 80)
-    
+
     breach_detected = False
-    
+
     for idx, record in enumerate(ledger):
         agent_id = record.get("agent_id")
         payload = record.get("payload")
@@ -109,15 +123,15 @@ def audit_ledger():
 
         # Verify record
         is_valid = verify_signature(payload, signature)
-        
+
         status_text = "\033[92m[VERIFIED]\033[0m" if is_valid else "\033[91m[TAMPERED / BREACH]\033[0m"
         print(f"Row {idx+1:02d} | Agent: {agent_id:<25} | Status: {status_text}")
         print(f"       | Payload: {json.dumps(payload)}")
         print(f"       | Signature: {signature[:16]}...{signature[-8:]}")
-        
+
         if not is_valid:
             breach_detected = True
-            
+
     print("-" * 80)
     if breach_detected:
         print("\033[91m⚠️  AUDIT ALARM: DATABASE INTEGRITY VIOLATION DETECTED!\033[0m")
