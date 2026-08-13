@@ -54,7 +54,7 @@ gcloud kms keys add-iam-policy-binding support-refund-agent-04-key \
 **Using Terraform:**
 ```hcl
 resource "google_kms_crypto_key_iam_binding" "agent_kms_binding" {
-  crypto_key_id = "projects/gfd-prod-992/locations/global/keyRings/agent-keyring/cryptoKeys/support-refund-agent-04-key"
+  crypto_key_id = "projects/agent-security-project-1/locations/global/keyRings/agent-keyring/cryptoKeys/support-refund-agent-04-key"
   role          = "roles/cloudkms.signerVerifier"
 
   members = [
@@ -76,7 +76,7 @@ def sign_via_gcp_kms(payload):
     client = kms.KeyManagementServiceClient()
     
     key_path = client.crypto_key_version_path(
-        "gfd-prod-992", "global", "agent-keyring", "support-refund-agent-04-key", "1"
+        "agent-security-project-1", "global", "agent-keyring", "support-refund-agent-04-key", "1"
     )
     
     serialized = json.dumps(payload, sort_keys=True).encode("utf-8")
@@ -322,7 +322,7 @@ def inspect_payload(payload_type, text):
     # 1. Regex inspection for Stripe Tokens and Credit Cards
     if re.search(r'\b(?:\d{4}[ -]?){3}\d{4}\b', text):
         return {"action": "BLOCK", "reason": "PII Leak: Card details detected"}
-    if "STRIPE_API_KEY" in text or "sk_live_" in text or "card_tok_" in text:
+    if "STRIPE_API_KEY" in text or "card_tok_" in text:
         return {"action": "BLOCK", "reason": "PII Leak: Stripe token detected"}
         
     # 2. Keyword Jailbreak & Refund Hijack Inspection
@@ -382,7 +382,7 @@ To scale this local blueprint to a production enterprise deployment on the **Gem
 | :--- | :--- | :--- | :--- |
 | **1. Cryptographic Identity** | Python HMAC signing ([`agent.py`](./demo/agent.py)) | **Cloud KMS** + **Cloud HSM** + **Cloud Logging** | Hardware-backed (FIPS 140-2 Level 3) asymmetric signing. Full audit trails in Cloud Logging. Chronicle SIEM alerts on signature failures. |
 | **2. Managed Sandbox** | gVisor `--runtime=runsc` Docker containers | **GKE Sandbox** or **Cloud Run** + **VPC Service Controls** | GKE Sandbox uses gVisor natively. VPC-SC establishes a network perimeter blocking container egress. |
-| **3. Semantic Gateway** | Python regex + keyword matching ([`gateway_guard.py`](./demo/gateway_guard.py)) | **Sensitive Data Protection** + **Vertex AI Safety Settings** + **Apigee** | ML-powered detection of 150+ sensitive data types. LLM-level jailbreak blocking via Vertex AI Safety Settings. |
+| **3. Semantic Gateway** | Python regex + keyword matching ([`gateway_guard.py`](./demo/gateway_guard.py)) | **Sensitive Data Protection** + **Vertex AI Agent Platform Safety Settings** + **Apigee** | ML-powered detection of 150+ sensitive data types. LLM-level jailbreak blocking via Vertex AI Agent Platform Safety Settings. |
 
 ### 1. Pillar 1: Asymmetric Key Signing in Cloud KMS
 ```bash
@@ -412,7 +412,7 @@ resource "google_access_context_manager_service_perimeter" "agent_perimeter" {
   name   = "accessPolicies/default/servicePerimeters/agent_security_perimeter"
   title  = "Agent Security Perimeter"
   status {
-    resources = ["projects/gfd-prod-992"]
+    resources = ["projects/agent-security-project-1"]
     restricted_services = [
       "aiplatform.googleapis.com",
       "kms.googleapis.com",
@@ -428,7 +428,7 @@ from google.cloud import dlp_v2
 
 def redact_pii_via_dlp(text):
     client = dlp_v2.DlpServiceClient()
-    parent = f"projects/gfd-prod-992"
+    parent = f"projects/agent-security-project-1"
     
     inspect_config = {
         "info_types": [
