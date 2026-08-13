@@ -38,8 +38,20 @@ import (
 )
 
 func main() {
+	// Cloud Logging expects the severity key to be "severity", not "level".
+	// We also want to emit Debug logs so they can be filtered in the Logs Explorer.
+	logOpts := &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.LevelKey {
+				a.Key = "severity"
+			}
+			return a
+		},
+	}
+
 	// Step 1: plain JSON logger for startup errors, before settings are loaded.
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, logOpts)))
 
 	// Step 2: load job settings from Cloud Run Job environment variables.
 	settings, err := config.LoadJobSettings()
@@ -58,7 +70,7 @@ func main() {
 	// Step 4: re-set the default logger with workflow and task_index attributes
 	// so that every subsequent log line — including those emitted by the service
 	// layer via middleware.LoggerFromContext — carries these fields automatically.
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)).With(
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, logOpts)).With(
 		slog.String("workflow", string(settings.JobType)),
 		slog.Int("task_index", settings.TaskIndex),
 	))

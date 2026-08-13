@@ -95,6 +95,16 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		}
 		totalRevoked += revoked
 		totalEvaluated += evaluated
+
+		// verbose debug logging: Emitted per-project
+		logger.DebugContext(ctx, "project processed",
+			slog.String("project_id", projectID),
+			slog.Int("licenses_revoked", revoked),
+			slog.Int("users_evaluated", evaluated),
+			slog.Bool("dry_run", dryRun),
+			slog.Bool("direct_law_mode", directLaw),
+			slog.Bool("gc_skip_group_eval", gcSkipGroupEval),
+		)
 	}
 
 	elapsed := time.Since(start).Milliseconds()
@@ -188,6 +198,11 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 						if err := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, chunk); err != nil {
 							return 0, 0, fmt.Errorf("project %q batch revoke: %w", projectID, err)
 						}
+						// verbose debug logging: Emitted per batch
+						middleware.LoggerFromContext(ctx).DebugContext(ctx, "batch revoked",
+							slog.String("project_id", projectID),
+							slog.Int("count", len(chunk)),
+						)
 					}
 				}
 				licensesRevoked += len(pageRevocations)
