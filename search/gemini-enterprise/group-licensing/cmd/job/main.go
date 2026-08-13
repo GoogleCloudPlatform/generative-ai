@@ -114,7 +114,7 @@ func main() {
 		}
 
 	case models.WorkflowGarbageCollection:
-		req := dto.SyncRemoveRequest{DryRun: &settings.DryRun, DirectLaw: &settings.DirectLaw}
+		req := dto.SyncRemoveRequest{DryRun: &settings.DryRun, DirectLaw: &settings.DirectLaw, GCSkipGroupEval: &settings.GCSkipGroupEval}
 		if _, err := services.NewGCService(idpAdapter, geminiAdapter).Run(ctx, cfg, req); err != nil {
 			slog.Error("garbage collection workflow failed", slog.Any("error", err))
 			os.Exit(1)

@@ -11,11 +11,12 @@ import (
 // JobSettings holds the Cloud Run Job execution parameters read from
 // well-known environment variables injected by the Cloud Run Jobs runtime.
 type JobSettings struct {
-	JobType   models.WorkflowType
-	DryRun    bool
-	DirectLaw bool
-	TaskIndex int
-	TaskCount int
+	JobType                models.WorkflowType
+	DryRun                 bool
+	DirectLaw              bool
+	GCSkipGroupEval        bool
+	TaskIndex              int
+	TaskCount              int
 }
 
 // LoadJobSettings reads Cloud Run Job configuration from environment variables
@@ -55,6 +56,16 @@ func LoadJobSettings() (*JobSettings, error) {
 		}
 	}
 
+	// GC_SKIP_GROUP_EVAL — optional, default false.
+	gcSkipGroupEval := false
+	if raw := os.Getenv("GC_SKIP_GROUP_EVAL"); raw != "" {
+		var err error
+		gcSkipGroupEval, err = strconv.ParseBool(raw)
+		if err != nil {
+			return nil, fmt.Errorf("GC_SKIP_GROUP_EVAL %q is not a valid boolean: %w", raw, models.ErrConfigInvalid)
+		}
+	}
+
 	// CLOUD_RUN_TASK_INDEX — optional, default 0.
 	taskIndex := 0
 	if raw := os.Getenv("CLOUD_RUN_TASK_INDEX"); raw != "" {
@@ -81,10 +92,11 @@ func LoadJobSettings() (*JobSettings, error) {
 	}
 
 	return &JobSettings{
-		JobType:   jobType,
-		DryRun:    dryRun,
-		DirectLaw: directLaw,
-		TaskIndex: taskIndex,
-		TaskCount: taskCount,
+		JobType:                jobType,
+		DryRun:                 dryRun,
+		DirectLaw:              directLaw,
+		GCSkipGroupEval:        gcSkipGroupEval,
+		TaskIndex:              taskIndex,
+		TaskCount:              taskCount,
 	}, nil
 }

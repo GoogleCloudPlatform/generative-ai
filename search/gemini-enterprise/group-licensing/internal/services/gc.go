@@ -66,6 +66,10 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 	if req.DirectLaw != nil {
 		directLaw = *req.DirectLaw
 	}
+	gcSkipGroupEval := false
+	if req.GCSkipGroupEval != nil {
+		gcSkipGroupEval = *req.GCSkipGroupEval
+	}
 
 	start := time.Now()
 	logger.InfoContext(ctx, "garbage collection workflow starting",
@@ -73,12 +77,13 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		slog.Int("staleness_threshold_days", cfg.Settings.StalenessThresholdDays),
 		slog.Bool("dry_run", dryRun),
 		slog.Bool("direct_law_mode", directLaw),
+		slog.Bool("gc_skip_group_eval", gcSkipGroupEval),
 	)
 
 	var totalRevoked, totalEvaluated int
 
 	for projectID, projectCfg := range cfg.Projects {
-		revoked, evaluated, err := s.processProject(ctx, projectID, projectCfg, cfg.Settings.StalenessThresholdDays, dryRun)
+		revoked, evaluated, err := s.processProject(ctx, projectID, projectCfg, cfg.Settings.StalenessThresholdDays, dryRun, gcSkipGroupEval)
 		if err != nil {
 			logger.ErrorContext(ctx, "garbage collection workflow failed",
 				slog.String("project_id", projectID),
@@ -99,6 +104,7 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		slog.Int("users_evaluated", totalEvaluated),
 		slog.Bool("dry_run", dryRun),
 		slog.Bool("direct_law_mode", directLaw),
+		slog.Bool("gc_skip_group_eval", gcSkipGroupEval),
 	)
 
 	return dto.SyncRemoveResponse{
@@ -106,6 +112,7 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		UsersEvaluated:  totalEvaluated,
 		DryRun:          dryRun,
 		DirectLaw:       directLaw,
+		GCSkipGroupEval: gcSkipGroupEval,
 	}, nil
 }
 
@@ -118,7 +125,7 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 // correct location. Revocation candidates are chunked and flushed per page so
 // that memory usage is bounded to one page of candidates at any point rather
 // than accumulating the full result set before issuing any writes.
-func (s *GCService) processProject(ctx context.Context, projectID string, projectCfg config.ProjectConfig, thresholdDays int, dryRun bool) (licensesRevoked, usersEvaluated int, err error) {
+func (s *GCService) processProject(ctx context.Context, projectID string, projectCfg config.ProjectConfig, thresholdDays int, dryRun bool, gcSkipGroupEval bool) (licensesRevoked, usersEvaluated int, err error) {
 	seen := make(map[models.Location]bool)
 	var locations []models.Location
 	for _, entry := range projectCfg {
@@ -161,7 +168,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 				}
 				usersEvaluated++
 
-				shouldRevoke, err := s.shouldRevoke(ctx, license, projectCfg, thresholdDays)
+				shouldRevoke, err := s.shouldRevoke(ctx, license, projectCfg, thresholdDays, gcSkipGroupEval)
 				if err != nil {
 					return 0, 0, fmt.Errorf("project %q evaluating license: %w", projectID, err)
 				}
@@ -209,7 +216,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 //     before the user has had a chance to sign in.
 //   - When both are zero (pathological; should not occur in practice), the user
 //     is treated as immediately stale and the license is revoked.
-func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense, projectCfg config.ProjectConfig, thresholdDays int) (bool, error) {
+func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense, projectCfg config.ProjectConfig, thresholdDays int, gcSkipGroupEval bool) (bool, error) {
 	// Staleness check: only performed when thresholdDays > 0.
 	if thresholdDays > 0 {
 		ref := license.LastLoginTime
@@ -221,6 +228,11 @@ func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense
 		if ref.IsZero() || ref.Before(time.Now().AddDate(0, 0, -thresholdDays)) {
 			return true, nil
 		}
+	}
+
+	// If the skip entitlement check flag is enabled, bypass the group checks.
+	if gcSkipGroupEval {
+		return false, nil
 	}
 
 	// Entitlement check: the user must be a member of at least one group

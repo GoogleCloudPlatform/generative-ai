@@ -333,6 +333,51 @@ func TestGCService_Run_UnentitledUser_LicenseRevoked(t *testing.T) {
 	gemini.AssertExpectations(t)
 }
 
+func TestGCService_Run_GCSkipGroupEval_Bypass(t *testing.T) {
+	// When GCSkipGroupEval is true, an active user (not stale) should NOT be evaluated
+	// for group membership and should NOT be revoked, even if they theoretically
+	// aren't in the group anymore.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-skip-eval"
+		group     = "grp@example.com"
+		userEmail = "active-skipped@example.com"
+	)
+
+	recentLogin := time.Now().AddDate(0, 0, -5)
+
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: recentLogin,
+			},
+		}, "", nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, gemini)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCSkipGroupEval: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.True(t, resp.GCSkipGroupEval)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	// HasMember must not be called because of the bypass.
+	idp.AssertNotCalled(t, "HasMember")
+	gemini.AssertNotCalled(t, "BatchUpdateUserLicenses")
+}
+
 func TestGCService_Run_DryRun_NoAPIWrite(t *testing.T) {
 	// In dry-run mode, evaluation runs in full but BatchUpdateUserLicenses is
 	// never called, even when users qualify for revocation.
@@ -682,7 +727,7 @@ func TestGCService_processProject_PageLimitReached(t *testing.T) {
 	}
 
 	svc := NewGCService(idp, gemini)
-	_, _, err := svc.processProject(ctx, projectID, projectCfg, 30, false)
+	_, _, err := svc.processProject(ctx, projectID, projectCfg, 30, false, false)
 
 	require.NoError(t, err)
 	gemini.AssertNumberOfCalls(t, "ListUserLicenses", models.MaxPagesPerGroup)
