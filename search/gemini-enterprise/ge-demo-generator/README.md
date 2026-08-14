@@ -11,7 +11,7 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - **Reality-Grounded Demos**: The tool provisions actual BigQuery analytics, Google Maps grounding, and Firestore persistence databases for a raw, living demo experience.
 
 ### ⚙️ Technical Features
-- **Triple-Agent Autonomous Architecture**: Features a multi-agent execution framework powered by **Gemini 3.6 Flash** by default. Consists of a coordinator (`root_agent`) for chat, simple retrieval, and A2UI card rendering; an analytical sub-agent (`deep_analysis_agent`) for complex inline calculations; and a standalone background worker (`background_agent`) run asynchronously for long-running background tasks and recurring cron scheduled tasks. Models are configurable via `--model-analysis-agent` and `--model-root-agent` CLI flags.
+- **Triple-Agent Autonomous Architecture**: Features a multi-agent execution framework powered by **Gemini 3.7 Flash** by default. Consists of a coordinator (`root_agent`) for chat, simple retrieval, and A2UI card rendering; an analytical sub-agent (`deep_analysis_agent`) for complex inline calculations; and a standalone background worker (`background_agent`) run asynchronously for long-running background tasks and recurring cron scheduled tasks. Models are configurable via `--model-analysis-agent` and `--model-root-agent` CLI flags.
 - **Autonomous Workflow Pipelines & Guardrails**: Incorporates advanced background pipelines for both workflow-based operations (`SCAN -> ANALYZE -> PLAN -> EXECUTE -> VERIFY -> REPORT` with human-in-the-loop escalations) and deep analytical tasks. All background tasks are protected by an **Anti-Shallow Guard** self-check to ensure rigorous statistical results and extensive data tool coverage.
 - **MCP Server Catalog**: A curated catalog of pre-configured MCP servers (Government & Legal, Finance, Social, Japan-Specific, Environment & Weather, Google Official) with one-click add, recipe bundles, and custom URL import.
 - **A2UI (Agent-to-UI) Compliant**: Streams interactive Bento Grid layouts, Analytics Charts, and interactive confirmation cards using the A2UI SDK (`a2ui-agent-sdk`) via `<a2ui-json>` tags embedded in model responses. Integrates rich Welcome Card onboarding and step-by-step Workflow Execution Plan patterns.
@@ -208,7 +208,7 @@ A complete setup is **two properties**: `PROJECT_ID` and `LOG_SHEET_URL`. Everyt
 | Property | Default | Description |
 |---|---|---|
 | `LOCATION` | `global` | Vertex AI Agent Platform API location (e.g., `us-central1`, `global`) |
-| `MODEL` | `gemini-3.6-flash` | Gemini model name for data generation |
+| `MODEL` | `gemini-3.7-flash` | Gemini model name for data generation |
 | `GITHUB_TOKEN` | (unset) | GitHub personal access token used for GitHub API calls when importing custom MCP servers from a repository URL. Only needed for private repos or to avoid unauthenticated rate limits |
 
 **Development and administration** — for working on this sample, not for running it. If you are deploying the app to give demos, skip these entirely:
@@ -295,7 +295,7 @@ When a user generates a demo through the web UI, the tool:
    - Provisions Firestore with operational documents
    - Deploys a **Data Viewer** web app (Flask on Cloud Run Functions Gen2)
    - Scaffolds an ADK agent project with MCP toolsets, A2UI support, and an A2A FastAPI server exposing a chat agent (`root_agent` and `deep_analysis_agent` sub-agent) and a background worker (`background_agent` via `/execute_task` runner)
-   - Defaults to **Gemini 3.6 Flash** for all three agents, with support for model override via `--model-analysis-agent` and `--model-root-agent` CLI flags
+   - Defaults to **Gemini 3.7 Flash** for all three agents, with support for model override via `--model-analysis-agent` and `--model-root-agent` CLI flags
    - Automatically builds a container image and deploys the Agent FastAPI server to **Cloud Run** (with `--min-instances 0` to control standby costs).
    - Provisions IAM bindings and environment configurations automatically.
    - Discovers any existing Gemini Enterprise Apps in your project and registers the newly deployed Cloud Run agent automatically.
@@ -600,12 +600,12 @@ When the user runs the generated setup script in Cloud Shell, the following arch
 
 #### Agent Architecture
 
-The synthesized agent uses a **triple-agent/multi-agent autonomous execution** architecture to achieve high-depth operational execution alongside optimal latency and cost. The architecture features three specialized agent instances, all utilizing **Gemini 3.6 Flash** by default for rapid response and high token efficiency:
+The synthesized agent uses a **triple-agent/multi-agent autonomous execution** architecture to achieve high-depth operational execution alongside optimal latency and cost. The architecture features three specialized agent instances, all utilizing **Gemini 3.7 Flash** by default for rapid response and high token efficiency:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  root_agent (LlmAgent — Coordinator)                         │
-│  Model: gemini-3.6-flash (AGENT_MODEL_LITE)                  │
+│  Model: gemini-3.7-flash (AGENT_MODEL_LITE)                  │
 │  Role: Chat coordinator, simple queries, A2UI card builder    │
 │  Instruction: Generated system prompt + A2UI schema          │
 │               + Background-First Routing Rules               │
@@ -621,7 +621,7 @@ The synthesized agent uses a **triple-agent/multi-agent autonomous execution** a
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐    │
 │  │  deep_analysis_agent (LlmAgent — Analytical Sub)     │    │
-│  │  Model: gemini-3.6-flash (AGENT_MODEL)                │    │
+│  │  Model: gemini-3.7-flash (AGENT_MODEL)                │    │
 │  │  Role: Complex inline multi-step reasoning            │    │
 │  │  Tools: Same shared toolset                           │    │
 │  │  Transfer: Returns to root_agent on completion        │    │
@@ -635,7 +635,7 @@ The synthesized agent uses a **triple-agent/multi-agent autonomous execution** a
 
 ┌──────────────────────────────────────────────────────────────┐
 │  background_agent (LlmAgent — Standalone Worker)              │
-│  Model: gemini-3.6-flash (AGENT_MODEL)                       │
+│  Model: gemini-3.7-flash (AGENT_MODEL)                       │
 │  Role: Autonomous background operations & deep analysis       │
 │  Instruction: Main instruction + Pipeline guardrails         │
 │               + Anti-Shallow Guard (no UI / no transfers)    │
@@ -849,7 +849,7 @@ graph TD
 The setup script deploys the agent directly to Google Cloud Run and supports model overrides and automated cleanup via CLI flags:
 
 ```bash
-# Default models (gemini-3.6-flash)
+# Default models (gemini-3.7-flash)
 bash setup-demo-xxx.sh
 
 # Override models
@@ -923,7 +923,7 @@ After running the setup script, the following directory structure is created:
 
 1. **Prompt**: The user says in Gemini Enterprise: *"Approve safety issue #104 and log update notes."*
 2. **A2A Routing**: Gemini Enterprise sends the message via A2A JSON-RPC to the Cloud Run FastAPI server.
-3. **Model Announcement**: The server emits a `🧠 Model: gemini-3.6-flash` status event in the thinking accordion.
+3. **Model Announcement**: The server emits a `🧠 Model: gemini-3.7-flash` status event in the thinking accordion.
 4. **Reasoning**: The `root_agent` identifies a write request and plans to use the Firestore MCP toolset.
 5. **Confirmation**: The agent renders an A2UI confirmation card (via `<a2ui-json>` tags) showing before/after data with Approve/Reject buttons and a `dataModelUpdate` for pre-populated fields.
 6. **User Approval**: The user clicks "Approve" in the interactive card, which sends a `sendText` action back to the agent.

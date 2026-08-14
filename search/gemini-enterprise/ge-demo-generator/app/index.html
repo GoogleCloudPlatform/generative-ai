@@ -2151,7 +2151,7 @@ limitations under the License.
             </div>
             <div class="flex items-center gap-2 text-[10px] text-gray-400">
               <span>Model:</span>
-              <span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 font-mono text-sky-400 font-semibold"><?= typeof generatorModel !== 'undefined' ? generatorModel : 'gemini-3.5-flash' ?></span>
+              <span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 font-mono text-sky-400 font-semibold"><?= typeof generatorModel !== 'undefined' ? generatorModel : 'gemini-3.7-flash' ?></span>
             </div>
           </div>
 
@@ -2762,7 +2762,7 @@ limitations under the License.
   <div id="toast">Copied to clipboard!</div>
 
   <script>
-    const GENERATOR_MODEL = '<?= typeof generatorModel !== "undefined" ? generatorModel : "gemini-3.5-flash" ?>';
+    const GENERATOR_MODEL = '<?= typeof generatorModel !== "undefined" ? generatorModel : "gemini-3.7-flash" ?>';
     const CURRENT_USER_EMAIL = '<?= typeof userEmail !== "undefined" ? userEmail : "" ?>';
     
     function formatModelName(modelId) {
