@@ -17,7 +17,7 @@ HOST        ?= 127.0.0.1
 PORT        ?= 8030
 PORTED_PORT ?= 8060
 URL         := http://$(HOST):$(PORT)
-PORTFILE    := .rosetta-ports
+PORT_FILE   := .rosetta-ports
 
 # ---- Cloud Run deploy (optional). Override on the CLI:
 #      make deploy GCP_PROJECT=my-project GCP_REGION=us-central1
@@ -85,7 +85,7 @@ serve: ## Run the Rosetta cockpit (Ctrl-C to stop)
 	@if [ ! -f .env ]; then \
 		echo "No .env found. Run 'make setup' first."; exit 1; \
 	fi
-	@echo "$(PORT) $(PORTED_PORT)" > $(PORTFILE)
+	@echo "$(PORT) $(PORTED_PORT)" > $(PORT_FILE)
 	@echo "Rosetta cockpit  ->  $(URL)"
 	@echo "ported agent     ->  :$(PORTED_PORT)      (Ctrl-C to stop)"
 	ROSETTA_HOST=$(HOST) ROSETTA_PORT=$(PORT) ROSETTA_PORTED_PORT=$(PORTED_PORT) uv run python serve.py
@@ -93,16 +93,16 @@ serve: ## Run the Rosetta cockpit (Ctrl-C to stop)
 run: serve ## Alias for 'serve'
 
 stop: ## Stop the cockpit + ported api_server from the last run
-	@if [ -f $(PORTFILE) ]; then \
-		read p pp < $(PORTFILE); \
-		for prt in $$p $$pp; do \
-			pid=$$(lsof -ti tcp:$$prt 2>/dev/null); \
-			if [ -n "$$pid" ]; then kill $$pid 2>/dev/null && echo "  stopped port $$prt"; \
-			else echo "  nothing on port $$prt"; fi; \
+	@if [ -f $(PORT_FILE) ]; then \
+		read p pp < $(PORT_FILE); \
+		for port_num in $$p $$pp; do \
+			pid=$$(lsof -ti tcp:$$port_num 2>/dev/null); \
+			if [ -n "$$pid" ]; then kill $$pid 2>/dev/null && echo "  stopped port $$port_num"; \
+			else echo "  nothing on port $$port_num"; fi; \
 		done; \
-		rm -f $(PORTFILE); \
+		rm -f $(PORT_FILE); \
 	else \
-		echo "No $(PORTFILE) — nothing to stop."; \
+		echo "No $(PORT_FILE) — nothing to stop."; \
 	fi
 
 restart: stop serve ## Stop the last run, then start fresh

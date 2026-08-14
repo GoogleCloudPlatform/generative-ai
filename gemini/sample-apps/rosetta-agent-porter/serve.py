@@ -134,10 +134,13 @@ async def _port_stream(url: str):
             # blocked; the scorecard fills in as each case is judged.
             yield {"event": "phase", "data": json.dumps({"phase": "evaluating"})}
             try:
-                async for eev in evalgen.evaluate_fidelity(
+                async for eval_ev in evalgen.evaluate_fidelity(
                     Path(project_path), mined_inputs, agent_summary, analyses
                 ):
-                    yield {"event": eev["type"], "data": json.dumps(eev["data"])}
+                    yield {
+                        "event": eval_ev["type"],
+                        "data": json.dumps(eval_ev["data"]),
+                    }
             except (
                 Exception
             ) as e:  # broad except on purpose: eval must never break the demo

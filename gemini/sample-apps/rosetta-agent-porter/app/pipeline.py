@@ -67,7 +67,7 @@ async def port_repo(
             "warning",
             message=f"possible secrets in {secrets[:5]} (ignored, not copied to port)",
         )
-    mblock = intake.manifest_block(repo, manifest)
+    manifest_text = intake.manifest_block(repo, manifest)
     yield _ev(
         "repo_tree",
         tree=manifest["tree"],
@@ -75,7 +75,7 @@ async def port_repo(
         files=manifest["n_code"],
     )
 
-    st = await run_agent(agents.build_intake(), {"manifest_block": mblock})
+    st = await run_agent(agents.build_intake(), {"manifest_block": manifest_text})
     scan = as_dict(st.get("scope")) or {}
     timings["intake"] = round(time.time() - ts, 1)
     yield _ev(
@@ -205,14 +205,14 @@ async def port_repo(
         verdict = await asyncio.to_thread(verify.static_check, project)
         while not verdict.ok and repairs < config.MAX_REPAIRS:
             yield _ev("repair", n=repairs + 1, errors=verdict.errors)
-            hst = await run_agent(
+            heal = await run_agent(
                 agents.build_fixer(),
                 {
                     "verdict_errors": "\n".join(verdict.errors),
                     "broken_block": codegen.broken_block(files),
                 },
             )
-            patch = codegen.parse_files(hst.get("fixed_raw") or "")
+            patch = codegen.parse_files(heal.get("fixed_raw") or "")
             if not patch:
                 break
             files = build.merge_files(files, patch)
@@ -259,7 +259,7 @@ async def port_repo(
 def cache_files(name: str, files) -> None:
     cache = intake.WORKSPACE / "cache"
     cache.mkdir(parents=True, exist_ok=True)
-    (cache / f"{name}.codefiles.json").write_text(
+    (cache / f"{name}.code_files.json").write_text(
         json.dumps([f.model_dump() for f in files], indent=2)
     )
 

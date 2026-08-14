@@ -343,7 +343,7 @@ def start_api_server(project: Path, port: int, log_path: Path) -> subprocess.Pop
     adk api_server serves POST /run and POST /run_sse over the agents in the dir.
     """
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    logf = open(
+    log_file = open(
         log_path, "w"
     )  # handle outlives this scope: (handle lives with the process
     return subprocess.Popen(
@@ -359,7 +359,7 @@ def start_api_server(project: Path, port: int, log_path: Path) -> subprocess.Pop
             "127.0.0.1",
         ],
         cwd=str(project),
-        stdout=logf,
+        stdout=log_file,
         stderr=subprocess.STDOUT,
         # Own process group. `uv run` execs a GRANDCHILD (the real uvicorn), and
         # terminating only the uv wrapper leaves that grandchild alive holding the

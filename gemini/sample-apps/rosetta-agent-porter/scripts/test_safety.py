@@ -27,8 +27,8 @@ def _mk(root: Path, files: dict[str, str]) -> Path:
 
 async def scan(repo: Path) -> dict:
     manifest = intake.build_manifest(repo)
-    mblock = intake.manifest_block(repo, manifest)
-    st = await run_agent(agents.build_intake(), {"manifest_block": mblock})
+    manifest_text = intake.manifest_block(repo, manifest)
+    st = await run_agent(agents.build_intake(), {"manifest_block": manifest_text})
     return as_dict(st.get("scope")) or {}
 
 

@@ -370,8 +370,8 @@ def build_source_blocks(
             all_paths, repo_dir, lambda p: "example" in p.lower() and p.endswith(".py")
         )
     )
-    dparts: list[str] = []
-    dused = 0
+    doc_parts: list[str] = []
+    doc_used = 0
     seen: set[str] = set()
     for rel in doc_candidates:
         if rel in seen:
@@ -379,11 +379,11 @@ def build_source_blocks(
         seen.add(rel)
         body = _read_text(repo_dir / rel, 8000)
         block = f"\n===== {rel} =====\n{body}\n"
-        if dused + len(block) > config.MAX_SOURCE_BLOCK_CHARS:
+        if doc_used + len(block) > config.MAX_SOURCE_BLOCK_CHARS:
             break
-        dparts.append(block)
-        dused += len(block)
-    docs_block = "".join(dparts) or "(no README/tests/examples found)"
+        doc_parts.append(block)
+        doc_used += len(block)
+    docs_block = "".join(doc_parts) or "(no README/tests/examples found)"
 
     return {"source_block": source_block, "docs_block": docs_block}
 

@@ -122,7 +122,7 @@ def main() -> int:
     print("\n\n================ SUMMARY ================")
     hdr = (
         f"{'example':9} {'framework':10} {'green':6} {'rep':4} {'files':6} "
-        f"{'fid':6} {'chat':5} {'intake':7} {'analys':7} {'plan':6} "
+        f"{'fid':6} {'chat':5} {'intake':7} {'swarm':7} {'plan':6} "
         f"{'codegen':8} {'install':8} {'verify':7} {'TOTAL':7}"
     )
     print(hdr)

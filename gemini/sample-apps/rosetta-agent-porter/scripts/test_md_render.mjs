@@ -76,9 +76,9 @@ check('bold inside inline code is NOT applied', code.includes('<code class="md-c
 // ---- output_schema JSON dump: raw JSON becomes a pretty ```json code block ----
 console.log('\n[Structured JSON output — the reported bug]');
 // prose from a no-schema agent, immediately followed by two output_schema JSON dumps
-const strat = JSON.stringify({name:'Full-Funnel Growth', tatics:'TOFU/MOFU/BOFU', channels:['Meta Ads','SEO'], KPIs:['CAC','ROAS','LTV']});
+const strategy = JSON.stringify({name:'Full-Funnel Growth', tactics:'TOFU/MOFU/BOFU', channels:['Meta Ads','SEO'], KPIs:['CAC','ROAS','LTV']});
 const copy  = JSON.stringify({campaign_name:'Wear Return Repeat', ideas:[{title:'Footprint Unmasked', description:'short-form video series', audience:'Gen Z', channel:'TikTok', expected_impact:'builds trust'}], headline:'Turn Old Kicks Into VIP', body:'Send us any worn-out pair.', call_to_action:'Join now'});
-const mixed = 'As a **Lead Market Analyst**, here is the plan.\n\n### Strategy\n* channel focus\n' + strat + copy;
+const mixed = 'As a **Lead Market Analyst**, here is the plan.\n\n### Strategy\n* channel focus\n' + strategy + copy;
 const r = renderAnswer(mixed);
 check('prose still renders (heading + bold + list)', r.includes('<div class="md-h md-h3">') && r.includes('<b>Lead Market Analyst</b>') && r.includes('<ul class="md-ul">'));
 check('first JSON object rendered as a <pre> code block', (r.match(/<pre class="md-pre">/g)||[]).length >= 2);
@@ -89,8 +89,8 @@ check('array values preserved inside the block', r.includes('Meta Ads') && r.inc
 const fenced = renderAnswer('```json\n{"a":1,"b":2,"c":3,"d":4,"e":5}\n```');
 check('pre-fenced JSON not double-processed', (fenced.match(/<pre class="md-pre">/g)||[]).length === 1);
 // invalid JSON (unquoted keys) is left as prose, not crashed
-const notjson = renderAnswer('config looks like {name: value, x: y} in pseudo-code');
-check('invalid JSON left as text (no crash, no code block)', !notjson.includes('<pre class="md-pre">') && notjson.includes('pseudo-code'));
+const not_json = renderAnswer('config looks like {name: value, x: y} in pseudo-code');
+check('invalid JSON left as text (no crash, no code block)', !not_json.includes('<pre class="md-pre">') && not_json.includes('pseudo-code'));
 
 console.log('\n' + (failures ? `FAILED (${failures})` : 'ALL PASSED'));
 process.exit(failures ? 1 : 0);
