@@ -18,4 +18,5 @@ This directory contains sample applications that demonstrate how to use the Gemi
 - [LlamaIndex RAG](llamaindex-rag/): An advanced Retrieval-Augmented Generation (RAG) system using LlamaIndex and Google Cloud Vertex AI for rapid prototyping and experimentation.
 - [Photo Discovery](photo-discovery/): A demo that integrates a Vertex AI Agent with a multi-platform Flutter app to identify landmarks and merchandise from photos.
 - [Quickbot](quickbot/): An innovative, out-of-the-box solution enabling users to deploy sophisticated AI Agents as full-stack cloud applications on their own Google Cloud Platform (GCP) accounts, entirely without requiring any coding expertise.
+- [Rosetta](rosetta-agent-porter/): An agent that ports agents — point it at a LangGraph, CrewAI or AutoGen repository and it rebuilds it as a native Google ADK agent with Gemini 3.7 Flash, self-heals the build until it is green, checks the port still behaves like the original, and runs it live.
 - [SWOT Agent](swot-agent/): A web application that performs automated SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) using the Gemini 2.0 Flash model and the Pydantic AI agent framework.
