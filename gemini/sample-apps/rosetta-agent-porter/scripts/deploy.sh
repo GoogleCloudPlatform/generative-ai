@@ -85,7 +85,7 @@ gcloud run deploy "$SERVICE" \
   --max-instances=1 \
   --concurrency=4 \
   --timeout=1800 \
-  --set-env-vars=GOOGLE_CLOUD_PROJECT="$PROJECT",GOOGLE_CLOUD_LOCATION=global,GOOGLE_GENAI_USE_VERTEXAI=true,ROSETTA_WORKSPACE=/tmp/rosetta-workspace
+  --set-env-vars=GOOGLE_CLOUD_PROJECT="$PROJECT",GOOGLE_CLOUD_LOCATION=global,ROSETTA_BACKEND=agent-platform,ROSETTA_WORKSPACE=/tmp/rosetta-workspace
 
 echo ">> 7/7 done"
 URL="$(gcloud run services describe "$SERVICE" --region="$REGION" \

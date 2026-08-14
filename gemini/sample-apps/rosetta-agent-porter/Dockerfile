@@ -63,8 +63,8 @@ RUN uv sync --frozen --no-dev
 # key is needed in the image. GOOGLE_CLOUD_PROJECT is deliberately NOT baked in —
 # it is supplied at deploy time (--set-env-vars), keeping the image project-agnostic.
 # To run this image against the Gemini API instead, pass
-#   -e GOOGLE_GENAI_USE_VERTEXAI=false -e GOOGLE_API_KEY=...
-ENV GOOGLE_GENAI_USE_VERTEXAI=true \
+#   -e ROSETTA_BACKEND=ai-studio -e GOOGLE_API_KEY=...
+ENV ROSETTA_BACKEND=agent-platform \
     GOOGLE_CLOUD_LOCATION=global \
     ROSETTA_WORKSPACE=/tmp/rosetta-workspace \
     PYTHONUNBUFFERED=1

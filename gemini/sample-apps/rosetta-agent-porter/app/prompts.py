@@ -481,9 +481,10 @@ def _backend_rules() -> str:
     """
     from app import config
 
-    if config.USE_VERTEXAI:
+    if config.USE_AGENT_PLATFORM:
         return (
-            '- Set os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true", and read\n'
+            '- Set os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true" (the SDK\'s own\n'
+            "  variable for selecting the backend), and read\n"
             '  GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION (default "global") from the\n'
             "  environment. Do NOT hardcode a project id — read it, and raise a clear error\n"
             "  naming the variable if it is missing.\n"

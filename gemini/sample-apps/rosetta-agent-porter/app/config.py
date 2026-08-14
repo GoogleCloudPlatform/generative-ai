@@ -67,32 +67,41 @@ MODEL_SMART_NAME = os.getenv("ROSETTA_MODEL_SMART_NAME", MODEL_NAME)
 MODEL_FAST_NAME = os.getenv("ROSETTA_MODEL_FAST_NAME", MODEL_NAME)
 
 
-# --- Backend: Gemini API (AI Studio) or Gemini Enterprise Agent Platform ------------------
+# --- Backend: Gemini API (AI Studio) or Gemini Enterprise Agent Platform -----
 def _resolve_backend() -> tuple[bool, str, str]:
-    """Pick the Gemini backend from the environment. Returns (use_vertex, project, location).
+    """Pick the Gemini backend from the environment.
+
+    Returns (use_agent_platform, project, location).
 
     Precedence:
-      1. GOOGLE_GENAI_USE_VERTEXAI, if you set it explicitly — you're the boss.
-      2. GOOGLE_API_KEY / GEMINI_API_KEY present  -> Gemini API (AI Studio).
-      3. GOOGLE_CLOUD_PROJECT present             -> Gemini Enterprise Agent Platform.
-    Raises with actionable instructions if neither is configured, because the
+      1. ROSETTA_BACKEND, if set: "agent-platform" or "ai-studio".
+      2. GOOGLE_API_KEY / GEMINI_API_KEY present -> Gemini API (AI Studio).
+      3. GOOGLE_CLOUD_PROJECT present            -> Gemini Enterprise Agent Platform.
+    Raises with actionable instructions when nothing is configured, because the
     alternative is a stack trace from deep inside the SDK on the first call.
 
     The resolved choice is written back to os.environ so the ADK/genai clients —
     and the `adk api_server` child process Rosetta launches for a ported agent —
     all agree on one backend.
     """
-    explicit = os.getenv("GOOGLE_GENAI_USE_VERTEXAI")
+    choice = (os.getenv("ROSETTA_BACKEND") or "").strip().lower()
     api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     project = os.getenv("GOOGLE_CLOUD_PROJECT", "")
     location = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
 
-    if explicit is not None:
-        use_vertex = explicit.strip().lower() in ("true", "1", "yes")
+    if choice in ("agent-platform", "agent_platform", "platform"):
+        use_agent_platform = True
+    elif choice in ("ai-studio", "ai_studio", "studio", "api"):
+        use_agent_platform = False
+    elif choice:
+        raise RuntimeError(
+            f"ROSETTA_BACKEND={choice!r} is not valid. "
+            'Use "agent-platform" or "ai-studio".'
+        )
     elif api_key:
-        use_vertex = False
+        use_agent_platform = False
     elif project:
-        use_vertex = True
+        use_agent_platform = True
     else:
         raise RuntimeError(
             "No Gemini backend configured. Pick one and re-run:\n"
@@ -104,29 +113,34 @@ def _resolve_backend() -> tuple[bool, str, str]:
             "Or copy .env.example to .env and fill in one of them."
         )
 
-    if use_vertex and not project:
+    if use_agent_platform and not project:
         raise RuntimeError(
-            "GOOGLE_GENAI_USE_VERTEXAI is true but GOOGLE_CLOUD_PROJECT is not set.\n"
-            "  export GOOGLE_CLOUD_PROJECT=your-project-id\n"
-            "and make sure ADC is available: gcloud auth application-default login"
+            "Gemini Enterprise Agent Platform selected but GOOGLE_CLOUD_PROJECT is "
+            "not set.\n  export GOOGLE_CLOUD_PROJECT=your-project-id\n"
+            "and make sure credentials are available: "
+            "gcloud auth application-default login"
         )
-    if not use_vertex and not api_key:
+    if not use_agent_platform and not api_key:
         raise RuntimeError(
             "Gemini API backend selected but no GOOGLE_API_KEY / GEMINI_API_KEY is set.\n"
             "Create one at https://aistudio.google.com/apikey"
         )
 
-    os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true" if use_vertex else "false"
-    if use_vertex:
+    # The google-genai SDK selects its backend from this variable; the name is the
+    # library's, not ours, so it is set here and never surfaced to the user.
+    os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true" if use_agent_platform else "false"
+    if use_agent_platform:
         os.environ["GOOGLE_CLOUD_LOCATION"] = location
-    return use_vertex, project, location
+    return use_agent_platform, project, location
 
 
-USE_VERTEXAI, PROJECT_ID, LOCATION = _resolve_backend()
+USE_AGENT_PLATFORM, PROJECT_ID, LOCATION = _resolve_backend()
 
 # Human-readable backend label — shown in the cockpit and in generated projects.
 BACKEND_NAME = (
-    "Gemini Enterprise Agent Platform" if USE_VERTEXAI else "Gemini API (AI Studio)"
+    "Gemini Enterprise Agent Platform"
+    if USE_AGENT_PLATFORM
+    else "Gemini API (AI Studio)"
 )
 
 # --- Pipeline caps (tunable knobs) ------------------------------------------
