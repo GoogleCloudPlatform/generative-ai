@@ -17,7 +17,7 @@
 # The image carries python 3.12 + git + uv + agents-cli + the app, and runs
 # serve.py (which shells out to that toolchain and spawns a child adk api_server).
 #
-# The deployed service talks to Vertex AI Agent Platform as its own service account, so no API
+# The deployed service talks to Gemini Enterprise Agent Platform as its own service account, so no API
 # key is involved.
 #
 # Usage:
@@ -56,7 +56,7 @@ echo ">> 2/7 service account ($SA)"
 gcloud iam service-accounts create rosetta-sa --project="$PROJECT" \
   --display-name="Rosetta (Cloud Run)" 2>/dev/null || echo "   (exists)"
 
-echo ">> 3/7 let the service account call Vertex AI Agent Platform"
+echo ">> 3/7 let the service account call Gemini Enterprise Agent Platform"
 # --condition=None is required in non-interactive mode when the project's IAM
 # policy already contains conditional bindings.
 gcloud projects add-iam-policy-binding "$PROJECT" \

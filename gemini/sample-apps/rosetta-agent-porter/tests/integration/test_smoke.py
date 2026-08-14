@@ -1,4 +1,4 @@
-"""P1 smoke test: prove config + schemas + ADK LlmAgent(output_schema) + the real
+"""Smoke test: prove config + schemas + ADK LlmAgent(output_schema) + the real
 experimental models all work end to end via a Runner. Run:
 
     uv run pytest tests/integration/test_smoke.py -s

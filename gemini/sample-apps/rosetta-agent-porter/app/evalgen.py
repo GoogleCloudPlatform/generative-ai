@@ -21,7 +21,7 @@ verdicts + verified tricky-mapping notes).
 Judge/synth path: this is a raw structured-output grading call (deterministic,
 schema-locked), so we use `google.genai` directly with a Pydantic
 `response_schema`, so grading is deterministic JSON rather than free text
-— rather than the ADK `make_model` wrapper. Vertex env is already set by importing
+— rather than the ADK `make_model` wrapper. The backend env is already set by importing
 `app.config` (which loads .env with override=True). Grading runs on the SMART
 model (config.MODEL_SMART), matching the `eval_author` role in config.ROLE_MODEL.
 """
@@ -72,7 +72,7 @@ _CLIENT: genai.Client | None = None
 
 
 def _client() -> genai.Client:
-    """genai client on Vertex (env pinned by importing app.config).
+    """genai client for the configured backend (env pinned by importing app.config).
 
     Cached at module level, and that is load-bearing: callers use it as
     `_client().models.generate_content(...)`, so a freshly built client would be

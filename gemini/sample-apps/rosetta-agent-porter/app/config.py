@@ -25,7 +25,7 @@ MEDIUM. See ROLE_THINKING.
 
 Backends: works with either
   * the Gemini API (Google AI Studio) — set GOOGLE_API_KEY, or
-  * Vertex AI / Gemini Enterprise Agent Platform — set GOOGLE_CLOUD_PROJECT.
+  * Gemini Enterprise Agent Platform — set GOOGLE_CLOUD_PROJECT.
 Rosetta picks whichever you configured; see `_resolve_backend()`.
 """
 
@@ -67,14 +67,14 @@ MODEL_SMART_NAME = os.getenv("ROSETTA_MODEL_SMART_NAME", MODEL_NAME)
 MODEL_FAST_NAME = os.getenv("ROSETTA_MODEL_FAST_NAME", MODEL_NAME)
 
 
-# --- Backend: Gemini API (AI Studio) or Vertex AI Agent Platform ----------------------------
+# --- Backend: Gemini API (AI Studio) or Gemini Enterprise Agent Platform ------------------
 def _resolve_backend() -> tuple[bool, str, str]:
     """Pick the Gemini backend from the environment. Returns (use_vertex, project, location).
 
     Precedence:
       1. GOOGLE_GENAI_USE_VERTEXAI, if you set it explicitly — you're the boss.
       2. GOOGLE_API_KEY / GEMINI_API_KEY present  -> Gemini API (AI Studio).
-      3. GOOGLE_CLOUD_PROJECT present             -> Vertex AI Agent Platform.
+      3. GOOGLE_CLOUD_PROJECT present             -> Gemini Enterprise Agent Platform.
     Raises with actionable instructions if neither is configured, because the
     alternative is a stack trace from deep inside the SDK on the first call.
 
@@ -98,7 +98,7 @@ def _resolve_backend() -> tuple[bool, str, str]:
             "No Gemini backend configured. Pick one and re-run:\n"
             "  * Gemini API (Google AI Studio) — fastest to start:\n"
             "      export GOOGLE_API_KEY=...      # https://aistudio.google.com/apikey\n"
-            "  * Vertex AI / Gemini Enterprise Agent Platform:\n"
+            "  * Gemini Enterprise Agent Platform:\n"
             "      gcloud auth application-default login\n"
             "      export GOOGLE_CLOUD_PROJECT=your-project-id\n"
             "Or copy .env.example to .env and fill in one of them."
@@ -125,7 +125,9 @@ def _resolve_backend() -> tuple[bool, str, str]:
 USE_VERTEXAI, PROJECT_ID, LOCATION = _resolve_backend()
 
 # Human-readable backend label — shown in the cockpit and in generated projects.
-BACKEND_NAME = "Vertex AI Agent Platform" if USE_VERTEXAI else "Gemini API (AI Studio)"
+BACKEND_NAME = (
+    "Gemini Enterprise Agent Platform" if USE_VERTEXAI else "Gemini API (AI Studio)"
+)
 
 # --- Pipeline caps (tunable knobs) ------------------------------------------
 # Rosetta is quality-first, not latency-first: caps are generous.

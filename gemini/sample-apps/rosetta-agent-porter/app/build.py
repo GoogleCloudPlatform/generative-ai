@@ -10,8 +10,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 """Assemble a ported ADK project on disk: scaffold it with agents-cli, write the
-Vertex .env, and drop the generated app/ files in. Shared by the P4 harness and
-the orchestrator."""
+backend .env, and drop the generated app/ files in."""
 
 from __future__ import annotations
 

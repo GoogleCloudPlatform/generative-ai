@@ -57,7 +57,7 @@ The quickest way to start. Get a key at
 GOOGLE_API_KEY=your-api-key-here
 ```
 
-### Option B — Vertex AI (Gemini Enterprise Agent Platform)
+### Option B — Gemini Enterprise Agent Platform
 
 Use your own Google Cloud project:
 
@@ -72,7 +72,7 @@ GOOGLE_CLOUD_LOCATION=global
 ```
 
 Rosetta picks the backend automatically: if `GOOGLE_API_KEY` is set it uses the Gemini
-API, otherwise it uses Vertex AI Agent Platform. Set `GOOGLE_GENAI_USE_VERTEXAI=true|false` to force one.
+API, otherwise it uses Gemini Enterprise Agent Platform. Set `GOOGLE_GENAI_USE_VERTEXAI=true|false` to force one.
 Variables exported in your shell take precedence over `.env`.
 
 ## Run it
@@ -151,7 +151,7 @@ make deploy GCP_PROJECT=your-project-id
 ```
 
 Builds the container, creates a runtime service account with `roles/aiplatform.user`, and
-deploys to Cloud Run using Vertex AI Agent Platform — no API key in the container. The service is
+deploys to Cloud Run using Gemini Enterprise Agent Platform — no API key in the container. The service is
 deployed **private** (`--no-allow-unauthenticated`); the script prints the command to
 grant yourself access. Put real authentication in front of it before exposing it to
 anyone else.
@@ -162,7 +162,7 @@ Rosetta makes many model calls per port (six parallel analysts, a planner, a cod
 generator, a repair loop and an LLM judge). On the Gemini API free tier you may hit rate
 limits on the larger repos. See
 [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing) and
-[Vertex AI Agent Platform pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing).
+[Gemini Enterprise Agent Platform pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing).
 
 Delete generated projects and cloned repos when you are done:
 
