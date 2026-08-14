@@ -10,6 +10,7 @@ achat
 Achird
 acked
 acking
+acli
 AClient
 acomplete
 acs
@@ -29,6 +30,7 @@ Afshaan
 AFX
 agains
 agentcard
+agentchat
 agentic
 agg
 AGG
@@ -178,6 +180,7 @@ BIKBEAR
 bikeshare
 Bikeshare
 biloba
+bitbucket
 BITCODE
 bitcoin
 Bitcoin
@@ -370,7 +373,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 DALL
 Daniil
 Darabont
@@ -436,6 +438,7 @@ doi
 DOIs
 Donen
 Doogler
+D'orsay
 dotprompt
 Downscale
 dpf
@@ -542,6 +545,7 @@ etype
 euchlora
 eula
 eur
+evalgen
 evals
 evalset
 Evalset
@@ -681,6 +685,7 @@ getconn
 getdata
 getexif
 getparent
+getpgid
 getpid
 geval
 GFD
@@ -906,8 +911,8 @@ ixed
 izakaya
 ize
 ized
-J'aime
 jaccard
+J'aime
 JAISH
 Jaival
 japonicum
@@ -979,6 +984,7 @@ kfp
 Khanh
 khz
 kickstart
+killpg
 Kipchoge
 Kleiser
 kmeans
@@ -1003,8 +1009,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1017,6 +1021,7 @@ langgraph
 Laomedeia
 lastb
 latte
+L'avenir
 lbl
 LCEL
 LEBRON
@@ -1030,6 +1035,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 lic
 linalg
@@ -1071,6 +1077,7 @@ lro
 LROs
 lru
 lsb
+lsof
 LSTATUS
 LSTM
 LSum
@@ -1096,6 +1103,7 @@ mahut
 mai
 Makemake
 makeover
+malware
 Malware
 Mamah
 Mandiri
@@ -1107,6 +1115,7 @@ marp
 Masaru
 maskmode
 mathbf
+mathlib
 mathvista
 mavenrc
 maxcold
@@ -1264,6 +1273,7 @@ ngrams
 NGRAMS
 NHK
 NICOLAS
+Nigam
 nih
 Nihonga
 Niitsuma
@@ -1311,6 +1321,7 @@ oai
 objc
 ocr
 ODb
+odr
 oglevel
 Ohashi
 ohlcv
@@ -1408,6 +1419,7 @@ pevt
 pfas
 pgadmin
 PGHOST
+pgid
 PGPORT
 PGUSER
 pgvector
@@ -1485,6 +1497,7 @@ Puram
 putalpha
 putdata
 pvc
+PWNED
 pyautogen
 pyav
 pybind
@@ -1604,6 +1617,8 @@ Robotica
 rooney
 ROOTSPAN
 Rosberg
+rosetta
+ROSETTA
 ROUVs
 rpet
 rrf
@@ -1613,6 +1628,7 @@ rsi
 RSI
 rslora
 rsp
+rst
 rstarted
 RTN
 rubra

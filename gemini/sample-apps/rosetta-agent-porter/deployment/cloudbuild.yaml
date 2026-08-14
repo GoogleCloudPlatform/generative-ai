@@ -1,0 +1,15 @@
+# Cloud Build config for the Rosetta single-container image.
+# One image carries python 3.12 + git + uv + agents-cli + the app; it runs serve.py.
+# Usage:
+#   gcloud builds submit --project=PROJECT --region=REGION \
+#     --config=deployment/cloudbuild.yaml --substitutions=_IMAGE=IMAGE_URI .
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_IMAGE}", "."]
+images:
+  - "${_IMAGE}"
+options:
+  logging: CLOUD_LOGGING_ONLY
+# The image installs a full toolchain (apt git/curl, uv, agents-cli, uv sync of
+# google-adk) so give the build ample headroom.
+timeout: 1800s

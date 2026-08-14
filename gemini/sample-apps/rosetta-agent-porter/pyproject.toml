@@ -1,0 +1,74 @@
+[project]
+name = "rosetta"
+version = "0.1.0"
+description = "Rosetta — an ADK multi-agent system that ports agents from other frameworks into native ADK, validates fidelity with ADK evals, and runs the port live."
+authors = [
+    {name = "Google LLC"},
+]
+license = "Apache-2.0"
+readme = "README.md"
+
+dependencies = [
+    "google-adk[gcp]>=2.5.0,<3.0.0",
+    # Scaffolds and lints the generated ADK project. Rosetta shells out to the
+    # `agents-cli` console script, so keeping it in the project venv means
+    # `uv sync` is the only install step. https://github.com/google/agents-cli
+    "google-agents-cli>=1.3.0",
+    "google-genai>=2.11.0",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "sse-starlette>=2.1",
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+]
+requires-python = ">=3.11,<3.14"
+
+# Pin public PyPI as the default index so uv.lock stays reproducible even when a
+# machine has a different default index configured.
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple/"
+default = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2,<10.0.0",
+    "pytest-asyncio>=1.0.0,<2.0.0",
+    "nest-asyncio>=1.6.0,<2.0.0",
+]
+
+[project.optional-dependencies]
+eval = [
+    "google-adk[eval]>=2.5.0,<3.0.0",
+]
+lint = [
+    "ruff>=0.4.6,<1.0.0",
+    "ty>=0.0.1a0",
+    "codespell>=2.2.0,<3.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+# Runtime state, not our source: cloned repos and generated ports land here, and
+# linting third-party code produces failures a contributor cannot act on.
+# extend-exclude (not exclude) so ruff's defaults — .venv, caches — are kept.
+extend-exclude = ["workspace"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "C", "B", "UP", "RUF"]
+ignore = ["E501", "C901", "B006"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
