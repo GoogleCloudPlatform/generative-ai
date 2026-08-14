@@ -111,10 +111,10 @@ def worker_instruction(i: int) -> str:
 
 # The generative-UI contract. This is where the SMART model's front-end quality shows.
 # It synthesizes the grounded research AND builds the instrument in one streamed call.
-# NOTE: deliberately un-versioned ("powered by Gemini"). Naming a specific model
+# NOTE: deliberately un-versioned ("with Gemini"). Naming a specific model
 # here both drifts on every swap and risks leaking a pre-launch codename into a
 # prompt. app/fill_prompt.txt follows the same rule.
-UI_GENERATOR = """You are Prism's UI generator, powered by Gemini. Research has \
+UI_GENERATOR = """You are Prism's UI generator, built with Gemini. Research has \
 been done for you; synthesize it and build ONE self-contained interactive HTML explainer.
 
 CONCEPT: {concept}

@@ -122,6 +122,8 @@ autoflake
 autogen
 automerge
 automl
+autoplays
+AUTOPLAYS
 autoptr
 autopush
 autorater
@@ -211,6 +213,7 @@ Broadoak
 Brusdar
 Brynner
 bshot
+bstep
 BTitle
 btn
 Btn
@@ -251,6 +254,7 @@ cce
 cctv
 CDIP
 cdiv
+cdn
 CDNs
 ceb
 Ceccotti
@@ -339,6 +343,7 @@ cpg
 Creuset
 crewai
 CRF
+CRISPR
 cristo
 crm
 CRM
@@ -370,7 +375,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 DALL
 Daniil
 Darabont
@@ -436,12 +440,14 @@ doi
 DOIs
 Donen
 Doogler
+D'orsay
 dotprompt
 Downscale
 dpf
 dpi
 dpo
 DPO
+DPR
 DQN
 draig
 Dreesen
@@ -805,6 +811,7 @@ historien
 histplot
 HITL
 Hlc
+hline
 Hmmm
 HMO
 hnsw
@@ -906,8 +913,8 @@ ixed
 izakaya
 ize
 ized
-J'aime
 jaccard
+J'aime
 JAISH
 Jaival
 japonicum
@@ -957,6 +964,7 @@ Kalamang
 kamada
 Kamradt
 Kanagawa
+katex
 Katsura
 Kaufmanns
 Kawagoe
@@ -1003,8 +1011,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1017,6 +1023,7 @@ langgraph
 Laomedeia
 lastb
 latte
+L'avenir
 lbl
 LCEL
 LEBRON
@@ -1030,6 +1037,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 lic
 linalg
@@ -1071,6 +1079,7 @@ lro
 LROs
 lru
 lsb
+lsof
 LSTATUS
 LSTM
 LSum
@@ -1113,6 +1122,7 @@ maxcold
 Mbappe
 mbp
 mbsdk
+mcfg
 mcmaster
 mcp
 MCP
@@ -1264,6 +1274,7 @@ ngrams
 NGRAMS
 NHK
 NICOLAS
+Nigam
 nih
 Nihonga
 Niitsuma
@@ -1454,6 +1465,7 @@ Ponyo
 Popken
 popleft
 Porat
+PORTFILE
 postictal
 powerups
 PPO
@@ -2013,6 +2025,7 @@ Virat
 viridis
 Viru
 Visualise
+vline
 vllm
 VLM
 VLMs

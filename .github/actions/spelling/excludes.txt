@@ -116,3 +116,5 @@ py\.typed$
 ^\Qaudio/speech/use-cases/storytelling/macbeth_the_sitcom.json\E$
 .ruff.toml
 ^\Q.gemini/styleguide.md\E$
+^\Qgemini/sample-apps/prism-science-explainer/app/shell.html\E$
+^\Qgemini/sample-apps/prism-science-explainer/frontend/index.html\E$
