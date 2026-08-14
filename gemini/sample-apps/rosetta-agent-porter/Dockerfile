@@ -59,7 +59,7 @@ COPY ./.env.example ./.env.example
 RUN uv sync --frozen --no-dev
 
 # --- runtime config -----------------------------------------------------------
-# The deployed service uses Vertex AI with the runtime service account, so no API
+# The deployed service uses Vertex AI Agent Platform with the runtime service account, so no API
 # key is needed in the image. GOOGLE_CLOUD_PROJECT is deliberately NOT baked in —
 # it is supplied at deploy time (--set-env-vars), keeping the image project-agnostic.
 # To run this image against the Gemini API instead, pass

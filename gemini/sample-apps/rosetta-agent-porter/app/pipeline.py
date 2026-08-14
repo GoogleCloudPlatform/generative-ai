@@ -153,14 +153,14 @@ async def port_repo(
     # ---- 4. SCAFFOLD (agents-cli) ------------------------------------------
     yield _ev("phase", phase="scaffolding")
     ts = time.time()
-    tname = plan["target_name"]
-    project, run = await asyncio.to_thread(build.scaffold_project, tname)
+    target = plan["target_name"]
+    project, run = await asyncio.to_thread(build.scaffold_project, target)
     if not run.ok:
         yield _ev("error", message=f"scaffold failed: {run.text[-400:]}")
         yield _ev("done", ok=False, reason="scaffold failed")
         return
     await asyncio.to_thread(build.write_env, project)
-    yield _ev("scaffold", name=tname, path=str(project))
+    yield _ev("scaffold", name=target, path=str(project))
 
     # ---- 5. CODEGEN (SMART, delimited files) -------------------------------
     yield _ev("phase", phase="codegen")
@@ -249,7 +249,7 @@ async def port_repo(
         "done",
         ok=ok,
         project=str(project),
-        target_name=tname,
+        target_name=target,
         build_green=(verdict.ok if verdict else None),
         repairs=repairs,
     )

@@ -99,7 +99,7 @@ def _parse_source(url_or_path: str) -> dict:
       github.com/o/r/sub/dir               -> clone o/r, descend into sub/dir
       https://github.com/o/r/tree/<ref>/x  -> clone o/r @<ref>, descend into x
       www. prefixes, trailing slashes, and .git suffixes are tolerated.
-    Anything that isn't an http(s)/git URL is treated as a local filesystem path
+    Anything that isn't an HTTP(S)/git URL is treated as a local filesystem path
     (preserves the local-copy path used by the CLI harness and tests).
     """
     s = (url_or_path or "").strip()
@@ -114,7 +114,7 @@ def _parse_source(url_or_path: str) -> dict:
             "name": _basename(s),
         }
 
-    # 2) Strip an http(s) scheme (if any) so scheme-ful and scheme-less host URLs
+    # 2) Strip an HTTP(S) scheme (if any) so scheme-ful and scheme-less host URLs
     #    take the same parsing path.
     had_http = bool(re.match(r"^https?://", s, re.I))
     body = re.sub(r"^https?://", "", s, flags=re.I)

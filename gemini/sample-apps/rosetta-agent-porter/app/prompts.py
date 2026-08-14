@@ -403,7 +403,7 @@ MODEL POLICY (critical — the port must run on our Gemini models):
 - COPY THE TWO MODEL ID STRINGS BELOW VERBATIM, character for character. They are real,
   current, and NEWER than your training data, so at least one will look unfamiliar. Do NOT
   "correct", modernise, downgrade or replace either with a model you recognise
-  (gemini-2.0-flash, gemini-1.5-pro, gemini-2.5-flash, ...). Substituting a familiar-looking
+  (an older Flash or Pro release you have seen before). Substituting a familiar-looking
   id is the most common way this port breaks: the id you substitute does not exist on our
   endpoint, so every call 404s at runtime. Emit the exact characters given.
 - app/config.py MUST define: MODEL_SMART default "__MODEL_SMART__" and MODEL_FAST default

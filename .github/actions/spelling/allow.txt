@@ -1628,6 +1628,7 @@ rsi
 RSI
 rslora
 rsp
+rst
 rstarted
 RTN
 rubra

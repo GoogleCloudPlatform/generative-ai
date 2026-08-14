@@ -232,7 +232,7 @@ async def ui_config():
     """
     return {
         "model_name": config.MODEL_NAME,
-        # Which Gemini backend is live: "Vertex AI" or "Gemini API (AI Studio)".
+        # Which Gemini backend is live: "Vertex AI Agent Platform" or "Gemini API (AI Studio)".
         "backend": config.BACKEND_NAME,
         # Derived from the real swarm, not a hardcoded 6, so the "xN" the UI
         # prints always matches the number of analysts actually dispatched.

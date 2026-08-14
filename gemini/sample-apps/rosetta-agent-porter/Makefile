@@ -42,7 +42,7 @@ setup: check install env ## One-shot first-time setup (check tools, install, cre
 	@echo ""
 	@echo "Setup complete. Next:"
 	@echo "  1. Edit .env and set EITHER GOOGLE_API_KEY (Gemini API / AI Studio)"
-	@echo "     OR GOOGLE_CLOUD_PROJECT (Vertex AI)."
+	@echo "     OR GOOGLE_CLOUD_PROJECT (Vertex AI Agent Platform)."
 	@echo "  2. make demo"
 
 check: ## Verify the host tools are installed (uv, git)
@@ -138,7 +138,7 @@ clean: ## Remove Python / test caches
 	@echo "Cleaned caches."
 
 # ---- Optional: deploy to Cloud Run ------------------------------------------
-# Requires GCP_PROJECT. The deployed service uses Vertex AI with the runtime
+# Requires GCP_PROJECT. The deployed service uses Vertex AI Agent Platform with the runtime
 # service account, so no API key is needed in the container.
 deploy: ## Full deploy to Cloud Run:  make deploy GCP_PROJECT=my-project
 	@if [ -z "$(GCP_PROJECT)" ]; then echo "Usage: make deploy GCP_PROJECT=<project-id>"; exit 1; fi
