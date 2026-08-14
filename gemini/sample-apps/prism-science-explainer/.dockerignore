@@ -1,0 +1,23 @@
+# Keep the build context lean: the image needs only app/, frontend/, serve.py,
+# pyproject.toml and uv.lock. Everything below is local-only or dev.
+
+.venv/
+__pycache__/
+**/__pycache__/
+.git/
+.pytest_cache/
+.ruff_cache/
+
+# Tests, docs and screenshots are not needed at runtime.
+tests/
+images/
+*.md
+!README.md
+
+# Secrets: never bake the real .env into the image.
+.env
+.env.*
+!.env.example
+
+*.log
+.prism-port

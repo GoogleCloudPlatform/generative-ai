@@ -124,6 +124,8 @@ autoflake
 autogen
 automerge
 automl
+autoplays
+AUTOPLAYS
 autoptr
 autopush
 autorater
@@ -214,6 +216,7 @@ Broadoak
 Brusdar
 Brynner
 bshot
+bstep
 BTitle
 btn
 Btn
@@ -254,6 +257,7 @@ cce
 cctv
 CDIP
 cdiv
+cdn
 CDNs
 ceb
 Ceccotti
@@ -342,6 +346,7 @@ cpg
 Creuset
 crewai
 CRF
+CRISPR
 cristo
 crm
 CRM
@@ -445,6 +450,7 @@ dpf
 dpi
 dpo
 DPO
+DPR
 DQN
 draig
 Dreesen
@@ -810,6 +816,7 @@ historien
 histplot
 HITL
 Hlc
+hline
 Hmmm
 HMO
 hnsw
@@ -962,6 +969,7 @@ Kalamang
 kamada
 Kamradt
 Kanagawa
+katex
 Katsura
 Kaufmanns
 Kawagoe
@@ -1122,6 +1130,7 @@ maxcold
 Mbappe
 mbp
 mbsdk
+mcfg
 mcmaster
 mcp
 MCP
@@ -1466,6 +1475,7 @@ Ponyo
 Popken
 popleft
 Porat
+PORTFILE
 postictal
 powerups
 PPO
@@ -2029,6 +2039,7 @@ Virat
 viridis
 Viru
 Visualise
+vline
 vllm
 VLM
 VLMs

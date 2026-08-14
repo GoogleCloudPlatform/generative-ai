@@ -80,3 +80,4 @@
 /generative-ai/gemini/sample-apps/gemini-live-telephony-app                                                                      @GoogleCloudPlatform/generative-ai-devrel @KVishnuVardhanR
 /generative-ai/search/auto-rag-eval                                                                                              @tanyagoogle
 /generative-ai/agents/personalized-agent-swarms                                                                  @GoogleCloudPlatform/generative-ai-devrel @tanyagoogle @PouyaOmran @soujanyav @olifei
+/generative-ai/gemini/sample-apps/prism-science-explainer                                                                        @GoogleCloudPlatform/generative-ai-devrel @lavinigam-gcp
