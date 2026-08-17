@@ -1,20 +1,38 @@
+from dataclasses import dataclass  # noqa: INP001
 from typing import Any
 
 from google.api_core.client_options import ClientOptions
+from google.api_core.exceptions import GoogleAPIError
 from google.cloud import discoveryengine_v1 as discoveryengine
+from google.cloud import discoveryengine_v1alpha
+
+MAX_NUM_CHUNKS = 5
+
+
+@dataclass(frozen=True)
+class DataStoreConfig:
+    """Coordinates identifying a Discovery Engine data store."""
+
+    project_id: str
+    location: str
+    data_store_id: str
+
+
+class DataStoreError(Exception):
+    """Raised when a data store operation fails."""
 
 
 def list_documents_in_datastore(
-    project_id: str, location: str, data_store_id: str
+    config: DataStoreConfig,
 ) -> list[dict[str, str]]:
-    """List all documents in a Vertex AI Search data store"""
+    """List all documents in a Vertex AI Agent Platform data store."""
     client_options = ClientOptions(api_endpoint="discoveryengine.googleapis.com")
     client = discoveryengine.DocumentServiceClient(client_options=client_options)
 
     parent = client.branch_path(
-        project=project_id,
-        location=location,
-        data_store=data_store_id,
+        project=config.project_id,
+        location=config.location,
+        data_store=config.data_store_id,
         branch="default_branch",
     )
 
@@ -26,32 +44,28 @@ def list_documents_in_datastore(
             if hasattr(document, "struct_data") and document.struct_data:
                 doc_info["metadata"] = document.struct_data
             documents.append(doc_info)
+    except GoogleAPIError as e:
+        raise DataStoreError(f"Failed to list documents: {e}") from e
+    else:
         return documents
-    except Exception as e:
-        raise Exception(f"Failed to list documents: {e}")
 
 
 def search_with_chunk_augmentation(
     query: str,
-    project_id: str,
-    location: str,
-    data_store_id: str,
+    config: DataStoreConfig,
     top_n: int = 5,
     num_chunks: int = 1,
 ) -> list[dict[str, Any]]:
-    """Search the Vertex AI data store and return results with augmented chunks"""
-    if num_chunks > 5:
-        num_chunks = 5
-    elif num_chunks < 0:
-        num_chunks = 0
+    """Search the data store and return results with augmented chunks."""
+    num_chunks = min(max(num_chunks, 0), MAX_NUM_CHUNKS)
 
     client_options = ClientOptions(api_endpoint="discoveryengine.googleapis.com")
     client = discoveryengine.SearchServiceClient(client_options=client_options)
 
     serving_config = client.serving_config_path(
-        project=project_id,
-        location=location,
-        data_store=data_store_id,
+        project=config.project_id,
+        location=config.location,
+        data_store=config.data_store_id,
         serving_config="default_search",
     )
 
@@ -124,28 +138,27 @@ def search_with_chunk_augmentation(
 
                 result_data["augmented_content"] = " ".join(all_chunk_content)
             results.append(result_data)
+    except GoogleAPIError as e:
+        raise DataStoreError(f"Search failed: {e}") from e
+    else:
         return results
-    except Exception as e:
-        raise Exception(f"Search failed: {e}")
 
 
 def list_chunks_for_document(
-    document_id: str, project_id: str, location: str, data_store_id: str
+    document_id: str,
+    config: DataStoreConfig,
 ) -> list[dict[str, Any]]:
-    """List all chunks for a specific document in Vertex AI Search"""
+    """List all chunks for a specific document in the data store."""
     client_options = ClientOptions(api_endpoint="discoveryengine.googleapis.com")
     try:
-        # Using v1alpha for chunk support if available, otherwise fallback
-        from google.cloud import discoveryengine_v1alpha
-
         client = discoveryengine_v1alpha.ChunkServiceClient(
             client_options=client_options
         )
 
         parent = client.document_path(
-            project=project_id,
-            location=location,
-            data_store=data_store_id,
+            project=config.project_id,
+            location=config.location,
+            data_store=config.data_store_id,
             branch="default_branch",
             document=document_id,
         )
@@ -167,17 +180,18 @@ def list_chunks_for_document(
                 },
             }
             chunks.append(chunk_data)
-        return chunks
-    except Exception as e:
+    except GoogleAPIError as e:
         print(f"Error listing chunks for document {document_id}: {e}")
         # Fallback to search-based approach could be implemented here if needed
         return []
+    else:
+        return chunks
 
 
 def merge_chunks_into_bigger_chunks(
     chunks: list[dict[str, Any]], merge_count: int = 3
 ) -> list[dict[str, Any]]:
-    """Merge consecutive chunks into bigger chunks"""
+    """Merge consecutive chunks into bigger chunks."""
     if not chunks:
         return []
 

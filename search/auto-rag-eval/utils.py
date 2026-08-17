@@ -1,12 +1,13 @@
-import json
-import os
+import json  # noqa: INP001
 import types
+from pathlib import Path
+from typing import Any
 
+from google.api_core.exceptions import GoogleAPIError
 from google.cloud import storage
 
-
-def convert_to_serializable(obj):
-    """Recursively converts an object to a JSON-serializable representation"""
+def convert_to_serializable(obj: Any) -> Any:
+    """Recursively convert an object to a JSON-serializable representation."""
     if isinstance(obj, dict):
         return {k: convert_to_serializable(v) for k, v in obj.items()}
     if isinstance(obj, list):
@@ -18,11 +19,11 @@ def convert_to_serializable(obj):
     return obj
 
 
-def save_qa_incrementally(benchmark_entry, output_file):
-    """Save a single Q&A entry incrementally to the output file"""
+def save_qa_incrementally(benchmark_entry: dict[str, Any], output_file: str) -> bool:
+    """Save a single Q&A entry incrementally to the output file."""
     try:
         # Convert the benchmark entry to the format used by convert_list_to_json
-        formatted_entry = {}
+        formatted_entry: dict[str, Any] = {}
         if "distilled context:" in benchmark_entry:
             formatted_entry["context"] = convert_to_serializable(
                 benchmark_entry["distilled context:"]
@@ -52,10 +53,11 @@ def save_qa_incrementally(benchmark_entry, output_file):
                 )
 
         # Read existing data or initialize new list
+        output_path = Path(output_file)
         existing_data = []
-        if os.path.exists(output_file):
+        if output_path.exists():
             try:
-                with open(output_file) as f:
+                with output_path.open() as f:
                     existing_data = json.load(f)
             except (json.JSONDecodeError, FileNotFoundError):
                 existing_data = []
@@ -64,28 +66,31 @@ def save_qa_incrementally(benchmark_entry, output_file):
         existing_data.append(formatted_entry)
 
         # Write back
-        with open(output_file, "w") as f:
+        with output_path.open("w") as f:
             json.dump(existing_data, f, indent=4)
 
         print(
             f"[LOGGING] Successfully saved Q&A #{len(existing_data)} to {output_file}"
         )
-        return True
-
-    except Exception as e:
+    except (OSError, TypeError, ValueError) as e:
         print(f"[LOGGING] Error saving Q&A incrementally: {e}")
         return False
+    else:
+        return True
 
 
-def download_from_gcs(bucket_name, source_blob_name, destination_file_name):
-    """Downloads a blob from the bucket."""
+def download_from_gcs(
+    bucket_name: str, source_blob_name: str, destination_file_name: str
+) -> bool:
+    """Download a blob from the bucket."""
     try:
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
         print(f"Blob {source_blob_name} downloaded to {destination_file_name}.")
-        return True
-    except Exception as e:
+    except (GoogleAPIError, OSError) as e:
         print(f"Error downloading from GCS: {e}")
         return False
+    else:
+        return True

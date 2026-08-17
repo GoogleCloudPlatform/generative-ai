@@ -1,4 +1,4 @@
-from google import genai
+from google import genai  # noqa: INP001
 from google.genai import types
 from pydantic import BaseModel, Field
 
@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 
 
 class QuestionClue(BaseModel):
+    """Structured output schema for a single generated question clue."""
+
     chain_of_thought: str = Field(
         ...,
         description="Reasoning for why this question is relevant and answerable based on the text.",
@@ -14,10 +16,14 @@ class QuestionClue(BaseModel):
 
 
 class ClueResponse(BaseModel):
+    """Structured output schema for a set of question clues."""
+
     questions: list[QuestionClue]
 
 
 class TargetedInfo(BaseModel):
+    """Structured output schema for targeted information retrieval."""
+
     description: str = Field(
         ...,
         description="Concise description of the type of text that would be most relevant.",
@@ -32,23 +38,28 @@ class TargetedInfo(BaseModel):
 
 
 class QAPair(BaseModel):
+    """Structured output schema for a generated question-answer pair."""
+
     question: str
     answer: str
 
 
 class ReviewResult(BaseModel):
+    """Structured output schema for a Q&A review decision."""
+
     decision: str = Field(..., description="APPROVED or REJECTED")
     reasoning: str = Field(..., description="Reasoning for the decision")
 
 
-def get_client(project_id: str, location: str):
+def get_client(project_id: str, location: str) -> genai.Client:
+    """Create a Gen AI client configured for Vertex AI Agent Platform."""
     return genai.Client(vertexai=True, project=project_id, location=location)
 
 
 def clue_generator(
     text: str, client: genai.Client, model_name: str = "gemini-3.5-flash"
 ) -> ClueResponse:
-    """Generate clues from text using Structured Output"""
+    """Generate clues from text using structured output."""
     prompt = f"""
     Reference Text:
     {text}
@@ -77,7 +88,7 @@ def clue_generator(
 def targeted_information_seeking(
     query: str, client: genai.Client, model_name: str = "gemini-3.5-flash"
 ) -> TargetedInfo:
-    """Generate targeted information for a query using Structured Output"""
+    """Generate targeted information for a query using structured output."""
     prompt = f"""
     You are a helpful information retrieval assistant.
     I will give you a query, and you need to perform the following three tasks:
@@ -105,7 +116,7 @@ def generate_qa_pair(
     client: genai.Client,
     model_name: str = "gemini-3.5-flash",
 ) -> QAPair:
-    """Generate a Q&A pair based on context and profile"""
+    """Generate a Q&A pair based on context and profile."""
     prompt = f"""
     Context:
     {context}
@@ -137,7 +148,7 @@ def review_qa_pair(
     client: genai.Client,
     model_name: str = "gemini-3.5-flash",
 ) -> ReviewResult:
-    """Review a Q&A pair using a specific critic persona"""
+    """Review a Q&A pair using a specific critic persona."""
     prompt = f"""
     Context:
     {context}

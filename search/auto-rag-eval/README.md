@@ -19,7 +19,7 @@ gcloud storage cp gs://github-repo/search/auto-rag-eval/qa_profiles.json .
 # Edit .env with your values:
 # - PROJECT_ID=your-gcp-project-id
 # - LOCATION=us-central1
-# - DATA_STORE_ID=your-vertex-ai-search-datastore-id
+# - DATA_STORE_ID=your-datastore-id
 
 # 4. Authenticate with Google Cloud
 gcloud auth application-default login
@@ -36,9 +36,9 @@ That's it! Your benchmark Q&A pairs will be saved to `benchmark.json`.
 ## What is it?
 
 Auto RAG Eval is an automated benchmark generation tool for evaluating Retrieval-Augmented Generation (RAG) systems.
-It creates high-quality question-answer pairs from your document corpus using Google Cloud's Vertex AI Search and Gemini models.
+It creates high-quality question-answer pairs from your document corpus using Google Cloud's Vertex AI Agent Platform and Gemini models.
 
-The primary component of this solution is the **Benchmark Generator** (`main.py`), which creates the Q&A pairs from your documents in Vertex AI Search.
+The primary component of this solution is the **Benchmark Generator** (`main.py`), which creates the Q&A pairs from your documents in Vertex AI Agent Platform.
 
 A secondary utility, the **Benchmark Transformer** (`transform_benchmark.py`), is also provided. This simple script can be used to convert the generated benchmark into a format compatible with evaluation frameworks like Google's Agent Development Kit (ADK).
 
@@ -55,7 +55,7 @@ Auto RAG Eval addresses these challenges by:
 - **Automating Benchmark Generation**: Creates hundreds of Q&A pairs in hours instead of weeks
 - **Ensuring Comprehensive Coverage**: Systematically samples documents and chunks to cover the entire corpus
 - **Multi-Stage Quality Control**: Uses multiple AI agents to review and validate each Q&A pair
-- **Scalable Architecture**: Works with any size Vertex AI Search data store
+- **Scalable Architecture**: Works with any size Vertex AI Agent Platform data store
 - **Format Flexibility**: Transforms benchmarks into various formats for different evaluation frameworks
 
 ## How to use this solution
@@ -63,8 +63,8 @@ Auto RAG Eval addresses these challenges by:
 ### Prerequisites
 
 1.  **Google Cloud Project** with the following APIs enabled:
-    -   Vertex AI API
-    -   Discovery Engine API (for Vertex AI Search)
+    -   Vertex AI Agent Platform API
+    -   Discovery Engine API (for Vertex AI Agent Platform)
     -   Cloud Storage API
 
 2.  **Authentication**:
@@ -73,8 +73,8 @@ Auto RAG Eval addresses these challenges by:
     gcloud auth application-default login
     ```
 
-3.  **Vertex AI Search Data Store**:
-    -   Create a data store in Vertex AI Search
+3.  **Vertex AI Agent Platform Data Store**:
+    -   Create a data store in Vertex AI Agent Platform
     -   Ingest your documents into the data store
     -   Note the data store ID
     -   Detailed instructions on creating a data store in Google Cloud Console:
@@ -196,7 +196,7 @@ Auto RAG Eval follows a sophisticated multi-stage pipeline architecture that orc
 
 ```
 ┌─────────────────────────┐
-│   Vertex AI Search      │
+│ Vertex AI Agent Platform│
 │   (Document Store)      │
 └───────────┬─────────────┘
             │
@@ -241,14 +241,14 @@ Auto RAG Eval follows a sophisticated multi-stage pipeline architecture that orc
 
 The data flows through the pipeline as follows:
 
-1.  **Input**: Vertex AI Search data store containing your documents
+1.  **Input**: Vertex AI Agent Platform data store containing your documents
 2.  **Processing**: Documents → Chunks → Clues → Retrieved Contexts → Distilled Context → Profiles → Q&As
 3.  **Output**: JSON file with validated Q&A pairs
 
 ### Detailed Pipeline Stages
 
 1.  **Document Selection**
-    -   Lists all documents from Vertex AI Search data store
+    -   Lists all documents from Vertex AI Agent Platform data store
     -   Randomly selects specified number of documents
     -   Ensures diverse coverage of the corpus
 
@@ -264,7 +264,7 @@ The data flows through the pipeline as follows:
     -   Ensures questions are answerable from the text
 
 4.  **Context Retrieval**
-    -   For each clue, searches for relevant contexts using Vertex AI Search
+    -   For each clue, searches for relevant contexts using Vertex AI Agent Platform
     -   Enhances the clue with hypothetical examples and descriptions
     -   Retrieves top-k most relevant chunks from the entire corpus
     -   Can include neighboring chunks for additional context
@@ -298,7 +298,7 @@ The data flows through the pipeline as follows:
 
 ### API Integration Points
 
--   **Vertex AI Search**: Document listing, chunk retrieval, semantic search
+-   **Vertex AI Agent Platform**: Document listing, chunk retrieval, semantic search
 -   **Gemini Models**: Clue generation, profile suggestion, Q&A generation, review
 -   **Google Cloud Storage**: Optional for document storage
 -   **Discovery Engine API**: Core search and retrieval functionality
@@ -320,7 +320,7 @@ This repository includes a folder `exemplary_docs/` containing three PDF documen
 -   `input_2_exec_guide_gen_ai.pdf` - Executive guide to generative AI
 -   `input_2_google-about-generative-ai.pdf` - General information about Google's generative AI
 
-These documents were ingested into a Vertex AI Search data store with the following settings:
+These documents were ingested into a Vertex AI Agent Platform data store with the following settings:
 -   **LLM feature enabled** for table and image annotation
 -   **Layout parser option** enabled during ingestion time
 -   The data store ID is configured in the `env example` file

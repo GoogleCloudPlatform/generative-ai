@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
-"""Copyright 2025 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Benchmark Data Transformation Script
-
-This script transforms a source benchmark file into the desired format for evaluation.
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Transform a source benchmark file into the target evaluation format.
 
 The transformation follows this mapping:
 - query (target) <-- Question (source)
@@ -28,10 +24,12 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
-
-def transform_benchmark_data(source_records):
-    """Transforms a list of source benchmark records to the target format.
+def transform_benchmark_data(
+    source_records: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Transform a list of source benchmark records to the target format.
 
     Args:
         source_records: A list of dictionaries in the source format.
@@ -62,7 +60,8 @@ def transform_benchmark_data(source_records):
     return transformed_data
 
 
-def main():
+def main() -> None:
+    """Run the benchmark transformation command-line interface."""
     parser = argparse.ArgumentParser(
         description="Transform benchmark data from source format to target format"
     )
@@ -89,13 +88,13 @@ def main():
 
     # Load source data
     try:
-        with open(input_path, encoding="utf-8") as f:
+        with input_path.open(encoding="utf-8") as f:
             source_data = json.load(f)
         print(f"Successfully loaded {len(source_data)} records from {input_path}")
     except json.JSONDecodeError as e:
         print(f"Error: Failed to parse JSON from {input_path}: {e}")
         sys.exit(1)
-    except Exception as e:
+    except OSError as e:
         print(f"Error: Failed to read file {input_path}: {e}")
         sys.exit(1)
 
@@ -112,11 +111,11 @@ def main():
 
     # Save the transformed data
     try:
-        with open(output_path, "w", encoding="utf-8") as f:
+        with output_path.open("w", encoding="utf-8") as f:
             json.dump(transformed_data, f, indent=args.indent, ensure_ascii=False)
         print(f"\nSuccessfully transformed {len(transformed_data)} records")
         print(f"Saved transformed data to '{output_path}'")
-    except Exception as e:
+    except OSError as e:
         print(f"Error: Failed to write output file {output_path}: {e}")
         sys.exit(1)
 
