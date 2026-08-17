@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRISM // console — generative science explainer</title>
+
+<!--
+  ============================================================================
+  PRISM · CONSOLE  (technical / Swiss-mono scientific instrument, LIGHT canvas)
+  ----------------------------------------------------------------------------
+  Real product. Wired live to the streaming pipeline at POST /api/prism (SSE).
+  Aesthetic locked to Direction-C: warm paper, off-black ink, one restrained
+  vermilion accent (<80% S), Space Grotesk + JetBrains Mono, strict grid,
+  hairline rules, numbered pipeline index, one model end-to-end, FIG-01 instrument.
+  Single self-contained file (inline CSS + JS). No mock data — the run is real.
+  ============================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- KaTeX: render inline math in research findings / plan brief -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+  :root{
+    /* ---- palette ---- */
+    --bg:            #F1EFE9;   /* warm paper, sunken field */
+    --surface:       #FBFAF6;   /* panels */
+    --surface-2:     #F6F4EE;   /* nested / raised-sunken */
+    --ink:           #0A0A0B;   /* off-black text */
+    --ink-2:         #44433E;   /* secondary */
+    --ink-3:         #7C7A72;   /* tertiary / faint mono */
+    --ink-4:         #A5A29A;   /* ghost */
+    --hair:          #DBD8CF;   /* hairline rule */
+    --hair-2:        #C7C3B7;   /* stronger hairline */
+    --accent:        #D0472A;   /* signal vermilion (S<80%) */
+    --accent-ink:    #FBFAF6;   /* text on accent */
+    --accent-weak:   #F6E3DC;   /* accent tint bg */
+    --accent-line:   #E6BAAD;   /* accent hairline */
+    --ok:            #3C6E4C;   /* muted ink-green, checks only */
+    --warn:          #9A5B12;   /* muted amber, declines only */
+    /* shadows tinted to warm bg hue, never pure black */
+    --shadow-1: 0 1px 2px rgba(58,50,32,.07), 0 2px 6px rgba(58,50,32,.05);
+    --shadow-2: 0 2px 6px rgba(58,50,32,.08), 0 10px 26px rgba(58,50,32,.07);
+    --focus:  0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+    /* ---- type ---- */
+    --font-sans:'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --fs-2xs: 10px; --fs-xs: 11px; --fs-sm: 12px; --fs-base: 13px;
+    --fs-md: 15px; --fs-lg: 19px; --fs-xl: 26px; --fs-2xl: 38px;
+    /* ---- radius (one scale) ---- */
+    --r1: 2px; --r2: 4px; --r3: 6px;
+    /* ---- spacing (one scale) ---- */
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+    --maxw: 1280px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-sans);
+    font-size:var(--fs-base);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    letter-spacing:.005em;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--accent-weak); color:var(--ink); }
+
+  .mono{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; letter-spacing:0; }
+  .tnum{ font-variant-numeric:tabular-nums; }
+
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; text-underline-offset:2px; }
+
+  /* ---------- shell ---------- */
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--s5); }
+
+  /* ---------- masthead ---------- */
+  header.mast{ border-bottom:1px solid var(--hair-2); background:var(--surface); }
+  .mast-in{ display:flex; align-items:center; gap:var(--s4); padding:var(--s4) 0; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:baseline; gap:var(--s3); }
+  .logo{ display:inline-flex; align-items:center; gap:8px; font-weight:700; font-size:var(--fs-lg); letter-spacing:.14em; }
+  .logo .prism-mark{ width:14px; height:14px; position:relative; display:inline-block; border:1.5px solid var(--ink); transform:rotate(45deg); border-radius:var(--r1); }
+  .logo .prism-mark::after{ content:""; position:absolute; inset:3px; background:var(--accent); border-radius:1px; }
+  .brand .sub{ font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-3); letter-spacing:.16em; text-transform:uppercase; }
+  .mast-spacer{ flex:1 1 auto; }
+  .mast-meta{ display:flex; align-items:center; gap:var(--s3); flex-wrap:wrap; }
+  .clock{ font-family:var(--font-mono); font-size:var(--fs-sm); color:var(--ink-2); border:1px solid var(--hair-2); border-radius:var(--r2); padding:5px 9px; background:var(--surface-2); letter-spacing:.02em; }
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.08em;
+    text-transform:uppercase; padding:5px 8px; border-radius:var(--r2);
+    border:1px solid var(--hair-2); background:var(--surface-2); color:var(--ink-2);
+    white-space:nowrap;
+  }
+  .badge .dot{ width:7px; height:7px; border-radius:50%; background:var(--ink-3); flex:none; }
+  .badge.flash .dot{ background:var(--ink); }
+  .badge.live{ border-color:var(--accent-line); background:var(--accent-weak); color:var(--accent); }
+  .badge.live .dot{ background:var(--accent); animation:blink 1.4s steps(2,end) infinite; }
+  @keyframes blink{ 50%{ opacity:.25; } }
+
+  /* ---------- input console bar ---------- */
+  .console{ border-bottom:1px solid var(--hair); background:var(--surface); }
+  .console-in{ padding:var(--s5) 0; }
+  .console-label{
+    display:flex; align-items:center; gap:var(--s2);
+    font-family:var(--font-mono); font-size:var(--fs-2xs);
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+    margin-bottom:var(--s3);
+  }
+  .console-label .rule{ height:1px; background:var(--hair); flex:1 1 auto; }
+
+  .qrow{ display:flex; gap:var(--s3); align-items:stretch; flex-wrap:wrap; }
+  .field{
+    flex:1 1 420px; min-width:0; position:relative;
+    display:flex; align-items:center; gap:var(--s3);
+    background:var(--surface-2); border:1px solid var(--hair-2);
+    border-radius:var(--r3); padding:0 var(--s4);
+    transition:border-color .14s ease, box-shadow .14s ease;
+  }
+  .field:focus-within{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-weak); }
+  .field.disabled{ opacity:.55; }
+  .field .prompt{ font-family:var(--font-mono); color:var(--accent); font-size:var(--fs-md); flex:none; }
+  #concept{
+    flex:1 1 auto; min-width:0; border:0; background:transparent; outline:none;
+    font-family:var(--font-sans); font-size:var(--fs-md); font-weight:500; color:var(--ink);
+    padding:14px 0;
+  }
+  #concept::placeholder{ color:var(--ink-4); }
+  .btn{
+    font-family:var(--font-mono); font-size:var(--fs-sm); letter-spacing:.06em;
+    text-transform:uppercase; font-weight:700;
+    border:1px solid var(--ink); background:var(--ink); color:var(--accent-ink);
+    border-radius:var(--r3); padding:0 var(--s5); cursor:pointer;
+    display:inline-flex; align-items:center; gap:9px;
+    transition:transform .08s ease, background .14s ease, box-shadow .14s ease, color .14s ease, border-color .14s ease;
+  }
+  .btn:hover{ background:var(--accent); border-color:var(--accent); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:none; box-shadow:var(--focus); }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+  .btn.explain{ flex:none; padding:14px var(--s6); }
+  .btn .arrow{ font-family:var(--font-mono); }
+  .btn .spin{ width:11px; height:11px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; display:none; animation:spin .7s linear infinite; }
+  .btn.busy .spin{ display:inline-block; }
+  .btn.busy .arrow{ display:none; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .chips{ display:flex; gap:var(--s2); flex-wrap:wrap; margin-top:var(--s3); align-items:center; }
+  .chips .lab{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-4); margin-right:2px; }
+  .chip{
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.02em;
+    border:1px solid var(--hair-2); background:var(--surface-2); color:var(--ink-2);
+    border-radius:var(--r2); padding:6px 10px; cursor:pointer;
+    transition:border-color .12s ease, color .12s ease, background .12s ease;
+  }
+  .chip:hover{ border-color:var(--ink-3); color:var(--ink); }
+  .chip:focus-visible{ outline:none; box-shadow:var(--focus); }
+  .chip[disabled]{ opacity:.5; cursor:not-allowed; }
+  .modes{ margin-top:var(--s2); }
+  .chip.mode{ display:inline-flex; align-items:baseline; gap:7px; }
+  .chip.mode .mnote{ color:var(--ink-4); font-size:var(--fs-2xs); letter-spacing:.03em; }
+  .chip.mode.on{ border-color:var(--accent); color:var(--accent); }
+  .chip.mode.on .mnote{ color:var(--accent); opacity:.8; }
+
+  /* ---------- workspace grid ---------- */
+  .workspace{
+    display:grid;
+    grid-template-columns: minmax(330px, 430px) minmax(0,1fr);
+    gap:var(--s6);
+    padding:var(--s6) 0 var(--s8);
+    align-items:start;
+  }
+
+  .panel{ background:var(--surface); border:1px solid var(--hair-2); border-radius:var(--r3); box-shadow:var(--shadow-1); }
+  .panel + .panel{ margin-top:var(--s5); }
+  .col-left, .col-right{ min-width:0; }
+
+  /* ---------- tabbed output panel ---------- */
+  .tabbar{ gap:var(--s2); }
+  .tab{
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.04em;
+    color:var(--ink-3); background:transparent; border:0; border-bottom:2px solid transparent;
+    padding:7px 3px; margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+    transition:color .12s ease, border-color .12s ease;
+  }
+  .tab:hover{ color:var(--ink); }
+  .tab:focus-visible{ outline:none; box-shadow:var(--focus); border-radius:var(--r1); }
+  .tab.on{ color:var(--ink); border-bottom-color:var(--accent); }
+  .tab .tabct{ font-size:var(--fs-2xs); color:var(--ink-4); }
+  .tab.on .tabct{ color:var(--accent); }
+  .tabpanel{ display:block; }
+  .tabpanel[hidden]{ display:none; }
+  #panelCode{ padding:var(--s4); }
+  .panel-head{ display:flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s4); border-bottom:1px solid var(--hair); }
+  .panel-head .idx{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.1em; color:var(--ink-4); }
+  .panel-head h2{ margin:0; font-size:var(--fs-sm); font-weight:700; letter-spacing:.1em; text-transform:uppercase; font-family:var(--font-mono); color:var(--ink); }
+  .panel-head .hspacer{ flex:1 1 auto; }
+  .panel-head .stat{ font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-3); letter-spacing:.06em; }
+
+  /* ---------- lanes / step index ---------- */
+  .lane-legend{
+    display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4);
+    padding:var(--s3) var(--s4); border-bottom:1px solid var(--hair);
+    font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.04em; color:var(--ink-3);
+  }
+  .lane-legend .k{ display:inline-flex; align-items:center; gap:6px; }
+  .lane-legend .sq{ width:9px; height:9px; border-radius:var(--r1); flex:none; }
+  .sq.acc{ background:var(--accent); }
+  .sq.ink{ background:var(--ink); }
+
+  ol.steps{ list-style:none; margin:0; padding:var(--s2) 0; }
+  li.step{
+    display:grid; grid-template-columns: 34px 1fr; column-gap:var(--s3);
+    padding:var(--s3) var(--s4) var(--s3) var(--s3); position:relative;
+    border-left:2px solid transparent;
+  }
+  li.step .rail{ display:flex; flex-direction:column; align-items:center; }
+  li.step .num{ font-family:var(--font-mono); font-size:var(--fs-sm); font-weight:700; color:var(--ink-4); line-height:1; padding-top:1px; letter-spacing:.02em; }
+  li.step .node{ width:11px; height:11px; border-radius:50%; border:2px solid var(--hair-2); background:var(--surface); margin-top:8px; flex:none; transition:border-color .18s ease, background .18s ease; }
+  li.step .thread{ width:2px; flex:1 1 auto; background:var(--hair); margin-top:6px; min-height:8px; }
+  li.step:last-child .thread{ display:none; }
+  li.step .body{ min-width:0; padding-bottom:2px; }
+  .step-top{ display:flex; align-items:center; gap:var(--s2); flex-wrap:wrap; }
+  .step-name{ font-weight:700; font-size:var(--fs-base); letter-spacing:.01em; }
+  .step-top .st-ms{ font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-4); margin-left:auto; letter-spacing:.02em; }
+  .step-msg{ color:var(--ink-2); font-size:var(--fs-sm); margin-top:3px; }
+  .step-msg.empty{ color:var(--ink-4); }
+
+  /* step states */
+  li.step[data-state="run"]{ border-left-color:var(--accent); background:linear-gradient(90deg, var(--accent-weak), transparent 60%); }
+  li.step[data-state="run"] .num{ color:var(--accent); }
+  li.step[data-state="run"] .node{ border-color:var(--accent); background:var(--accent); }
+  li.step[data-state="run"] .st-ms{ color:var(--accent); }
+  li.step[data-state="done"] .num{ color:var(--ink-2); }
+  li.step[data-state="done"] .node{ border-color:var(--ink); background:var(--ink); }
+  li.step[data-state="done"] .st-ms{ color:var(--ink-3); }
+  li.step[data-state="skip"]{ opacity:.55; }
+  li.step[data-state="err"] .node{ border-color:var(--warn); background:var(--warn); }
+  li.step[data-state="err"] .num{ color:var(--warn); }
+
+  /* swarm worker rows (built dynamically) */
+  .swarm{ margin-top:var(--s2); border-top:1px solid var(--hair); padding-top:var(--s2); display:none; }
+  .swarm.on{ display:block; }
+  .swarm-head{
+    font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.1em;
+    text-transform:uppercase; color:var(--accent); margin-bottom:var(--s2);
+    display:flex; align-items:center; gap:8px;
+  }
+  .swarm-head .pill{ color:var(--ink-3); border:1px solid var(--hair-2); border-radius:var(--r1); padding:1px 6px; letter-spacing:.06em; }
+  .worker{ padding:3px 0; }
+  .worker-top{
+    display:grid; grid-template-columns: 108px 1fr 58px 16px; align-items:center; gap:var(--s2);
+    font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-3);
+  }
+  .worker .wid{ color:var(--ink-2); letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .worker .wid b{ color:var(--accent); font-weight:700; }
+  .wbar{ height:6px; background:var(--surface-2); border:1px solid var(--hair); border-radius:var(--r1); overflow:hidden; position:relative; }
+  .wbar > i{ display:block; height:100%; width:0%; background:var(--accent); transition:width .12s linear; }
+  .wbar > i.run{ width:42%; animation:wrun 1.05s cubic-bezier(.5,0,.5,1) infinite; }
+  @keyframes wrun{ 0%{ transform:translateX(-120%);} 100%{ transform:translateX(300%);} }
+  .worker .wms{ text-align:right; color:var(--ink-3); }
+  .worker .wok{ text-align:center; color:var(--ink-4); }
+  .worker.done .wok{ color:var(--ok); }
+  .worker.done .wid b{ color:var(--ink); }
+  .worker.done .wbar > i{ background:var(--ink); width:100%; animation:none; }
+  .worker-detail{ display:none; margin:5px 0 2px 0; padding-left:2px; }
+  .worker.done .worker-detail.has{ display:block; }
+  ul.mini-bul{ list-style:none; margin:0; padding:0; min-width:0; }
+  ul.mini-bul li{ position:relative; padding-left:12px; font-family:var(--font-sans); font-size:var(--fs-xs); color:var(--ink-2); line-height:1.45; overflow-wrap:anywhere; }
+  ul.mini-bul li + li{ margin-top:3px; }
+  ul.mini-bul li::before{ content:""; position:absolute; left:0; top:7px; width:4px; height:4px; background:var(--ink-3); border-radius:1px; }
+
+  /* ---------- figure / instrument ---------- */
+  .figure .panel-head{ background:var(--surface-2); }
+  .figbar-scan{ height:2px; background:transparent; overflow:hidden; position:relative; border-bottom:1px solid var(--hair); }
+  .figbar-scan.on{ background:var(--surface-2); }
+  .figbar-scan > i{ position:absolute; left:0; top:0; height:100%; width:34%; background:var(--accent); opacity:0; transform:translateX(-40%); }
+  .figbar-scan.on > i{ opacity:1; animation:scan 1.1s cubic-bezier(.5,0,.5,1) infinite; }
+  @keyframes scan{ 0%{ transform:translateX(-110%);} 100%{ transform:translateX(320%);} }
+
+  .stage-body{ padding:var(--s5); min-height:420px; }
+
+  /* idle placeholder */
+  .stage-idle{ display:flex; flex-direction:column; gap:var(--s3); color:var(--ink-3); }
+  .stage-idle .big{ font-family:var(--font-mono); font-size:var(--fs-sm); letter-spacing:.08em; text-transform:uppercase; color:var(--ink-4); }
+  .stage-idle .frame-hint{
+    border:1px dashed var(--hair-2); border-radius:var(--r2);
+    padding:var(--s6) var(--s5); text-align:center; color:var(--ink-4);
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.04em; line-height:1.7;
+  }
+
+  /* declined / error message */
+  .stage-msg{ display:none; }
+  .stage-msg .mtag{
+    font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase;
+    color:var(--warn); border:1px solid var(--hair-2); border-radius:var(--r1); padding:3px 8px;
+    display:inline-block; margin-bottom:var(--s3);
+  }
+  .stage-msg.err .mtag{ color:var(--accent); border-color:var(--accent-line); background:var(--accent-weak); }
+  .stage-msg .mbody{ font-size:var(--fs-md); color:var(--ink); line-height:1.55; max-width:60ch; }
+  .stage-msg .mreason{ margin-top:var(--s3); font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-4); letter-spacing:.02em; }
+
+  /* code stream view */
+  .codeview{ display:block; }
+  .codeview-head{ display:flex; align-items:center; gap:var(--s2); margin-bottom:var(--s2); }
+  .cv-cap{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.06em; color:var(--accent); display:inline-flex; align-items:center; gap:7px; }
+  .cv-cap .pulse{ width:7px; height:7px; border-radius:50%; background:var(--accent); animation:blink 1.1s steps(2,end) infinite; }
+  .cv-count{ margin-left:auto; font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-3); letter-spacing:.02em; }
+  pre.code{
+    margin:0; font-family:var(--font-mono); font-size:var(--fs-xs); line-height:1.55;
+    color:var(--ink-2); background:var(--surface-2); border:1px solid var(--hair);
+    border-radius:var(--r2); padding:var(--s3);
+    height:clamp(360px, 58vh, 560px); overflow:auto;
+    white-space:pre-wrap; word-break:break-word; tab-size:2;
+  }
+
+  /* the final instrument iframe */
+  .instrument{ display:none; }
+  #instrumentFrame{
+    width:100%; height:560px; /* fallback; JS grows this to the instrument's content height */
+    border:1px solid var(--hair-2); border-radius:var(--r2);
+    background:var(--surface); display:block; overflow:hidden;
+  }
+  .instrument .inst-foot{
+    display:flex; align-items:center; gap:var(--s3); margin-top:var(--s3);
+    font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-4); letter-spacing:.04em; flex-wrap:wrap;
+  }
+  .instrument .inst-foot .sb{ color:var(--ink-3); border:1px solid var(--hair-2); border-radius:var(--r1); padding:2px 7px; letter-spacing:.06em; }
+
+  /* ---------- plan brief ---------- */
+  .plan-brief{ display:none; padding:var(--s3) var(--s4); border-bottom:1px solid var(--hair); background:var(--surface-2); }
+  .plan-brief .pb-row{ display:flex; gap:var(--s2); align-items:baseline; }
+  .plan-brief .pb-row + .pb-row{ margin-top:5px; }
+  .plan-brief .pk{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-4); flex:none; width:84px; }
+  .plan-brief .pv{ font-size:var(--fs-sm); color:var(--ink); }
+  .plan-brief .pv.mono{ color:var(--ink-2); }
+
+  /* ---------- findings ---------- */
+  ol.findings{ list-style:none; margin:0; padding:var(--s2) 0; }
+  ol.findings > li{
+    display:grid; grid-template-columns:24px 1fr; gap:var(--s3);
+    padding:var(--s3) var(--s4); border-bottom:1px solid var(--hair);
+  }
+  ol.findings > li:last-child{ border-bottom:0; }
+  ol.findings > li > div{ min-width:0; }
+  .finding .fnum{ font-family:var(--font-mono); font-size:var(--fs-xs); color:var(--accent); font-weight:700; padding-top:2px; }
+  .finding .ftopic{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.08em; text-transform:uppercase; color:var(--ink-4); margin-bottom:4px; }
+  .findings-empty{ padding:var(--s5) var(--s4); color:var(--ink-4); font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.04em; }
+
+  /* sources */
+  .sources{ display:none; border-top:1px solid var(--hair); padding:var(--s3) var(--s4) var(--s4); }
+  .src-head{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-4); margin-bottom:var(--s2); }
+  ul.srclist{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+  ul.srclist li{ display:grid; grid-template-columns:16px 1fr; gap:8px; align-items:baseline; font-size:var(--fs-sm); }
+  ul.srclist li .sn{ font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-4); }
+  ul.srclist li a{ overflow-wrap:anywhere; }
+  ul.srclist li .host{ display:block; font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--ink-4); margin-top:1px; }
+
+  /* ---------- metrics ---------- */
+  .metrics{ display:none; }
+  .metrics-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--hair); border-bottom:1px solid var(--hair); }
+  .mcol{ background:var(--surface); padding:var(--s4); }
+  .mcol .mhead{ display:flex; align-items:center; gap:8px; margin-bottom:var(--s3); }
+  .mrow{ display:flex; justify-content:space-between; gap:var(--s3); padding:5px 0; border-bottom:1px dotted var(--hair); }
+  .mrow:last-child{ border-bottom:0; }
+  .mrow .mk{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); }
+  .mrow .mv{ font-family:var(--font-mono); font-size:var(--fs-sm); font-weight:700; color:var(--ink); }
+  .e2e{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3); padding:var(--s4); border-bottom:1px solid var(--hair); background:var(--surface-2); flex-wrap:wrap; }
+  .e2e .k{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
+  .e2e .v{ font-family:var(--font-mono); font-size:var(--fs-xl); font-weight:700; color:var(--ink); letter-spacing:.01em; }
+  .e2e .v small{ font-size:var(--fs-sm); color:var(--ink-3); font-weight:500; }
+  .tagline{ padding:var(--s4); font-size:var(--fs-sm); color:var(--ink-2); }
+  .tagline b{ color:var(--ink); font-weight:600; }
+  .metrics-foot{ display:flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s4); border-top:1px solid var(--hair); }
+  .remix{
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.06em; text-transform:uppercase; font-weight:700;
+    border:1px solid var(--ink); background:var(--surface); color:var(--ink); border-radius:var(--r2);
+    padding:9px 14px; cursor:pointer; display:none; align-items:center; gap:8px;
+    transition:background .14s ease, color .14s ease, transform .08s ease, border-color .14s ease;
+  }
+  .remix.on{ display:inline-flex; }
+  .remix:hover{ background:var(--ink); color:var(--accent-ink); }
+  .remix:active{ transform:translateY(1px); }
+  .remix:focus-visible{ outline:none; box-shadow:var(--focus); }
+  .remix .g{ width:9px; height:9px; border:2px solid currentColor; border-radius:50%; border-right-color:transparent; display:inline-block; }
+  .illus{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.08em; text-transform:uppercase; color:var(--ink-4); }
+
+  /* ---------- footer ---------- */
+  footer.foot{ border-top:1px solid var(--hair-2); background:var(--surface); }
+  .foot-in{ display:flex; align-items:center; gap:var(--s4); flex-wrap:wrap; padding:var(--s4) 0; }
+  .foot-in .m{ font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.06em; color:var(--ink-3); }
+  .foot-in .m b{ color:var(--ink-2); font-weight:500; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 880px){
+    .workspace{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 768px){
+    .wrap{ padding:0 var(--s4); }
+    .btn.explain{ flex:1 1 100%; justify-content:center; }
+    .metrics-grid{ grid-template-columns:1fr; }
+    .e2e .v{ font-size:var(--fs-lg); }
+  }
+
+  /* ---------- reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+    .figbar-scan.on > i{ animation:none; width:100%; opacity:.5; transform:none; }
+    .wbar > i.run{ animation:none; width:100%; opacity:.45; }
+    .badge.live .dot, .cv-cap .pulse{ animation:none; }
+  }
+
+  /* =========================================================================
+     SIMPLE VIEW  (ADDED — non-technical presentation of the SAME live run).
+     Everything is scoped under #simpleView / .sv-* so it never collides with the
+     Full console. Reuses the existing :root tokens + already-loaded fonts.
+     ========================================================================= */
+
+  /* view switching — masthead stays visible in both; only these two swap. */
+  #simpleView{ display:none; }
+  body.view-simple #fullView{ display:none; }
+  body.view-simple #simpleView{ display:block; }
+  body.view-full  #simpleView{ display:none; }
+  body.view-full  #fullView{ display:block; }
+  body.view-simple .foot{ display:none; }   /* keep the technical footer out of the clean Simple view */
+
+  /* masthead view toggle [ Simple | Full ] */
+  .sv-toggle{ display:inline-flex; border:1px solid var(--hair-2); border-radius:999px; overflow:hidden; background:var(--surface-2); }
+  .sv-seg-btn{
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.12em; text-transform:uppercase;
+    border:0; background:transparent; color:var(--ink-3); padding:7px 16px; cursor:pointer;
+    transition:background .14s ease, color .14s ease;
+  }
+  .sv-seg-btn[aria-pressed="true"]{ background:var(--accent); color:var(--accent-ink); }
+  .sv-seg-btn:hover[aria-pressed="false"]{ color:var(--ink); }
+  .sv-seg-btn:focus-visible{ outline:none; box-shadow:var(--focus); }
+
+  /* layout */
+  .sv-wrap{ max-width:940px; margin:0 auto; padding:var(--s7) var(--s5) var(--s8); }
+  .sv-center{ text-align:center; }
+  .sv-eyebrow{ font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.28em; text-transform:uppercase; color:var(--ink-4); margin-bottom:18px; }
+  .sv-h1{ font-size:clamp(34px,5vw,52px); line-height:1.04; font-weight:600; letter-spacing:-.02em; margin:0 auto; max-width:15ch; }
+  .sv-h1 em{ font-style:normal; color:var(--accent); }
+  .sv-sub{ color:var(--ink-2); font-size:17px; max-width:46ch; margin:18px auto 0; }
+
+  /* query row */
+  .sv-ask{
+    margin:34px auto 0; max-width:680px; display:flex; gap:10px; align-items:stretch;
+    background:var(--surface); border:1px solid var(--hair-2); border-radius:14px;
+    padding:8px 8px 8px 16px; box-shadow:var(--shadow-1);
+  }
+  .sv-ask:focus-within{ border-color:var(--accent-line); box-shadow:0 0 0 3px var(--accent-weak); }
+  .sv-ico{ align-self:center; color:var(--ink-4); display:inline-flex; flex:none; }
+  #svConcept{
+    flex:1 1 auto; min-width:0; border:0; background:transparent; font-family:var(--font-sans);
+    font-size:17px; color:var(--ink); padding:10px 4px; outline:none;
+  }
+  #svConcept::placeholder{ color:var(--ink-4); }
+  .sv-explainbtn{
+    flex:none; border:0; background:var(--accent); color:var(--accent-ink); font-family:var(--font-sans);
+    font-weight:600; font-size:15px; border-radius:9px; padding:0 20px; cursor:pointer; white-space:nowrap;
+    transition:background .14s ease, transform .08s ease;
+  }
+  .sv-explainbtn:hover{ background:var(--ink); }
+  .sv-explainbtn:active{ transform:translateY(1px); }
+  .sv-explainbtn:focus-visible{ outline:none; box-shadow:var(--focus); }
+  .sv-explainbtn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+  /* curated easy-topic chips */
+  .sv-chips{ display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin:16px auto 0; max-width:720px; }
+  .sv-chip{
+    font-size:13.5px; color:var(--ink-2); background:var(--surface); border:1px solid var(--hair-2);
+    border-radius:999px; padding:8px 15px; cursor:pointer; font-family:var(--font-sans);
+    transition:border-color .12s ease, color .12s ease, background .12s ease;
+  }
+  .sv-chip:hover{ border-color:var(--accent-line); color:var(--ink); }
+  .sv-chip[aria-pressed="true"]{ border-color:var(--accent); color:var(--accent); background:var(--accent-weak); }
+  .sv-chip:focus-visible{ outline:none; box-shadow:var(--focus); }
+  .sv-chip[disabled]{ opacity:.55; cursor:not-allowed; }
+
+  /* result area */
+  .sv-result{ margin-top:46px; }
+  .sv-rlabel{
+    display:flex; align-items:center; justify-content:space-between; gap:var(--s3);
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink-4); margin-bottom:10px;
+  }
+  .sv-rlabel > span{ display:inline-flex; align-items:center; min-width:0; }
+  .sv-rlabel #svQuestion{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-transform:none; letter-spacing:.02em; }
+  .sv-rdot{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:8px; flex:none; }
+  .sv-card{ background:var(--surface); border:1px solid var(--hair-2); border-radius:14px; box-shadow:var(--shadow-2); overflow:hidden; }
+  .sv-card-hd{ display:flex; align-items:center; justify-content:space-between; gap:var(--s3); padding:20px 22px 12px; }
+  .sv-card-hd h2{ font-size:20px; font-weight:600; margin:0; letter-spacing:-.01em; }
+
+  /* card states: idle / status / message */
+  .sv-idle{ padding:0 22px 22px; color:var(--ink-3); font-size:15px; }
+  .sv-status{ display:flex; align-items:center; gap:10px; padding:0 22px 22px; color:var(--ink-2); font-size:15px; }
+  .sv-status[hidden]{ display:none; }   /* explicit display:flex above would otherwise beat [hidden] */
+  .sv-spin{ width:14px; height:14px; border:2px solid var(--accent); border-right-color:transparent; border-radius:50%; display:inline-block; animation:spin .7s linear infinite; flex:none; }
+  .sv-msg{ padding:0 22px 22px; }
+  .sv-msg-tag{
+    font-family:var(--font-mono); font-size:var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase;
+    color:var(--warn); border:1px solid var(--hair-2); border-radius:var(--r1); padding:3px 8px; display:inline-block; margin-bottom:10px;
+  }
+  .sv-msg.err .sv-msg-tag{ color:var(--accent); border-color:var(--accent-line); background:var(--accent-weak); }
+  .sv-msg p{ margin:0; font-size:15.5px; color:var(--ink); line-height:1.55; max-width:60ch; }
+
+  /* the real generated instrument (SECOND sandboxed iframe; Full keeps its own) */
+  .sv-stage{ padding:0 22px 6px; }
+  #svFrame{
+    width:100%; height:420px;  /* fallback; JS grows this to the instrument's content height */
+    border:1px solid var(--hair); border-radius:8px; background:var(--surface); display:block; overflow:hidden;
+  }
+
+  /* "In plain words" explanation */
+  .sv-explain{ padding:18px 22px 22px; border-top:1px solid var(--hair); margin-top:12px; }
+  .sv-explain h3{ font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.18em; text-transform:uppercase; color:var(--ink-4); margin:0 0 10px; }
+  .sv-explain p{ margin:0; color:var(--ink-2); font-size:15.5px; line-height:1.55; max-width:62ch; }
+  .sv-explain p b{ color:var(--ink); font-weight:600; }
+  /* "In plain words" in the Full-mode Live UI (parity with Simple) */
+  .inst-explain{ margin-top:var(--s3); padding-top:var(--s3); border-top:1px solid var(--hair); }
+  .inst-explain h3{ font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-4); margin:0 0 var(--s2); }
+  .inst-explain p{ margin:0; color:var(--ink-2); font-size:var(--fs-md); line-height:1.55; max-width:64ch; }
+
+  /* "How this was made" strip */
+  .sv-made{ margin-top:22px; border:1px solid var(--hair); border-radius:12px; background:var(--surface-2); padding:16px 20px; }
+  .sv-made-h{ font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-4); margin-bottom:12px; }
+  /* one model runs the whole pipeline — a single lane, full width */
+  .sv-lanes{ display:grid; grid-template-columns:1fr; gap:14px; }
+  .sv-lane{ display:flex; gap:11px; align-items:flex-start; }
+  .sv-badge{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; padding:4px 9px; border-radius:999px; white-space:nowrap; margin-top:1px; flex:none; }
+  .sv-badge.flash{ background:#EDEBE3; color:var(--ink-2); border:1px solid var(--hair-2); }
+  .sv-d{ font-size:13.5px; color:var(--ink-2); max-width:68ch; }   /* keep the measure readable now the lane is full width */
+  .sv-d b{ color:var(--ink); font-weight:600; }
+  .sv-made-foot{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    margin-top:14px; padding-top:12px; border-top:1px solid var(--hair);
+    font-family:var(--font-mono); font-size:var(--fs-xs); letter-spacing:.06em; color:var(--ink-3);
+  }
+  .sv-made-foot .sv-adk b{ color:var(--ink-2); }
+  .sv-made-foot .sv-metric{ color:var(--ink-3); }
+
+  @media (max-width:640px){
+    .sv-ask{ flex-wrap:wrap; }
+    #svConcept{ min-width:0; }
+    .sv-h1{ font-size:32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================ MASTHEAD ============================ -->
+<header class="mast">
+  <div class="wrap mast-in">
+    <div class="brand">
+      <span class="logo"><span class="prism-mark" aria-hidden="true"></span>PRISM</span>
+      <span class="sub">generative science explainer</span>
+    </div>
+    <div class="mast-spacer"></div>
+    <div class="mast-meta">
+      <span class="badge flash"><span class="dot"></span>Gemini 3.7 Flash</span>
+      <span class="clock mono" id="sessionClock">T+0.000s</span>
+    </div>
+    <div class="sv-toggle" role="group" aria-label="View mode">
+      <button type="button" id="viewSimpleBtn" class="sv-seg-btn" aria-pressed="true">Simple</button>
+      <button type="button" id="viewFullBtn" class="sv-seg-btn" aria-pressed="false" title="The full technical console">Full</button>
+    </div>
+  </div>
+</header>
+
+<!-- Boot: pick the initial view BEFORE the views render (prevents any flash). -->
+<script>
+  (function(){
+    /* PRISM default view — change THIS ONE LINE to 'full' to boot into the console. */
+    var DEFAULT_VIEW = 'simple';
+    var v; try{ v = localStorage.getItem('prism_view'); }catch(e){}
+    if(v!=='simple' && v!=='full') v = DEFAULT_VIEW;
+    document.body.classList.add('view-' + v);
+  })();
+</script>
+
+<!-- ============================ SIMPLE VIEW (added) ============================ -->
+<section id="simpleView" aria-label="Simple view">
+  <main class="sv-wrap">
+    <div class="sv-center">
+      <div class="sv-eyebrow">Generative science explainer</div>
+      <h1 class="sv-h1">See how <em>anything</em> works.</h1>
+      <p class="sv-sub">Ask a plain question. Prism researches it and builds you a small
+        interactive answer you can actually play with &mdash; no jargon, no setup.</p>
+    </div>
+
+    <form class="sv-ask" id="svAsk">
+      <span class="sv-ico" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </span>
+      <input id="svConcept" type="text" placeholder="Ask about anything&hellip; e.g. why is the sky blue?" autocomplete="off" spellcheck="false" aria-label="Ask a plain question" />
+      <button type="submit" id="svExplain" class="sv-explainbtn">Explain &rarr;</button>
+    </form>
+
+    <div class="sv-chips" id="svChips" role="group" aria-label="Try a topic">
+      <button type="button" class="sv-chip">Why is the sky blue?</button>
+      <button type="button" class="sv-chip">How do rainbows form?</button>
+      <button type="button" class="sv-chip">How does a swing work?</button>
+      <button type="button" class="sv-chip">What makes ice float?</button>
+      <button type="button" class="sv-chip">How do plants use sunlight?</button>
+    </div>
+
+    <section class="sv-result">
+      <div class="sv-rlabel">
+        <span><span class="sv-rdot" aria-hidden="true"></span>Generated instrument</span>
+        <span id="svQuestion"></span>
+      </div>
+
+      <div class="sv-card">
+        <div class="sv-card-hd">
+          <h2 id="svTitle">Your interactive answer</h2>
+        </div>
+
+        <!-- idle (before any run) -->
+        <div class="sv-idle" id="svIdle">Ask a question above and Prism will build a small interactive answer here.</div>
+
+        <!-- friendly single status line while a run is in progress -->
+        <div class="sv-status" id="svStatus" hidden>
+          <span class="sv-spin" aria-hidden="true"></span>
+          <span id="svStatusText">Researching&hellip;</span>
+        </div>
+
+        <!-- declined / error notice -->
+        <div class="sv-msg" id="svMsg" hidden>
+          <span class="sv-msg-tag" id="svMsgTag">notice</span>
+          <p id="svMsgBody"></p>
+        </div>
+
+        <!-- the REAL generated instrument (second sandboxed iframe) -->
+        <div class="sv-stage" id="svStage" hidden>
+          <iframe id="svFrame" sandbox="allow-scripts" title="Generated interactive instrument" referrerpolicy="no-referrer"></iframe>
+        </div>
+
+        <!-- plain-English explanation -->
+        <div class="sv-explain" id="svExplainBlock" hidden>
+          <h3>In plain words</h3>
+          <p id="svIntro"></p>
+        </div>
+      </div>
+
+      <!-- subtle "how this was made" strip -->
+      <div class="sv-made">
+        <div class="sv-made-h">How this was made</div>
+        <div class="sv-lanes">
+          <div class="sv-lane">
+            <span class="sv-badge flash" id="svBuildBadge">3.7 Flash</span>
+            <div class="sv-d" id="svLaneBuild"><b>Gemini 3.7 Flash</b> &mdash; researched the science in parallel with Google Search, then turned those findings into this interactive instrument, written live. One model, end to end.</div>
+          </div>
+        </div>
+        <div class="sv-made-foot">
+          <span class="sv-adk">A multi-agent system on <b>Google ADK</b></span>
+          <span class="sv-metric" id="svMetric">built live</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- ======== FULL VIEW (existing console + workspace; DOM unchanged) ======== -->
+<div id="fullView">
+
+<!-- ============================ INPUT CONSOLE ============================ -->
+<section class="console">
+  <div class="wrap console-in">
+    <div class="console-label"><span>INPUT // concept</span><span class="rule"></span><span class="mono" id="dirTag">SSE // POST /api/prism</span></div>
+    <div class="qrow">
+      <label class="field" id="conceptField" for="concept">
+        <span class="prompt mono" aria-hidden="true">&gt;</span>
+        <input id="concept" type="text" value="Why is the sky blue?" autocomplete="off" spellcheck="false" aria-label="Science concept to explain" />
+      </label>
+      <button class="btn explain" id="explainBtn">
+        <span class="spin" aria-hidden="true"></span><span class="lbl">Explain</span><span class="arrow" aria-hidden="true">&rarr;</span>
+      </button>
+    </div>
+    <div class="chips" id="chips">
+      <span class="lab">try</span>
+      <button class="chip" data-concept="Why is the sky blue?">Why is the sky blue?</button>
+      <button class="chip" data-concept="How do rainbows form?">How do rainbows form?</button>
+      <button class="chip" data-concept="How does a swing work?">How does a swing work?</button>
+      <button class="chip" data-concept="What makes ice float?">What makes ice float?</button>
+    </div>
+    <div class="chips modes" id="modes" role="radiogroup" aria-label="Generation mode">
+      <span class="lab">mode</span>
+      <button class="chip mode" data-mode="fast" role="radio" aria-checked="false">Fast<span class="mnote mono">quickest</span></button>
+      <button class="chip mode on" data-mode="balanced" role="radio" aria-checked="true">Balanced<span class="mnote mono">tuned</span></button>
+      <button class="chip mode" data-mode="freeform" role="radio" aria-checked="false">Freeform<span class="mnote mono">bespoke</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ WORKSPACE ============================ -->
+<main class="wrap workspace">
+
+  <!-- ---------- LEFT: pipeline + metrics ---------- -->
+  <div class="col-left">
+  <section class="panel" aria-label="Pipeline">
+    <div class="panel-head">
+      <span class="idx mono">PIPE</span>
+      <h2>Pipeline</h2>
+      <span class="hspacer"></span>
+      <span class="stat mono" id="pipeStat">idle</span>
+    </div>
+    <div class="lane-legend">
+      <span class="k"><span class="sq acc" aria-hidden="true"></span><span id="legendResearch">RESEARCH // gatekeeper · parallel research swarm</span></span>
+      <span class="k"><span class="sq ink" aria-hidden="true"></span><span id="legendBuild">BUILD // planner · builds the instrument · verify</span></span>
+    </div>
+
+    <ol class="steps" id="steps">
+      <!-- 01 Gatekeeper -->
+      <li class="step" data-state="idle" data-step="0">
+        <div class="rail"><span class="num mono">01</span><span class="node"></span><span class="thread"></span></div>
+        <div class="body">
+          <div class="step-top"><span class="step-name">Gatekeeper</span><span class="badge flash"><span class="dot"></span>3.7 Flash</span><span class="st-ms mono">&mdash;</span></div>
+          <div class="step-msg empty" data-msg>awaiting input</div>
+        </div>
+      </li>
+      <!-- 02 Planner -->
+      <li class="step" data-state="idle" data-step="1">
+        <div class="rail"><span class="num mono">02</span><span class="node"></span><span class="thread"></span></div>
+        <div class="body">
+          <div class="step-top"><span class="step-name">Planner</span><span class="badge flash"><span class="dot"></span>3.7 Flash</span><span class="st-ms mono">&mdash;</span></div>
+          <div class="step-msg empty" data-msg>queued</div>
+        </div>
+      </li>
+      <!-- 03 Research swarm -->
+      <li class="step" data-state="idle" data-step="2">
+        <div class="rail"><span class="num mono">03</span><span class="node"></span><span class="thread"></span></div>
+        <div class="body">
+          <div class="step-top"><span class="step-name">Research swarm</span><span class="badge flash" id="swarmBadge"><span class="dot"></span>3.7 Flash &times;N</span><span class="st-ms mono">&mdash;</span></div>
+          <div class="step-msg empty" data-msg>queued</div>
+          <div class="swarm" id="swarm">
+            <div class="swarm-head"><span>3.7 FLASH // swarm</span><span class="pill mono" id="swarmPill">PARALLEL</span></div>
+            <div id="workers"></div>
+          </div>
+        </div>
+      </li>
+      <!-- 04 UI generator -->
+      <li class="step" data-state="idle" data-step="3">
+        <div class="rail"><span class="num mono">04</span><span class="node"></span><span class="thread"></span></div>
+        <div class="body">
+          <div class="step-top"><span class="step-name">UI generator</span><span class="badge flash" id="uiGenBadge"><span class="dot"></span>3.7 Flash</span><span class="st-ms mono">&mdash;</span></div>
+          <div class="step-msg empty" data-msg>queued</div>
+        </div>
+      </li>
+      <!-- 05 Verifier -->
+      <li class="step" data-state="idle" data-step="4">
+        <div class="rail"><span class="num mono">05</span><span class="node"></span><span class="thread"></span></div>
+        <div class="body">
+          <div class="step-top"><span class="step-name">Verifier</span><span class="badge"><span class="dot"></span>static</span><span class="st-ms mono">&mdash;</span></div>
+          <div class="step-msg empty" data-msg>queued</div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- METRICS (below pipeline) -->
+  <section class="panel metrics" id="metrics" aria-label="Performance metrics">
+    <div class="panel-head">
+      <span class="idx mono">PERF</span>
+      <h2>Feel the speed</h2>
+      <span class="hspacer"></span>
+      <span class="badge live"><span class="dot"></span>Live</span>
+    </div>
+    <div class="e2e">
+      <span class="k">end-to-end</span>
+      <span class="v mono" id="e2eVal">&mdash;</span>
+    </div>
+    <div class="metrics-grid">
+      <div class="mcol research" id="mcolResearch">
+        <div class="mhead"><span class="badge"><span class="dot"></span>research</span></div>
+        <div class="mrow"><span class="mk">workers</span><span class="mv" id="mWorkers">&mdash;</span></div>
+        <div class="mrow"><span class="mk">gatekeeper</span><span class="mv" id="mGate">&mdash;</span></div>
+        <div class="mrow"><span class="mk">swarm wall-time</span><span class="mv" id="mSwarm">&mdash;</span></div>
+        <div class="mrow"><span class="mk">sources</span><span class="mv" id="mSources">&mdash;</span></div>
+      </div>
+      <div class="mcol build" id="mcolBuild">
+        <div class="mhead"><span class="badge"><span class="dot"></span>build</span></div>
+        <div class="mrow" id="rowPlanner"><span class="mk">planner</span><span class="mv" id="mPlanner">&mdash;</span></div>
+        <div class="mrow" id="rowUigen"><span class="mk">UI gen</span><span class="mv" id="mUigen">&mdash;</span></div>
+        <div class="mrow" id="rowRepairs"><span class="mk">repairs</span><span class="mv" id="mRepairs">&mdash;</span></div>
+        <div class="mrow" id="rowHtml"><span class="mk">HTML size</span><span class="mv" id="mHtml">&mdash;</span></div>
+      </div>
+    </div>
+    <div class="tagline" id="tagline"><b>3.7 Flash covered the breadth in parallel</b> &mdash; fast &amp; cheap. <b>Then it built the instrument itself</b> &mdash; the depth.</div>
+    <div class="metrics-foot">
+      <button class="remix" id="remixBtn"><span class="g" aria-hidden="true"></span>Remix</button>
+      <span class="illus" id="e2eMeasured">measured on this run</span>
+    </div>
+  </section>
+  </div><!-- /col-left -->
+
+  <!-- ---------- RIGHT: tabbed output (Live UI / Findings & sources / Code) ---------- -->
+  <div class="col-right">
+    <section class="panel figure" aria-label="Output">
+      <div class="panel-head tabbar" role="tablist" aria-label="Output views">
+        <button class="tab on" id="tabUi" role="tab" aria-selected="true" data-tab="ui">Live UI</button>
+        <button class="tab" id="tabFind" role="tab" aria-selected="false" data-tab="findings">Findings &amp; sources <span class="tabct mono" id="findTabCt"></span></button>
+        <button class="tab" id="tabCode" role="tab" aria-selected="false" data-tab="code">Code</button>
+        <span class="hspacer"></span>
+        <span class="stat mono" id="figStat">awaiting concept</span>
+      </div>
+      <div class="figbar-scan" id="scanBar"><i></i></div>
+
+      <!-- TAB: Live UI -->
+      <div class="tabpanel" id="panelUi" role="tabpanel" aria-labelledby="tabUi">
+        <div class="stage-body">
+          <div class="stage-idle" id="stageIdle">
+            <span class="big">// output panel</span>
+            <div class="frame-hint" id="frameHint">3.7 Flash will build a bespoke interactive instrument here,<br />grounded by its own parallel research swarm.<br />Press <span style="color:var(--accent)">Explain</span> to run the live pipeline.</div>
+          </div>
+          <div class="stage-msg" id="stageMsg">
+            <span class="mtag" id="stageMsgTag">notice</span>
+            <div class="mbody" id="stageMsgBody"></div>
+            <div class="mreason" id="stageMsgReason"></div>
+          </div>
+          <div class="instrument" id="instrumentWrap">
+            <iframe id="instrumentFrame" sandbox="allow-scripts" title="Generated interactive instrument" referrerpolicy="no-referrer"></iframe>
+            <div class="inst-explain" id="fvExplainBlock" hidden>
+              <h3>In plain words</h3>
+              <p id="fvIntro"></p>
+            </div>
+            <div class="inst-foot">
+              <span class="sb" id="instBytes">&mdash;</span>
+              <span>interactive · self-contained · sandboxed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Findings & sources -->
+      <div class="tabpanel" id="panelFindings" role="tabpanel" aria-labelledby="tabFind" hidden>
+        <div class="plan-brief" id="planBrief">
+          <div class="pb-row"><span class="pk">key interaction</span><span class="pv" id="pbKey"></span></div>
+          <div class="pb-row"><span class="pk">viz hint</span><span class="pv mono" id="pbViz"></span></div>
+        </div>
+        <ol class="findings" id="findings"></ol>
+        <div class="findings-empty" id="findingsEmpty">// no findings yet &mdash; run the research swarm</div>
+        <div class="sources" id="sourcesWrap">
+          <div class="src-head">grounded sources</div>
+          <ul class="srclist" id="srcList"></ul>
+        </div>
+      </div>
+
+      <!-- TAB: Code -->
+      <div class="tabpanel" id="panelCode" role="tabpanel" aria-labelledby="tabCode" hidden>
+        <div class="codeview" id="codeView">
+          <div class="codeview-head">
+            <span class="cv-cap" id="cvCap"><span class="pulse" aria-hidden="true"></span>3.7 Flash is writing the instrument&hellip;</span>
+            <span class="cv-count mono" id="cvCount">0 chars</span>
+          </div>
+          <pre class="code mono" id="codePre" aria-label="Streaming generated HTML"></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+</div><!-- /#fullView -->
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span class="m"><b>PRISM</b> &middot; console</span>
+    <span class="m">Swiss-mono instrument &middot; light theme</span>
+    <span class="m">Live &middot; streamed from the Prism pipeline &middot; <b>Gemini 3.7 Flash</b>, end to end</span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+(function(){
+  const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $  = (s,el)=> (el||document).querySelector(s);
+  const $$ = (s,el)=> Array.from((el||document).querySelectorAll(s));
+
+  /* ---------- element refs ---------- */
+  const explainBtn   = $('#explainBtn');
+  const conceptEl    = $('#concept');
+  const conceptField = $('#conceptField');
+  const chipsBox     = $('#chips');
+  const modesBox     = $('#modes');
+  let selectedMode   = 'balanced';
+  const sessionClock = $('#sessionClock');
+  const pipeStat     = $('#pipeStat');
+  const figStat      = $('#figStat');
+  const findTabCt    = $('#findTabCt');
+  const scanBar      = $('#scanBar');
+  const stepEls      = $$('#steps li.step');
+
+  /* ---------- output tabs (Live UI / Findings / Code) ---------- */
+  const TABS = {
+    ui:       { btn: $('#tabUi'),   panel: $('#panelUi') },
+    findings: { btn: $('#tabFind'), panel: $('#panelFindings') },
+    code:     { btn: $('#tabCode'), panel: $('#panelCode') },
+  };
+  let activeTab = 'ui';
+  function showTab(name){
+    if(!TABS[name]) return;
+    activeTab = name;
+    for(const k in TABS){
+      const on = (k === name);
+      TABS[k].btn.classList.toggle('on', on);
+      TABS[k].btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      TABS[k].panel.hidden = !on;
+    }
+  }
+  Object.keys(TABS).forEach(k => TABS[k].btn.addEventListener('click', () => showTab(k)));
+
+  const swarmBox   = $('#swarm');
+  const workersBox = $('#workers');
+  const swarmBadge = $('#swarmBadge');
+  const swarmPill  = $('#swarmPill');
+  const uiGenBadge = $('#uiGenBadge');
+  const cvCap      = $('#cvCap');
+  const legendResearch = $('#legendResearch');
+  const legendBuild    = $('#legendBuild');
+  const taglineEl  = $('#tagline');
+  const frameHint  = $('#frameHint');
+
+  /* One model runs every stage: Gemini 3.7 Flash. Modes differ by APPROACH and
+     deliberation, never by model (keep in sync with app/config.py MODES).
+     Everything mode-dependent in the UI derives from this. */
+  const UI_MODEL = {
+    fast:     { label:'3.7 Flash', cls:'flash', writer:'3.7 Flash' },
+    balanced: { label:'3.7 Flash', cls:'flash', writer:'3.7 Flash' },
+    freeform: { label:'3.7 Flash', cls:'flash', writer:'3.7 Flash' }
+  };
+  function uiModelFor(mode){ return UI_MODEL[mode] || UI_MODEL.balanced; }
+
+  /* Per-mode copy for the pipeline legend, metrics tagline, idle hint, and the
+     Simple view's "how this was made" line. Same model throughout — the modes
+     differ only in how much deliberation 3.7 Flash spends on the build. */
+  const MODE_COPY = {
+    fast: {
+      legendResearch:'RESEARCH // gatekeeper \u00B7 parallel research swarm',
+      legendBuild:'BUILD // straight to the instrument \u00B7 least deliberation',
+      tagline:'<b>3.7 Flash covered the breadth in parallel</b> &mdash; fast &amp; cheap. <b>Then it went straight to a working instrument</b> &mdash; fewest steps.',
+      frameHint:'3.7 Flash will build a fast interactive instrument here,<br />grounded by its own parallel research swarm.<br />Press <span style="color:var(--accent)">Explain</span> to run the live pipeline.',
+      made:'<b>Gemini 3.7 Flash</b> \u2014 researched the science in parallel with Google Search, then went straight to this interactive instrument, written live. One model, fewest steps.'
+    },
+    balanced: {
+      legendResearch:'RESEARCH // gatekeeper \u00B7 parallel research swarm',
+      legendBuild:'BUILD // planner \u00B7 builds the instrument \u00B7 verify',
+      tagline:'<b>3.7 Flash covered the breadth in parallel</b> &mdash; fast &amp; cheap. <b>Then it built the instrument itself</b> &mdash; the depth.',
+      frameHint:'3.7 Flash will build a bespoke interactive instrument here,<br />grounded by its own parallel research swarm.<br />Press <span style="color:var(--accent)">Explain</span> to run the live pipeline.',
+      made:'<b>Gemini 3.7 Flash</b> \u2014 researched the science in parallel with Google Search, then turned those findings into this interactive instrument, written live. One model, end to end.'
+    },
+    freeform: {
+      legendResearch:'RESEARCH // gatekeeper \u00B7 parallel research swarm',
+      legendBuild:'BUILD // planner \u00B7 writes a bespoke instrument \u00B7 verify',
+      tagline:'<b>3.7 Flash covered the breadth in parallel</b> &mdash; fast &amp; cheap. <b>Then it wrote a fully bespoke instrument</b> &mdash; maximum depth.',
+      frameHint:'3.7 Flash will write a fully bespoke interactive instrument here,<br />grounded by its own parallel research swarm.<br />Press <span style="color:var(--accent)">Explain</span> to run the live pipeline.',
+      made:'<b>Gemini 3.7 Flash</b> \u2014 researched the science in parallel with Google Search, then wrote this interactive instrument from scratch, live. One model, end to end.'
+    }
+  };
+  function copyFor(mode){ return MODE_COPY[mode] || MODE_COPY.balanced; }
+
+  /* Single source of truth: reflect the selected/active mode everywhere so the
+     tagging + numbers are always honest (the approach changes by mode; the model
+     never does — it is Gemini 3.7 Flash at every stage). */
+  function applyModeAware(mode){
+    const m = uiModelFor(mode), c = copyFor(mode);
+    if(uiGenBadge){
+      uiGenBadge.className = 'badge ' + m.cls;
+      if(uiGenBadge.lastChild && uiGenBadge.lastChild.nodeType===3) uiGenBadge.lastChild.textContent = m.label;
+    }
+    if(cvCap && cvCap.lastChild && cvCap.lastChild.nodeType===3)
+      cvCap.lastChild.textContent = m.writer + ' is writing the instrument\u2026';
+    if(legendResearch) legendResearch.textContent = c.legendResearch;
+    if(legendBuild)    legendBuild.textContent    = c.legendBuild;
+    if(taglineEl)   taglineEl.innerHTML     = c.tagline;
+    if(frameHint)   frameHint.innerHTML     = c.frameHint;
+  }
+
+  const planBrief  = $('#planBrief');
+  const pbKey      = $('#pbKey');
+  const pbViz      = $('#pbViz');
+
+  const stageIdle  = $('#stageIdle');
+  const stageMsg   = $('#stageMsg');
+  const stageMsgTag= $('#stageMsgTag');
+  const stageMsgBody=$('#stageMsgBody');
+  const stageMsgReason=$('#stageMsgReason');
+  const codeView   = $('#codeView');
+  const codePre    = $('#codePre');
+  const cvCount    = $('#cvCount');
+  const instrumentWrap = $('#instrumentWrap');
+  const instrumentFrame= $('#instrumentFrame');
+  const instBytes  = $('#instBytes');
+
+  const findingsOl = $('#findings');
+  const findingsEmpty = $('#findingsEmpty');
+  const sourcesWrap= $('#sourcesWrap');
+  const srcList    = $('#srcList');
+
+  const metrics    = $('#metrics');
+  const e2eVal     = $('#e2eVal');
+  const e2eMeasured= $('#e2eMeasured');
+  const remixBtn   = $('#remixBtn');
+  const mWorkers=$('#mWorkers'), mGate=$('#mGate'), mSwarm=$('#mSwarm'), mSources=$('#mSources');
+  const mPlanner=$('#mPlanner'), mUigen=$('#mUigen'), mRepairs=$('#mRepairs'), mHtml=$('#mHtml');
+
+  /* =====================================================================
+     SIMPLE VIEW  (added) — non-technical presentation driven by the SAME
+     backend run + SAME SSE handlers. Only the presentation differs.
+     ===================================================================== */
+  const svConcept      = $('#svConcept');
+  const svExplainBtn   = $('#svExplain');
+  const svChipsBox     = $('#svChips');
+  const svAskForm      = $('#svAsk');
+  const svQuestion     = $('#svQuestion');
+  const svTitle        = $('#svTitle');
+  const svIdle         = $('#svIdle');
+  const svStatus       = $('#svStatus');
+  const svStatusText   = $('#svStatusText');
+  const svMsg          = $('#svMsg');
+  const svMsgTag       = $('#svMsgTag');
+  const svMsgBody      = $('#svMsgBody');
+  const svStage        = $('#svStage');
+  const svFrame        = $('#svFrame');
+  const svExplainBlock = $('#svExplainBlock');
+  const svIntro        = $('#svIntro');
+  const fvExplainBlock = $('#fvExplainBlock');   // Full-mode "In plain words" (parity with Simple)
+  const fvIntro        = $('#fvIntro');
+  const svMetric       = $('#svMetric');
+  const svBuildBadge   = $('#svBuildBadge');
+  const svLaneBuild    = $('#svLaneBuild');
+  const viewSimpleBtn  = $('#viewSimpleBtn');
+  const viewFullBtn    = $('#viewFullBtn');
+  let   lastPlanKey    = '';   // fallback plain-English explanation (onPlan.key_interaction)
+
+  /* Pull a quoted string value (e.g. intro/title) out of the generated PRISM_SPEC.
+     Tolerant of unquoted OR quoted keys and of ' " ` string delimiters. */
+  function extractSpecString(html, key){
+    if(!html) return '';
+    try{
+      const re = new RegExp("[\"']?" + key + "[\"']?\\s*:\\s*([\"'`])((?:\\\\.|(?!\\1).)*)\\1");
+      const m = re.exec(html);
+      if(m && m[2]) return m[2].replace(/\\(["'`\\])/g,'$1').replace(/\\n/g,' ').replace(/\s+/g,' ').trim();
+    }catch(e){/* ignore */}
+    return '';
+  }
+
+  /* Set the Simple result area into its "run starting" state. */
+  function svRunStart(concept){
+    lastPlanKey='';
+    if(svQuestion) svQuestion.textContent = concept ? ('answer to \u201C'+concept+'\u201D') : '';
+    if(svTitle)    svTitle.textContent = 'Building your interactive answer';
+    if(svIdle)     svIdle.hidden = true;
+    if(svMsg){ svMsg.hidden = true; svMsg.classList.remove('err'); }
+    if(svStage)    svStage.hidden = true;
+    if(svExplainBlock) svExplainBlock.hidden = true;
+    if(svIntro)    svIntro.textContent = '';
+    if(svFrame)    svFrame.removeAttribute('srcdoc');
+    if(svStatus)   svStatus.hidden = false;
+    if(svStatusText) svStatusText.textContent = 'Researching\u2026';
+  }
+
+  /* Friendly single status line for the Simple view (mirrors phase events). */
+  const SV_PHASE = {
+    gatekeeping:'Checking your question\u2026',
+    planning:'Planning the research\u2026',
+    researching:'Researching the science\u2026',
+    generating:'Building your interactive answer\u2026',
+    verifying:'Checking it\u2026'
+  };
+  function svPhase(phase){
+    if(!SV_PHASE[phase] || !svStatus) return;
+    if(svStage && !svStage.hidden) return;   // instrument already up
+    if(svMsg && !svMsg.hidden) return;       // already terminated
+    svStatus.hidden=false;
+    if(svStatusText) svStatusText.textContent = SV_PHASE[phase];
+  }
+
+  /* Mirror the generated instrument into #svFrame + surface a plain-English blurb. */
+  function svRenderInstrument(html){
+    if(!svFrame || !html) return;
+    svFrame.style.height='';   // reset; the posted content height will drive it
+    svFrame.setAttribute('srcdoc', withHeightReporter(html));
+    if(svStatus) svStatus.hidden=true;
+    if(svIdle)   svIdle.hidden=true;
+    if(svMsg)    svMsg.hidden=true;
+    if(svStage)  svStage.hidden=false;
+    const title = extractSpecString(html,'title');
+    const intro = extractSpecString(html,'intro');
+    if(svTitle) svTitle.textContent = title || 'Your interactive answer';
+    const explanation = intro || lastPlanKey || '';
+    if(svIntro && svExplainBlock){
+      if(explanation){ svIntro.textContent = explanation; svExplainBlock.hidden=false; }
+      else { svIntro.textContent=''; svExplainBlock.hidden=true; }
+    }
+  }
+
+  /* Keep the "how this was made" strip truthful: one model (Gemini 3.7 Flash) runs
+     research AND build in every mode — only the approach shifts, so reuse
+     uiModelFor()/copyFor() for the badge + the single lane's wording. */
+  function svApplyMade(mode, e2e){
+    const m = uiModelFor(mode), c = copyFor(mode);
+    if(svBuildBadge) svBuildBadge.textContent = m.writer;             /* always '3.7 Flash' */
+    if(svLaneBuild)  svLaneBuild.innerHTML = c.made;
+    if(svMetric && e2e!=null && !isNaN(Number(e2e)))
+      svMetric.textContent = 'Explained in '+Number(e2e).toFixed(1)+'s \u00B7 built live';
+  }
+
+  /* Show a declined/error message inside the Simple result area. */
+  function svShowMsg(isErr, message, reason){
+    if(svStatus) svStatus.hidden=true;
+    if(svIdle)   svIdle.hidden=true;
+    if(svStage)  svStage.hidden=true;
+    if(svExplainBlock) svExplainBlock.hidden=true;
+    if(svMsg){
+      svMsg.classList.toggle('err', !!isErr);
+      if(svMsgTag)  svMsgTag.textContent = isErr ? 'error' : 'out of scope';
+      if(svMsgBody) svMsgBody.textContent = String(message||'') + (reason ? (' \u2014 '+reason) : '');
+      svMsg.hidden=false;
+    }
+    if(svTitle) svTitle.textContent = isErr ? 'Something went wrong' : 'Let\u2019s try a different question';
+  }
+
+  /* View toggle (Simple / Full): swap containers, reflect on buttons, persist. */
+  function setView(view){
+    const simple = (view!=='full');
+    document.body.classList.toggle('view-simple', simple);
+    document.body.classList.toggle('view-full', !simple);
+    if(viewSimpleBtn) viewSimpleBtn.setAttribute('aria-pressed', simple?'true':'false');
+    if(viewFullBtn)   viewFullBtn.setAttribute('aria-pressed', simple?'false':'true');
+    try{ localStorage.setItem('prism_view', simple?'simple':'full'); }catch(e){/* ignore */}
+  }
+
+  /* Simple query -> mirror into the Full #concept -> reuse the existing run(). */
+  function svStartFromInput(){
+    if(running) return;
+    const concept=((svConcept && svConcept.value)||'').trim();
+    if(!concept){ if(svConcept) svConcept.focus(); return; }
+    if(conceptEl) conceptEl.value = concept;   // keep Full input state consistent
+    run(concept);                              // same backend run, current selectedMode
+  }
+
+  /* ---------- phase -> step index ---------- */
+  const PHASE_STEP = { gatekeeping:0, planning:1, researching:2, generating:3, verifying:4 };
+  const PHASE_LABEL = {
+    gatekeeping:'gatekeeping', planning:'planning', researching:'researching',
+    generating:'generating', verifying:'verifying'
+  };
+
+  /* ---------- run state ---------- */
+  let running=false;
+  let startAt=0;
+  let activeStep=null;
+  let researching=false;
+  let researchStart=0;
+  const stepStart = new Array(stepEls.length).fill(0);
+  const workersByAngle = new Map();   // angleKey -> worker obj
+  const workerList = [];              // ordered
+  let findingCount=0;
+  let htmlChars=0;
+  let htmlBuffer='';                  // accumulated ui_chunk deltas (display + fallback)
+  let generatedOnce=false;           // an instrument rendered this run
+  let terminated=false;              // declined/error stops the run
+  let lastConcept='';
+  let currentReader=null;
+
+  /* ---------- KaTeX inline-math rendering (for research findings / plan brief) ---------- */
+  const KATEX_DELIMS = [
+    {left:'$$', right:'$$', display:true},
+    {left:'$',  right:'$',  display:false},
+    {left:'\\(', right:'\\)', display:false},
+    {left:'\\[', right:'\\]', display:true},
+  ];
+  function renderMath(el){
+    if(el && window.renderMathInElement){
+      try{
+        renderMathInElement(el, {
+          delimiters:KATEX_DELIMS, throwOnError:false,
+          ignoredTags:['script','style','textarea','pre','code'],
+        });
+      }catch(e){/* leave as-is */}
+    }
+  }
+
+  /* ---------- auto-size the sandboxed instrument iframe(s) (posted from inside) ----------
+     Both the Full console's #instrumentFrame and the Simple view's #svFrame use the
+     same height-reporter; size whichever frame actually posted (by e.source), and if
+     the source can't be matched, size both so neither view ever inner-scrolls. */
+  window.addEventListener('message', (e)=>{
+    const h = e && e.data && e.data.__prism_h;
+    if(typeof h!=='number' || !isFinite(h)) return;
+    const px = Math.min(Math.max(Math.ceil(h), 360), 5000) + 'px';
+    let matched=false;
+    if(instrumentFrame && e.source===instrumentFrame.contentWindow){ instrumentFrame.style.height=px; matched=true; }
+    if(svFrame && e.source===svFrame.contentWindow){ svFrame.style.height=px; matched=true; }
+    if(!matched){
+      if(instrumentFrame) instrumentFrame.style.height=px;
+      if(svFrame) svFrame.style.height=px;
+    }
+  });
+
+  /* ---------- tiny helpers ---------- */
+  function fmtS(v, dp){
+    if(v===undefined || v===null || isNaN(Number(v))) return '\u2014';
+    return Number(v).toFixed(dp===undefined?2:dp) + 's';
+  }
+  function slug(s){
+    const t=String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,26);
+    return (t||'instrument') + '.live';
+  }
+  function angleKey(a){ return String(a||'').trim().toLowerCase(); }
+  function hostOf(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
+  function toBullets(text){
+    return String(text==null?'':text)
+      .split(/\r?\n/)
+      .map(l => l.replace(/^\s*[-*\u2022\u25E6]\s?/, '')
+                 .replace(/^\s*\d+[.)]\s?/, '')
+                 .replace(/\*\*(.+?)\*\*/g, '$1')
+                 .replace(/`([^`]+)`/g, '$1')
+                 .trim())
+      .filter(Boolean);
+  }
+  function fmtChars(n){
+    n=Number(n)||0;
+    return (n>=1000 ? (n/1000).toFixed(1)+'k' : String(n));
+  }
+
+  /* ---------- step helpers ---------- */
+  function setMsg(i, text){
+    const li=stepEls[i]; if(!li) return;
+    const m=$('[data-msg]',li); m.textContent=text; m.classList.remove('empty');
+  }
+  function setStepMs(i, seconds){
+    const li=stepEls[i]; if(!li) return;
+    $('.st-ms',li).textContent = Number(seconds).toFixed(3)+'s';
+  }
+  function startStep(i){ stepStart[i]=performance.now(); if(stepEls[i]) stepEls[i].dataset.state='run'; }
+  function finishStep(i){
+    const li=stepEls[i]; if(!li) return;
+    if(li.dataset.state==='done') return;
+    li.dataset.state='done';
+    setStepMs(i, (performance.now()-stepStart[i])/1000);
+  }
+
+  /* ---------- rAF live counters ---------- */
+  function tick(){
+    const now=performance.now();
+    if(running){
+      sessionClock.textContent = 'T+' + ((now-startAt)/1000).toFixed(3) + 's';
+      stepEls.forEach((el,i)=>{
+        if(el.dataset.state==='run') $('.st-ms',el).textContent = ((now-stepStart[i])/1000).toFixed(3)+'s';
+      });
+      if(researching && researchStart){
+        const e=((now-researchStart)/1000);
+        workerList.forEach(w=>{ if(!w.done) w.msEl.textContent = e.toFixed(1)+'s'; });
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ---------- stage view switch ---------- */
+  function showStage(mode){ // idle | frame | msg  (content of the Live UI tab)
+    // NB: these elements have a base CSS rule of display:none, so revealing them
+    // requires an explicit display value (setting '' would revert to the stylesheet).
+    stageIdle.style.display      = (mode==='idle')  ? 'flex'  : 'none';
+    instrumentWrap.style.display = (mode==='frame') ? 'block' : 'none';
+    stageMsg.style.display       = (mode==='msg')   ? 'block' : 'none';
+  }
+
+  /* ---------- workers ---------- */
+  function buildWorker(idx, angle){
+    const key=angleKey(angle);
+    const row=document.createElement('div');
+    row.className='worker';
+    const top=document.createElement('div');
+    top.className='worker-top';
+    const wid=document.createElement('span'); wid.className='wid mono';
+    const b=document.createElement('b'); b.textContent='w'+idx;
+    wid.appendChild(b); wid.appendChild(document.createTextNode(' '+(angle||('angle-'+idx))));
+    const bar=document.createElement('span'); bar.className='wbar';
+    const barI=document.createElement('i'); bar.appendChild(barI);
+    const ms=document.createElement('span'); ms.className='wms mono'; ms.textContent='0.0s';
+    const ok=document.createElement('span'); ok.className='wok mono'; ok.textContent='\u00B7';
+    top.appendChild(wid); top.appendChild(bar); top.appendChild(ms); top.appendChild(ok);
+    const detail=document.createElement('div'); detail.className='worker-detail';
+    row.appendChild(top); row.appendChild(detail);
+    workersBox.appendChild(row);
+    // mark running immediately
+    barI.classList.add('run');
+    const obj={ idx, key, el:row, barI, msEl:ms, okEl:ok, detail, done:false, start:0 };
+    workerList.push(obj);
+    if(key) workersByAngle.set(key, obj);
+    return obj;
+  }
+  function completeWorker(w, bullets){
+    if(!w || w.done) return;
+    w.done=true;
+    w.el.classList.add('done');
+    w.barI.classList.remove('run');
+    w.okEl.textContent='\u2713';
+    const e = researchStart ? (performance.now()-researchStart)/1000 : 0;
+    w.msEl.textContent = e.toFixed(1)+'s';
+    // Research notes are shown ONLY in the right-hand Findings panel (not on the
+    // left pipeline) to keep the pipeline clean. `bullets` is intentionally unused here.
+  }
+  function finalizeWorkers(){
+    researching=false;
+    workerList.forEach(w=>{ if(!w.done) completeWorker(w, null); });
+  }
+
+  /* ---------- findings ---------- */
+  function addFinding(angle, text){
+    findingsEmpty.style.display='none';
+    findingCount++;
+    const li=document.createElement('li'); li.className='finding';
+    const num=document.createElement('span'); num.className='fnum mono';
+    num.textContent=String(findingCount).padStart(2,'0');
+    const body=document.createElement('div');
+    const topic=document.createElement('div'); topic.className='ftopic'; topic.textContent=angle||'finding';
+    const ul=document.createElement('ul'); ul.className='mini-bul';
+    const bul=toBullets(text);
+    (bul.length?bul:['(no detail returned)']).forEach(t=>{ const b=document.createElement('li'); b.textContent=t; ul.appendChild(b); });
+    body.appendChild(topic); body.appendChild(ul);
+    li.appendChild(num); li.appendChild(body);
+    findingsOl.appendChild(li);
+    renderMath(li);
+    findTabCt.textContent = '('+findingCount+')';
+  }
+
+  /* ---------- sources ---------- */
+  function renderSources(sources){
+    srcList.innerHTML='';
+    if(!Array.isArray(sources) || !sources.length){ sourcesWrap.style.display='none'; return; }
+    sources.forEach((s,i)=>{
+      const li=document.createElement('li');
+      const n=document.createElement('span'); n.className='sn'; n.textContent='['+(i+1)+']';
+      const wrap=document.createElement('div');
+      const uri=(s && s.uri) ? String(s.uri) : '';
+      const title=(s && s.title) ? String(s.title) : '';
+      const host=hostOf(uri);
+      const label = title || host || uri || 'source';
+      const safe = /^https?:\/\//i.test(uri);
+      if(safe){
+        const a=document.createElement('a');
+        a.href=uri; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent=label;
+        wrap.appendChild(a);
+        if(host && title){ const h=document.createElement('span'); h.className='host'; h.textContent=host; wrap.appendChild(h); }
+      } else {
+        const span=document.createElement('span'); span.textContent=label; wrap.appendChild(span);
+      }
+      li.appendChild(n); li.appendChild(wrap);
+      srcList.appendChild(li);
+    });
+    sourcesWrap.style.display='block';
+  }
+
+  /* ---------- input lock ---------- */
+  function lockInput(lock){
+    explainBtn.disabled=lock;
+    explainBtn.classList.toggle('busy', lock);
+    conceptEl.disabled=lock;
+    conceptField.classList.toggle('disabled', lock);
+    $$('.chip', chipsBox).forEach(c=> c.disabled=lock);
+    $$('.chip', modesBox).forEach(c=> c.disabled=lock);
+    // Simple view controls (added) lock in step with the Full console.
+    if(svExplainBtn) svExplainBtn.disabled=lock;
+    if(svConcept) svConcept.disabled=lock;
+    if(svChipsBox) $$('.sv-chip', svChipsBox).forEach(c=> c.disabled=lock);
+  }
+
+  /* ---------- full reset ---------- */
+  function resetRun(){
+    running=false; activeStep=null; researching=false; researchStart=0;
+    findingCount=0; htmlChars=0; htmlBuffer=''; generatedOnce=false; terminated=false;
+    stepEls.forEach((el,i)=>{ el.dataset.state='idle'; $('.st-ms',el).textContent='\u2014'; });
+    $('[data-msg]',stepEls[0]).textContent='awaiting input'; $('[data-msg]',stepEls[0]).classList.add('empty');
+    for(let i=1;i<stepEls.length;i++){ const m=$('[data-msg]',stepEls[i]); m.textContent='queued'; m.classList.add('empty'); }
+    workersBox.innerHTML=''; workerList.length=0; workersByAngle.clear();
+    swarmBox.classList.remove('on'); swarmBadge.querySelector('.dot')&&(null);
+    swarmBadge.lastChild && (swarmBadge.lastChild.nodeType===3 ? swarmBadge.lastChild.textContent='3.7 Flash \u00D7N' : null);
+    swarmPill.textContent='PARALLEL';
+    planBrief.style.display='none'; pbKey.textContent=''; pbViz.textContent='';
+    findingsOl.innerHTML=''; findingsEmpty.style.display='';
+    srcList.innerHTML=''; sourcesWrap.style.display='none';
+    codePre.textContent=''; cvCount.textContent='0 chars';
+    instrumentFrame.removeAttribute('srcdoc'); instBytes.textContent='\u2014';
+    if(fvExplainBlock){ fvExplainBlock.hidden=true; } if(fvIntro){ fvIntro.textContent=''; }
+    metrics.style.display='none'; remixBtn.classList.remove('on');
+    e2eVal.innerHTML='\u2014'; e2eMeasured.textContent='measured on this run';
+    mWorkers.textContent=mGate.textContent=mSwarm.textContent=mSources.textContent='\u2014';
+    mPlanner.textContent=mUigen.textContent=mRepairs.textContent=mHtml.textContent='\u2014';
+    scanBar.classList.remove('on');
+    showStage('idle'); showTab('ui');
+    figStat.textContent='awaiting concept';
+    findTabCt.textContent='';
+    pipeStat.textContent='idle'; sessionClock.textContent='T+0.000s';
+  }
+
+  /* =====================================================================
+     SSE dispatch
+     ===================================================================== */
+  function onPhase(d){
+    const phase=d && d.phase;
+    if(!(phase in PHASE_STEP)) return;
+    const idx=PHASE_STEP[phase];
+    // finish the previously-running step (phases are sequential)
+    if(activeStep!==null && activeStep!==idx) finishStep(activeStep);
+    // leaving researching -> finalize workers
+    if(idx>2 && workerList.length) finalizeWorkers();
+    startStep(idx); activeStep=idx;
+    pipeStat.textContent=PHASE_LABEL[phase]||phase;
+    svPhase(phase);   // friendly Simple-view status line
+
+    if(phase==='gatekeeping'){ setMsg(0,'Validating concept scope\u2026'); figStat.textContent='routing'; }
+    else if(phase==='planning'){ setMsg(1,'Decomposing into research angles\u2026'); figStat.textContent='planning'; }
+    else if(phase==='researching'){
+      const n=(d.workers!=null)?d.workers:workerList.length;
+      researching=true; researchStart=performance.now();
+      workerList.forEach(w=>{ w.start=researchStart; });
+      setMsg(2, n+' 3.7 Flash workers dispatched in parallel\u2026');
+      swarmPill.textContent='PARALLEL \u00D7'+n;
+      if(swarmBadge.lastChild && swarmBadge.lastChild.nodeType===3) swarmBadge.lastChild.textContent='3.7 Flash \u00D7'+n;
+      figStat.textContent='researching';
+    }
+    else if(phase==='generating'){
+      const gm = uiModelFor(d.mode || selectedMode);
+      applyModeAware(d.mode || selectedMode);   // trust the backend's actual mode
+      setMsg(3, gm.writer + ' synthesizing findings + writing the instrument\u2026');
+      figStat.textContent='generating \u00B7 streaming';
+      showTab('code'); scanBar.classList.add('on');
+    }
+    else if(phase==='verifying'){ setMsg(4,'Static-checking the generated HTML\u2026'); figStat.textContent='verifying'; }
+  }
+
+  function onPlan(d){
+    if(!d) return;
+    if(d.key_interaction) lastPlanKey = d.key_interaction;   // Simple-view explanation fallback
+    const key=d.key_interaction||'', viz=d.viz_hint||'';
+    if(key||viz){ planBrief.style.display='block'; pbKey.textContent=key||'\u2014'; pbViz.textContent=viz||'\u2014'; renderMath(planBrief); }
+    const subs=Array.isArray(d.subtopics)?d.subtopics:[];
+    setMsg(1,'Plan ready \u00B7 '+subs.length+' research angle'+(subs.length===1?'':'s')+'.');
+    // build worker rows (running)
+    workersBox.innerHTML=''; workerList.length=0; workersByAngle.clear();
+    subs.forEach((s,i)=> buildWorker(i, (s&&s.angle)||('angle-'+i)));
+    if(workerList.length){ swarmBox.classList.add('on'); swarmPill.textContent='PARALLEL \u00D7'+workerList.length; }
+  }
+
+  function onFinding(d){
+    if(!d) return;
+    const w = workersByAngle.get(angleKey(d.angle));
+    if(w) completeWorker(w, toBullets(d.text));
+    addFinding(d.angle||'finding', d.text||'');
+  }
+
+  function onCitation(d){ if(d) renderSources(d.sources||[]); }
+
+  function onUiChunk(d){
+    if(!d || d.text==null) return;
+    // Code streams into the Code tab (already selected at 'generating'); don't yank
+    // the user back if they've navigated to another tab mid-generation.
+    const delta=String(d.text);
+    htmlBuffer += delta;
+    htmlChars += delta.length;
+    codePre.appendChild(document.createTextNode(delta));
+    cvCount.textContent = htmlChars.toLocaleString() + ' chars';
+    codePre.scrollTop = codePre.scrollHeight;
+  }
+
+  function onVerdict(d){
+    if(!d) return;
+    const errs=Array.isArray(d.errors)?d.errors:[];
+    if(d.ok) setMsg(4,'\u2713 static parse clean \u00B7 0 errors.');
+    else setMsg(4, errs.length+' issue'+(errs.length===1?'':'s')+' flagged \u2192 self-heal applied.');
+  }
+
+  function onMetrics(d){
+    if(!d) return;
+    metrics.style.display='block';
+    e2eVal.innerHTML = (Number(d.e2e_s).toFixed(1)) + '<small>s</small>';
+    const t=d.timings_s||{};
+    mWorkers.textContent = (d.workers!=null?d.workers:'\u2014') + ' \u00B7 parallel';
+    mGate.textContent   = fmtS(t.gatekeeper);
+    mSwarm.textContent  = fmtS(t.swarm);
+    mSources.textContent= (d.sources!=null?d.sources:'\u2014');
+    mPlanner.textContent= fmtS(t.planner);
+    mUigen.textContent  = fmtS(t.ui_gen);
+    mRepairs.textContent= (d.repairs!=null?d.repairs:'\u2014');
+    mHtml.textContent   = fmtChars(d.html_chars)+' chars';
+    if(d.html_chars!=null) instBytes.textContent = fmtChars(d.html_chars)+' chars';
+    e2eMeasured.textContent='measured on this run';
+    // authoritative per-stage timings override live estimates
+    if(t.gatekeeper!=null) setStepMs(0, t.gatekeeper);
+    if(t.planner!=null)    setStepMs(1, t.planner);
+    if(t.swarm!=null)      setStepMs(2, t.swarm);
+    if(t.ui_gen!=null)     setStepMs(3, t.ui_gen);
+    svApplyMade(d.mode || selectedMode, d.e2e_s);   // Simple: "Explained in Ns" + truthful builder
+  }
+
+  // Inject a tiny height reporter so the sandboxed (null-origin) iframe can tell us
+  // its content height via postMessage -> we grow the frame so it never inner-scrolls.
+  function withHeightReporter(html){
+    const reporter =
+      '<script>(function(){function ph(){try{var b=document.body,d=document.documentElement;'
+      + 'var h=Math.max(b?b.scrollHeight:0,b?b.offsetHeight:0,d.scrollHeight,d.offsetHeight);'
+      + 'parent.postMessage({__prism_h:h},"*");}catch(e){}}'
+      + 'window.addEventListener("load",ph);window.addEventListener("resize",ph);'
+      + 'if(window.ResizeObserver){try{new ResizeObserver(ph).observe(document.documentElement);}catch(e){}}'
+      + 'setTimeout(ph,200);setTimeout(ph,800);setTimeout(ph,2000);})();<\/script>';
+    return /<\/body>/i.test(html) ? html.replace(/<\/body>/i, reporter + '</body>') : html + reporter;
+  }
+  function renderInstrument(html){
+    if(!html) return;
+    generatedOnce=true;
+    scanBar.classList.remove('on');
+    instrumentFrame.style.height = '';  // reset; the posted content height will drive it
+    instrumentFrame.setAttribute('srcdoc', withHeightReporter(html));
+    instBytes.textContent = fmtChars(html.length)+' chars';
+    showStage('frame');
+    showTab('ui');
+    figStat.textContent='live';
+    // parity with Simple: surface the plain-English concept explanation in the Live UI
+    if(fvExplainBlock && fvIntro){
+      const ex = extractSpecString(html,'intro') || lastPlanKey || '';
+      if(ex){ fvIntro.textContent = ex; fvExplainBlock.hidden = false; }
+      else { fvIntro.textContent = ''; fvExplainBlock.hidden = true; }
+    }
+    svRenderInstrument(html);   // mirror into the Simple view (its own iframe + blurb)
+  }
+
+  function onUiDone(d){
+    const html = d && d.html;
+    renderInstrument(html || htmlBuffer);
+    // pipeline effectively complete
+    if(activeStep!==null) finishStep(activeStep);
+    activeStep=null;
+    pipeStat.textContent='done';
+    remixBtn.classList.add('on');
+  }
+
+  function onDeclined(d){
+    terminated=true;
+    const kind=(d&&d.kind)||'declined';
+    const message=(d&&d.message)||'This request was declined.';
+    const reason=(d&&d.reason)||'';
+    if(activeStep!==null){ stepEls[activeStep].dataset.state='err'; setMsg(activeStep, 'Declined \u00B7 '+kind); }
+    // mark remaining steps skipped
+    for(let i=(activeStep===null?0:activeStep+1);i<stepEls.length;i++){
+      if(stepEls[i].dataset.state==='idle'){ stepEls[i].dataset.state='skip'; }
+    }
+    scanBar.classList.remove('on');
+    stageMsgTag.textContent = kind==='unsafe' ? 'declined // unsafe' : 'out of scope';
+    stageMsg.classList.remove('err');
+    stageMsgBody.textContent = message;
+    stageMsgReason.textContent = reason ? ('reason: '+reason) : '';
+    showStage('msg');
+    showTab('ui');
+    figStat.textContent='declined';
+    pipeStat.textContent='declined';
+    svShowMsg(false, message, reason);   // mirror into the Simple view
+  }
+
+  function onError(d){
+    terminated=true;
+    const message=(d&&d.message)||'Something went wrong during generation.';
+    if(activeStep!==null){ stepEls[activeStep].dataset.state='err'; }
+    scanBar.classList.remove('on');
+    stageMsgTag.textContent='error';
+    stageMsg.classList.add('err');
+    stageMsgBody.textContent = message;
+    stageMsgReason.textContent='';
+    showStage('msg');
+    showTab('ui');
+    figStat.textContent='error';
+    pipeStat.textContent='error';
+    svShowMsg(true, message, '');   // mirror into the Simple view
+  }
+
+  function onEnd(){
+    running=false;
+    if(activeStep!==null){ finishStep(activeStep); activeStep=null; }
+    // fallback: generating happened but no authoritative ui_done arrived
+    if(!generatedOnce && !terminated && htmlBuffer.trim()){ renderInstrument(htmlBuffer); }
+    if(!terminated && pipeStat.textContent!=='done') pipeStat.textContent='done';
+    lockInput(false);
+  }
+
+  function dispatch(event, data){
+    switch(event){
+      case 'phase':    onPhase(data); break;
+      case 'plan':     onPlan(data); break;
+      case 'finding':  onFinding(data); break;
+      case 'citation': onCitation(data); break;
+      case 'ui_chunk': onUiChunk(data); break;
+      case 'verdict':  onVerdict(data); break;
+      case 'metrics':  onMetrics(data); break;
+      case 'ui_done':  onUiDone(data); break;
+      case 'declined': onDeclined(data); break;
+      case 'error':    onError(data); break;
+      case 'end':      onEnd(); break;
+      default: /* ignore unknown / ping */ break;
+    }
+  }
+
+  /* ---------- SSE frame parser (handles partial chunks & multi-event reads) ---------- */
+  function parseFrame(raw){
+    const block = raw.replace(/\r\n/g,'\n');
+    if(!block.trim()) return;
+    let event='message';
+    const dataLines=[];
+    for(const line of block.split('\n')){
+      if(!line || line[0]===':') continue;           // blank or comment (ping)
+      if(line.startsWith('event:')) event=line.slice(6).trim();
+      else if(line.startsWith('data:')) dataLines.push(line.slice(5).replace(/^ /,''));
+      // id:/retry:/other fields ignored
+    }
+    if(event==='message' && !dataLines.length) return;
+    let payload={};
+    const rawData=dataLines.join('\n');
+    if(rawData){ try{ payload=JSON.parse(rawData); }catch(e){ return; } }
+    dispatch(event, payload);
+  }
+
+  /* =====================================================================
+     Run the pipeline against the live backend
+     ===================================================================== */
+  async function run(concept){
+    if(running) return;
+    lastConcept=concept;
+    resetRun();
+    running=true; startAt=performance.now();
+    activeStep=null;
+    pipeStat.textContent='connecting';
+    figStat.textContent='connecting';
+    lockInput(true);
+    svRunStart(concept);   // put the Simple result area into its loading state
+
+    let resp;
+    try{
+      resp = await fetch('/api/prism', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Accept':'text/event-stream' },
+        body: JSON.stringify({ concept, mode: selectedMode })
+      });
+    }catch(e){
+      onError({ message:'Could not reach the Prism server ('+(e&&e.message||e)+'). Is it running?' });
+      onEnd(); return;
+    }
+
+    if(!resp.ok){
+      let m='Request failed ('+resp.status+').';
+      try{ const j=await resp.json(); if(j&&j.error) m=String(j.error); }catch(e){ /* ignore */ }
+      onError({ message:m }); onEnd(); return;
+    }
+    if(!resp.body){ onError({ message:'This browser did not return a readable stream body.' }); onEnd(); return; }
+
+    const reader = resp.body.getReader();
+    currentReader = reader;
+    const decoder = new TextDecoder('utf-8');
+    let buffer='';
+
+    try{
+      while(true){
+        const { done, value } = await reader.read();
+        if(done) break;
+        buffer += decoder.decode(value, { stream:true });
+        buffer = buffer.replace(/\r\n/g,'\n');   // normalize CRLF once
+        let sep;
+        // frames are separated by a blank line (\n\n)
+        while((sep = buffer.indexOf('\n\n')) >= 0){
+          const frame = buffer.slice(0, sep);
+          buffer = buffer.slice(sep + 2);
+          parseFrame(frame);
+        }
+      }
+      // flush trailing bytes + any final frame without trailing blank line
+      buffer += decoder.decode();
+      buffer = buffer.replace(/\r\n/g,'\n');
+      if(buffer.trim()) parseFrame(buffer);
+    }catch(e){
+      if(!terminated) onError({ message:'Stream interrupted: '+(e&&e.message||e) });
+    }finally{
+      currentReader=null;
+      onEnd();
+    }
+  }
+
+  function startFromInput(){
+    const concept=(conceptEl.value||'').trim();
+    if(!concept){ conceptEl.focus(); conceptField.classList.add('disabled'); setTimeout(()=>conceptField.classList.remove('disabled'),160); return; }
+    run(concept);
+  }
+
+  /* ---------- wire controls ---------- */
+  explainBtn.addEventListener('click', startFromInput);
+  conceptEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !running){ e.preventDefault(); startFromInput(); } });
+  $$('.chip', chipsBox).forEach(ch=> ch.addEventListener('click', ()=>{
+    if(running) return;
+    conceptEl.value = ch.getAttribute('data-concept');
+    conceptEl.focus();
+  }));
+  $$('.chip', modesBox).forEach(ch=> ch.addEventListener('click', ()=>{
+    if(running) return;
+    selectedMode = ch.getAttribute('data-mode');
+    $$('.chip', modesBox).forEach(m=>{
+      const on = m===ch;
+      m.classList.toggle('on', on);
+      m.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    applyModeAware(selectedMode);   // reflect the chosen model everywhere
+    svApplyMade(selectedMode);      // keep the Simple "how this was made" wording honest
+  }));
+  applyModeAware(selectedMode);     // initialize all mode-aware copy for the default
+  remixBtn.addEventListener('click', ()=>{ if(!running && lastConcept) run(lastConcept); });
+
+  /* ---------- Simple view wiring (added) ---------- */
+  setView(document.body.classList.contains('view-full') ? 'full' : 'simple');  // reflect boot choice
+  if(viewSimpleBtn) viewSimpleBtn.addEventListener('click', ()=> setView('simple'));
+  if(viewFullBtn)   viewFullBtn.addEventListener('click', ()=> setView('full'));
+  if(svExplainBtn)  svExplainBtn.addEventListener('click', (e)=>{ e.preventDefault(); svStartFromInput(); });
+  if(svAskForm)     svAskForm.addEventListener('submit', (e)=>{ e.preventDefault(); svStartFromInput(); });
+  if(svConcept)     svConcept.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !running){ e.preventDefault(); svStartFromInput(); } });
+  if(svChipsBox) $$('.sv-chip', svChipsBox).forEach(ch=> ch.addEventListener('click', ()=>{
+    if(running) return;
+    if(svConcept) svConcept.value = ch.textContent.trim();
+    $$('.sv-chip', svChipsBox).forEach(x=> x.setAttribute('aria-pressed', x===ch ? 'true':'false'));
+    if(svConcept) svConcept.focus();
+  }));
+  svApplyMade(selectedMode);        // initialize the Simple "how this was made" wording
+})();
+</script>
+</body>
+</html>

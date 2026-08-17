@@ -1,0 +1,30 @@
+# Keep the build context lean: ship only what serve.py + the porting pipeline
+# need at runtime (app/, frontend/, serve.py, pyproject.toml, uv.lock,
+# README.md, .env.example). Everything below is scratch, local-only, or dev.
+
+# Scratch workspace (cloned source repos + generated ports) — recreated at runtime.
+workspace/
+
+# Local virtualenv + build caches.
+.venv/
+__pycache__/
+**/__pycache__/
+
+# VCS metadata.
+.git/
+
+# Local demo state / logs.
+.rosetta-ports
+*.log
+
+# Docs, tests, dev-only scripts, prototypes — not needed in the image.
+docs/
+tests/
+scripts/run_*.py
+prototypes/
+
+# Secrets: exclude the real .env; the image bakes only .env.example.
+.env
+
+# Screenshots / captured images.
+*.png

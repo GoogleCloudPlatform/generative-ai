@@ -93,6 +93,7 @@
 ^\Qgemini/agent-engine/tutorial_google_maps_agent.ipynb\E$
 ^\Qgemini/sample-apps/image-bash-jam/images/.keep\E$
 ^\Qgemini/sample-apps/image-bash-jam/README.md\E$
+^\Qgemini/sample-apps/rosetta-agent-porter/frontend/index.html\E$
 ^\Qgemini/sample-apps/photo-discovery/app/linux/CMakeLists.txt\E$
 ^\Qgemini/sample-apps/photo-discovery/app/windows/CMakeLists.txt\E$
 ^\Qgemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions/src/sql/provision_text_sample_table.sql\E$
@@ -116,3 +117,5 @@ py\.typed$
 ^\Qaudio/speech/use-cases/storytelling/macbeth_the_sitcom.json\E$
 .ruff.toml
 ^\Q.gemini/styleguide.md\E$
+^\Qgemini/sample-apps/prism-science-explainer/app/shell.html\E$
+^\Qgemini/sample-apps/prism-science-explainer/frontend/index.html\E$

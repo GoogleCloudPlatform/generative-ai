@@ -1731,7 +1731,22 @@ limitations under the License.
                 <option value="Nederlands">Nederlands</option>
                 <option value="Svenska">Svenska</option>
                 <option value="Suomi">Suomi</option>
+                <option value="Polski">Polski</option>
+                <option value="T&uuml;rk&ccedil;e">T&uuml;rk&ccedil;e</option>
+                <option value="العربية">العربية</option>
+                <option value="हिन्दी">हिन्दी</option>
+                <option value="ไทย">ไทย</option>
+                <option value="Tiếng Việt">Tiếng Việt</option>
+                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                <option value="Bahasa Melayu">Bahasa Melayu</option>
+                <option value="Filipino">Filipino</option>
+                <option value="__custom__">Other language...</option>
               </select>
+              <input id="researchCustomLang" type="text" maxlength="40" spellcheck="false"
+                placeholder="Type a language" title="Research output language, typed in yourself"
+                onchange="saveResearchLang()"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();saveResearchLang();researchDomain();}"
+                class="hidden w-32 bg-gray-900/60 border border-violet-500/30 rounded-xl px-3 py-2.5 text-xs text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all" />
               <button id="researchBtn" onclick="researchDomain()"
                 class="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-2 uppercase tracking-wider shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
                 <svg id="researchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -1902,7 +1917,22 @@ limitations under the License.
                     <option value="nl">Nederlands</option>
                     <option value="sv">Svenska</option>
                     <option value="fi">Suomi</option>
+                    <option value="pl">Polski</option>
+                    <option value="tr">T&uuml;rk&ccedil;e</option>
+                    <option value="ar">العربية</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="th">ไทย</option>
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="id">Bahasa Indonesia</option>
+                    <option value="ms">Bahasa Melayu</option>
+                    <option value="tl">Filipino</option>
+                    <option value="__custom__">Other language...</option>
                   </select>
+                  <input id="customLangInput" type="text" maxlength="40" spellcheck="false"
+                    placeholder="Type a language" title="Type any language, then press Enter"
+                    onkeydown="if (event.key === 'Enter') { event.preventDefault(); applyCustomTemplateLang(); }"
+                    onblur="applyCustomTemplateLang()"
+                    class="hidden w-28 bg-black/30 border border-white/10 rounded-md text-[9px] outline-none text-sky-300 placeholder-gray-600 font-bold px-1.5 py-0.5 focus:border-sky-500/50 transition-colors" />
                 </div>
               </div>
 
@@ -2151,7 +2181,7 @@ limitations under the License.
             </div>
             <div class="flex items-center gap-2 text-[10px] text-gray-400">
               <span>Model:</span>
-              <span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 font-mono text-sky-400 font-semibold"><?= typeof generatorModel !== 'undefined' ? generatorModel : 'gemini-3.5-flash' ?></span>
+              <span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 font-mono text-sky-400 font-semibold"><?= typeof generatorModel !== 'undefined' ? generatorModel : 'gemini-3.7-flash' ?></span>
             </div>
           </div>
 
@@ -2762,7 +2792,7 @@ limitations under the License.
   <div id="toast">Copied to clipboard!</div>
 
   <script>
-    const GENERATOR_MODEL = '<?= typeof generatorModel !== "undefined" ? generatorModel : "gemini-3.5-flash" ?>';
+    const GENERATOR_MODEL = '<?= typeof generatorModel !== "undefined" ? generatorModel : "gemini-3.7-flash" ?>';
     const CURRENT_USER_EMAIL = '<?= typeof userEmail !== "undefined" ? userEmail : "" ?>';
     
     function formatModelName(modelId) {
@@ -2884,23 +2914,72 @@ limitations under the License.
     // 'auto' lets the server-side model detect the company's primary business
     // language from grounded search results; any other value is passed through
     // as an explicit override.
+    // The selector's list bounds what auto-detect may answer with, not what a
+    // user may ask for: 'Other language...' reveals a free-text box and the
+    // typed name travels as 'custom:<name>', the same form the Template Hub
+    // uses (sanitized server-side by sanitizeCustomLanguage_).
     var RESEARCH_LANG_KEY = 'ge_research_lang';
+    var RESEARCH_CUSTOM_LANG_KEY = 'ge_research_lang_custom';
+
+    function researchCustomLangValue() {
+      var box = document.getElementById('researchCustomLang');
+      return box ? box.value.replace(/\s+/g, ' ').trim().substring(0, 40) : '';
+    }
+
     function getResearchLangOverride() {
       var sel = document.getElementById('researchLangSelector');
       if (!sel || sel.value === 'auto') return null;
+      if (sel.value === '__custom__') {
+        // An empty box is not an override - it falls back to auto-detect.
+        var typed = researchCustomLangValue();
+        return typed ? 'custom:' + typed : null;
+      }
       return sel.value;
     }
+
+    // Doubles as the selector's onchange: shows or hides the free-text box.
     function saveResearchLang() {
       var sel = document.getElementById('researchLangSelector');
-      if (sel) { try { localStorage.setItem(RESEARCH_LANG_KEY, sel.value); } catch (e) {} }
+      if (!sel) return;
+      var box = document.getElementById('researchCustomLang');
+      if (box) {
+        if (sel.value === '__custom__') {
+          var wasHidden = box.classList.contains('hidden');
+          box.classList.remove('hidden');
+          if (wasHidden) box.focus();
+        } else {
+          box.classList.add('hidden');
+          box.value = '';
+        }
+      }
+      try {
+        localStorage.setItem(RESEARCH_LANG_KEY, sel.value);
+        localStorage.setItem(RESEARCH_CUSTOM_LANG_KEY, researchCustomLangValue());
+      } catch (e) {}
     }
+
     function restoreResearchLang() {
-      var saved = null;
-      try { saved = localStorage.getItem(RESEARCH_LANG_KEY); } catch (e) {}
+      var saved = null, savedCustom = '';
+      try {
+        saved = localStorage.getItem(RESEARCH_LANG_KEY);
+        savedCustom = localStorage.getItem(RESEARCH_CUSTOM_LANG_KEY) || '';
+      } catch (e) {}
       if (!saved) return;
       var sel = document.getElementById('researchLangSelector');
-      // Unknown stored values are a no-op: the select stays on Auto.
-      if (sel) sel.value = saved;
+      if (!sel) return;
+      // Assigning a value no option carries blanks the select, so a language
+      // dropped in a later version has to leave the selector on Auto.
+      var known = false;
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === saved) { known = true; break; }
+      }
+      if (!known) return;
+      sel.value = saved;
+      var box = document.getElementById('researchCustomLang');
+      if (box && saved === '__custom__') {
+        box.value = savedCustom;
+        box.classList.remove('hidden');
+      }
     }
 
     function researchDomain() {
@@ -3076,8 +3155,10 @@ limitations under the License.
         var r = getResearchLangOverride() || cachedResearchData.detectedLanguage;
         if (r) return r;
       }
-      var sel = document.getElementById('langSelector');
-      return (sel && sel.value) || 'en';
+      // Not the selector's raw value: for a typed language that is the
+      // '__custom__' sentinel, while currentTemplateLang carries the
+      // 'custom:<name>' form the backend understands.
+      return currentTemplateLang || 'en';
     }
 
     function optimizeGoalWithMagicWand() {
@@ -4191,6 +4272,10 @@ limitations under the License.
     // English is the only authored dataset. Other languages are translated on
     // demand by the backend (translateTemplates) and cached per session, so
     // non-ASCII translations never live in this inline JS (GAS minifier).
+    // Because nothing but the model does the translating, the selector's list
+    // is a short list rather than a limit: 'Other language...' opens a free-text
+    // box and the typed name travels as 'custom:<name>' (sanitized backend-side
+    // by sanitizeCustomLanguage_ before it reaches a prompt).
     var currentTemplateLang = 'en';
     var templateHubCache = {
       en: {
@@ -4215,9 +4300,45 @@ limitations under the License.
       return { prefix: head + ' ', text: label.substring(idx + 1) };
     }
 
+    // hasOwnProperty, not templateHubCache[lang]: a typed language of
+    // 'constructor' or 'toString' would otherwise hit Object.prototype and
+    // render as a function.
+    function cachedTemplateHub(lang) {
+      return Object.prototype.hasOwnProperty.call(templateHubCache, lang) ? templateHubCache[lang] : null;
+    }
+
+    // Called by the selector. Codes load straight away; the '__custom__'
+    // sentinel just reveals the free-text box and waits for a language.
     function setTemplateLang(lang) {
+      var input = document.getElementById('customLangInput');
+      if (lang === '__custom__') {
+        if (input) {
+          input.classList.remove('hidden');
+          input.focus();
+          input.select();
+        }
+        return;
+      }
+      if (input) { input.classList.add('hidden'); input.value = ''; }
+      loadTemplateLang(lang);
+    }
+
+    // Applies whatever was typed into the free-text language box. Fires on both
+    // Enter and blur, so repeating with an unchanged value must be a no-op.
+    function applyCustomTemplateLang() {
+      var input = document.getElementById('customLangInput');
+      if (!input || input.classList.contains('hidden')) return;
+      var name = input.value.replace(/\s+/g, ' ').trim().substring(0, 40);
+      if (!name) return;
+      input.value = name;
+      var lang = 'custom:' + name;
+      if (lang === currentTemplateLang) return;
+      loadTemplateLang(lang);
+    }
+
+    function loadTemplateLang(lang) {
       currentTemplateLang = lang;
-      if (templateHubCache[lang]) { updateSamples(); return; }
+      if (cachedTemplateHub(lang)) { updateSamples(); return; }
       var reqId = ++templateLangRequest;
       var grid = document.getElementById('templateGrid');
       if (grid) grid.innerHTML = '<div class="col-span-full flex items-center justify-center gap-2 py-10 text-gray-400 text-xs"><div class="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div><span>Translating templates...</span></div>';
@@ -4248,7 +4369,9 @@ limitations under the License.
             };
           } else {
             templateHubCache[lang] = base;
-            showToast('Translation unavailable; showing English.');
+            showToast(res && res.error === 'Unrecognized language'
+              ? 'That does not look like a language; showing English.'
+              : 'Translation unavailable; showing English.');
           }
           updateSamples();
         })
@@ -4262,7 +4385,7 @@ limitations under the License.
     }
 
     function updateSamples() {
-      var hub = templateHubCache[currentTemplateLang] || templateHubCache.en;
+      var hub = cachedTemplateHub(currentTemplateLang) || templateHubCache.en;
       const industryContainer = document.getElementById('industryFilters');
       const functionContainer = document.getElementById('jobFunctionFilters');
       const templateGrid = document.getElementById('templateGrid');
