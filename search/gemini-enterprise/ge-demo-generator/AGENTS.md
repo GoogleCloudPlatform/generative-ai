@@ -109,9 +109,39 @@ or the research language while research is in play — so `getOptimizeLanguage()
 passes it in `capabilityOpts.language` and the prompt states it once,
 positively: `**OUTPUT LANGUAGE (MANDATORY)**: Write the entire output in
 <Language>.` English then held in 8 of 8 runs.
-`resolveOutputLanguage_()` accepts both vocabularies the UI has to hand
-(Template Hub codes like `en`, research names like `Deutsch`) and returns `''`
-for anything else, which leaves the caller on a detection-only fallback.
+`resolveOutputLanguage_()` accepts every vocabulary the UI has to hand
+(Template Hub codes like `en`, research names like `Deutsch`, and since v11.58
+`custom:<name>` for a language the user typed into a free-text box) and returns
+`''` for anything else, which leaves the caller on a detection-only fallback.
+
+**Free-text languages (v11.58, both selectors in v11.59).** Nothing but the
+model does the translating, so a selector's list is a short list, not a limit —
+`Other language...` reveals an input and the typed name travels as
+`custom:<name>`. The list is only there to save typing, which is why the entries
+added in v11.58 (Malay, Indonesian, Thai, Vietnamese, Filipino, Hindi, Arabic,
+Turkish, Polish) are a convenience rather than a capability change. The Template
+Hub got this first; v11.59 gave the customer-domain research selector the same
+list and the same free-text box, so `SUPPORTED_RESEARCH_LANGS_` now bounds only
+what **auto-detect** may answer with. Three rules hold the free-text path
+together:
+
+- **Sanitize before the prompt, not after.** `sanitizeCustomLanguage_()` strips
+  quoting/markup characters and rejects anything over 40 characters or 4 words:
+  a language name is a couple of words, so a sentence arriving in that box is
+  far likelier to be an injection attempt than a language. A rejected value
+  returns `{success: false, error: 'Unrecognized language'}` so the UI can say
+  so, rather than silently rendering English.
+- **Look languages up with `hasOwnProperty`.** `TEMPLATE_LANGS_['constructor']`
+  is a function, and a truthiness check would have stringified it straight into
+  the prompt. The frontend's per-language cache has the same hazard and the same
+  fix (`cachedTemplateHub()`).
+- **A language that cannot round-trip is a language that gets lost.**
+  `researchCompanyByDomain` returns `detectedLanguage` for the Magic Wand and
+  `regenerateGoalForWorkflows` to reuse, so an unlisted answer (a typed
+  override, or auto-detect replying `Norsk`) comes back as `custom:Norsk`.
+  Returned bare, it resolves to `''` two calls later and the scenario quietly
+  reverts to text detection — the failure shows up as an English optimize on a
+  Thai research result, nowhere near the code that caused it.
 
 Two things worth keeping in mind if you touch this:
 
@@ -959,3 +989,34 @@ verbatim. `find /.agent/skills -name SKILL.md` fails; `ls .agent/skills` from
 `/workspace/.agent/skills` and adds a "list it relative first, and build anyway
 if there are none" hedge. Leave the env spec `target` alone — the platform
 interprets it.
+
+---
+
+## 12. The domain-research 429 is a shared bucket, not a bug (v11.59)
+
+Symptom: **Research failed: AI Search Error: { "error": { "code": 429,
+"message": "Unable to submit request because you've reached the maximum number
+of requests with search as tool you can make per day. Remove Google search tool
+from"** — truncated mid-sentence, and reproducible on every retry.
+
+Two grounded call sites can produce it, both sending `tools:
+[{googleSearch:{}}]`: `researchCompanyByDomain()` and
+`callVertexAIWithSearch()` (BigQuery public-dataset discovery).
+
+**The cap is per project per day, not per user and not per token spend.** So on
+a project shared by a team, a builder who has made zero requests all day can be
+locked out by everyone else's traffic, and it comes back on its own at the
+midnight US/Pacific reset. Verified 2026-08-17: the identical request (same
+model, same `googleSearch` tool, same body) returned HTTP 200 against a
+dedicated project while a shared one was 429ing, which rules out the request
+shape, the model, and the code. The daily search cap is **not** visible in
+`gcloud alpha services quota list` — the 373 `aiplatform.googleapis.com` quota
+entries contain no per-day search metric — so do not go looking for a Cloud
+Quotas override to raise. The lever is the `PROJECT_ID` Script Property.
+
+The code lesson is about the error, not the quota: `describeVertexError_()` now
+names the project, the reset, and the shared-bucket mechanic, and logs the full
+body instead of `substring(0, 200)`. **A truncated upstream error reads as a bug
+in your own app.** The old message cut off at "Remove Google search tool from",
+which is advice this app cannot take — ungrounded research would invent the
+company facts the feature exists to ground.
