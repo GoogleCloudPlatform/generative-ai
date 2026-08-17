@@ -33,6 +33,7 @@
 /generative-ai/gemini/sample-apps/finance-advisor-spanner/                                                                       @GoogleCloudPlatform/generative-ai-devrel @anirbanbagchi1979
 /generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                                                                      @GoogleCloudPlatform/generative-ai-devrel @willisc7
 /generative-ai/gemini/sample-apps/genwealth/                                                                                     @GoogleCloudPlatform/generative-ai-devrel @paulramsey
+/generative-ai/gemini/sample-apps/rosetta-agent-porter                                                            @GoogleCloudPlatform/generative-ai-devrel @lavinigam-gcp
 /generative-ai/gemini/sample-apps/photo-discovery                                                                                @GoogleCloudPlatform/generative-ai-devrel @KhanhNwin @kazunori279
 /generative-ai/gemini/tuning/gemini_supervised_finetuning_text_classification.ipynb                                              @GoogleCloudPlatform/generative-ai-devrel @eliasecchig @gabrielahrlr
 /generative-ai/gemini/tuning/supervised_finetuning_using_gemini.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @dmoonat
@@ -79,3 +80,4 @@
 /generative-ai/gemini/sample-apps/gemini-live-telephony-app                                                                      @GoogleCloudPlatform/generative-ai-devrel @KVishnuVardhanR
 /generative-ai/search/auto-rag-eval                                                                                              @tanyagoogle
 /generative-ai/agents/personalized-agent-swarms                                                                  @GoogleCloudPlatform/generative-ai-devrel @tanyagoogle @PouyaOmran @soujanyav @olifei
+/generative-ai/gemini/sample-apps/prism-science-explainer                                                                        @GoogleCloudPlatform/generative-ai-devrel @lavinigam-gcp

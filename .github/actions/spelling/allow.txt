@@ -10,6 +10,7 @@ achat
 Achird
 acked
 acking
+acli
 AClient
 acomplete
 acs
@@ -29,6 +30,7 @@ Afshaan
 AFX
 agains
 agentcard
+agentchat
 agentic
 agg
 AGG
@@ -122,6 +124,8 @@ autoflake
 autogen
 automerge
 automl
+autoplays
+AUTOPLAYS
 autoptr
 autopush
 autorater
@@ -178,6 +182,7 @@ BIKBEAR
 bikeshare
 Bikeshare
 biloba
+bitbucket
 BITCODE
 bitcoin
 Bitcoin
@@ -211,6 +216,7 @@ Broadoak
 Brusdar
 Brynner
 bshot
+bstep
 BTitle
 btn
 Btn
@@ -251,6 +257,7 @@ cce
 cctv
 CDIP
 cdiv
+cdn
 CDNs
 ceb
 Ceccotti
@@ -339,6 +346,7 @@ cpg
 Creuset
 crewai
 CRF
+CRISPR
 cristo
 crm
 CRM
@@ -370,7 +378,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 DALL
 Daniil
 Darabont
@@ -436,12 +443,14 @@ doi
 DOIs
 Donen
 Doogler
+D'orsay
 dotprompt
 Downscale
 dpf
 dpi
 dpo
 DPO
+DPR
 DQN
 draig
 Dreesen
@@ -542,6 +551,7 @@ etype
 euchlora
 eula
 eur
+evalgen
 evals
 evalset
 Evalset
@@ -681,6 +691,7 @@ getconn
 getdata
 getexif
 getparent
+getpgid
 getpid
 geval
 GFD
@@ -805,6 +816,7 @@ historien
 histplot
 HITL
 Hlc
+hline
 Hmmm
 HMO
 hnsw
@@ -906,8 +918,8 @@ ixed
 izakaya
 ize
 ized
-J'aime
 jaccard
+J'aime
 JAISH
 Jaival
 japonicum
@@ -957,6 +969,7 @@ Kalamang
 kamada
 Kamradt
 Kanagawa
+katex
 Katsura
 Kaufmanns
 Kawagoe
@@ -979,6 +992,7 @@ kfp
 Khanh
 khz
 kickstart
+killpg
 Kipchoge
 Kleiser
 kmeans
@@ -1003,8 +1017,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1017,6 +1029,7 @@ langgraph
 Laomedeia
 lastb
 latte
+L'avenir
 lbl
 LCEL
 LEBRON
@@ -1030,6 +1043,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 lic
 linalg
@@ -1071,6 +1085,7 @@ lro
 LROs
 lru
 lsb
+lsof
 LSTATUS
 LSTM
 LSum
@@ -1096,6 +1111,7 @@ mahut
 mai
 Makemake
 makeover
+malware
 Malware
 Mamah
 Mandiri
@@ -1107,12 +1123,14 @@ marp
 Masaru
 maskmode
 mathbf
+mathlib
 mathvista
 mavenrc
 maxcold
 Mbappe
 mbp
 mbsdk
+mcfg
 mcmaster
 mcp
 MCP
@@ -1265,6 +1283,7 @@ ngrams
 NGRAMS
 NHK
 NICOLAS
+Nigam
 nih
 Nihonga
 Niitsuma
@@ -1312,6 +1331,7 @@ oai
 objc
 ocr
 ODb
+odr
 oglevel
 Ohashi
 ohlcv
@@ -1409,6 +1429,7 @@ pevt
 pfas
 pgadmin
 PGHOST
+pgid
 PGPORT
 PGUSER
 pgvector
@@ -1456,6 +1477,7 @@ Ponyo
 Popken
 popleft
 Porat
+PORTFILE
 postictal
 powerups
 PPO
@@ -1487,6 +1509,7 @@ Puram
 putalpha
 putdata
 pvc
+PWNED
 pyautogen
 pyav
 pybind
@@ -1606,6 +1629,8 @@ Robotica
 rooney
 ROOTSPAN
 Rosberg
+rosetta
+ROSETTA
 ROUVs
 rpet
 rrf
@@ -1615,6 +1640,7 @@ rsi
 RSI
 rslora
 rsp
+rst
 rstarted
 RTN
 rubra
@@ -2015,6 +2041,7 @@ Virat
 viridis
 Viru
 Visualise
+vline
 vllm
 VLM
 VLMs
