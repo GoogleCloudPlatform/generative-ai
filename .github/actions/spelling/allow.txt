@@ -1287,6 +1287,7 @@ Nigam
 nih
 Nihonga
 Niitsuma
+nimport
 nin
 Nith
 NLG
@@ -1470,6 +1471,7 @@ podfile
 podhelper
 podman
 Poirot
+polong
 Polong
 polski
 ponyo
@@ -1886,6 +1888,7 @@ THT
 THTH
 Tianli
 Tianxiang
+Tianyang
 ticktext
 tickvals
 tiebreak
@@ -1901,6 +1904,7 @@ TLDs
 tobytes
 Tojiro
 tok
+tokeninfo
 TOKENLIST
 tomate
 tomentosa
@@ -1994,6 +1998,7 @@ useast
 usebackq
 usecases
 USERDATA
+userinfo
 username
 usernames
 USK
