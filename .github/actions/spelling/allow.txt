@@ -1471,8 +1471,8 @@ podfile
 podhelper
 podman
 Poirot
-Polong
 polong
+Polong
 polski
 ponyo
 Ponyo
