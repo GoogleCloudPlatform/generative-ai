@@ -25,7 +25,7 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - **Google Workspace MCP**: Optional integration with Gmail, Drive, Calendar, and People MCP servers via OAuth token passthrough.
 - **Managed Autonomous Agent (Antigravity)**: Optionally provisions a Pre-GA **Managed Agents API** agent (Antigravity harness) the demo agent can delegate long-horizon autonomous tasks to — live web research, code execution in a cloud sandbox, and professional deliverables (presentation decks, documents, PDFs, and web reports) crafted with mounted **SKILL.md** packs, with live progress streamed into the chat. Enabled by default; provisioning adds ~10 minutes (hidden behind the rest of the setup) and requires only the Vertex AI Agent Platform API — no allowlist.
 - **Workspace Authorization (No MCP)**: A lightweight alternative to Workspace MCP that adds Google sign-in for the demo user without any Developer-Preview allowlist. Combined with the Managed Agent, deliverables are saved to the user's Drive as native Google Slides / Docs / Sheets, and the autonomous agent acts on Gmail / Chat / Calendar via the open-source [Workspace CLI (gws)](https://github.com/googleworkspace/cli) inside its sandbox.
-- **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain.
+- **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain. The output language is detected from the company itself, or you can pick one from the selector next to the domain box; **Other language...** takes any language you type.
 - **Target Persona Selector**: Pick the demo's primary user (or describe a custom role) in the wizard — the selected persona becomes the protagonist of the generated scenario, demo guide, and agent instruction, keeping every step framed around that role's real workflow.
 - **Cross-Department Scenario Fabric**: Generated demos model realistic organizational hand-offs — records carry `current_department` / `next_department` fields plus an append-only audit-trail history, the agent narrates department-boundary transitions, and the Data Viewer surfaces the process stage as a badge. Quantitative grounding derived from domain research keeps the synthetic numbers business-plausible, and a coverage self-check warns when the demo guide fails to showcase a requested capability. Disable everything at once with the `DISABLE_CROSSORG_PACK` Script Property.
 - **Model Transparency**: Real-time model name announcement in the streaming response accordion for runtime visibility.
@@ -487,6 +487,11 @@ If every message comes back with the Gemini Enterprise authorization card, you c
 - **Detection**: The setup script now probes the token endpoint with a throwaway code before wiring the credentials into Gemini Enterprise. `invalid_grant` means the credentials are good (only the fake code was rejected); `invalid_client` means the secret is stale.
 - **Fix**: Add a **new secret to the existing OAuth client** (the `client_id` and redirect URI stay valid) at `https://console.cloud.google.com/auth/clients`, then re-run the setup script — it prompts for the new secret, verifies it, stores it as a new Secret Manager version, and refreshes the authorization resource.
  
+#### 8. "Research failed" with a 429 About Search as a Tool
+If Customer Domain Research fails with `code: 429` and a message about "the maximum number of requests with search as tool you can make per day":
+- **Cause**: the daily Google Search grounding cap is enforced **per project, per day**. On a project shared with other people, your own request count is irrelevant — the bucket is drained collectively, and it refills at midnight US/Pacific.
+- **Fix**: point the `PROJECT_ID` Script Property at a project with its own quota, or wait for the reset. There is no Cloud Quotas entry for this limit to raise. The scenario box still works by hand in the meantime; research is not required to build a demo.
+ 
 ---
  
 ### 13.3 Cleanup
@@ -537,7 +542,7 @@ The system is divided into two main parts: the **Generator Dashboard** (the Apps
 A Tailwind-based Single Page Application (~388 KB, ~7,000 lines) that provides:
 
 - **Demo Wizard**: Step-by-step UI to input business requirements, configure options (row count, table count, public dataset enrichment), and generate the demo.
-- **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain.
+- **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain. The output language is detected from the company itself, or you can pick one from the selector next to the domain box; **Other language...** takes any language you type.
 - **Data Preview**: Inline data tables and ER diagrams for the generated datasets.
 - **Premium Live Synthesis Progress Dashboard**: Displays a high-fidelity interactive Google Cloud target architecture blueprint SVG during synthesis. It shows the active pulsing/success glowing states across BigQuery, Gemini Agent, and Cloud Run nodes with flowing SVG stream lines. Includes a context-sensitive animated **Dynamic Tips Carousel** rotating every 12 seconds, a real-time **Elapsed Timer**, and an **Automatic Retry Mechanism** (up to 2 retries) for robust Apps Script code generation and parsing recovery. Exposes active model name (`generatorModel`) for transparency.
 - **Setup Script Export**: One-click copy of the generated bash setup script for Cloud Shell.

@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.57-public',
+  APP_VERSION: 'v11.59-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -5990,23 +5990,53 @@ ${params.importedMcpList.map((mcp, idx) => {
  * @param {Object|null} persona - { id, label, description, custom? } or null
  * @returns {string} Sanitized description text, or '' when absent
  */
-// Languages offered by the research language selector in the UI. Exact
-// membership check doubles as sanitization: only these strings are ever
-// interpolated into prompts.
-const SUPPORTED_RESEARCH_LANGS_ = ['日本語', 'English', 'Deutsch', 'Français', 'Español', 'Italiano', '中文', '한국어', 'Português', 'Русский', 'Nederlands', 'Svenska', 'Suomi'];
+// Languages offered by the research language selector in the UI, in the native
+// names the selector and the model both use. Exact membership check doubles as
+// sanitization: only these strings are ever interpolated into prompts. Anything
+// the user types instead arrives as 'custom:<name>' and goes through
+// sanitizeCustomLanguage_(), so this list bounds the auto-detect vocabulary
+// rather than what a user can ask for.
+const SUPPORTED_RESEARCH_LANGS_ = ['日本語', 'English', 'Deutsch', 'Français', 'Español', 'Italiano', '中文', '한국어', 'Português', 'Русский', 'Nederlands', 'Svenska', 'Suomi', 'Polski', 'Türkçe', 'العربية', 'हिन्दी', 'ไทย', 'Tiếng Việt', 'Bahasa Indonesia', 'Bahasa Melayu', 'Filipino'];
 
 // Template Hub language codes -> the English name used when instructing a model.
 // Shared by translateTemplates() and the Magic Wand optimizer.
 const TEMPLATE_LANGS_ = {
   en: 'English', ja: 'Japanese', de: 'German', fr: 'French', es: 'Spanish',
   it: 'Italian', zh: 'Simplified Chinese', ko: 'Korean', pt: 'Portuguese',
-  ru: 'Russian', nl: 'Dutch', sv: 'Swedish', fi: 'Finnish'
+  ru: 'Russian', nl: 'Dutch', sv: 'Swedish', fi: 'Finnish',
+  ms: 'Malay', id: 'Indonesian', th: 'Thai', vi: 'Vietnamese',
+  tl: 'Filipino (Tagalog)', hi: 'Hindi', ar: 'Arabic', tr: 'Turkish',
+  pl: 'Polish'
 };
+
+// The Template Hub selector also offers a free-text box, so the fixed list
+// above is a convenience rather than a boundary. Free-text values arrive
+// prefixed, e.g. 'custom:Bahasa Melayu', and are sanitized before they reach a
+// prompt - the prefix is what keeps "is this a code or user input?" explicit.
+const CUSTOM_LANG_PREFIX_ = 'custom:';
+
+/**
+ * Sanitizes a user-typed language name into something safe to interpolate
+ * into a prompt. A language name is a couple of words: anything longer, or
+ * carrying quoting/markup characters, is far more likely to be a prompt
+ * injection attempt than a language, so it is rejected outright.
+ * @param {string} raw
+ * @returns {string} A short language name, or '' when it does not look like one.
+ */
+function sanitizeCustomLanguage_(raw) {
+  if (typeof raw !== 'string') return '';
+  const stripRe = new RegExp('[' + String.fromCharCode(96) + '{}\\[\\]<>"\'|\\\\/*#\\r\\n\\t]', 'g');
+  const t = raw.replace(stripRe, ' ').replace(/\s+/g, ' ').trim();
+  if (t.length < 2 || t.length > 40) return '';
+  if (t.split(' ').length > 4) return '';
+  return t;
+}
 
 /**
  * Normalizes whichever language identifier the frontend had to hand.
- * The Template Hub selector emits codes ('en'); the research selector and
- * researchCompanyByDomain's detectedLanguage emit native names ('Deutsch').
+ * The Template Hub selector emits codes ('en') or 'custom:<name>' for a
+ * free-text language; the research selector and researchCompanyByDomain's
+ * detectedLanguage emit native names ('Deutsch').
  * Returns '' for anything unrecognized, which leaves the caller on its
  * detect-from-the-input fallback.
  * @param {string} lang
@@ -6016,7 +6046,12 @@ function resolveOutputLanguage_(lang) {
   if (typeof lang !== 'string') return '';
   const t = lang.trim();
   if (!t) return '';
-  if (TEMPLATE_LANGS_[t]) return TEMPLATE_LANGS_[t];
+  if (t.indexOf(CUSTOM_LANG_PREFIX_) === 0) {
+    return sanitizeCustomLanguage_(t.substring(CUSTOM_LANG_PREFIX_.length));
+  }
+  // hasOwnProperty, not a truthiness check: a code of 'constructor' would
+  // otherwise resolve to a function and get stringified into the prompt.
+  if (Object.prototype.hasOwnProperty.call(TEMPLATE_LANGS_, t)) return TEMPLATE_LANGS_[t];
   if (SUPPORTED_RESEARCH_LANGS_.indexOf(t) !== -1) return t;
   return '';
 }
@@ -6044,8 +6079,10 @@ function researchCompanyByDomain(domain, persona, langOverride) {
   domain = domain.trim().toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/.*$/, '');
 
   // Optional manual override from the UI language selector ('Auto' sends null).
-  const overrideLang = (typeof langOverride === 'string' && SUPPORTED_RESEARCH_LANGS_.indexOf(langOverride.trim()) !== -1)
-    ? langOverride.trim() : null;
+  // resolveOutputLanguage_ accepts the selector's native names and the
+  // 'custom:<name>' form its free-text box emits, and returns '' for anything
+  // that fails sanitization - which lands us back on auto-detect.
+  const overrideLang = resolveOutputLanguage_(langOverride) || null;
 
   // TLD map is no longer the decision mechanism (a Japanese company on a .com
   // domain used to get English). It only seeds the fallback used when the
@@ -6056,6 +6093,14 @@ function researchCompanyByDomain(domain, persona, langOverride) {
     '.de': 'Deutsch', '.fr': 'Français', '.es': 'Español', '.it': 'Italiano',
     '.cn': '中文', '.tw': '中文', '.kr': '한국어', '.br': 'Português',
     '.ru': 'Русский', '.nl': 'Nederlands', '.se': 'Svenska', '.fi': 'Suomi',
+    '.pl': 'Polski', '.tr': 'Türkçe', '.com.tr': 'Türkçe',
+    '.sa': 'العربية', '.ae': 'العربية', '.eg': 'العربية',
+    '.th': 'ไทย', '.co.th': 'ไทย', '.vn': 'Tiếng Việt', '.com.vn': 'Tiếng Việt',
+    '.id': 'Bahasa Indonesia', '.co.id': 'Bahasa Indonesia',
+    '.my': 'Bahasa Melayu', '.com.my': 'Bahasa Melayu',
+    '.ph': 'Filipino', '.com.ph': 'Filipino',
+    // .in stays English: English is the working business language of most
+    // Indian enterprises, so Hindi has to be asked for rather than inferred.
     '.in': 'English', '.co.uk': 'English', '.com.au': 'English',
     '.com': 'English', '.io': 'English', '.ai': 'English', '.org': 'English', '.net': 'English'
   };
@@ -6073,7 +6118,7 @@ function researchCompanyByDomain(domain, persona, langOverride) {
   const langBlock = overrideLang
     ? '**RESPONSE LANGUAGE**: Respond entirely in ' + overrideLang + '. Set "detectedLanguage" to exactly "' + overrideLang + '".'
     : '**RESPONSE LANGUAGE (AUTO-DETECT)**: Determine the company\'s primary business language and write ALL text values in that language.\n' +
-      '- Country-code TLDs are decisive: e.g. .jp/.co.jp -> 日本語, .de -> Deutsch, .fr -> Français, .es -> Español, .it -> Italiano, .cn/.tw -> 中文, .kr -> 한국어, .br -> Português.\n' +
+      '- Country-code TLDs are decisive: e.g. .jp/.co.jp -> 日本語, .de -> Deutsch, .fr -> Français, .es -> Español, .it -> Italiano, .cn/.tw -> 中文, .kr -> 한국어, .br -> Português, .th -> ไทย, .id/.co.id -> Bahasa Indonesia, .my -> Bahasa Melayu, .vn -> Tiếng Việt.\n' +
       '- For generic TLDs (.com, .io, .ai, .org, .net, ...), decide from your search results: use the primary language of the company\'s headquarters country and official website. Example: a Japanese company using a .com domain MUST still be answered in 日本語.\n' +
       '- Report your final choice in the "detectedLanguage" JSON field, picking the closest match from: ' + SUPPORTED_RESEARCH_LANGS_.join(', ') + '.';
 
@@ -6146,7 +6191,7 @@ Output pure JSON only (no code blocks, no markdown):
       muteHttpExceptions: true
     });
     if (apiResponse.getResponseCode() !== 200) {
-      throw new Error('AI Search Error: ' + apiResponse.getContentText().substring(0, 200));
+      throw new Error(describeVertexError_(apiResponse.getResponseCode(), apiResponse.getContentText(), 'RESEARCH'));
     }
     
     // Google Search grounding can return text across multiple parts — concatenate all
@@ -6179,6 +6224,18 @@ Output pure JSON only (no code blocks, no markdown):
       return { success: false, error: 'Could not find sufficient information for domain: ' + domain };
     }
 
+    // detectedLanguage is a carrier for the prompts that come later (Magic Wand,
+    // workflow regeneration), so a language outside SUPPORTED_RESEARCH_LANGS_ -
+    // a typed override, or an auto-detect that answered 'Norsk' - has to come
+    // back in the 'custom:' form those callers can resolve. A bare unknown name
+    // resolves to '' and drops them onto text detection instead.
+    const rawDetected = (typeof parsed.detectedLanguage === 'string' && parsed.detectedLanguage.trim())
+      ? parsed.detectedLanguage.trim()
+      : (overrideLang || fallbackLang);
+    const detectedCustom = SUPPORTED_RESEARCH_LANGS_.indexOf(rawDetected) === -1
+      ? sanitizeCustomLanguage_(rawDetected)
+      : '';
+
     return {
       success: true,
       companyName: parsed.companyName,
@@ -6188,9 +6245,7 @@ Output pure JSON only (no code blocks, no markdown):
       workflows: parsed.workflows || [],
       suggestedGoal: parsed.suggestedGoal,
       quantFacts: parsed.quantFacts || null,
-      detectedLanguage: (typeof parsed.detectedLanguage === 'string' && parsed.detectedLanguage.trim())
-        ? parsed.detectedLanguage.trim()
-        : (overrideLang || fallbackLang)
+      detectedLanguage: detectedCustom ? CUSTOM_LANG_PREFIX_ + detectedCustom : rawDetected
     };
   } catch (e) {
     console.error('[RESEARCH] Error for domain ' + domain + ':', e.message);
@@ -6215,9 +6270,8 @@ function regenerateGoalForWorkflows(companyInfo, selectedWorkflows, persona, lan
 
   // Prefer the explicit language carried over from the research step; the CJK
   // regex is only a JP/EN fallback for old callers (it loses e.g. German).
-  const responseLang = (typeof language === 'string' && SUPPORTED_RESEARCH_LANGS_.indexOf(language.trim()) !== -1)
-    ? language.trim()
-    : (/[\u3000-\u9fff\uff00-\uffef]/.test(companyInfo.companySummary) ? '日本語' : 'English');
+  const responseLang = resolveOutputLanguage_(language)
+    || (/[\u3000-\u9fff\uff00-\uffef]/.test(companyInfo.companySummary) ? '日本語' : 'English');
 
   const personaDesc = sanitizePersonaText_(persona);
   const personaSection = personaDesc
@@ -6298,6 +6352,34 @@ function callVertexAI(prompt) {
 }
 
 /**
+ * Turns a failed Vertex response into a message the demo builder can act on.
+ *
+ * The case worth naming is the daily Google Search grounding cap. It is
+ * enforced per project per day, so on a project shared with a team a builder
+ * who has made zero requests of their own can still be locked out
+ * by everyone else's traffic - and the raw body, truncated to 200 characters
+ * mid-sentence, reads like a bug in this app rather than a drained bucket.
+ * The full body goes to the log; the caller gets the actionable version.
+ * @param {number} code - HTTP status
+ * @param {string} body - Raw response body
+ * @param {string} context - Short label for the log line, e.g. 'RESEARCH'
+ * @returns {string} Message to put in the thrown Error.
+ */
+function describeVertexError_(code, body, context) {
+  const raw = String(body || '');
+  console.error('[' + (context || 'VERTEX') + '] HTTP ' + code + ': ' + raw.substring(0, 1500));
+  if (code === 429 && /search as a tool|search as tool/i.test(raw)) {
+    return 'Daily Google Search grounding quota is used up for project "' + (CONFIG.PROJECT_ID || '(PROJECT_ID unset)') +
+      '". The cap is per project per day and resets at midnight US/Pacific, and on a shared project every user draws from the same bucket. ' +
+      'Point the PROJECT_ID Script Property at a project with its own quota, or wait for the reset - the scenario box still works by hand.';
+  }
+  if (code === 429) {
+    return 'Vertex AI Agent Platform rate-limited project "' + (CONFIG.PROJECT_ID || '(PROJECT_ID unset)') + '" (HTTP 429). Wait a few seconds and retry. ' + raw.substring(0, 200);
+  }
+  return 'AI Search Error: ' + raw.substring(0, 200);
+}
+
+/**
  * Calls Vertex AI Agent Platform with Google Search grounding enabled.
  * Used for discovering real BigQuery public dataset IDs.
  */
@@ -6319,7 +6401,9 @@ function callVertexAIWithSearch(prompt) {
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   });
-  if (response.getResponseCode() !== 200) throw new Error(`AI Search Error: ${response.getContentText()}`);
+  if (response.getResponseCode() !== 200) {
+    throw new Error(describeVertexError_(response.getResponseCode(), response.getContentText(), 'SEARCH'));
+  }
   return JSON.parse(response.getContentText()).candidates[0].content.parts[0].text;
 }
 
@@ -7400,19 +7484,26 @@ Return ONLY the raw Markdown text in the detected language. Do not include any c
  * and asks the backend for translations on demand, so non-ASCII translations
  * never live in the inline frontend JS (which would break the GAS minifier).
  * Entries with an empty "text" are category labels (industries/job functions).
- * @param {string} lang - Target language code (en/ja/de/fr/es/it/zh/ko/pt/ru/nl/sv/fi)
+ * @param {string} lang - A TEMPLATE_LANGS_ code ('ja'), or 'custom:<name>' for a
+ *   language the user typed in themselves. Values the sanitizer rejects come
+ *   back as { success: false, error: 'Unrecognized language' } with the
+ *   originals intact, so the caller can fall back to English and say why.
  * @param {Array} items - [{ label, text }]
  * @returns {Object} { success, items } same length/order translated; originals on failure.
  */
 function translateTemplates(lang, items) {
-  const target = TEMPLATE_LANGS_[lang];
-  if (!target || lang === 'en') return { success: true, items: items || [] };
+  const target = resolveOutputLanguage_(lang);
+  if (target === 'English') return { success: true, items: items || [] };
+  // A typed language the sanitizer rejected reports back rather than silently
+  // returning English, so the UI can say why nothing was translated.
+  if (!target) return { success: false, items: items || [], error: 'Unrecognized language' };
   if (!items || !items.length) return { success: true, items: [] };
 
   const prompt =
     'Translate the "label" and "text" of each entry below into ' + target + '. ' +
     'Keep it natural and professional (business demo scenario titles, descriptions, and category names). ' +
     'Entries with an empty "text" are category labels - translate only their "label" and keep "text" as an empty string. ' +
+    'If ' + target + ' is not a human language you can actually write, return every entry unchanged in English instead of inventing text. ' +
     'Return ONLY a JSON array of objects with "label" and "text", in the SAME order and SAME length as the input. ' +
     'Do not add or remove entries.\n\nINPUT:\n' +
     JSON.stringify(items.map(function (i) { return { label: String(i.label || ''), text: String(i.text || '') }; }));

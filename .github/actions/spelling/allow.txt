@@ -1130,6 +1130,7 @@ MEGA
 Megarobot
 Meinl
 Meirelles
+melayu
 Meltem
 meme
 Memegen
@@ -1449,6 +1450,7 @@ podhelper
 podman
 Poirot
 Polong
+polski
 ponyo
 Ponyo
 Popken
@@ -1923,6 +1925,7 @@ tts
 TTT
 Tunables
 tures
+türkçe
 Tuteja
 tval
 twiml
