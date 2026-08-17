@@ -1,0 +1,56 @@
+[project]
+name = "prism"
+version = "0.1.0"
+description = "Prism — a multi-agent system that answers a science question with a generated, interactive explainer."
+requires-python = ">=3.11,<3.14"
+
+dependencies = [
+    "google-adk>=2.0.0,<3.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sse-starlette>=2.1.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.7.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[project.optional-dependencies]
+lint = [
+    "ruff>=0.4.6,<1.0.0",
+]
+
+# Pin the default package index to public PyPI so `uv.lock` records
+# pythonhosted.org URLs. Without this, locking on a machine whose uv is
+# configured with a private mirror bakes that mirror's URLs into the lockfile,
+# and `uv sync --frozen` then fails for everyone else — including the Cloud Run
+# build. A no-op if PyPI is already your default.
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple/"
+default = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "C", "B", "UP", "RUF"]
+ignore = ["E501", "C901", "B006"]
+
+[tool.ruff.lint.per-file-ignores]
+# prompts.py is prose aimed at a model, not code: it deliberately contains the
+# real Unicode a science instrument renders (×, λ, ≈, —). RUF001 flags those as
+# "ambiguous characters", which is right for identifiers and wrong for copy.
+"app/prompts.py" = ["RUF001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Make `import app` work without installing the project.
+pythonpath = ["."]

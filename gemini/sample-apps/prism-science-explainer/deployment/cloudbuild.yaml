@@ -1,0 +1,12 @@
+# Cloud Build config for the Prism container image.
+# Usage:
+#   gcloud builds submit --project=PROJECT --region=REGION \
+#     --config=deployment/cloudbuild.yaml --substitutions=_IMAGE=IMAGE_URI .
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_IMAGE}", "."]
+images:
+  - "${_IMAGE}"
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1200s

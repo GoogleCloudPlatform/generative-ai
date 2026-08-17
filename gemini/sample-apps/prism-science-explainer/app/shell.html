@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRISM instrument</title>
+
+<!--
+  ============================================================================
+  PRISM · INSTRUMENT SHELL  (fixed hand-crafted chrome, Direction-C light)
+  ----------------------------------------------------------------------------
+  This file is CONSTANT across every generated concept. The model NEVER writes
+  HTML/CSS/boilerplate; it writes ONLY a small JS payload (1-4KB) that assigns
+  two globals: PRISM_SPEC and PRISM_SIM. That payload is spliced in at the
+  single injection marker inside the fill <script> block further below.
+  The shell owns everything else: light aesthetic, KaTeX + auto-render,
+  responsive layout, the <canvas>, controls bar, formula area, live caption,
+  sources line, Play/Step/Reset, the animation loop (honours
+  prefers-reduced-motion), DPR-crisp rendering, error isolation, and the
+  parent.postMessage({__prism_h}) height reporter the host uses to grow the
+  sandboxed iframe.
+
+  Renders inside a sandboxed iframe: sandbox="allow-scripts" (null origin, no
+  network beyond the CDN allowlist below; connect-src 'none' blocks exfil).
+  If the fill is empty or broken, the shell renders a graceful placeholder.
+  ============================================================================
+-->
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  base-uri 'none';
+  script-src 'unsafe-inline' https://cdn.jsdelivr.net;
+  style-src  'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;
+  font-src   https://cdn.jsdelivr.net https://fonts.gstatic.com;
+  img-src    data: blob:;
+  connect-src 'none';
+" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- KaTeX + auto-render (math is rendered by the shell, never by the fill) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+  :root{
+    --bg:         #F1EFE9;   /* warm paper field */
+    --surface:    #FBFAF6;   /* panels / canvas ground */
+    --surface-2:  #F6F4EE;   /* nested */
+    --ink:        #0A0A0B;   /* off-black */
+    --ink-2:      #44433E;   /* secondary */
+    --ink-3:      #7C7A72;   /* tertiary */
+    --ink-4:      #A5A29A;   /* ghost */
+    --hair:       #DBD8CF;   /* hairline */
+    --hair-2:     #C7C3B7;   /* stronger hairline */
+    --accent:     #D0472A;   /* signal vermilion */
+    --accent-ink: #FBFAF6;
+    --accent-weak:#F6E3DC;
+    --accent-line:#E6BAAD;
+    --ok:         #3C6E4C;
+    --warn:       #9A5B12;
+    --shadow-1: 0 1px 2px rgba(58,50,32,.07), 0 2px 6px rgba(58,50,32,.05);
+    --focus:  0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+    --font-sans:'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --r1:2px; --r2:4px; --r3:6px;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--surface); }
+  body{
+    color:var(--ink);
+    font-family:var(--font-sans);
+    font-size:14px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    letter-spacing:.005em;
+    padding:var(--s5) var(--s4) var(--s6);
+  }
+  .mono{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; letter-spacing:0; }
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; text-underline-offset:2px; }
+  ::selection{ background:var(--accent-weak); color:var(--ink); }
+
+  .wrap{ max-width:680px; margin:0 auto; }
+
+  /* ---- header ---- */
+  .head{ margin-bottom:var(--s4); }
+  .kicker{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-4); margin-bottom:6px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .kicker .mark{ width:11px; height:11px; border:1.5px solid var(--ink); transform:rotate(45deg); border-radius:1px; position:relative; flex:none; }
+  .kicker .mark::after{ content:""; position:absolute; inset:2px; background:var(--accent); border-radius:1px; }
+  h1.title{ margin:0; font-size:22px; font-weight:700; letter-spacing:.005em; line-height:1.2; color:var(--ink); }
+  p.intro{ margin:var(--s2) 0 0; font-size:14px; color:var(--ink-2); max-width:62ch; }
+
+  /* ---- figure / canvas ---- */
+  .stage{
+    margin-top:var(--s4);
+    background:var(--surface); border:1px solid var(--hair-2); border-radius:var(--r3);
+    box-shadow:var(--shadow-1); overflow:hidden;
+  }
+  .stage-bar{
+    display:flex; align-items:center; gap:var(--s2);
+    padding:8px var(--s3); border-bottom:1px solid var(--hair); background:var(--surface-2);
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-4);
+  }
+  .stage-bar .fig{ color:var(--ink-3); }
+  .stage-bar .sp{ flex:1 1 auto; }
+  .stage-bar .live{ display:inline-flex; align-items:center; gap:6px; color:var(--ink-3); }
+  .stage-bar .live .dot{ width:6px; height:6px; border-radius:50%; background:var(--ink-4); }
+  .stage-bar.running .live{ color:var(--accent); }
+  .stage-bar.running .live .dot{ background:var(--accent); animation:blink 1.4s steps(2,end) infinite; }
+  @keyframes blink{ 50%{ opacity:.25; } }
+  canvas#cv{ display:block; width:100%; height:auto; background:var(--surface); touch-action:none; }
+
+  /* ---- controls bar ---- */
+  .controls{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:var(--s3) var(--s5);
+    margin-top:var(--s4); padding:var(--s4);
+    background:var(--surface-2); border:1px solid var(--hair); border-radius:var(--r3);
+  }
+  .controls:empty{ display:none; }
+  .ctrl{ min-width:0; }
+  .ctrl .ctrl-top{ display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+  .ctrl .lbl{ font-size:12px; font-weight:600; color:var(--ink); }
+  .ctrl .sym{ font-family:var(--font-mono); font-size:11px; color:var(--ink-3); }
+  .ctrl .val{ margin-left:auto; font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .ctrl input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:22px; background:transparent; cursor:pointer; margin:0;
+  }
+  .ctrl input[type=range]:focus-visible{ outline:none; }
+  .ctrl input[type=range]::-webkit-slider-runnable-track{ height:4px; background:var(--hair-2); border-radius:99px; }
+  .ctrl input[type=range]::-moz-range-track{ height:4px; background:var(--hair-2); border-radius:99px; }
+  .ctrl input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none; width:16px; height:16px; margin-top:-6px;
+    background:var(--surface); border:2px solid var(--accent); border-radius:50%; box-shadow:var(--shadow-1);
+    transition:transform .08s ease;
+  }
+  .ctrl input[type=range]::-moz-range-thumb{
+    width:16px; height:16px; background:var(--surface); border:2px solid var(--accent); border-radius:50%; box-shadow:var(--shadow-1);
+  }
+  .ctrl input[type=range]:active::-webkit-slider-thumb{ transform:scale(1.12); }
+  .ctrl input[type=range]:focus-visible::-webkit-slider-thumb{ box-shadow:var(--focus); }
+  .ctrl input[type=range]:focus-visible::-moz-range-thumb{ box-shadow:var(--focus); }
+
+  /* ---- transport ---- */
+  .transport{ display:flex; align-items:center; gap:var(--s2); margin-top:var(--s3); flex-wrap:wrap; }
+  .btn{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; font-weight:700;
+    border:1px solid var(--hair-2); background:var(--surface); color:var(--ink);
+    border-radius:var(--r2); padding:9px 15px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px;
+    transition:background .14s ease, color .14s ease, border-color .14s ease, transform .08s ease;
+  }
+  .btn:hover{ border-color:var(--ink-3); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:none; box-shadow:var(--focus); }
+  .btn.primary{ border-color:var(--ink); background:var(--ink); color:var(--accent-ink); }
+  .btn.primary:hover{ background:var(--accent); border-color:var(--accent); }
+  .btn .ic{ font-size:10px; }
+  .transport .spacer{ flex:1 1 auto; }
+  .transport .tstat{ font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-4); }
+
+  /* ---- formula ---- */
+  .formula{
+    margin-top:var(--s4); padding:var(--s4);
+    background:var(--surface); border:1px solid var(--hair); border-radius:var(--r3);
+    overflow-x:auto; overflow-y:hidden; color:var(--ink);
+  }
+  .formula .katex{ font-size:1.12em; }
+
+  /* ---- caption ---- */
+  .caption{
+    margin-top:var(--s3); padding:var(--s3) var(--s4);
+    border-left:2px solid var(--accent); background:var(--accent-weak);
+    border-radius:0 var(--r2) var(--r2) 0;
+    font-size:13.5px; line-height:1.55; color:var(--ink); min-height:1.5em;
+  }
+
+  /* ---- sources ---- */
+  .sources{
+    margin-top:var(--s4); padding-top:var(--s3); border-top:1px solid var(--hair);
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; color:var(--ink-4);
+    display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline;
+  }
+  .sources .sh{ text-transform:uppercase; letter-spacing:.12em; }
+  .sources a, .sources span.src{ color:var(--ink-3); overflow-wrap:anywhere; }
+  .sources a:hover{ color:var(--accent); }
+
+  /* ---- placeholder (empty / broken fill) ---- */
+  .placeholder{
+    margin-top:var(--s4); border:1px dashed var(--hair-2); border-radius:var(--r3);
+    padding:var(--s6) var(--s5); text-align:center; color:var(--ink-4);
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.04em; line-height:1.8; background:var(--surface-2);
+  }
+  .placeholder b{ color:var(--ink-3); font-weight:700; }
+  .placeholder.error{ border-color:var(--accent-line); background:var(--accent-weak); color:var(--warn); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+  @media (max-width:520px){
+    body{ padding:var(--s4) var(--s3) var(--s5); }
+    .controls{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div class="kicker"><span class="mark" aria-hidden="true"></span><span>PRISM · interactive instrument</span></div>
+    <h1 class="title" id="ttl">Interactive instrument</h1>
+    <p class="intro" id="intro"></p>
+  </header>
+
+  <!-- Placeholder shown until (or unless) a valid fill defines PRISM_SPEC + PRISM_SIM -->
+  <div class="placeholder" id="placeholder">
+    <div>// instrument shell ready</div>
+    <div>waiting for the concept payload &mdash; <b>PRISM_SPEC</b> + <b>PRISM_SIM</b></div>
+  </div>
+
+  <!-- Instrument body (revealed by the shell once a valid fill is present) -->
+  <div id="instrument" hidden>
+    <div class="stage">
+      <div class="stage-bar" id="stageBar">
+        <span class="fig">FIG&mdash;01</span>
+        <span class="sp"></span>
+        <span class="live"><span class="dot"></span><span id="liveLbl">paused</span></span>
+      </div>
+      <canvas id="cv" width="640" height="400" role="img" aria-label="Interactive visualization"></canvas>
+    </div>
+
+    <div class="controls" id="controls"></div>
+
+    <div class="transport">
+      <button class="btn primary" id="btnPlay" type="button" aria-pressed="false"><span class="ic" aria-hidden="true">&#9654;</span><span id="playLbl">Play</span></button>
+      <button class="btn" id="btnStep" type="button"><span class="ic" aria-hidden="true">&#8677;</span>Step</button>
+      <button class="btn" id="btnReset" type="button"><span class="ic" aria-hidden="true">&#8635;</span>Reset</button>
+      <span class="spacer"></span>
+      <span class="tstat mono" id="tstat">t = 0.00 s</span>
+    </div>
+
+    <div class="formula" id="formula" hidden></div>
+    <div class="caption" id="caption"></div>
+    <div class="sources" id="sources" hidden></div>
+  </div>
+</div>
+
+<!--
+  PRISM_KIT (window.PK). A tiny, fixed Canvas2D + math harness so the fill's
+  draw()/step() stay small: the model calls PK.frame/curve/dot/arrow/... instead
+  of re-deriving coordinate transforms, axes, and plotting boilerplate every
+  time. Smaller fills => faster generation. All helpers default to the brand
+  palette, so a fill can be as terse as:
+      const F = PK.frame(ctx, W, H, {xmin:-3, xmax:3, ymin:0, ymax:9, grid:true});
+      PK.curve(F, x => x*x);            // the loss curve
+      PK.dot(F, state.w, state.w**2);   // the moving ball
+  Raw ctx is still available; PK is optional sugar. Defined before the fill so
+  the fill's methods (called later by the runtime) can reference PK freely.
+-->
+<script>
+window.PK = (function(){
+  "use strict";
+  function tok(n, fb){
+    try{ var v = getComputedStyle(document.documentElement).getPropertyValue(n);
+         return (v && v.trim()) || fb; }catch(e){ return fb; }
+  }
+  var C = {
+    bg:tok('--bg','#F1EFE9'), surface:tok('--surface','#FBFAF6'), surface2:tok('--surface-2','#F6F4EE'),
+    ink:tok('--ink','#0A0A0B'), ink2:tok('--ink-2','#44433E'), ink3:tok('--ink-3','#7C7A72'),
+    ink4:tok('--ink-4','#A5A29A'), hair:tok('--hair','#DBD8CF'), hair2:tok('--hair-2','#C7C3B7'),
+    accent:tok('--accent','#D0472A'), accentWeak:tok('--accent-weak','#F6E3DC'),
+    ok:tok('--ok','#3C6E4C'), warn:tok('--warn','#9A5B12')
+  };
+  var MONO = "'JetBrains Mono', ui-monospace, Menlo, monospace";
+  var TAU = Math.PI*2;
+  function num(v, d){ v = Number(v); return isFinite(v) ? v : d; }
+  function clamp(v,a,b){ return v<a ? a : (v>b ? b : v); }
+  // Colour helpers. The fill routinely wants to blend two colours (a sky going
+  // from day to sunset), and reaches for lerp() to do it. Numeric lerp on two
+  // hex strings yields NaN, and addColorStop(NaN) THROWS, which aborts draw()
+  // and leaves a blank canvas with no visible error. So lerp is colour-aware.
+  function isHex(v){ return typeof v === 'string' && /^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/.test(v.trim()); }
+  function hex2rgb(h){
+    h = String(h).trim().replace(/^#/, '');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    var n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function mix(a, b, t){
+    t = clamp(num(t, 0), 0, 1);
+    var A = hex2rgb(a), B = hex2rgb(b);
+    return 'rgb(' + Math.round(A[0]+(B[0]-A[0])*t) + ',' +
+                    Math.round(A[1]+(B[1]-A[1])*t) + ',' +
+                    Math.round(A[2]+(B[2]-A[2])*t) + ')';
+  }
+  function lerp(a,b,t){ return (isHex(a) && isHex(b)) ? mix(a,b,t) : a + (b-a)*t; }
+  function map(v,a,b,c,d){ return (b===a) ? c : c + (d-c)*((v-a)/(b-a)); }
+  function px(p){ return (p && p.x!=null) ? p.x : p[0]; }
+  function py(p){ return (p && p.y!=null) ? p.y : p[1]; }
+
+  // A data<->pixel coordinate frame over the canvas. Optionally draws grid + axes
+  // (+ axis labels) as a side effect and returns the frame for plotting.
+  function frame(ctx, W, H, o){
+    o = o || {};
+    var p = num(o.pad, NaN);
+    var padL = num(o.padL, isFinite(p)?p:48), padR = num(o.padR, isFinite(p)?p:18),
+        padT = num(o.padT, isFinite(p)?p:22), padB = num(o.padB, isFinite(p)?p:34);
+    var xmin=num(o.xmin,-1), xmax=num(o.xmax,1), ymin=num(o.ymin,-1), ymax=num(o.ymax,1);
+    if(xmax===xmin) xmax = xmin+1;
+    if(ymax===ymin) ymax = ymin+1;
+    var X0=padL, X1=W-padR, Y0=H-padB, Y1=padT;
+    var F = {
+      ctx:ctx, c:C, W:W, H:H, xmin:xmin, xmax:xmax, ymin:ymin, ymax:ymax,
+      X0:X0, X1:X1, Y0:Y0, Y1:Y1,
+      sx:function(x){ return X0 + (x-xmin)/(xmax-xmin)*(X1-X0); },
+      sy:function(y){ return Y0 - (y-ymin)/(ymax-ymin)*(Y0-Y1); }
+    };
+    if(o.grid) grid(F, o);
+    if(o.axes !== false) axes(F, o);
+    return F;
+  }
+  function grid(F, o){
+    o = o || {}; var ctx=F.ctx, nx=num(o.nx,8), ny=num(o.ny,5), i;
+    ctx.save(); ctx.strokeStyle=C.hair; ctx.lineWidth=1;
+    for(i=0;i<=nx;i++){ var x=F.X0+(F.X1-F.X0)*i/nx; ctx.beginPath(); ctx.moveTo(x,F.Y1); ctx.lineTo(x,F.Y0); ctx.stroke(); }
+    for(i=0;i<=ny;i++){ var y=F.Y1+(F.Y0-F.Y1)*i/ny; ctx.beginPath(); ctx.moveTo(F.X0,y); ctx.lineTo(F.X1,y); ctx.stroke(); }
+    ctx.restore();
+  }
+  function axes(F, o){
+    o = o || {}; var ctx=F.ctx;
+    var yb = (F.ymin<=0 && F.ymax>=0) ? F.sy(0) : F.Y0;   // baseline at y=0 if visible
+    var xb = (F.xmin<=0 && F.xmax>=0) ? F.sx(0) : F.X0;   // vertical at x=0 if visible
+    ctx.save(); ctx.strokeStyle=C.hair2; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(F.X0,yb); ctx.lineTo(F.X1,yb); ctx.moveTo(xb,F.Y0); ctx.lineTo(xb,F.Y1); ctx.stroke();
+    ctx.fillStyle=C.ink3; ctx.font="12px "+MONO;
+    if(o.xlabel!=null){ ctx.textAlign="right"; ctx.textBaseline="top"; ctx.fillText(String(o.xlabel), F.X1, F.Y0+8); }
+    if(o.ylabel!=null){ ctx.textAlign="left"; ctx.textBaseline="alphabetic"; ctx.fillText(String(o.ylabel), F.X0-2, F.Y1-6); }
+    ctx.restore();
+  }
+  // Confine subsequent drawing to the plot box so nothing spills over the axes.
+  function clipBox(F){ var ctx=F.ctx; ctx.beginPath(); ctx.rect(F.X0, F.Y1, F.X1-F.X0, F.Y0-F.Y1); ctx.clip(); }
+  // Plot y=fn(x) sampled across the frame's x-range (clamped to the y-window).
+  function curve(F, fn, o){
+    o = o || {}; var ctx=F.ctx, n=num(o.n,160), started=false, i;
+    ctx.save(); clipBox(F); ctx.strokeStyle=o.color||C.ink3; ctx.lineWidth=num(o.width,2);
+    ctx.lineJoin="round"; ctx.lineCap="round"; ctx.beginPath();
+    for(i=0;i<=n;i++){
+      var x=F.xmin+(F.xmax-F.xmin)*i/n, y=fn(x);
+      if(y==null || !isFinite(y)){ started=false; continue; }
+      var Px=F.sx(x), Py=clamp(F.sy(y), F.Y1-6, F.Y0+6);
+      started ? ctx.lineTo(Px,Py) : ctx.moveTo(Px,Py); started=true;
+    }
+    ctx.stroke(); ctx.restore();
+  }
+  // Polyline through data points ([[x,y],...] or [{x,y},...]).
+  function path(F, pts, o){
+    o = o || {}; if(!pts || !pts.length) return; var ctx=F.ctx, i;
+    ctx.save(); clipBox(F); ctx.strokeStyle=o.color||C.accent; ctx.lineWidth=num(o.width,2);
+    ctx.lineJoin="round"; ctx.lineCap="round"; ctx.beginPath();
+    for(i=0;i<pts.length;i++){ var X=F.sx(px(pts[i])), Y=F.sy(py(pts[i])); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }
+    ctx.stroke(); ctx.restore();
+  }
+  // Filled dot at data coords, with an optional contrast ring (on by default).
+  function dot(F, x, y, o){
+    o = o || {}; var ctx=F.ctx, r=num(o.r,6);
+    ctx.save(); ctx.beginPath(); ctx.arc(F.sx(x), F.sy(y), r, 0, TAU);
+    ctx.fillStyle=o.color||C.accent; ctx.fill();
+    if(o.ring !== false){ ctx.strokeStyle=o.ringColor||C.surface; ctx.lineWidth=num(o.ringWidth,2); ctx.stroke(); }
+    ctx.restore();
+  }
+  // Arrow / vector between two data points (arrowhead at the end).
+  function arrow(F, x0, y0, x1, y1, o){
+    o = o || {}; var ctx=F.ctx;
+    var ax=F.sx(x0), ay=F.sy(y0), bx=F.sx(x1), by=F.sy(y1);
+    var col=o.color||C.accent, hs=num(o.head,8), a=Math.atan2(by-ay, bx-ax);
+    ctx.save(); clipBox(F); ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=num(o.width,2); ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx,by);
+    ctx.lineTo(bx-hs*Math.cos(a-0.42), by-hs*Math.sin(a-0.42));
+    ctx.lineTo(bx-hs*Math.cos(a+0.42), by-hs*Math.sin(a+0.42));
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function hline(F, y, o){
+    o = o || {}; var ctx=F.ctx; ctx.save(); ctx.strokeStyle=o.color||C.hair2; ctx.lineWidth=num(o.width,1);
+    if(o.dash) ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(F.X0,F.sy(y)); ctx.lineTo(F.X1,F.sy(y)); ctx.stroke(); ctx.restore();
+  }
+  function vline(F, x, o){
+    o = o || {}; var ctx=F.ctx; ctx.save(); ctx.strokeStyle=o.color||C.hair2; ctx.lineWidth=num(o.width,1);
+    if(o.dash) ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(F.sx(x),F.Y1); ctx.lineTo(F.sx(x),F.Y0); ctx.stroke(); ctx.restore();
+  }
+  // Text anchored at data coords. o.align/baseline/color/size/font; dx/dy nudge in px.
+  function text(F, str, x, y, o){
+    o = o || {}; var ctx=F.ctx;
+    ctx.save(); ctx.fillStyle=o.color||C.ink3; ctx.font=num(o.size,12)+"px "+(o.font||MONO);
+    ctx.textAlign=o.align||"left"; ctx.textBaseline=o.baseline||"middle";
+    ctx.fillText(String(str), F.sx(x)+num(o.dx,0), F.sy(y)+num(o.dy,0)); ctx.restore();
+  }
+  return { colors:C, mono:MONO, TAU:TAU, clamp:clamp, lerp:lerp, mix:mix, map:map,
+           frame:frame, axes:axes, grid:grid, curve:curve, path:path,
+           dot:dot, arrow:arrow, hline:hline, vline:vline, text:text };
+})();
+</script>
+
+<!--
+  FILL BLOCK. The model's payload replaces the marker below. It must assign
+  exactly two globals: PRISM_SPEC (data) and PRISM_SIM (methods). It may use
+  const/let/var/function or bare assignment. If empty or if it throws at parse
+  time, the shell falls back to the placeholder above (this block failing does
+  NOT take down the shell block that follows).
+-->
+<script>
+/*__PRISM_FILL__*/
+</script>
+
+<!-- SHELL RUNTIME. Fixed. Reads PRISM_SPEC / PRISM_SIM, wires everything up. -->
+<script>
+(function(){
+  "use strict";
+
+  /* ---- palette + fonts handed to the fill's draw() so canvas is on-brand ---- */
+  var CSS = getComputedStyle(document.documentElement);
+  function tok(n, fb){ var v = CSS.getPropertyValue(n); return (v && v.trim()) || fb; }
+  var COLORS = {
+    bg:tok('--bg','#F1EFE9'), surface:tok('--surface','#FBFAF6'), surface2:tok('--surface-2','#F6F4EE'),
+    ink:tok('--ink','#0A0A0B'), ink2:tok('--ink-2','#44433E'), ink3:tok('--ink-3','#7C7A72'), ink4:tok('--ink-4','#A5A29A'),
+    hair:tok('--hair','#DBD8CF'), hair2:tok('--hair-2','#C7C3B7'),
+    accent:tok('--accent','#D0472A'), accentWeak:tok('--accent-weak','#F6E3DC'),
+    ok:tok('--ok','#3C6E4C'), warn:tok('--warn','#9A5B12')
+  };
+  var FONTS = {
+    mono:"'JetBrains Mono', ui-monospace, Menlo, monospace",
+    sans:"'Space Grotesk', ui-sans-serif, system-ui, sans-serif"
+  };
+
+  /* ---- element refs ---- */
+  var $ = function(id){ return document.getElementById(id); };
+  var elPlaceholder=$('placeholder'), elInstrument=$('instrument'),
+      elTitle=$('ttl'), elIntro=$('intro'),
+      cv=$('cv'), elControls=$('controls'),
+      elFormula=$('formula'), elCaption=$('caption'), elSources=$('sources'),
+      btnPlay=$('btnPlay'), btnStep=$('btnStep'), btnReset=$('btnReset'),
+      playLbl=$('playLbl'), tstat=$('tstat'), stageBar=$('stageBar'), liveLbl=$('liveLbl');
+
+  var REDUCED = false;
+  try { REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){}
+
+  /* ---- height reporter: host grows the sandboxed iframe from this ---- */
+  var lastH = 0;
+  function reportHeight(){
+    try{
+      var d=document.documentElement, b=document.body;
+      var h=Math.max(b?b.scrollHeight:0, b?b.offsetHeight:0, d.scrollHeight, d.offsetHeight);
+      if(h && Math.abs(h-lastH) >= 1){ lastH=h; parent.postMessage({__prism_h:h}, '*'); }
+    }catch(e){}
+  }
+  var hTimer=0;
+  function scheduleHeight(){ clearTimeout(hTimer); hTimer=setTimeout(reportHeight, 60); }
+  window.addEventListener('load', reportHeight);
+  window.addEventListener('resize', scheduleHeight);
+  if(window.ResizeObserver){ try{ new ResizeObserver(scheduleHeight).observe(document.documentElement); }catch(e){} }
+  [200,600,1500].forEach(function(ms){ setTimeout(reportHeight, ms); });
+
+  /* ---- read the fill ---- */
+  var SPEC = (typeof PRISM_SPEC !== 'undefined') ? PRISM_SPEC : null;
+  var SIM  = (typeof PRISM_SIM  !== 'undefined') ? PRISM_SIM  : null;
+
+  function fail(msg){
+    elPlaceholder.className = 'placeholder error';
+    elPlaceholder.innerHTML = '<div>// instrument unavailable</div><div>'+ String(msg||'invalid payload') +'</div>';
+    elPlaceholder.hidden = false;
+    elInstrument.hidden = true;
+    scheduleHeight();
+  }
+  if(!SPEC && !SIM){
+    // empty / not-yet-filled: keep the friendly idle placeholder as-is.
+    elPlaceholder.hidden=false; elInstrument.hidden=true; scheduleHeight(); return;
+  }
+  if(!SPEC || typeof SPEC!=='object'){ fail('PRISM_SPEC missing'); return; }
+  if(!SIM  || typeof SIM.draw!=='function'){ fail('PRISM_SIM.draw missing'); return; }
+
+  /* normalize spec defensively */
+  var title = (SPEC.title!=null) ? String(SPEC.title) : 'Interactive instrument';
+  var intro = (SPEC.intro!=null) ? String(SPEC.intro) : '';
+  var params = Array.isArray(SPEC.parameters) ? SPEC.parameters : [];
+  var formulaLatex = (SPEC.formulaLatex!=null) ? String(SPEC.formulaLatex) : '';
+  var sources = Array.isArray(SPEC.sources) ? SPEC.sources : [];
+
+  elTitle.textContent = title;
+  if(intro){ elIntro.textContent = intro; } else { elIntro.style.display='none'; }
+  elPlaceholder.hidden = true;
+  elInstrument.hidden = false;
+
+  /* ---- shared sim state ---- */
+  var state = {
+    params:{}, t:0, frame:0, W:640, H:400,
+    playing:false, reducedMotion:REDUCED, colors:COLORS, fonts:FONTS,
+    kit:(typeof PK!=='undefined'?PK:null)   // PRISM_KIT harness (also global as PK)
+  };
+
+  /* ---- build controls ---- */
+  function decimalsFor(step){
+    step = Number(step);
+    if(!isFinite(step) || step<=0) return 2;
+    var s = String(step);
+    var i = s.indexOf('.');
+    return i<0 ? 0 : Math.min(6, s.length-i-1);
+  }
+  function fmt(v, dp){ return Number(v).toFixed(dp); }
+
+  params.forEach(function(p){
+    if(!p || p.id==null) return;
+    var id=String(p.id);
+    var min=Number(p.min), max=Number(p.max);
+    var step=Number(p.step); if(!isFinite(step)||step<=0) step=(isFinite(max)&&isFinite(min))?(max-min)/100:1;
+    if(!isFinite(min)) min=0; if(!isFinite(max)) max=1;
+    var def=Number(p.default); if(!isFinite(def)) def=(min+max)/2;
+    def=Math.min(max, Math.max(min, def));
+    var dp=decimalsFor(step);
+    state.params[id]=def;
+
+    var wrap=document.createElement('div'); wrap.className='ctrl';
+    var top=document.createElement('div'); top.className='ctrl-top';
+    var lbl=document.createElement('span'); lbl.className='lbl'; lbl.textContent=(p.label!=null?String(p.label):id);
+    top.appendChild(lbl);
+    if(p.symbol!=null && String(p.symbol)!==''){ var sym=document.createElement('span'); sym.className='sym'; var sv=String(p.symbol); if(sv.indexOf('$')===-1) sv='$'+sv+'$'; sym.textContent=sv; top.appendChild(sym); }
+    var val=document.createElement('span'); val.className='val mono';
+    var unit=(p.unit!=null && String(p.unit)!=='') ? (' '+String(p.unit)) : '';
+    val.textContent=fmt(def,dp)+unit;
+    top.appendChild(val);
+
+    var rng=document.createElement('input');
+    rng.type='range'; rng.min=String(min); rng.max=String(max); rng.step=String(step); rng.value=String(def);
+    rng.setAttribute('aria-label', (p.label!=null?String(p.label):id));
+    rng.addEventListener('input', function(){
+      var v=Number(rng.value);
+      state.params[id]=v;
+      val.textContent=fmt(v,dp)+unit;
+      if(!state.playing){ renderOnce(); }   // reflect change immediately when paused
+      updateCaption();
+    });
+
+    wrap.appendChild(top); wrap.appendChild(rng);
+    elControls.appendChild(wrap);
+  });
+
+  /* ---- canvas sizing (DPR-crisp; draw() works in CSS px) ---- */
+  var ctx = cv.getContext('2d');
+  var dpr = Math.max(1, Math.min(3, window.devicePixelRatio||1));
+  var ASPECT = 1.6;  // 16:10
+  function sizeCanvas(){
+    var cssW = Math.max(240, Math.round(cv.clientWidth || cv.parentNode.clientWidth || 640));
+    var cssH = Math.round(cssW / ASPECT);
+    cssH = Math.min(460, Math.max(300, cssH));
+    state.W = cssW; state.H = cssH;
+    cv.style.height = cssH + 'px';
+    cv.width  = Math.round(cssW*dpr);
+    cv.height = Math.round(cssH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  /* ---- safe wrappers around fill methods ---- */
+  var broke=false;
+  function guard(fn, label){
+    try{ return fn(); }
+    catch(e){
+      if(!broke){
+        broke=true; stop();
+        elCaption.textContent = 'Simulation error in '+label+'(): '+(e&&e.message||e);
+        elCaption.style.borderLeftColor=COLORS.warn;
+        scheduleHeight();
+      }
+    }
+  }
+  function doInit(){ if(typeof SIM.init==='function') guard(function(){ SIM.init(state); },'init'); }
+  function doStep(dt){ if(typeof SIM.step==='function') guard(function(){ SIM.step(state, dt); },'step'); }
+  function doDraw(){
+    // clear to the panel ground so draw() starts from a clean, on-brand surface
+    ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height); ctx.restore();
+    ctx.fillStyle=COLORS.surface; ctx.fillRect(0,0,state.W,state.H);
+    guard(function(){ SIM.draw(ctx, state, state.W, state.H); },'draw');
+  }
+
+  /* ---- caption (may contain inline $...$; may change every frame) ---- */
+  /* THROTTLE the whole update (compute + textContent + KaTeX) as one atomic,
+     synchronous pass at ~7Hz. Because textContent is only ever written
+     immediately before the synchronous renderMathIn (same tick, no paint
+     between), the element is never left showing raw "$...$" — even for a
+     caption that changes every frame (e.g. a diverging sim). */
+  var lastCap='', capTimer=0, capLastAt=0;
+  function applyCaption(){
+    capLastAt=performance.now();
+    var txt='';
+    if(typeof SIM.caption==='function'){ try{ txt = String(SIM.caption(state)); }catch(e){ txt=''; } }
+    if(txt===lastCap) return;
+    lastCap=txt;
+    elCaption.textContent=txt;
+    renderMathIn(elCaption);
+    scheduleHeight();
+  }
+  function updateCaption(){
+    if(broke) return;
+    var since=performance.now()-capLastAt;
+    if(since>=140){ if(capTimer){ clearTimeout(capTimer); capTimer=0; } applyCaption(); }
+    else if(!capTimer){ capTimer=setTimeout(function(){ capTimer=0; applyCaption(); }, 140-since); }
+  }
+
+  /* ---- KaTeX (rendered by the shell; degrade gracefully if CDN unavailable) ---- */
+  function renderMathIn(node){
+    if(node && window.renderMathInElement){
+      try{ renderMathInElement(node, {
+        delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},
+                    {left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],
+        throwOnError:false, ignoredTags:['script','style','textarea','pre','code']
+      }); }catch(e){}
+    }
+  }
+  function renderFormula(){
+    if(!formulaLatex){ elFormula.hidden=true; return; }
+    elFormula.hidden=false;
+    if(window.katex){ try{ katex.render(formulaLatex, elFormula, {displayMode:true, throwOnError:false}); return; }catch(e){} }
+    elFormula.textContent = formulaLatex;  // fallback: raw
+  }
+  function whenKatex(cb, n){
+    n=n||0;
+    if((window.katex && window.renderMathInElement) || n>40){ cb(); return; }
+    setTimeout(function(){ whenKatex(cb, n+1); }, 120);
+  }
+
+  /* ---- sources line ---- */
+  function renderSources(){
+    if(!sources.length){ elSources.hidden=true; return; }
+    elSources.hidden=false;
+    var head=document.createElement('span'); head.className='sh'; head.textContent='sources'; elSources.appendChild(head);
+    sources.forEach(function(s,i){
+      var uri=(s&&s.uri)?String(s.uri):'';
+      var t=(s&&s.title)?String(s.title):'';
+      var host=''; try{ host=new URL(uri).hostname.replace(/^www\./,''); }catch(e){}
+      var label=t||host||uri||'source';
+      if(/^https?:\/\//i.test(uri)){
+        var a=document.createElement('a'); a.href=uri; a.target='_blank'; a.rel='noopener noreferrer';
+        a.textContent='['+(i+1)+'] '+label; elSources.appendChild(a);
+      } else {
+        var sp=document.createElement('span'); sp.className='src'; sp.textContent='['+(i+1)+'] '+label; elSources.appendChild(sp);
+      }
+    });
+  }
+
+  /* ---- animation loop (fixed-step, clamped) ---- */
+  var FIXED=1/60, acc=0, last=0, raf=0;
+  function renderOnce(){ doDraw(); updateCaption(); tstat.textContent='t = '+state.t.toFixed(2)+' s'; }
+  function loop(now){
+    raf=requestAnimationFrame(loop);
+    if(!last) last=now;
+    var el=(now-last)/1000; last=now;
+    if(el>0.25) el=0.25;
+    acc+=el;
+    var n=0;
+    while(acc>=FIXED && n<8){ doStep(FIXED); state.t+=FIXED; state.frame++; acc-=FIXED; n++; if(broke) break; }
+    renderOnce();
+    if(broke) stop();
+  }
+  function play(){
+    if(state.playing || broke) return;
+    state.playing=true; last=0; acc=0;
+    btnPlay.setAttribute('aria-pressed','true'); playLbl.textContent='Pause';
+    btnPlay.querySelector('.ic').innerHTML='&#10073;&#10073;';
+    stageBar.classList.add('running'); liveLbl.textContent='running';
+    raf=requestAnimationFrame(loop);
+  }
+  function stop(){
+    state.playing=false;
+    btnPlay.setAttribute('aria-pressed','false'); playLbl.textContent='Play';
+    btnPlay.querySelector('.ic').innerHTML='&#9654;';
+    stageBar.classList.remove('running'); liveLbl.textContent='paused';
+    if(raf) cancelAnimationFrame(raf); raf=0;
+  }
+  function stepOnce(){
+    if(broke) return;
+    if(state.playing) stop();
+    doStep(FIXED); state.t+=FIXED; state.frame++;
+    renderOnce();
+  }
+  function reset(){
+    stop(); broke=false;
+    elCaption.style.borderLeftColor=COLORS.accent;
+    state.t=0; state.frame=0; acc=0; last=0; lastCap='';
+    doInit(); renderOnce();
+    if(!REDUCED) play();
+    scheduleHeight();
+  }
+
+  btnPlay.addEventListener('click', function(){ state.playing ? stop() : play(); });
+  btnStep.addEventListener('click', stepOnce);
+  btnReset.addEventListener('click', reset);
+
+  /* keep canvas crisp on resize, redraw current frame */
+  var rzTimer=0;
+  window.addEventListener('resize', function(){
+    clearTimeout(rzTimer);
+    rzTimer=setTimeout(function(){ dpr=Math.max(1,Math.min(3,window.devicePixelRatio||1)); sizeCanvas(); renderOnce(); scheduleHeight(); }, 120);
+  });
+
+  /* one-time math in the static chrome (intro + control labels/symbols) */
+  function renderStaticMath(){ renderMathIn(elIntro); renderMathIn(elControls); }
+
+  /* ---- boot ---- */
+  sizeCanvas();
+  doInit();
+  renderFormula();
+  renderSources();
+  renderOnce();
+  renderStaticMath();
+  whenKatex(function(){ renderFormula(); renderStaticMath(); renderMathIn(elCaption); scheduleHeight(); });
+  if(REDUCED){ stop(); } else { play(); }
+  scheduleHeight();
+})();
+</script>
+</body>
+</html>
