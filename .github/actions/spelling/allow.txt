@@ -378,6 +378,7 @@ cycleways
 cygpath
 CZE
 czf
+D'orsay
 DALL
 Daniil
 Darabont
@@ -443,7 +444,6 @@ doi
 DOIs
 Donen
 Doogler
-D'orsay
 dotprompt
 Downscale
 dpf
@@ -918,8 +918,8 @@ ixed
 izakaya
 ize
 ized
-jaccard
 J'aime
+jaccard
 JAISH
 Jaival
 japonicum
@@ -1017,6 +1017,8 @@ Kwanzan
 kyc
 KYC
 Kylian
+L'avenir
+l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1029,7 +1031,6 @@ langgraph
 Laomedeia
 lastb
 latte
-L'avenir
 lbl
 LCEL
 LEBRON
@@ -1043,7 +1044,6 @@ levelname
 Leventer
 lexer
 lexers
-l'harmonie
 liberties
 lic
 linalg
