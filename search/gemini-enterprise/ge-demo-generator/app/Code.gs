@@ -5996,7 +5996,7 @@ ${params.importedMcpList.map((mcp, idx) => {
 // the user types instead arrives as 'custom:<name>' and goes through
 // sanitizeCustomLanguage_(), so this list bounds the auto-detect vocabulary
 // rather than what a user can ask for.
-const SUPPORTED_RESEARCH_LANGS_ = ['日本語', 'English', 'Deutsch', 'Français', 'Español', 'Italiano', '中文', '한국어', 'Português', 'Русский', 'Nederlands', 'Svenska', 'Suomi', 'Polski', 'Türkçe', 'العربية', 'हिन्दी', 'ไทย', 'Tiếng Việt', 'Bahasa Indonesia', 'Bahasa Melayu', 'Filipino'];
+const SUPPORTED_RESEARCH_LANGS_ = ['日本語', 'English', 'Deutsch', 'Français', 'Español', 'Italiano', '中文', '한국어', 'Português', 'Русский', 'Nederlands', 'Svenska', 'Suomi', 'Polski', 'T\u00fcrk\u00e7e', 'العربية', 'हिन्दी', 'ไทย', 'Tiếng Việt', 'Bahasa Indonesia', 'Bahasa Melayu', 'Filipino'];
 
 // Template Hub language codes -> the English name used when instructing a model.
 // Shared by translateTemplates() and the Magic Wand optimizer.
@@ -6093,7 +6093,7 @@ function researchCompanyByDomain(domain, persona, langOverride) {
     '.de': 'Deutsch', '.fr': 'Français', '.es': 'Español', '.it': 'Italiano',
     '.cn': '中文', '.tw': '中文', '.kr': '한국어', '.br': 'Português',
     '.ru': 'Русский', '.nl': 'Nederlands', '.se': 'Svenska', '.fi': 'Suomi',
-    '.pl': 'Polski', '.tr': 'Türkçe', '.com.tr': 'Türkçe',
+    '.pl': 'Polski', '.tr': 'T\u00fcrk\u00e7e', '.com.tr': 'T\u00fcrk\u00e7e',
     '.sa': 'العربية', '.ae': 'العربية', '.eg': 'العربية',
     '.th': 'ไทย', '.co.th': 'ไทย', '.vn': 'Tiếng Việt', '.com.vn': 'Tiếng Việt',
     '.id': 'Bahasa Indonesia', '.co.id': 'Bahasa Indonesia',
