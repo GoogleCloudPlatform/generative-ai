@@ -254,3 +254,6 @@ GHSA(?:-[0-9a-z]{4}){3}
 
 # mailto urls
 mailto:[-a-zA-Z=;:/?%&0-9+@._]{3,}
+
+# ruff / flake8 noqa suppression rule codes (e.g. `# noqa: INP001`)
+\bnoqa:\s*(?:[A-Z]+[0-9]+[,\s]*)+
