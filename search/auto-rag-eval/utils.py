@@ -6,6 +6,7 @@ from typing import Any
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import storage
 
+
 def convert_to_serializable(obj: Any) -> Any:
     """Recursively convert an object to a JSON-serializable representation."""
     if isinstance(obj, dict):

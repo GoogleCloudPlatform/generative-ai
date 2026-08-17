@@ -26,6 +26,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+
 def transform_benchmark_data(
     source_records: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
