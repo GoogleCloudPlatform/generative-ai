@@ -113,6 +113,15 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 		totalGranted += granted
 		totalSoftFailed += softFailed
 		totalGroups += groups
+		// verbose debug logging: Emitted per-project
+		logger.DebugContext(ctx, "project processed",
+			slog.String("project_id", projectID),
+			slog.Int("licenses_granted", granted),
+			slog.Int("licenses_soft_failed", softFailed),
+			slog.Int("groups_processed", groups),
+			slog.Bool("dry_run", dryRun),
+			slog.Bool("direct_law_mode", directLaw),
+		)
 	}
 
 	elapsed := time.Since(start).Milliseconds()
@@ -269,6 +278,12 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 	location := batch[0].Location
 
 	if batchErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, batch); batchErr == nil {
+		// verbose debug logging: Emitted per batch
+		logger.DebugContext(ctx, "batch granted",
+			slog.String("project_id", projectID),
+			slog.Int("count", len(batch)),
+			slog.String("license_config_path", entry.Path),
+		)
 		return len(batch), nil, nil
 	} else if !errors.Is(batchErr, models.ErrLicensesExhausted) {
 		return 0, nil, batchErr
@@ -302,6 +317,14 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 	if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, trimmed); retryErr != nil {
 		return 0, nil, retryErr
 	}
+
+	// verbose debug logging: Emitted per batch
+	logger.DebugContext(ctx, "batch granted after pool exhaustion",
+		slog.String("project_id", projectID),
+		slog.Int("count", int(available)),
+		slog.String("license_config_path", entry.Path),
+	)
+	
 	return int(available), batch[available:], nil
 }
 

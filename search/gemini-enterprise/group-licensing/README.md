@@ -19,6 +19,7 @@ Two Cloud Run Job definitions are deployed from a single container image, each t
 |---|---|---|
 | `JOB_TYPE` | Selects the workflow to run (`joiner` or `garbage_collection`). Required. | — |
 | `DRY_RUN` | When `true`, the full evaluation runs but no write API calls are made. Can be overridden per execution via the Cloud Scheduler request body. | `false` |
+| `GC_SKIP_GROUP_EVAL` | When `true`, the Garbage Collection job will skip group membership evaluation for currently licensed users. Users will be revoked solely based on license staleness. Only applicable to the garbage collection job. | `false` |
 | `CLOUD_RUN_TASK_INDEX` | Injected by Cloud Run. 0-based index of this task instance. | `0` |
 | `CLOUD_RUN_TASK_COUNT` | Injected by Cloud Run. Total number of concurrent task instances. | `1` |
 
@@ -159,7 +160,7 @@ gcloud run jobs deploy [name_of_job] \
   --source . \
   --region [desired_cloud_run_region] \
   --update-secrets=/run/secrets/entitlements.json=[name_of_secret_in_secret_manager]:latest \
-  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false \
+  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false,GC_SKIP_GROUP_EVAL=false \
   --service-account [desired_service_account_email_address]
 ```
 
@@ -181,7 +182,7 @@ gcloud run jobs deploy [name_of_job] \
   --image [desired_gcp_region]-docker.pkg.dev/[gcp_project_id]/[artifact_registry_repository]/[artifact_registry_package_name]:latest \
   --region [desired_cloud_run_region] \
   --update-secrets=/run/secrets/entitlements.json=[name_of_secret_in_secret_manager]:latest \
-  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false \
+  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false,GC_SKIP_GROUP_EVAL=false \
   --service-account [desired_service_account_email_address]
 ```
 
