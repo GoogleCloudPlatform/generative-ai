@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Agent-template validator for the GE Demo Generator.
+"""Agent-template validator for the Gemini Enterprise Demo Generator.
 
 The A2UI example JSONs and the agent runtime Python live as real files under
 agent_template/ (the generated setup script fetches them at run time), so

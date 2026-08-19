@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * GE Demo Generator — Backend (Code.gs)
+ * Gemini Enterprise Demo Generator — Backend (Code.gs)
  *
  * End-to-end generator for production-ready AI agent demo environments.
  * Given a natural-language business goal, this Google Apps Script file
@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.59-public',
+  APP_VERSION: 'v11.60-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -166,7 +166,7 @@ function doGet() {
     const template = HtmlService.createTemplateFromFile('SetupError');
     template.errorMessage = configError;
     return template.evaluate()
-      .setTitle('Setup Required - GE Demo Generator')
+      .setTitle('Setup Required - Gemini Enterprise Demo Generator')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
   }
 
@@ -179,7 +179,7 @@ function doGet() {
   template.generatorModel = CONFIG.MODEL || 'gemini-3.7-flash';
   
   return template.evaluate()
-    .setTitle('GE Demo Generator')
+    .setTitle('Gemini Enterprise Demo Generator')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
@@ -2865,7 +2865,7 @@ if [ "$SKIP_SLACK_OAUTH" = "false" ]; then
   SLACK_REDIRECT_URL="https://localhost"
 
   # ── Step 1: Create Slack App via Manifest URL ──
-  SLACK_MANIFEST='{"display_information":{"name":"${(`GE-${dirName}`).substring(0, 35)}"},"features":{},"oauth_config":{"redirect_urls":["'"$SLACK_REDIRECT_URL"'"],"scopes":{"user":["search:read","channels:read","channels:history","groups:read","groups:history","im:read","im:history","mpim:read","mpim:history","chat:write","reactions:read","users:read","users:read.email","team:read","files:read","canvases:read","canvases:write"]}},"settings":{"org_deploy_enabled":false,"socket_mode_enabled":false,"token_rotation_enabled":false}}'
+  SLACK_MANIFEST='{"display_information":{"name":"${dirName.substring(0, 35)}"},"features":{},"oauth_config":{"redirect_urls":["'"$SLACK_REDIRECT_URL"'"],"scopes":{"user":["search:read","channels:read","channels:history","groups:read","groups:history","im:read","im:history","mpim:read","mpim:history","chat:write","reactions:read","users:read","users:read.email","team:read","files:read","canvases:read","canvases:write"]}},"settings":{"org_deploy_enabled":false,"socket_mode_enabled":false,"token_rotation_enabled":false}}'
   ENCODED_MANIFEST=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$SLACK_MANIFEST'''))")
   CREATE_URL="https://api.slack.com/apps?new_app=1&manifest_json=$ENCODED_MANIFEST"
 
@@ -2991,7 +2991,7 @@ echo "════════════════════════�
 echo ""
 RMCP_URL="${mcp.endpoint_url}"
 RMCP_SECRET="${rmSecret}"
-RMCP_CLIENT_NAME="GE Demo (${dirName})"
+RMCP_CLIENT_NAME="Gemini Enterprise Demo (${dirName})"
 RMCP_REDIRECT="https://localhost"
 RMCP_CLIENT_ID=""
 RMCP_CLIENT_SECRET=""
@@ -3328,7 +3328,7 @@ echo "The following steps require manual interaction in the Google Cloud Console
   echo ""
   echo "1. Set up the OAuth consent screen (Branding):"
   echo "   URL: https://console.cloud.google.com/auth/branding?project=\$PROJECT_ID"
-  echo "   - App name: 'GE Demo Agent' (any name works - end users see it on the consent screen)"
+  echo "   - App name: 'Gemini Enterprise Demo Agent' (any name works - end users see it on the consent screen)"
   echo "   - Support email: your own email address"
   echo "   - Audience: choose 'Internal' (recommended - only users in your org, no verification needed)."
   echo "     If 'Internal' is not available (no Workspace org), choose 'External' and then add your"
@@ -3362,7 +3362,7 @@ echo "The following steps require manual interaction in the Google Cloud Console
   echo "3. Create an OAuth 2.0 Client ID (Web application):"
   echo "   URL: https://console.cloud.google.com/auth/clients/create?project=\$PROJECT_ID"
   echo "   - Application type: 'Web application'"
-  echo "   - Name: 'GE Demo Generator' (any name works - it is only shown in the console)"
+  echo "   - Name: 'Gemini Enterprise Demo Generator' (any name works - it is only shown in the console)"
   echo "   - Add the following Authorized Redirect URIs:"
   echo "     - https://vertexaisearch.cloud.google.com/oauth-redirect"
   echo "     - https://vertexaisearch.cloud.google.com/static/oauth/oauth.html"
@@ -3383,9 +3383,9 @@ ${ enableWorkspaceMcp ? `  echo "4. Configure the Chat app (required for Chat MC
 ` : `  echo "4. Configure the Google Chat API app (one-time; required for the agent to post to Chat with your authorization):"
   echo "   URL: https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=\$PROJECT_ID"
   echo "   In 'Google Chat API' -> 'Manage' -> 'Configuration', set:"
-  echo "     - App name: 'GE Demo Agent'"
+  echo "     - App name: 'Gemini Enterprise Demo Agent'"
   echo "     - Avatar URL: https://developers.google.com/chat/images/quickstart-app-avatar.png"
-  echo "     - Description: 'GE Demo Agent Workspace actions'"
+  echo "     - Description: 'Gemini Enterprise Demo Agent Workspace actions'"
   echo "     - Disable 'Enable interactive features'."
   echo "     - Under 'Visibility', make the app available to yourself (enter your email or your domain)."
   echo "     - Under 'Logs', select 'Log errors to Logging'."
@@ -3408,7 +3408,7 @@ else
   echo "✅ Stored OAuth credentials found - skipping the console tutorial."
   echo "   Reminder: posting to Google Chat needs a ONE-TIME Google Chat API app configuration:"
   echo "   https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=\$PROJECT_ID"
-  echo "   If Chat posts fail with a permission/configuration error, open 'Configuration' there and set it up (App name: '${enableWorkspaceMcp ? 'Chat MCP' : 'GE Demo Agent'}')."
+  echo "   If Chat posts fail with a permission/configuration error, open 'Configuration' there and set it up (App name: '${enableWorkspaceMcp ? 'Chat MCP' : 'Gemini Enterprise Demo Agent'}')."
 fi
 
 # ── OAuth credential pre-flight (v11.38) ──────────────────────────────────
@@ -3510,7 +3510,7 @@ rm -f "\$AUTH_RESP"
 
   let fullScript = `#!/bin/bash
 # ===========================================
-# GE Demo Generator - Setup Script (${CONFIG.APP_VERSION})
+# Gemini Enterprise Demo Generator - Setup Script (${CONFIG.APP_VERSION})
 # Generated: ${new Date().toISOString()}
 # Demo: ${dirName}
 # ===========================================
@@ -3697,7 +3697,7 @@ ${ enableManagedAgent ? `    echo "  • Managed Agent (Antigravity): ${managedA
     _HAS_SLACK=\$(gcloud secrets describe "${dirName}-slack-token" --project="\$PROJECT_ID" 2>/dev/null && echo "yes" || echo "no")
     if [ "\$_HAS_SLACK" = "yes" ]; then
       echo "⚠️  Manual cleanup required after deletion:"
-      echo "  • Slack App: GE-${dirName}"
+      echo "  • Slack App: ${dirName}"
       echo "    → Delete manually at https://api.slack.com/apps"
       echo ""
     fi
@@ -3980,12 +3980,12 @@ for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '
       echo ""
       echo "📱 Slack App (manual cleanup required):"
       echo "   ⚠️  Please delete the Slack App manually at: https://api.slack.com/apps"
-      echo "   Look for an app named 'GE-${dirName}' and delete it."
+      echo "   Look for an app named '${dirName}' and delete it."
     fi
 ${ (params.importedMcpList || []).some(m => m.type === 'remote' && m.auth_type === 'oauth2_dcr') ? `
     echo ""
     echo "🔗 Managed remote MCP authorizations (manual cleanup):"
-    echo "   Setup registered an OAuth client named 'GE Demo (${dirName})' with:"
+    echo "   Setup registered an OAuth client named 'Gemini Enterprise Demo (${dirName})' with:"
 ${params.importedMcpList.filter(m => m.type === 'remote' && m.auth_type === 'oauth2_dcr').map(m => `    echo "     • ${m.name || m.endpoint_url}"`).join('\n')}
     echo "   Dynamically registered clients usually cannot be deleted via API."
     echo "   Revoke the demo's access in each provider's connected-apps settings."
@@ -4007,7 +4007,7 @@ AGENT_DISPLAY_NAME='${safeShortName}' # ge:agent-display-name
 # --- 1. Project Detection & Confirmation Loop ---
 while true; do
   echo "========================================================="
-  echo "⚡ GE Demo Generator - Setup Script"
+  echo "⚡ Gemini Enterprise Demo Generator - Setup Script"
   echo "   Version:      ${CONFIG.APP_VERSION}"
   echo "   Generated At: ${new Date().toISOString()}"
   echo "   Options:      --help | --cleanup | --model-analysis-agent | --model-root-agent"
@@ -7484,7 +7484,7 @@ Return ONLY the raw Markdown text in the detected language. Do not include any c
 
 /**
  * Translates Template Hub entries into a target language for display.
- * Ported from GE Demo Generator Lite: the frontend ships English-only data
+ * Ported from Gemini Enterprise Demo Generator Lite: the frontend ships English-only data
  * and asks the backend for translations on demand, so non-ASCII translations
  * never live in the inline frontend JS (which would break the GAS minifier).
  * Entries with an empty "text" are category labels (industries/job functions).
