@@ -1,4 +1,4 @@
-# AGENTS.md — AI Agent Development Guide for GE Demo Generator
+# AGENTS.md — AI Agent Development Guide for Gemini Enterprise Demo Generator
 
 > **Purpose**: Project-specific knowledge for AI coding agents (Antigravity, Cursor, Copilot, etc.)
 > and humans working on this sample.
@@ -299,12 +299,12 @@ can delegate long-running autonomous work to over the **Interactions API**
   `create_managed_agent.py start`) → `.env` + Cloud Run env
   (`ENABLE_MANAGED_AGENT`, `MANAGED_AGENT_ID`, `MANAGED_AGENT_SKILLS_SOURCE`)
   → env-gated blocks in `tools.py` / `agent.py` / `fast_api_app.py` → PHASE B
-  (after Cloud Run deploy + GE registration: `create_managed_agent.py wait`
+  (after Cloud Run deploy + Gemini Enterprise registration: `create_managed_agent.py wait`
   polls readiness, `warmup_managed_agent.py` stores the environment id in
   Firestore `<demo>_managed_agent_state/current`). The A/B split hides the
   ~8-10 min agent creation behind the rest of the setup.
-- **`enableWorkspaceAuth` (auth-only mode)**: sets up the GE OAuth
-  authorization WITHOUT the Developer-Preview Workspace MCP servers (no
+- **`enableWorkspaceAuth` (auth-only mode)**: sets up the Gemini
+  Enterprise OAuth authorization WITHOUT the Developer-Preview Workspace MCP servers (no
   allowlist needed). Derived gates: `workspaceAuthEnabled = enableWorkspaceMcp
   || enableWorkspaceAuth` (auth infra) and `driveHandoffEnabled =
   enableManagedAgent && workspaceAuthEnabled` (Drive save tool, gws skills,

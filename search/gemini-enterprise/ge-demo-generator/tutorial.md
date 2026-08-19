@@ -24,7 +24,7 @@ gcloud config set project {{project-id}}
 
 The Demo Generator has synthesized a custom setup script for you. This script is responsible for provisioning the BigQuery dataset and setting up the agent code within YOUR Google Cloud environment.
 
-1. Go back to the **GE Demo Generator** Web UI.
+1. Go back to the **Gemini Enterprise Demo Generator** Web UI.
 2. Under **Step 3: Deploy**, click the **Copy** button next to the **Setup Script**.
 3. **Paste the command** into the Cloud Shell terminal window (at the bottom of your screen) and press **Enter**.
 
@@ -136,4 +136,4 @@ This will remove:
 ---
 
 ### Need Help?
-See the [GE Demo Generator README](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/gemini-enterprise/ge-demo-generator) or open an issue on the [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai/issues) repository. Support is handled on a best-effort basis.
+See the [Gemini Enterprise Demo Generator README](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/gemini-enterprise/ge-demo-generator) or open an issue on the [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai/issues) repository. Support is handled on a best-effort basis.

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * GE Demo Generator Lite - Backend (Code.gs)
+ * Gemini Enterprise Demo Generator Lite - Backend (Code.gs)
  *
  * Gemini Enterprise Business Edition (GEBE) does not support custom ADK agents.
  * Instead of generating a Cloud setup script, this app synthesizes demo content
@@ -23,7 +23,7 @@
  * Execution identity: the web app runs as USER_ACCESSING, so all files are created
  * in the accessing user's own Drive with their own authorization.
  *
- * Many helpers here are reused verbatim from the GE Demo Generator (Code.gs):
+ * Many helpers here are reused verbatim from the Gemini Enterprise Demo Generator (Code.gs):
  * Vertex AI Agent Platform calls, image generation, JSON repair, and retry.
  */
 
@@ -38,7 +38,7 @@ const CONFIG = {
   MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.7-flash',
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v1.8-public',
+  APP_VERSION: 'v1.9-public',
   MY_DEMOS_FOLDER: 'My Demos'
 };
 
@@ -60,7 +60,7 @@ function doGet(e) {
     const template = HtmlService.createTemplateFromFile('SetupError');
     template.errorMessage = configError;
     return template.evaluate()
-      .setTitle('Setup Required - GE Demo Generator Lite')
+      .setTitle('Setup Required - Gemini Enterprise Demo Generator Lite')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
   }
 
@@ -79,7 +79,7 @@ function doGet(e) {
   template.webAppUrl = webAppUrl;
 
   return template.evaluate()
-    .setTitle('GE Demo Generator Lite')
+    .setTitle('Gemini Enterprise Demo Generator Lite')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
@@ -123,7 +123,7 @@ function initializeProject(projectId) {
 }
 
 // ===========================================
-// Vertex AI Agent Platform utilities (reused from GE Demo Generator)
+// Vertex AI Agent Platform utilities (reused from Gemini Enterprise Demo Generator)
 // ===========================================
 
 function callVertexAIWithRetry(prompt) { return executeWithRetry(function () { return callVertexAI(prompt); }); }
@@ -498,7 +498,7 @@ function planDemo(userGoal, options) {
   // Normalize / clamp.
   plan.referenceDate = plan.referenceDate || todayStr;
   plan.customerName = plan.customerName ? String(plan.customerName) : '';
-  plan.folderName = sanitizeFolderName_(plan.folderName || ('Demo - ' + (plan.customerName || plan.domainName || 'GE Demo')));
+  plan.folderName = sanitizeFolderName_(plan.folderName || ('Demo - ' + (plan.customerName || plan.domainName || 'Gemini Enterprise Demo')));
   plan.agentDesignerPrompt = plan.agentDesignerPrompt ? String(plan.agentDesignerPrompt) : '';
   plan.demoGuide = Array.isArray(plan.demoGuide) ? plan.demoGuide.slice(0, 5) : [];
   plan.files = plan.files.slice(0, 6).filter(function (f) { return wanted.indexOf(f.type) !== -1; });
@@ -527,7 +527,7 @@ function sanitizePersonaText_(persona) {
 /**
  * Magic-wand goal optimizer. Expands a raw/loose business scenario (optionally
  * carrying selected research workflows) into a structured Markdown business
- * scenario in the SAME language. Reused from the GE Demo Generator, retargeted
+ * scenario in the SAME language. Reused from the Gemini Enterprise Demo Generator, retargeted
  * for Workspace-file demos. Returns { success, optimizedGoal } or { success:false, error }.
  */
 function optimizeGoalWithMagicWand(rawGoal, persona) {
@@ -638,7 +638,7 @@ function translateTemplates(lang, items) {
 
 /**
  * Researches the company behind a domain via Google Search grounding and proposes
- * a demo goal. Reused from the GE Demo Generator. Returns a structured object the
+ * a demo goal. Reused from the Gemini Enterprise Demo Generator. Returns a structured object the
  * frontend uses to pre-fill the goal + show challenges and automatable workflows.
  * Optional persona ({ id, label, description }) frames the suggested goal around
  * that target user's business process.
@@ -1138,7 +1138,7 @@ function createDemoGuideDoc(folderId, plan, fileResults) {
   }
 
   body.appendParagraph('How to delete this demo').setHeading(DocumentApp.ParagraphHeading.HEADING1);
-  body.appendListItem('Open GE Demo Generator Lite and click the trash icon on this demo in My Demos. This removes it from your history AND moves this entire demo folder (with all generated files) to your Google Drive Trash.');
+  body.appendListItem('Open Gemini Enterprise Demo Generator Lite and click the trash icon on this demo in My Demos. This removes it from your history AND moves this entire demo folder (with all generated files) to your Google Drive Trash.');
   body.appendListItem('Trashed items are recoverable from Google Drive Trash for about 30 days, or empty the Trash to delete them permanently.');
   body.appendListItem('You can also delete it manually: move this folder to the Trash in Google Drive.');
 

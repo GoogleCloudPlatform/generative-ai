@@ -1,10 +1,10 @@
-# GE Demo Generator
+# Gemini Enterprise Demo Generator
 
 > **Disclaimer:** This is not an officially supported Google product. This open-source solution is intended to enhance the Google customer experience. Support and/or new releases are handled on a best-effort basis.
 
-## What is the GE Demo Generator?
+## What is the Gemini Enterprise Demo Generator?
 
-The **GE Demo Generator** is a low-code web application built on Google Apps Script (GAS) that instantly synthesizes fully functional, domain-specific custom demo environments for **Gemini Enterprise**. By inputting your client's unique business challenges, the tool dynamically provisions datasets, an AI agent with MCP toolsets, and a real-time operations dashboard — all tailored to their business workflow.
+The **Gemini Enterprise Demo Generator** is a low-code web application built on Google Apps Script (GAS) that instantly synthesizes fully functional, domain-specific custom demo environments for **Gemini Enterprise**. By inputting your client's unique business challenges, the tool dynamically provisions datasets, an AI agent with MCP toolsets, and a real-time operations dashboard — all tailored to their business workflow.
 
 ### 💡 Business Value
 - **Hyper-Fast Pre-Sales**: Prepare hyper-personalized demonstrations within minutes instead of weeks.
@@ -35,7 +35,7 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 
 ## Table of Contents
 
-- [What is the GE Demo Generator?](#what-is-the-ge-demo-generator)
+- [What is the Gemini Enterprise Demo Generator?](#what-is-the-gemini-enterprise-demo-generator)
 - [1. Prerequisites](#1-prerequisites)
 - [2. Repository Setup](#2-repository-setup)
 - [3. Apps Script Project Setup](#3-apps-script-project-setup)
@@ -276,7 +276,7 @@ Even with correct scopes in `appsscript.json`, you **must** manually authorize t
 1. In the Apps Script editor, click **Deploy > New Deployment**.
 2. Click the gear icon next to "Select type" and choose **Web App**.
 3. Configure:
-   - **Description**: e.g., `GE Demo Generator v1`
+   - **Description**: e.g., `Gemini Enterprise Demo Generator v1`
    - **Execute as**: `User accessing the web app`
    - **Who has access**: `Anyone` (or restrict as needed)
 4. Click **Deploy**.
@@ -327,9 +327,10 @@ ge-demo-generator/
 ├── deploy.sh                # Clasp deployment orchestrator script
 ├── validate_examples.py     # Validates agent_template JSON + Python files
 ├── check_deps.py            # Audits the PINNED_DEPS major caps (AGENTS.md 8)
-├── ge-demo-generator-lite/  # (Subproject) GE Demo Generator Lite — Workspace
-│                            #  demo-data generator for Gemini Enterprise
-│                            #  editions without custom-agent support
+├── ge-demo-generator-lite/  # (Subproject) Gemini Enterprise Demo Generator
+│                            #  Lite — Workspace demo-data generator for
+│                            #  Gemini Enterprise editions without
+│                            #  custom-agent support
 │   ├── appsscript.json
 │   ├── Code.gs
 │   ├── index.html
@@ -523,13 +524,13 @@ When you open an issue, please include:
 
 ## 14. System Architecture
 
-This document describes the system architecture of the GE Demo Generator and the synthesized demo environments it produces.
+This document describes the system architecture of the Gemini Enterprise Demo Generator and the synthesized demo environments it produces.
 
 ---
 
 ### 14.1 Overview
 
-The GE Demo Generator is a low-code accelerator built on Google Apps Script that allows Customer Engineers to instantly synthesize fully functional AI agent demo environments for any business domain. It generates domain-specific datasets, an ADK-based agent with MCP toolsets, and a real-time operations dashboard — all provisioned into the user's own Google Cloud project.
+The Gemini Enterprise Demo Generator is a low-code accelerator built on Google Apps Script that allows Customer Engineers to instantly synthesize fully functional AI agent demo environments for any business domain. It generates domain-specific datasets, an ADK-based agent with MCP toolsets, and a real-time operations dashboard — all provisioned into the user's own Google Cloud project.
 
 The system is divided into two main parts: the **Generator Dashboard** (the Apps Script web app) and the **Synthesized Demo Environment** (the Google Cloud resources created by the setup script).
 
