@@ -1,0 +1,175 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "event-compose",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "event-compose",
+      "path": "/form",
+      "value": {
+        "title": "Inventory Review",
+        "startDate": "2024-09-17",
+        "startTime": "2024-09-17T14:00:00",
+        "endTime": "2024-09-17T15:00:00",
+        "location": "Main Office",
+        "attendees": "team@example.com"
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "event-compose",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "fTitle",
+            "dStartDate",
+            "tStart",
+            "tEnd",
+            "fLoc",
+            "fAtt",
+            "actions"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📅 Create Calendar Event",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "fTitle",
+          "component": "MaterialInput",
+          "label": "Title",
+          "value": {
+            "path": "/form/title"
+          }
+        },
+        {
+          "id": "dStartDate",
+          "component": "MaterialDatepicker",
+          "label": "Date",
+          "value": {
+            "path": "/form/startDate"
+          }
+        },
+        {
+          "id": "tStart",
+          "component": "MaterialTimepicker",
+          "label": "Start time",
+          "value": {
+            "path": "/form/startTime"
+          }
+        },
+        {
+          "id": "tEnd",
+          "component": "MaterialTimepicker",
+          "label": "End time",
+          "value": {
+            "path": "/form/endTime"
+          }
+        },
+        {
+          "id": "fLoc",
+          "component": "MaterialInput",
+          "label": "Location",
+          "value": {
+            "path": "/form/location"
+          }
+        },
+        {
+          "id": "fAtt",
+          "component": "MaterialInput",
+          "label": "Attendees (comma-separated)",
+          "value": {
+            "path": "/form/attendees"
+          }
+        },
+        {
+          "id": "actions",
+          "component": "MaterialRow",
+          "children": [
+            "btnCreate",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnCreate",
+          "component": "MaterialButton",
+          "label": "✅ Create",
+          "action": {
+            "event": {
+              "name": "submit_calendar_event",
+              "context": {
+                "prompt": "Create this calendar event",
+                "aTitle": {
+                  "path": "/form/title"
+                },
+                "aDate": {
+                  "path": "/form/startDate"
+                },
+                "aStart": {
+                  "path": "/form/startTime"
+                },
+                "aEnd": {
+                  "path": "/form/endTime"
+                },
+                "aLocation": {
+                  "path": "/form/location"
+                },
+                "aAttendees": {
+                  "path": "/form/attendees"
+                }
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "🚫 Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_calendar_event",
+              "context": {
+                "prompt": "Cancel creating the event"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

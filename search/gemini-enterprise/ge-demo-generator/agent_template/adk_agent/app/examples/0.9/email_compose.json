@@ -1,0 +1,137 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "email-compose",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "email-compose",
+      "path": "/form",
+      "value": {
+        "to": "supplier@example.com",
+        "subject": "Restock Request",
+        "body": "Hello,\n\nPlease restock the following items at your earliest convenience.\n\nThanks."
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "email-compose",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "fTo",
+            "fSubject",
+            "fBody",
+            "actions"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "✉️ Compose Email Draft",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "fTo",
+          "component": "MaterialInput",
+          "label": "To",
+          "type": "email",
+          "value": {
+            "path": "/form/to"
+          }
+        },
+        {
+          "id": "fSubject",
+          "component": "MaterialInput",
+          "label": "Subject",
+          "value": {
+            "path": "/form/subject"
+          }
+        },
+        {
+          "id": "fBody",
+          "component": "MaterialInput",
+          "label": "Body",
+          "value": {
+            "path": "/form/body"
+          }
+        },
+        {
+          "id": "actions",
+          "component": "MaterialRow",
+          "children": [
+            "btnSave",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnSave",
+          "component": "MaterialButton",
+          "label": "💾 Save Draft",
+          "action": {
+            "event": {
+              "name": "submit_email_draft",
+              "context": {
+                "prompt": "Create a Gmail draft with these details",
+                "aTo": {
+                  "path": "/form/to"
+                },
+                "aSubject": {
+                  "path": "/form/subject"
+                },
+                "aBody": {
+                  "path": "/form/body"
+                }
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "🚫 Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_email_draft",
+              "context": {
+                "prompt": "Cancel the email draft"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

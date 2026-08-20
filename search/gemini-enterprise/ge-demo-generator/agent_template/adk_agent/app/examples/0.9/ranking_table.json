@@ -1,0 +1,165 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "ranking-surface",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "ranking-surface",
+      "path": "/ranking",
+      "value": [
+        {
+          "rank": "🥇 1",
+          "name": "Taro Tanaka",
+          "faculty": "Engineering",
+          "amount": "[CURRENCY]1,200,000",
+          "score": "92"
+        },
+        {
+          "rank": "🥈 2",
+          "name": "Hanako Sato",
+          "faculty": "Law",
+          "amount": "[CURRENCY]980,000",
+          "score": "88"
+        },
+        {
+          "rank": "🥉 3",
+          "name": "Ichiro Suzuki",
+          "faculty": "Medicine",
+          "amount": "[CURRENCY]750,000",
+          "score": "85"
+        },
+        {
+          "rank": "4",
+          "name": "Misaki Yamada",
+          "faculty": "Economics",
+          "amount": "[CURRENCY]520,000",
+          "score": "76"
+        },
+        {
+          "rank": "5",
+          "name": "Kenta Takahashi",
+          "faculty": "Economics",
+          "amount": "[CURRENCY]50,000",
+          "score": "45"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "ranking-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "subtitle",
+            "table",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "🏆 Donation Ranking TOP 5",
+          "usageHint": "h2"
+        },
+        {
+          "id": "subtitle",
+          "component": "MaterialText",
+          "text": "FY2024 — Cumulative Donations",
+          "usageHint": "caption"
+        },
+        {
+          "id": "table",
+          "component": "MaterialTable",
+          "caption": "Top 5 donors by cumulative amount",
+          "columns": [
+            {
+              "header": "#",
+              "field": "rank"
+            },
+            {
+              "header": "Name",
+              "field": "name"
+            },
+            {
+              "header": "Faculty",
+              "field": "faculty"
+            },
+            {
+              "header": "Donations",
+              "field": "amount"
+            },
+            {
+              "header": "Score",
+              "field": "score"
+            }
+          ],
+          "rows": {
+            "path": "/ranking"
+          },
+          "style": {
+            "marginTop": "8px"
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnDetail",
+            "btnExport"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnDetail",
+          "component": "MaterialButton",
+          "label": "🔍 Deep-Dive #1",
+          "action": {
+            "event": {
+              "name": "deep_dive_top_donor",
+              "context": {
+                "prompt": "Analyze #1 Taro Tanaka in detail"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnExport",
+          "component": "MaterialButton",
+          "label": "📊 Show All",
+          "action": {
+            "event": {
+              "name": "show_full_ranking",
+              "context": {
+                "prompt": "Show the full alumni ranking"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

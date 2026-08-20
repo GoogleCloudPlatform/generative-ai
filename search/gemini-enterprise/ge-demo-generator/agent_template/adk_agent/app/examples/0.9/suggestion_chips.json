@@ -1,0 +1,71 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialRow",
+          "ariaLabel": "Suggested follow-up questions",
+          "justify": "spaceEvenly",
+          "align": "center",
+          "style": {
+            "marginTop": "8px",
+            "gap": "8px"
+          },
+          "children": ["chip_ranking", "chip_low_score", "chip_event"]
+        },
+        {
+          "id": "chip_ranking",
+          "component": "MaterialButton",
+          "label": "📊 Donation Ranking",
+          "variant": "stroked",
+          "action": {
+            "event": {
+              "name": "suggestion_ranking",
+              "context": {
+                "prompt": "Show the donation ranking"
+              }
+            }
+          }
+        },
+        {
+          "id": "chip_low_score",
+          "component": "MaterialButton",
+          "label": "📉 Low Score Analysis",
+          "variant": "stroked",
+          "action": {
+            "event": {
+              "name": "suggestion_low_score",
+              "context": {
+                "prompt": "Analyze alumni with low engagement scores"
+              }
+            }
+          }
+        },
+        {
+          "id": "chip_event",
+          "component": "MaterialButton",
+          "label": "📅 Event Proposal",
+          "variant": "stroked",
+          "action": {
+            "event": {
+              "name": "suggestion_event",
+              "context": {
+                "prompt": "Suggest the next event plan"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,104 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "image-report",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "image-report",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "chartImage",
+            "insight",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📊 Donation Trend Analysis Report",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "chartImage",
+          "component": "MaterialImage",
+          "url": "https://example.com/chart.png",
+          "alt": "2020-2024 Donation Trends by Faculty",
+          "fit": "contain",
+          "roundedCorners": true
+        },
+        {
+          "id": "insight",
+          "component": "MaterialText",
+          "text": "💡 Engineering donations up +23% YoY. Economics down -8%. Engagement strategy review recommended.",
+          "usageHint": "body",
+          "style": {
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnDetail",
+            "btnExport"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnDetail",
+          "component": "MaterialButton",
+          "label": "📉 Root Cause",
+          "action": {
+            "event": {
+              "name": "deep_dive_faculty",
+              "context": {
+                "prompt": "Analyze the root cause of declining donations in the Economics faculty"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnExport",
+          "component": "MaterialButton",
+          "label": "📄 Export Report",
+          "action": {
+            "event": {
+              "name": "export_report_pdf",
+              "context": {
+                "prompt": "Summarize this analysis report in PDF format"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,137 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "chat-compose",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "chat-compose",
+      "path": "/form",
+      "value": {
+        "space": "Engineering",
+        "message": "Heads up: shelf alert #4821 has been resolved."
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "chat-compose",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "selectSpace",
+            "fieldMsg",
+            "actions"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "💬 Send Chat Message",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "selectSpace",
+          "component": "MaterialSelect",
+          "label": "Space",
+          "value": {
+            "path": "/form/space"
+          },
+          "options": [
+            {
+              "label": "Engineering",
+              "value": "Engineering"
+            },
+            {
+              "label": "Operations",
+              "value": "Operations"
+            },
+            {
+              "label": "Store Managers",
+              "value": "Store Managers"
+            }
+          ]
+        },
+        {
+          "id": "fieldMsg",
+          "component": "MaterialInput",
+          "label": "Message",
+          "value": {
+            "path": "/form/message"
+          }
+        },
+        {
+          "id": "actions",
+          "component": "MaterialRow",
+          "children": [
+            "btnSend",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnSend",
+          "component": "MaterialButton",
+          "label": "📤 Send",
+          "action": {
+            "event": {
+              "name": "submit_chat_message",
+              "context": {
+                "prompt": "Send this chat message to the selected space",
+                "aSpace": {
+                  "path": "/form/space"
+                },
+                "aMessage": {
+                  "path": "/form/message"
+                }
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "🚫 Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_chat_message",
+              "context": {
+                "prompt": "Cancel sending the chat message"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

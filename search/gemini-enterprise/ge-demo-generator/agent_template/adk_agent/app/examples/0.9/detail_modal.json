@@ -1,0 +1,209 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "modal-detail",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "modal-detail",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "kpiRow",
+            "divider2",
+            "openDialogBtn",
+            "profileDialog",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📊 Kenta Takahashi Summary",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "kpiRow",
+          "component": "MaterialRow",
+          "children": [
+            "kpi1",
+            "kpi2",
+            "kpi3"
+          ],
+          "justify": "spaceEvenly",
+          "align": "center"
+        },
+        {
+          "id": "kpi1",
+          "component": "MaterialColumn",
+          "children": [
+            "kpi1Val",
+            "kpi1Lbl"
+          ],
+          "align": "center"
+        },
+        {
+          "id": "kpi1Val",
+          "component": "MaterialText",
+          "text": "45",
+          "usageHint": "h2"
+        },
+        {
+          "id": "kpi1Lbl",
+          "component": "MaterialText",
+          "text": "Score",
+          "usageHint": "caption"
+        },
+        {
+          "id": "kpi2",
+          "component": "MaterialColumn",
+          "children": [
+            "kpi2Val",
+            "kpi2Lbl"
+          ],
+          "align": "center"
+        },
+        {
+          "id": "kpi2Val",
+          "component": "MaterialText",
+          "text": "[CURRENCY]50K",
+          "usageHint": "h2"
+        },
+        {
+          "id": "kpi2Lbl",
+          "component": "MaterialText",
+          "text": "Lifetime Donations",
+          "usageHint": "caption"
+        },
+        {
+          "id": "kpi3",
+          "component": "MaterialColumn",
+          "children": [
+            "kpi3Val",
+            "kpi3Lbl"
+          ],
+          "align": "center"
+        },
+        {
+          "id": "kpi3Val",
+          "component": "MaterialText",
+          "text": "3x",
+          "usageHint": "h2"
+        },
+        {
+          "id": "kpi3Lbl",
+          "component": "MaterialText",
+          "text": "Attendance",
+          "usageHint": "caption"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "openDialogBtn",
+          "component": "MaterialButton",
+          "label": "📋 View Full Profile",
+          "action": {
+            "event": {
+              "name": "open_full_profile",
+              "context": {
+                "prompt": "Show the full profile for Kenta Takahashi"
+              }
+            }
+          }
+        },
+        {
+          "id": "profileDialog",
+          "component": "MaterialDialog",
+          "title": "Kenta Takahashi — Full Profile",
+          "open": false,
+          "children": [
+            "detailInfo",
+            "detailHistory",
+            "detailEvents"
+          ]
+        },
+        {
+          "id": "detailInfo",
+          "component": "MaterialText",
+          "text": "🏢 Mitsubishi UFJ Bank CFO — 🎓 Class of 2000, Economics — 📧 k.takahashi@example.com",
+          "usageHint": "body"
+        },
+        {
+          "id": "detailHistory",
+          "component": "MaterialText",
+          "text": "💰 Donation History: 2021: [CURRENCY]10,000 — 2022: [CURRENCY]15,000 — 2023: [CURRENCY]25,000 — Total: [CURRENCY]50,000",
+          "usageHint": "body"
+        },
+        {
+          "id": "detailEvents",
+          "component": "MaterialText",
+          "text": "📅 Event Attendance: 75% (3/4) — ✅ Career Seminar, Alumni Meetup, Lecture — ❌ Spring Gala 2024",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnApproach",
+            "btnEdit"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnApproach",
+          "component": "MaterialButton",
+          "label": "🎯 Engagement Strategy",
+          "action": {
+            "event": {
+              "name": "suggest_engagement_strategy",
+              "context": {
+                "prompt": "Suggest an engagement strategy for Takahashi"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnEdit",
+          "component": "MaterialButton",
+          "label": "✏️ Edit Record",
+          "action": {
+            "event": {
+              "name": "edit_alumni_record",
+              "context": {
+                "prompt": "I want to edit Takahashi's record"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

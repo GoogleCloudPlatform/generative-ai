@@ -17,7 +17,8 @@
 
 The A2UI example JSONs and the agent runtime Python live as real files under
 agent_template/ (the generated setup script fetches them at run time), so
-validation is now direct: parse every example JSON and byte-compile every
+validation is now direct: parse every example JSON, check the A2UI v0.9
+one-press-one-prompt rule the schema cannot express, and byte-compile every
 Python file. Run from this directory:
 
     python3 validate_examples.py
@@ -35,6 +36,52 @@ TEMPLATE = os.path.join(ROOT, "agent_template")
 CURRENCY_PLACEHOLDER = "[CURRENCY]"
 
 
+def check_one_action_per_prompt(messages):
+    """One press must send one prompt. Returns a list of problem strings.
+
+    No schema can catch this: a `MaterialChips` carries a SINGLE `action` for
+    ALL of its `options`, so a chip bar built out of one validates perfectly
+    and then sends the FIRST chip's `context.prompt` whichever chip the user
+    presses. `MaterialChips` is still right for BOUND selection inside a form,
+    where the choice travels through `value` and the data model rather than
+    through the action, so the rule is specifically "an action, plus more than
+    one option".
+
+    Also flags two prompts that are byte-identical within one surface, the
+    other way a chip bar silently collapses onto one destination.
+    """
+    problems = []
+    for message in messages:
+        if not isinstance(message, dict):
+            continue
+        body = message.get("updateComponents")
+        if not isinstance(body, dict):
+            continue
+        surface = body.get("surfaceId", "?")
+        prompts = {}
+        for comp in body.get("components") or []:
+            if not isinstance(comp, dict):
+                continue
+            action = comp.get("action")
+            if not isinstance(action, dict):
+                continue
+            options = comp.get("options")
+            if comp.get("component") == "MaterialChips" and isinstance(options, list) and len(options) > 1:
+                problems.append(
+                    "%s: MaterialChips '%s' has %d options behind ONE action - every "
+                    "option would send the same context.prompt. Use one MaterialButton "
+                    "per choice, or bind the selection with 'value' and drop the action."
+                    % (surface, comp.get("id"), len(options)))
+            prompt = ((action.get("event") or {}).get("context") or {}).get("prompt")
+            if isinstance(prompt, str):
+                if prompt in prompts:
+                    problems.append(
+                        "%s: '%s' and '%s' both send the prompt %r"
+                        % (surface, prompts[prompt], comp.get("id"), prompt))
+                prompts[prompt] = comp.get("id")
+    return problems
+
+
 def main() -> int:
     failures = 0
 
@@ -46,11 +93,18 @@ def main() -> int:
         rel = os.path.relpath(path, ROOT)
         try:
             with open(path, encoding="utf-8") as f:
-                json.loads(f.read().replace(CURRENCY_PLACEHOLDER, "$"))
-            print(f"  ✅ {rel}")
+                parsed = json.loads(f.read().replace(CURRENCY_PLACEHOLDER, "$"))
         except json.JSONDecodeError as exc:
             failures += 1
             print(f"  ❌ {rel}: {exc}")
+            continue
+        problems = check_one_action_per_prompt(parsed if isinstance(parsed, list) else [parsed])
+        if problems:
+            failures += 1
+            for problem in problems:
+                print(f"  ❌ {rel} {problem}")
+            continue
+        print(f"  ✅ {rel}")
 
     py_files = sorted(glob.glob(os.path.join(TEMPLATE, "**", "*.py"), recursive=True))
     for path in py_files:

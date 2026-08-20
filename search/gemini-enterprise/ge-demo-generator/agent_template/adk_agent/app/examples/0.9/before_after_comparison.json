@@ -1,0 +1,192 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "comparison-surface",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "comparison-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "outerColumn"
+          ]
+        },
+        {
+          "id": "outerColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "compTitle",
+            "divider1",
+            "comparisonRow",
+            "divider2",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "compTitle",
+          "component": "MaterialText",
+          "text": "Data Update Preview",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "comparisonRow",
+          "component": "MaterialRow",
+          "children": [
+            "beforeCard",
+            "afterCard"
+          ],
+          "justify": "spaceEvenly",
+          "align": "stretch",
+          "style": {
+            "gap": "12px"
+          }
+        },
+        {
+          "id": "beforeCard",
+          "component": "MaterialCard",
+          "appearance": "outlined",
+          "children": [
+            "beforeColumn"
+          ],
+          "weight": 1
+        },
+        {
+          "id": "beforeColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "beforeTitle",
+            "beforeStatus",
+            "beforePriority",
+            "beforeAssigned"
+          ],
+          "align": "start"
+        },
+        {
+          "id": "beforeTitle",
+          "component": "MaterialText",
+          "text": "Before",
+          "usageHint": "h3"
+        },
+        {
+          "id": "beforeStatus",
+          "component": "MaterialText",
+          "text": "Status: Discrepancy Found",
+          "usageHint": "body"
+        },
+        {
+          "id": "beforePriority",
+          "component": "MaterialText",
+          "text": "Priority: High",
+          "usageHint": "body"
+        },
+        {
+          "id": "beforeAssigned",
+          "component": "MaterialText",
+          "text": "Assigned: Unassigned",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterCard",
+          "component": "MaterialCard",
+          "appearance": "outlined",
+          "children": [
+            "afterColumn"
+          ],
+          "weight": 1
+        },
+        {
+          "id": "afterColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "afterTitle",
+            "afterStatus",
+            "afterPriority",
+            "afterAssigned"
+          ],
+          "align": "start"
+        },
+        {
+          "id": "afterTitle",
+          "component": "MaterialText",
+          "text": "After",
+          "usageHint": "h3"
+        },
+        {
+          "id": "afterStatus",
+          "component": "MaterialText",
+          "text": "Status: Resolved",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterPriority",
+          "component": "MaterialText",
+          "text": "Priority: Low",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterAssigned",
+          "component": "MaterialText",
+          "text": "Assigned: Tanaka Yuki",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnApply",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnApply",
+          "component": "MaterialButton",
+          "label": "Apply Changes",
+          "action": {
+            "event": {
+              "name": "apply_update",
+              "context": {
+                "prompt": "Apply this update"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_update",
+              "context": {
+                "prompt": "Cancel this update"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,129 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "dashboard-surface",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "dashboard-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainColumn"
+          ]
+        },
+        {
+          "id": "mainColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "dashTitle",
+            "divider1",
+            "statusList",
+            "divider2",
+            "refreshRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "dashTitle",
+          "component": "MaterialText",
+          "text": "Operational Status Dashboard",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "statusList",
+          "component": "MaterialColumn",
+          "children": [
+            "item1",
+            "item2",
+            "item3",
+            "item4"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "4px"
+          }
+        },
+        {
+          "id": "item1",
+          "component": "MaterialText",
+          "text": "✅ Invoice Processing: 142 completed, 0 errors",
+          "usageHint": "body"
+        },
+        {
+          "id": "item2",
+          "component": "MaterialText",
+          "text": "⚠️ Compliance Review: 8 items pending (3 high priority)",
+          "usageHint": "body"
+        },
+        {
+          "id": "item3",
+          "component": "MaterialText",
+          "text": "❌ Data Reconciliation: 2 mismatches found in Region-APAC",
+          "usageHint": "body"
+        },
+        {
+          "id": "item4",
+          "component": "MaterialText",
+          "text": "✅ Audit Trail: All 56 entries verified",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "refreshRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnRefresh",
+            "btnResolve"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnRefresh",
+          "component": "MaterialButton",
+          "label": "Refresh Status",
+          "action": {
+            "event": {
+              "name": "refresh_status",
+              "context": {
+                "prompt": "Refresh the operational status"
+              }
+            }
+          }
+        },
+        {
+          "id": "btnResolve",
+          "component": "MaterialButton",
+          "label": "Resolve Issues",
+          "action": {
+            "event": {
+              "name": "resolve_mismatches",
+              "context": {
+                "prompt": "Investigate and resolve the data reconciliation mismatches"
+              }
+            }
+          },
+          "variant": "raised"
+        }
+      ]
+    }
+  }
+]

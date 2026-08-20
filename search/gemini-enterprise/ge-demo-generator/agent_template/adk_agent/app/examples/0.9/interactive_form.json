@@ -1,0 +1,220 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "edit-form",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "edit-form",
+      "path": "/form",
+      "value": {
+        "name": "Kenta Takahashi",
+        "dept": "Corporate Planning",
+        "faculty": "Economics",
+        "score": 45,
+        "contactDate": "2024-03-05",
+        "vip": false,
+        "notes": "Key contact for CFO network.\nSchedule follow-up after Autumn Gala."
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "edit-form",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "fieldName",
+            "fieldDept",
+            "selectFaculty",
+            "scoreLabel",
+            "sliderScore",
+            "dateContact",
+            "toggleVip",
+            "fieldNotes",
+            "actionRow"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📝 Edit Alumni Record",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "fieldName",
+          "component": "MaterialInput",
+          "label": "Name",
+          "value": {
+            "path": "/form/name"
+          }
+        },
+        {
+          "id": "fieldDept",
+          "component": "MaterialInput",
+          "label": "Department",
+          "value": {
+            "path": "/form/dept"
+          }
+        },
+        {
+          "id": "selectFaculty",
+          "component": "MaterialSelect",
+          "label": "Faculty",
+          "value": {
+            "path": "/form/faculty"
+          },
+          "options": [
+            {
+              "label": "Economics",
+              "value": "Economics"
+            },
+            {
+              "label": "Engineering",
+              "value": "Engineering"
+            },
+            {
+              "label": "Law",
+              "value": "Law"
+            },
+            {
+              "label": "Medicine",
+              "value": "Medicine"
+            },
+            {
+              "label": "Literature",
+              "value": "Literature"
+            }
+          ]
+        },
+        {
+          "id": "scoreLabel",
+          "component": "MaterialText",
+          "text": "Engagement Score",
+          "usageHint": "caption"
+        },
+        {
+          "id": "sliderScore",
+          "component": "MaterialSlider",
+          "value": {
+            "path": "/form/score"
+          },
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "ariaLabel": "Engagement Score"
+        },
+        {
+          "id": "dateContact",
+          "component": "MaterialDatepicker",
+          "label": "Last contact",
+          "value": {
+            "path": "/form/contactDate"
+          }
+        },
+        {
+          "id": "toggleVip",
+          "component": "MaterialSlideToggle",
+          "label": "Register as VIP",
+          "checked": {
+            "path": "/form/vip"
+          }
+        },
+        {
+          "id": "fieldNotes",
+          "component": "MaterialInput",
+          "label": "Notes",
+          "value": {
+            "path": "/form/notes"
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnSave",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnSave",
+          "component": "MaterialButton",
+          "label": "💾 Save",
+          "action": {
+            "event": {
+              "name": "submit_alumni_record",
+              "context": {
+                "prompt": "Update the record with the following values",
+                "aName": {
+                  "path": "/form/name"
+                },
+                "aDept": {
+                  "path": "/form/dept"
+                },
+                "aFaculty": {
+                  "path": "/form/faculty"
+                },
+                "aScore": {
+                  "path": "/form/score"
+                },
+                "aContactDate": {
+                  "path": "/form/contactDate"
+                },
+                "aVip": {
+                  "path": "/form/vip"
+                },
+                "aNotes": {
+                  "path": "/form/notes"
+                }
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "🚫 Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_edit",
+              "context": {
+                "prompt": "Cancel editing"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

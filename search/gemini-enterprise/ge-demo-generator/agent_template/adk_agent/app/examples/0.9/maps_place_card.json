@@ -1,0 +1,137 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "maps-results",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "maps-results",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "place1",
+            "place1Detail",
+            "divider2",
+            "place2",
+            "place2Detail",
+            "divider3",
+            "place3",
+            "place3Detail",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📍 Recommended Venues Nearby — Search Results",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "place1",
+          "component": "MaterialText",
+          "text": "🏢 Palace Hotel Tokyo  ⭐ 4.6",
+          "usageHint": "h3"
+        },
+        {
+          "id": "place1Detail",
+          "component": "MaterialText",
+          "text": "📌 Marunouchi 1-1-1, Chiyoda | ☎ 03-3211-5211 — 💰 Budget: [CURRENCY]30,000+/person | Capacity: up to 200",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "place2",
+          "component": "MaterialText",
+          "text": "🏢 Andaz Tokyo  ⭐ 4.5",
+          "usageHint": "h3"
+        },
+        {
+          "id": "place2Detail",
+          "component": "MaterialText",
+          "text": "📌 Toranomon 1-23-4, Minato | ☎ 03-6830-1234 — 💰 Budget: [CURRENCY]25,000+/person | Capacity: up to 150",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider3",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "place3",
+          "component": "MaterialText",
+          "text": "🏢 Imperial Hotel  ⭐ 4.4",
+          "usageHint": "h3"
+        },
+        {
+          "id": "place3Detail",
+          "component": "MaterialText",
+          "text": "📌 Uchisaiwaicho 1-1-1, Chiyoda | ☎ 03-3504-1111 — 💰 Budget: [CURRENCY]35,000+/person | Capacity: up to 300",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnBook",
+            "btnCompare"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnBook",
+          "component": "MaterialButton",
+          "label": "🏢 Plan with #1",
+          "action": {
+            "event": {
+              "name": "plan_at_venue",
+              "context": {
+                "prompt": "Create a detailed event plan at Palace Hotel Tokyo"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCompare",
+          "component": "MaterialButton",
+          "label": "📊 Compare Venues",
+          "action": {
+            "event": {
+              "name": "compare_venues",
+              "context": {
+                "prompt": "Create a detailed comparison of the 3 venues"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

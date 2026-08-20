@@ -1,0 +1,127 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "analysis-surface",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "analysis-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainColumn"
+          ]
+        },
+        {
+          "id": "mainColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "titleText",
+            "divider1",
+            "kpiRow",
+            "divider2",
+            "summaryText",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "titleText",
+          "component": "MaterialText",
+          "text": "Analysis Summary: Q4 Revenue Performance",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "kpiRow",
+          "component": "MaterialRow",
+          "children": [
+            "kpi1",
+            "kpi2",
+            "kpi3"
+          ],
+          "justify": "spaceEvenly",
+          "align": "center"
+        },
+        {
+          "id": "kpi1",
+          "component": "MaterialText",
+          "text": "Total Revenue: $12.4M (+8.2%)",
+          "usageHint": "body"
+        },
+        {
+          "id": "kpi2",
+          "component": "MaterialText",
+          "text": "Anomalies Detected: 23",
+          "usageHint": "body"
+        },
+        {
+          "id": "kpi3",
+          "component": "MaterialText",
+          "text": "Resolution Rate: 87%",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "summaryText",
+          "component": "MaterialText",
+          "text": "Key findings: Revenue growth driven by APAC region (+15.3%). Three critical anomalies in billing reconciliation require immediate attention. Recommended action: escalate invoice IDs INV-4521, INV-4589 to finance team.",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnDrillDown",
+            "btnExport"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnDrillDown",
+          "component": "MaterialButton",
+          "label": "Drill Down",
+          "action": {
+            "event": {
+              "name": "drill_down_anomalies",
+              "context": {
+                "prompt": "Show me the detailed breakdown of the anomalies"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnExport",
+          "component": "MaterialButton",
+          "label": "Generate Report",
+          "action": {
+            "event": {
+              "name": "generate_report",
+              "context": {
+                "prompt": "Generate a visual summary report"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

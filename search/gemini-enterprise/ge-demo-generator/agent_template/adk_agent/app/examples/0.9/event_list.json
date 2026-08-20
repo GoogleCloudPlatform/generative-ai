@@ -1,0 +1,207 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "event-list",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "event-list",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "subtitle",
+            "divider1",
+            "eventList",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📅 Event Attendance History",
+          "usageHint": "h2"
+        },
+        {
+          "id": "subtitle",
+          "component": "MaterialText",
+          "text": "Kenta Takahashi (ALM-005) — Past 12 Months",
+          "usageHint": "caption"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "eventList",
+          "component": "MaterialColumn",
+          "children": [
+            "ev1",
+            "ev2",
+            "ev3",
+            "ev4"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "4px"
+          }
+        },
+        {
+          "id": "ev1",
+          "component": "MaterialRow",
+          "children": [
+            "ev1Icon",
+            "ev1Text"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "ev1Icon",
+          "component": "MaterialIcon",
+          "icon": "check_circle",
+          "color": "primary"
+        },
+        {
+          "id": "ev1Text",
+          "component": "MaterialText",
+          "text": "2024/03/05  Global Career Seminar — Attended",
+          "usageHint": "body"
+        },
+        {
+          "id": "ev2",
+          "component": "MaterialRow",
+          "children": [
+            "ev2Icon",
+            "ev2Text"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "ev2Icon",
+          "component": "MaterialIcon",
+          "icon": "cancel",
+          "color": "warn"
+        },
+        {
+          "id": "ev2Text",
+          "component": "MaterialText",
+          "text": "2024/04/10  Spring Gala 2024 — No-Show",
+          "usageHint": "body"
+        },
+        {
+          "id": "ev3",
+          "component": "MaterialRow",
+          "children": [
+            "ev3Icon",
+            "ev3Text"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "ev3Icon",
+          "component": "MaterialIcon",
+          "icon": "check_circle",
+          "color": "primary"
+        },
+        {
+          "id": "ev3Text",
+          "component": "MaterialText",
+          "text": "2024/06/15  Alumni Summer Meetup — Attended",
+          "usageHint": "body"
+        },
+        {
+          "id": "ev4",
+          "component": "MaterialRow",
+          "children": [
+            "ev4Icon",
+            "ev4Text"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "ev4Icon",
+          "component": "MaterialIcon",
+          "icon": "event",
+          "color": "accent"
+        },
+        {
+          "id": "ev4Text",
+          "component": "MaterialText",
+          "text": "2024/09/20  Autumn Gala 2024 — Invited (Pending)",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnAll",
+            "btnInvite"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnAll",
+          "component": "MaterialButton",
+          "label": "📋 Show All",
+          "action": {
+            "event": {
+              "name": "show_full_event_history",
+              "context": {
+                "prompt": "Show the full event attendance history for Takahashi"
+              }
+            }
+          }
+        },
+        {
+          "id": "btnInvite",
+          "component": "MaterialButton",
+          "label": "✉️ RSVP Email",
+          "action": {
+            "event": {
+              "name": "draft_rsvp_email",
+              "context": {
+                "prompt": "Draft an RSVP confirmation email for Autumn Gala 2024"
+              }
+            }
+          },
+          "variant": "raised"
+        }
+      ]
+    }
+  }
+]

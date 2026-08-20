@@ -635,6 +635,7 @@ frontline
 Frontline
 FRONTLINE
 fsc
+fset
 fsreq
 fsspec
 FTPS
@@ -662,6 +663,7 @@ gboolean
 GBP
 gbq
 gca
+gcbp
 gce
 gchar
 gclb

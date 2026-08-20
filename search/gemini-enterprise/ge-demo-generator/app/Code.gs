@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.60-public',
+  APP_VERSION: 'v11.61-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -1012,7 +1012,7 @@ function getTechnicalInstruction_() {
     "the agent MUST NEVER execute the operation immediately. Instead, the agent MUST ALWAYS present a clear summary of the proposed database action " +
     "and ask the human user for explicit confirmation using <a2ui-json> tags. " +
     "When the confirmation covers MULTIPLE independently-actionable items (e.g. a batch of draft orders), the card MUST let the user select WHICH items to approve " +
-    "(MultipleChoice variant 'checkbox' or per-row CheckBox bound to /form paths, with the confirm Button carrying the selections) — all-or-nothing batch confirmations are forbidden.\n" +
+    "(a MaterialChips bound to a /form path, or a per-row MaterialCheckbox, with the confirm MaterialButton carrying the selections in its event context) — all-or-nothing batch confirmations are forbidden.\n" +
     "9. **OUTPUT PLACEMENT (HIGHEST PRIORITY — RULE #0)**: When you call a tool, any text you include in the SAME response as the tool call will be hidden from the user. " +
     "All analytical dashboards, insights, and A2UI suggestion chips MUST appear in your FINAL response that contains NO tool calls.\n\n" +
     
@@ -1021,30 +1021,36 @@ function getTechnicalInstruction_() {
     "If you find yourself writing a markdown table or a numbered list of data, STOP and convert it to an A2UI Card instead.\n\n" +
     
     "**ANALYTICAL RESULT CARD TEMPLATE (MANDATORY)**:\n" +
-    "When presenting query results, KPIs, or entity summaries, wrap them in an A2UI Card. " +
+    "When presenting query results, KPIs, or entity summaries, wrap them in an A2UI MaterialCard. " +
     "Use surfaceId matching the analysis type (e.g. 'fleet-audit', 'cost-analysis', 'entity-profile'), and make it UNIQUE per card: " +
     "when rendering ANOTHER card of a type already shown earlier in the conversation, append a short distinguishing suffix " +
     "(entity or sequence, e.g. 'batch-editor-sakura', 'cost-analysis-2'). NEVER reuse a surfaceId from a previous turn unless you are " +
     "intentionally updating or deleting that exact card: the client anchors a surfaceId to the message where it FIRST rendered, so a " +
     "reused id silently overwrites the OLD card and renders NOTHING in the current turn. " +
-    "Minimal structure:\n" +
+    "The surface MUST contain a component whose id is exactly \"root\" — that is what the client renders. Minimal structure:\n" +
     "[\n" +
-    "  { \"id\": \"card_root\", \"component\": { \"Card\": { \"children\": { \"explicitList\": [\"card_title\", \"card_divider\", \"card_body\"] } } } },\n" +
-    "  { \"id\": \"card_title\", \"component\": { \"Text\": { \"text\": { \"literalString\": \"[Title]\" }, \"usageHint\": \"title\" } } },\n" +
-    "  { \"id\": \"card_divider\", \"component\": { \"Divider\": {} } },\n" +
-    "  { \"id\": \"card_body\", \"component\": { \"Column\": { \"children\": { \"explicitList\": [\"kpi_row\", \"detail_list\"] } } } },\n" +
-    "  { \"id\": \"kpi_row\", \"component\": { \"Row\": { \"children\": { \"explicitList\": [\"kpi_1\", \"kpi_2\", \"kpi_3\"] }, \"distribution\": \"spaceEvenly\" } } },\n" +
-    "  { \"id\": \"kpi_1\", \"component\": { \"Column\": { \"children\": { \"explicitList\": [\"kpi_1_val\", \"kpi_1_lbl\"] } } } },\n" +
-    "  { \"id\": \"kpi_1_val\", \"component\": { \"Text\": { \"text\": { \"literalString\": \"[Value]\" }, \"usageHint\": \"title\" } } },\n" +
-    "  { \"id\": \"kpi_1_lbl\", \"component\": { \"Text\": { \"text\": { \"literalString\": \"[Label]\" }, \"usageHint\": \"caption\" } } }\n" +
+    "  { \"id\": \"root\", \"component\": \"MaterialCard\", \"children\": [\"card_body\"] },\n" +
+    "  { \"id\": \"card_body\", \"component\": \"MaterialColumn\", \"children\": [\"card_title\", \"card_divider\", \"kpi_row\", \"detail_table\"], \"justify\": \"start\", \"align\": \"stretch\", \"style\": { \"gap\": \"10px\" } },\n" +
+    "  { \"id\": \"card_title\", \"component\": \"MaterialText\", \"text\": \"[Title]\", \"usageHint\": \"h2\" },\n" +
+    "  { \"id\": \"card_divider\", \"component\": \"MaterialDivider\" },\n" +
+    "  { \"id\": \"kpi_row\", \"component\": \"MaterialRow\", \"children\": [\"kpi_1\", \"kpi_2\", \"kpi_3\"], \"justify\": \"spaceEvenly\", \"align\": \"start\", \"style\": { \"gap\": \"8px\" } },\n" +
+    "  { \"id\": \"kpi_1\", \"component\": \"MaterialColumn\", \"children\": [\"kpi_1_val\", \"kpi_1_lbl\"], \"justify\": \"start\", \"align\": \"center\" },\n" +
+    "  { \"id\": \"kpi_1_val\", \"component\": \"MaterialText\", \"text\": \"[Value]\", \"usageHint\": \"h3\" },\n" +
+    "  { \"id\": \"kpi_1_lbl\", \"component\": \"MaterialText\", \"text\": \"[Label]\", \"usageHint\": \"caption\" },\n" +
+    "  { \"id\": \"detail_table\", \"component\": \"MaterialTable\", \"columns\": [{ \"header\": \"[Col A]\", \"field\": \"a\" }, { \"header\": \"[Col B]\", \"field\": \"b\" }], \"rows\": [{ \"a\": \"[v]\", \"b\": \"[v]\" }] }\n" +
     "]\n" +
-    "Add more KPIs, Lists, and detail Rows as needed.\n" +
-    "**TABS & MODAL THRESHOLDS (MANDATORY)**: A card with 3+ logical sections OR 8+ detail rows MUST use Tabs instead of one long scroll. " +
-    "When showing Top-N of a larger result set, never cram the remainder into a footnote Text — put the full list in a Modal opened by a 'view all' button.\n" +
-    "**NO PSEUDO-TABLES (CRITICAL)**: Never pack multiple metrics into ONE Text component using '|' or '/' separators. " +
-    "One entity per Row, one metric per Column/Text, so values align visually.\n" +
+    "Define kpi_2 and kpi_3 exactly like kpi_1, and add more detail sections as needed. " +
+    "EVERY id listed in a 'children' array MUST exist as a component in the same updateComponents message — a dangling child id renders as a hole in the card, and a component that no chain of children reaches from \"root\" is never rendered at all.\n" +
+    "**TABS & DIALOG THRESHOLDS (MANDATORY)**: A card with 3+ logical sections OR 8+ detail rows MUST use MaterialTabs instead of one long scroll. " +
+    "When showing Top-N of a larger result set, never cram the remainder into a footnote MaterialText — put the full list in a MaterialDialog opened by a 'view all' button.\n" +
+    "**NO PSEUDO-TABLES (CRITICAL)**: Never pack multiple metrics into ONE MaterialText using '|' or '/' separators, and never hand-build a table out of nested MaterialRow/MaterialText. " +
+    "Tabular data MUST use the MaterialTable component (columns + rows), so values align visually.\n" +
+    "**RICH COMPONENTS (USE THEM)**: the catalog is the Gemini Enterprise composite catalog, so prefer the native component over a hand-rolled imitation: " +
+    "MaterialTable for any tabular result, VegaChart (a Vega-Lite spec) for a chart, MaterialProgressBar for a ratio/utilization, " +
+    "IFrameSrcdoc for a self-contained HTML mini-dashboard rendered inline, and a Canvas root when the answer is a long report that deserves a resizable side panel.\n" +
     "**WHAT-IF SIMULATION CARD (WOW MOMENT)**: When an analysis result depends on a tunable parameter (threshold, budget, quantity), follow the result card with a what-if card: " +
-    "a Slider (label, minValue/maxValue, value bound to a /form path) plus a primary Button whose action context carries the /form value to request recalculation. " +
+    "a MaterialSlider (min / max / step, value bound to a /form path, with its caption supplied by a MaterialText above it — MaterialSlider has no label property) " +
+    "plus a MaterialButton whose event context carries the /form value to request recalculation. " +
     "Strongly recommended for critical-threshold findings (safety stock, alert thresholds).\n\n" +
     
     "**WHEN TO USE A2UI CARDS vs TEXT**:\n" +
@@ -1056,105 +1062,97 @@ function getTechnicalInstruction_() {
     "Replace technical tags like [AUTO] or [APPROVAL REQUIRED] with localized friendly text (e.g. System Automated or Requires Your Approval).\n\n" +
     
     "(J) Dynamic Multi-Entity Batch Editor (Side-by-Side Comparison Form):\n" +
-    "Each row MUST be a Column containing (1) a main Row and (2) an annotation Text component (usageHint: 'caption') below it.\n" +
-    "Inside the main Row: Show original raw product/entity name and raw quantity stacked in the Left Column.\n" +
-    "Show a MultipleChoice component (variant: 'chips' or 'dropdown') in the Middle Column to select the AI-proposed mapping SKU/target.\n" +
-    "Show the proposed quantity in the Far-right Column with a standard TextField.\n" +
-    "Below the main Row: Show a brief annotation Text explaining the recommendation reason.\n\n" +
-    
+    "Each row MUST be a MaterialColumn containing (1) a main MaterialRow and (2) an annotation MaterialText (usageHint: 'caption') below it.\n" +
+    "Inside the main MaterialRow: Show original raw product/entity name and raw quantity stacked in the Left MaterialColumn.\n" +
+    "Show a MaterialChips (2-3 candidates) or a MaterialSelect (more than 3 candidates) in the Middle Column to select the AI-proposed mapping SKU/target.\n" +
+    "Show the proposed quantity in the Far-right Column with a MaterialInput.\n" +
+    "Below the main Row: Show a brief annotation MaterialText explaining the recommendation reason.\n\n" +
+
     "**BATCH EDITOR ROW JSON TEMPLATE (MANDATORY)**:\n" +
     "When rendering the Batch Editor, you MUST use the following component structure for each row `i` (replace `i` with the actual 0-based index). " +
     "Ensure all component IDs are completely unique (e.g., by appending `_i` to each ID). " +
     "You MUST wrap the entire A2UI JSON payload in <a2ui-json> tags. " +
-    "The block MUST contain all three messages in order — beginRendering, dataModelUpdate (the initial row values), and surfaceUpdate (every row component) — inside that SAME <a2ui-json> block. Stopping after beginRendering + dataModelUpdate opens an empty surface and the editor never appears. " +
+    "The block MUST contain all three messages in order — createSurface, updateDataModel (the initial row values), and updateComponents (every row component, including the one with id \"root\") — inside that SAME <a2ui-json> block. Stopping after createSurface + updateDataModel opens an empty surface and the editor never appears. " +
     "Here is the mandatory layout structure for a single row `i`:\n" +
     "[\n" +
     "{\n" +
     "  \"id\": \"row_container_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"Column\": {\n" +
-    "      \"children\": { \"explicitList\": [\"main_row_i\", \"reason_text_i\"] }\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialColumn\",\n" +
+    "  \"children\": [\"main_row_i\", \"reason_text_i\"],\n" +
+    "  \"justify\": \"start\",\n" +
+    "  \"align\": \"stretch\",\n" +
+    "  \"style\": { \"gap\": \"4px\" }\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"main_row_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"Row\": {\n" +
-    "      \"children\": { \"explicitList\": [\"left_stack_i\", \"sku_select_i\", \"qty_field_i\"] },\n" +
-    "      \"distribution\": \"spaceBetween\",\n" +
-    "      \"alignment\": \"center\"\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialRow\",\n" +
+    "  \"children\": [\"left_stack_i\", \"sku_select_i\", \"qty_field_i\"],\n" +
+    "  \"justify\": \"spaceBetween\",\n" +
+    "  \"align\": \"center\",\n" +
+    "  \"style\": { \"gap\": \"8px\" }\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"left_stack_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"Column\": {\n" +
-    "      \"children\": { \"explicitList\": [\"orig_name_i\", \"orig_qty_i\"] },\n" +
-    "      \"distribution\": \"start\",\n" +
-    "      \"alignment\": \"start\"\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialColumn\",\n" +
+    "  \"children\": [\"orig_name_i\", \"orig_qty_i\"],\n" +
+    "  \"justify\": \"start\",\n" +
+    "  \"align\": \"start\"\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"orig_name_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"Text\": {\n" +
-    "      \"text\": { \"literalString\": \"[Original Item Name, e.g., 'エアコン5馬力']\" },\n" +
-    "      \"usageHint\": \"body\"\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialText\",\n" +
+    "  \"text\": \"[Original Item Name, e.g., 'エアコン5馬力']\",\n" +
+    "  \"usageHint\": \"body\"\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"orig_qty_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"Text\": {\n" +
-    "      \"text\": { \"literalString\": \"[Original Qty, e.g., 'Qty: 2']\" },\n" +
-    "      \"usageHint\": \"caption\"\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialText\",\n" +
+    "  \"text\": \"[Original Qty, e.g., 'Qty: 2']\",\n" +
+    "  \"usageHint\": \"caption\"\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"sku_select_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"MultipleChoice\": {\n" +
-    "      \"label\": { \"literalString\": \"[Select SKU]\" },\n" +
-    "      \"options\": [\n" +
-    "        { \"value\": \"SKU_CODE_A\", \"label\": { \"literalString\": \"[SKU_CODE_A]\" } },\n" +
-    "        { \"value\": \"SKU_CODE_B\", \"label\": { \"literalString\": \"[SKU_CODE_B]\" } }\n" +
-    "      ],\n" +
-    "      \"maxAllowedSelections\": 1,\n" +
-    "      \"variant\": \"chips\",\n" +
-    "      \"selections\": { \"path\": \"/form/item_i_selected_sku\" }\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialChips\",\n" +
+    "  \"value\": { \"path\": \"/form/item_i_selected_sku\" },\n" +
+    "  \"options\": [\n" +
+    "    { \"label\": \"[SKU_CODE_A]\", \"value\": \"SKU_CODE_A\" },\n" +
+    "    { \"label\": \"[SKU_CODE_B]\", \"value\": \"SKU_CODE_B\" }\n" +
+    "  ]\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"qty_field_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"TextField\": {\n" +
-    "      \"label\": { \"literalString\": \"[Qty]\" },\n" +
-    "      \"text\": { \"path\": \"/form/item_i_qty\" },\n" +
-    "      \"textFieldType\": \"shortText\"\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialInput\",\n" +
+    "  \"label\": \"[Qty]\",\n" +
+    "  \"value\": { \"path\": \"/form/item_i_qty\" }\n" +
     "},\n" +
     "{\n" +
     "  \"id\": \"reason_text_i\",\n" +
-    "  \"component\": {\n" +
-    "    \"Text\": {\n" +
-    "      \"text\": { \"literalString\": \"💡 [Recommendation reason, e.g., 'Direct successor (95% match)']\" },\n" +
-    "      \"usageHint\": \"caption\"\n" +
-    "    }\n" +
-    "  }\n" +
+    "  \"component\": \"MaterialText\",\n" +
+    "  \"text\": \"💡 [Recommendation reason, e.g., 'Direct successor (95% match)']\",\n" +
+    "  \"usageHint\": \"caption\"\n" +
     "}\n" +
-    "]\n\n" +
+    "]\n" +
+    "MaterialChips has NO label property — if the middle column needs a caption, add a separate MaterialText above it. " +
+    "With more than 3 candidates use a MaterialSelect instead (it DOES take a label, and the same options array of {label, value}). " +
+    "Seed every bound path in the SAME block's updateDataModel, e.g. \"value\": { \"form\": { \"item_0_selected_sku\": \"SKU_CODE_A\", \"item_0_qty\": \"2\" } } at path \"/\", or one updateDataModel at path \"/form\" carrying the whole object.\n\n" +
     
-    "11. **SUGGESTION CHIPS (CRITICAL)**: At the END of EVERY response, you MUST append a lightweight A2UI suggestion chip bar using surfaceId 'suggestions' and root='root' containing a Row of 3-4 Buttons with sendText actions. The chip block MUST be COMPLETE: a single <a2ui-json> block containing BOTH the beginRendering message AND the surfaceUpdate message with all Button components — never emit beginRendering alone. NEVER write any plain text or markdown headers (like \"Next Actions\", \"💡 Next Actions\", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. " +
-    "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: NEVER nest components inside a Button's 'child' property. 'child' MUST always be a flat string pointing to the ID of a separately defined Text component, and that Text component MUST be included in the SAME surfaceUpdate components array as its Button — a Button whose label Text component is missing renders as a BLANK button in the UI. Before finishing any A2UI block, verify every Button's child id has a matching Text component in the same block.\n" +
-    "**EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions)**: a beginRendering message only OPENS an empty surface; the components are delivered by surfaceUpdate. EVERY <a2ui-json> block you emit MUST therefore contain BOTH the beginRendering message AND the surfaceUpdate message carrying the full component tree for that same surfaceId, in the SAME block. A dataModelUpdate is NOT a substitute for surfaceUpdate: emitting [beginRendering, dataModelUpdate] and then moving on renders NOTHING and the user sees only your prose. This is the single most common way a rich card silently disappears — before you close any <a2ui-json> block, confirm it contains a surfaceUpdate whose components array includes the root id named in beginRendering.\n" +
-    "**ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL)**: inside a Button action's 'context', every 'key' MUST be different from every component 'id' in the same card. A context key that matches a component id is resolved against the component tree by the client and arrives server-side as the unusable literal key '[object Object]', so that value is LOST. Prefix component ids to keep them distinct (context key \"title\" with component id \"fTitle\", key \"qty\" with id \"qtyField\", and so on).\n" +
+    "11. **SUGGESTION CHIPS (CRITICAL)**: At the END of EVERY response, you MUST append a lightweight A2UI suggestion chip bar using surfaceId 'suggestions' and a MaterialRow whose id is 'root' containing 3-4 MaterialButtons. The chip block MUST be COMPLETE: a single <a2ui-json> block containing BOTH the createSurface message AND the updateComponents message with all MaterialButton components — never emit createSurface alone. NEVER write any plain text or markdown headers (like \"Next Actions\", \"💡 Next Actions\", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. " +
+    "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: a MaterialButton carries its caption in its own flat 'label' string — NEVER give it a 'child' or nest a text component inside it. A MaterialButton with no 'label' renders as a BLANK button.\n" +
+    "**NEVER BUILD THE CHIP BAR OUT OF MaterialChips**: MaterialChips has ONE action for ALL of its options, so whichever chip the user presses, the client sends that single action's context.prompt — every chip fires the FIRST chip's prompt. MaterialChips is for BOUND SELECTION inside a form (its 'value' points at a data-model path); a navigation chip bar MUST be one MaterialButton per chip, each with its OWN event name and context.prompt.\n" +
+    "**NEVER POINT AT A CARD BY POSITION (CRITICAL)**: a card always renders BELOW the text of the same turn, never above it, so wording like \"the card above\" / \"the checkboxes above\" / \"as shown above\" (in any language) sends the user the wrong way. Name the card by what it is and point DOWN (\"in the approval card below\"), or drop the positional word entirely (\"select the items to approve and press Confirm\"). The chip bar is always last, so never describe it as being anywhere else.\n" +
+    "**EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions)**: a createSurface message only OPENS an empty surface; the components are delivered by updateComponents. EVERY <a2ui-json> block you emit MUST therefore contain BOTH the createSurface message AND the updateComponents message carrying the full component tree for that same surfaceId, in the SAME block. An updateDataModel is NOT a substitute for updateComponents: emitting [createSurface, updateDataModel] and then moving on renders NOTHING and the user sees only your prose. This is the single most common way a rich card silently disappears — before you close any <a2ui-json> block, confirm it contains an updateComponents whose components array includes a component with id \"root\".\n" +
+    "**A2UI v0.9 PROTOCOL (NON-NEGOTIABLE)**: every message object carries \"version\": \"v0.9\" alongside exactly one of createSurface / updateComponents / updateDataModel / deleteSurface. " +
+    "createSurface takes { \"surfaceId\": \"...\" } and has NO 'root' key — the client renders the component whose id is exactly \"root\", so every surface MUST define one. " +
+    "A component is FLAT: { \"id\": \"x\", \"component\": \"MaterialText\", \"text\": \"hello\" } — never the old wrapper form { \"component\": { \"Text\": {...} } }. " +
+    "Values are plain JSON: \"hello\", not { \"literalString\": \"hello\" }. A data binding is still { \"path\": \"/form/x\" }. " +
+    "'children' is a plain array of id strings — [\"a\", \"b\"] — not { \"explicitList\": [...] }; for a repeated template it is { \"componentId\": \"rowTemplate\", \"path\": \"/items\" }. " +
+    "Layout uses \"justify\" and \"align\" (never \"distribution\" / \"alignment\"). " +
+    "updateDataModel takes { \"surfaceId\", \"path\", \"value\" } where value is plain JSON — never an array of { \"key\", \"valueString\" } entries.\n" +
+    "**FRESH surfaceId PER RESPONSE (CRITICAL)**: never reuse a surfaceId from an earlier turn unless you are deliberately updating or deleting that exact card. The client anchors a surfaceId to the message where it FIRST rendered, so a reused id overwrites the OLD card and renders nothing now. Use a descriptive id plus a short distinguishing suffix ('cost-analysis-2', 'batch-editor-sakura'). Within ONE response, createSurface / updateComponents / updateDataModel MUST all use the SAME id.\n" +
+    "**ACTIONS (CRITICAL)**: an interactive component's action is { \"action\": { \"event\": { \"name\": \"<intent>\", \"context\": { \"prompt\": \"<literal sentence>\" } } } }. " +
+    "The 'prompt' string is what Gemini Enterprise posts as the user's chat message — omit it and the user sees the useless \"User action triggered\". It MUST be a plain literal string, never a { \"path\": ... } binding. " +
+    "Encode the INTENT in the event 'name' (e.g. 'approve_order_42', 'drilldown_region_west'), never only in context, so it survives even if a context value fails to bind.\n" +
+    "**ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL)**: inside an event's 'context', every key MUST be different from every component 'id' in the same card. A context key that matches a component id is resolved against the component tree by the client and arrives server-side as the unusable literal '[object Object]', so that value is LOST. Prefix component ids to keep them distinct (context key \"title\" with component id \"fTitle\", key \"qty\" with id \"qtyField\", and so on).\n" +
     "**A2UI CARD INTERACTION EXCEPTION (STRICT RULE)**: When your response already contains a major interactive A2UI card featuring its own control buttons " +
     "(such as the Welcome Card onboarding buttons, the Analysis Plan pre-flight card buttons like Run inline / Run in background / Adjust, or the Workflow Execution Plan mode selection buttons like Immediate/Background/Scheduled), " +
     "you **MUST NOT** output any suggestion chip bar at the bottom of your response. The card's own control buttons are sufficient. " +
@@ -1167,20 +1165,21 @@ function getTechnicalInstruction_() {
     "Calling tools on the first greeting turn completely hides and breaks the onboarding card rendering. " +
     "You MUST immediately respond in the very first turn by writing ONE short line of plain-text greeting in the user's language FIRST, and THEN the rich A2UI onboarding card using surfaceId 'welcome-card' and NO suggestion chips at the bottom (the card's own buttons are sufficient). " +
     "The one-line plain-text greeting is MANDATORY and must appear in addition to the card: a UI-only response (an A2UI card with NO accompanying plain text) is NOT rendered by the client and shows a blank turn. " +
-    "Never execute queries or tool calls until the user explicitly requests analysis. The onboarding card must include your role title, a Divider, a List of key capabilities with Lucide icons, " +
-    "a Divider, and exactly 3 action Buttons.\n" +
+    "Never execute queries or tool calls until the user explicitly requests analysis. The onboarding card must include your role title, a MaterialDivider, the key capabilities as MaterialRows of MaterialIcon + MaterialText, " +
+    "a MaterialDivider, and exactly 3 action MaterialButtons.\n" +
     "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: When generating A2UI JSON payloads, you MUST ALWAYS use strict standard JSON syntax. " +
     "Under no circumstances should you use single quotes or omit quotes for keys. Keys and string values MUST always be enclosed in standard double quotes. " +
-    "Each Button component's action MUST strictly follow standard JSON structure:\n" +
+    "Each MaterialButton's action MUST strictly follow this structure:\n" +
     "{\n" +
+    "  \"id\": \"b1\",\n" +
+    "  \"component\": \"MaterialButton\",\n" +
+    "  \"label\": \"[Localized Button Label]\",\n" +
+    "  \"variant\": \"stroked\",\n" +
     "  \"action\": {\n" +
-    "    \"name\": \"sendText\",\n" +
-    "    \"context\": [\n" +
-    "      {\n" +
-    "        \"key\": \"text\",\n" +
-    "        \"value\": { \"literalString\": \"[Localized Button Label]\" }\n" +
-    "      }\n" +
-    "    ]\n" +
+    "    \"event\": {\n" +
+    "      \"name\": \"welcome_action_1\",\n" +
+    "      \"context\": { \"prompt\": \"[Localized request this button sends as the user's message]\" }\n" +
+    "    }\n" +
     "  }\n" +
     "}\n" +
     "Ensure all keys and string values are enclosed in standard double quotes to comply with strict standard JSON specifications. Use surfaceId 'welcome-card'.\n\n" +
@@ -1190,22 +1189,11 @@ function getTechnicalInstruction_() {
     "Mixing python code blocks with JSON tool calls triggers a fatal MALFORMED_FUNCTION_CALL system crash. " +
     "You MUST run the Python code alone first, receive its result, and only then issue the next tool call in a separate turn. " +
     "After this initial card, do NOT show the welcome card again in the same session unless the user explicitly requests a reset.\n\n" +
-    "**A2UI SCHEMA VALIDATION: usageHint CONSTRAINT (CRITICAL)**: The 'usageHint' property is ONLY allowed inside 'Text' components. You MUST NEVER place 'usageHint' inside any other component type (such as 'Button', 'Row', 'Column', 'Card', 'List', 'Divider', 'Icon', 'MultipleChoice', 'TextField'). Placing 'usageHint' in these non-Text components violates the schema and will cause the UI to crash and fail to render.\n\n" +
-    "**A2UI ICON VALIDATION (CRITICAL)**: When using 'Icon' components or specifying 'icon' inside components like 'Button', you MUST ONLY use one of the following allowed icon names. Using any other name (such as 'analytics', 'dashboard', 'chart', 'database', 'check_circle', 'lucide:*') is STRICTLY FORBIDDEN and will cause a fatal validation crash. The allowed icon names are:\n" +
-    "['accountCircle', 'add', 'arrowBack', 'arrowForward', 'attachFile', 'calendarToday', 'call', 'camera', 'check', 'close', 'delete', 'download', 'edit', 'event', 'error', 'favorite', 'favoriteOff', 'folder', 'help', 'home', 'info', 'locationOn', 'lock', 'lockOpen', 'mail', 'menu', 'moreVert', 'moreHoriz', 'notificationsOff', 'notifications', 'payment', 'person', 'phone', 'photo', 'print', 'refresh', 'search', 'send', 'settings', 'share', 'shoppingCart', 'star', 'starHalf', 'starOff', 'upload', 'visibility', 'visibilityOff', 'warning']\n\n" +
-    "13. **VERTICAL SPACING / SPACER HACK (CRITICAL)**: The tab bar of a Tabs component and its content Column may render extremely close to each other with insufficient vertical space. " +
-    "To insert an appropriate vertical gap below the tab bar, you MUST insert a dummy Text component acting as a spacer ONLY as the very first child of the tab content Column (the Column bound to the tab's child ID). " +
-    "The spacer component MUST have a single space \" \" as its literalString text and usageHint 'body'. For example:\n" +
-    "{\n" +
-    "  \"id\": \"[Unique_Spacer_ID]\",\n" +
-    "  \"component\": {\n" +
-    "    \"Text\": {\n" +
-    "      \"text\": { \"literalString\": \" \" },\n" +
-    "      \"usageHint\": \"body\"\n" +
-    "    }\n" +
-    "  }\n" +
-    "}\n" +
-    "You MUST ONLY use this spacer hack as the first child of a tab content Column. Do NOT place this spacer in any other standard Column, Row, or Dashboard layout where standard spacing is already optimal, to avoid creating unnecessary blank gaps.";
+    "**A2UI SCHEMA VALIDATION: usageHint CONSTRAINT (CRITICAL)**: The 'usageHint' property belongs ONLY to 'MaterialText'. You MUST NEVER place 'usageHint' on any other component (MaterialButton, MaterialRow, MaterialColumn, MaterialCard, MaterialDivider, MaterialIcon, MaterialChips, MaterialSelect, MaterialInput, MaterialTable, ...). Its allowed values are 'h1'-'h5', 'subtitle1', 'subtitle2', 'body1', 'body2', 'body' and 'caption' — 'title' is NOT one of them.\n\n" +
+    "**A2UI ICON NAMES**: 'MaterialIcon' takes a free-form Material Symbols / Material Icons font name in its required 'icon' property (e.g. 'analytics', 'insights', 'inventory_2', 'notifications', 'warning'). There is no allowlist — but it MUST be a real Material icon name in snake_case, never a Lucide name and never a 'lucide:*' prefix.\n\n" +
+    "13. **VERTICAL SPACING (USE style, NOT SPACER COMPONENTS)**: NEVER insert a dummy MaterialText containing a single space to create a gap. " +
+    "Every Material* component accepts a 'style' object, so ask for the spacing you want directly: put \"style\": { \"gap\": \"8px\" } on the MaterialRow/MaterialColumn that holds the children, and \"style\": { \"marginTop\": \"12px\" } on the first child of a MaterialTabs tab content column (the classic tab-bar-too-close case). " +
+    "Useful style keys: gap, margin, marginTop/Bottom/Left/Right, padding and its per-side variants, width, color, background, border, borderRadius.";
     
   return inst;
 }
@@ -1312,34 +1300,31 @@ You MUST classify the demo scenario into one of the following two agent archetyp
   - Instruct the agent to proactively query the history tables to auto-complete and resolve un-clear or hand-written entity names/quantities.
   - Instruct the agent to present the resolved items using the **(J) Dynamic Multi-Entity Batch Editor** A2UI pattern.
     - **ITEM-LEVEL SKU DECOMPOSITION (ABSOLUTELY MANDATORY)**: The agent MUST NOT treat the entire handwritten order text as a single block. It MUST split/decompose the text into **individual SKU line items (separate rows for each product)**.
-    - **AI-RECOMMENDED SKU/ENTITY SELECTION (STRICTLY REQUIRED)**: In the Middle Column of each row in the Batch Editor, the agent **MUST NOT use a raw \`TextField\` for mapping input**. The agent **MUST use a \`MultipleChoice\` component (variant: "chips" to render as horizontal selection buttons, or "dropdown" if there are more than 3 options, with maxAllowedSelections: 1)** bound to \`item_i_selected_sku\` (e.g. \`item_0_selected_sku\`) to allow the user to select the mapped SKU/entity.
-    - **ANNOTATION & RECOMMENDATION REASON (MANDATORY)**: Below each row's main components (Original, Selection, Qty), the agent **MUST include a \`Text\` component (usageHint: "caption")** that dynamically displays the reason why the AI recommended these specific SKUs (e.g., "💡 SKU_A is the direct successor (95% match); SKU_B is a similar alternative").
-    - **LOCALIZATION RULE (CRITICAL)**: All literalString values in A2UI component labels, headers, options, and buttons MUST be translated dynamically into the user's interaction language (or the language of the userGoal). Do NOT hardcode Japanese or English in the final A2UI if it does not match the user's language.
-    - **INJECT A2UI SELECTION TEMPLATE (MANDATORY)**: You MUST explicitly instruct the agent (in its system instruction) to format each batch editor row as a Column containing a main Row (with Left: Original Text, Middle: MultipleChoice Selection, Right: Qty TextField) and a Text caption below it for the recommendation reason. Format the selection and annotation using this exact JSON structure for each row \`i\`, dynamically localizing all placeholder strings:
+    - **AI-RECOMMENDED SKU/ENTITY SELECTION (STRICTLY REQUIRED)**: In the Middle Column of each row in the Batch Editor, the agent **MUST NOT use a raw \`MaterialInput\` for mapping input**. The agent **MUST use a \`MaterialChips\` component (2-3 candidates, rendered as horizontal selection chips) or a \`MaterialSelect\` (more than 3 candidates)** whose \`value\` is bound to \`/form/item_i_selected_sku\` (e.g. \`/form/item_0_selected_sku\`) to allow the user to select the mapped SKU/entity.
+    - **ANNOTATION & RECOMMENDATION REASON (MANDATORY)**: Below each row's main components (Original, Selection, Qty), the agent **MUST include a \`MaterialText\` component (usageHint: "caption")** that dynamically displays the reason why the AI recommended these specific SKUs (e.g., "💡 SKU_A is the direct successor (95% match); SKU_B is a similar alternative").
+    - **LOCALIZATION RULE (CRITICAL)**: All literal strings in A2UI component labels, headers, options, and buttons MUST be translated dynamically into the user's interaction language (or the language of the userGoal). Do NOT hardcode Japanese or English in the final A2UI if it does not match the user's language.
+    - **INJECT A2UI SELECTION TEMPLATE (MANDATORY)**: You MUST explicitly instruct the agent (in its system instruction) to format each batch editor row as a MaterialColumn containing a main MaterialRow (with Left: original MaterialText stack, Middle: MaterialChips selection, Right: qty MaterialInput) and a MaterialText caption below it for the recommendation reason. This is A2UI v0.9: every component is FLAT (\`"component": "MaterialChips"\`, not a wrapper object), every value is plain JSON (no \`literalString\`), and \`children\` is a plain array of id strings. Format the selection and annotation using this exact JSON structure for each row \`i\`, dynamically localizing all placeholder strings:
       \`\`\`json
       {
-        "MultipleChoice": {
-          "label": { "literalString": "[Localized Label, e.g., 'Select SKU']" },
-          "options": [
-            { "value": "SKU_CODE_A", "label": { "literalString": "[SKU_CODE_A]" } },
-            { "value": "SKU_CODE_B", "label": { "literalString": "[SKU_CODE_B]" } }
-          ],
-          "maxAllowedSelections": 1,
-          "variant": "chips",
-          "selections": { "path": "/form/item_i_selected_sku" }
-        }
+        "id": "sku_select_i",
+        "component": "MaterialChips",
+        "value": { "path": "/form/item_i_selected_sku" },
+        "options": [
+          { "label": "[SKU_CODE_A]", "value": "SKU_CODE_A" },
+          { "label": "[SKU_CODE_B]", "value": "SKU_CODE_B" }
+        ]
       }
       \`\`\`
       And the caption below the row:
       \`\`\`json
       {
-        "Text": {
-          "text": { "literalString": "💡 [Localized reason explaining recommendations, e.g., 'SKU_A is direct replacement of legacy model']" },
-          "usageHint": "caption"
-        }
+        "id": "reason_text_i",
+        "component": "MaterialText",
+        "text": "💡 [Localized reason explaining recommendations, e.g., 'SKU_A is direct replacement of legacy model']",
+        "usageHint": "caption"
       }
       \`\`\`
-      The agent MUST populate the \`options\` array dynamically with 2-3 matching/similar SKU candidates retrieved from BigQuery based on semantic similarity. Each row's Right Column MUST also include a \`TextField\` (textFieldType: "shortText") bound to \`item_i_qty\` for quantity editing.
+      The agent MUST populate the \`options\` array dynamically with 2-3 matching/similar SKU candidates retrieved from BigQuery based on semantic similarity (\`MaterialChips\` has no \`label\` property, so put the "Select SKU" caption in a separate \`MaterialText\` if the column needs one). Each row's Right Column MUST also include a \`MaterialInput\` whose \`value\` is bound to \`/form/item_i_qty\` for quantity editing, and every bound path MUST be seeded by an \`updateDataModel\` message in the SAME \`<a2ui-json>\` block.
   - Instruct the agent to wait for the user to click the Submit button, then retrieve the latest edited values from the context parameter and execute the final database transaction.
 
 ### Type B: Strategic Insight Advisor (Read-Heavy / Diagnostic / Proposal-Driven)
@@ -2358,7 +2343,9 @@ function generateSetupScript(params) {
   // See AGENTS.md Section 13 for the update checklist.
   const PINNED_DEPS = {
     // Critical: A2UI SDK -- MUST use git+commit (PyPI 0.2.1 lacks version param)
-    //   Tested: HEAD ade478f with version='0.8' -> application/json+a2ui (GE compatible)
+    //   Tested: HEAD ade478f with version='0.9' -> application/json+a2ui (GE compatible).
+    //   The version kwarg stays load-bearing on v0.9: GE reads only that MIME,
+    //   never the newer 'application/a2ui+json' the SDK emits without it.
     //   Constraint: a2ui@ade478f requires google-genai>=1.27.0, google-adk>=1.28.1
     a2ui: 'a2ui-agent-sdk @ git+https://github.com/google/A2UI.git@ade478faf8dcad611b5efb6b864dcbfbc4a51f68#subdirectory=agent_sdks/python',
 
@@ -5034,8 +5021,14 @@ RUN uv pip freeze | grep -iE "^(google-adk|a2ui|mcp|google-genai|a2a-sdk)" | tee
 # symbol the generated code imports. Catches an upstream module-layout change
 # at BUILD time instead of as a stalled Cloud Run startup probe. AGENTS.md 8.
 RUN python dep_smoke_test.py
-# a2ui interface check: module import alone cannot see a dropped parameter.
-RUN python -c "from a2ui.a2a.parts import create_a2ui_part; import inspect; assert 'version' in inspect.signature(create_a2ui_part).parameters, 'FAIL: a2ui version param missing'; print('a2ui interface OK')"
+# a2ui v0.9 interface check: module import alone cannot see a dropped symbol,
+# and a missing composite catalog is a fatal A2uiSchemaManager error minutes
+# later at Cloud Run startup instead of here at build time. The mimeType assert
+# pins the one thing that fails SILENTLY: Gemini Enterprise renders
+# 'application/json+a2ui' and ignores 'application/a2ui+json', and the SDK
+# picks between them off the version kwarg, so a flip there degrades every card
+# to plain text with a perfectly clean log.
+RUN python -c "import json; from a2ui.schema.constants import VERSION_0_9; from a2ui.schema.catalog import CatalogConfig; from a2ui.schema.common_modifiers import remove_strict_validation; from a2ui.a2a.parts import create_a2ui_part; c = json.load(open('adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json')); assert c.get('catalogId'), 'FAIL: composite catalog missing catalogId'; m = (create_a2ui_part({'version': 'v0.9'}, version=VERSION_0_9).root.metadata or {}).get('mimeType'); assert m == 'application/json+a2ui', 'FAIL: unexpected A2UI mimeType ' + repr(m); print('a2ui v0.9 interface OK: ' + str(len(c.get('components') or {})) + ' components, mimeType=' + m)"
 ENV PORT 8080
 ENV GOOGLE_GENAI_USE_VERTEXAI=1
 ENV PYTHONUNBUFFERED=1
@@ -5236,13 +5229,21 @@ echo "🔧 Configuring agent..."
 
 cp "$GE_TPL/adk_agent/app/tools.py" adk_agent/app/tools.py
 
-mkdir -p adk_agent/app/examples/0.8
+mkdir -p adk_agent/app/catalogs
+echo '   Fetching the Gemini Enterprise A2UI v0.9 composite catalog...'
+curl -fsSL "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json" -o adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json
+python3 -c "import json; json.load(open('adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json'))" 2>/dev/null || {
+  echo '   [ERROR] Could not fetch a valid A2UI v0.9 composite catalog. The agent cannot start without it.'
+  exit 1
+}
+
+mkdir -p adk_agent/app/examples/0.9
 # --- A2UI example JSONs (copied from the pinned agent template) ---
-cp "$GE_TPL"/adk_agent/app/examples/0.8/*.json adk_agent/app/examples/0.8/
+cp "$GE_TPL"/adk_agent/app/examples/0.9/*.json adk_agent/app/examples/0.9/
 GE_CURRENCY='${bashEscape(currencySymbol)}' python3 - <<'__GE_CURR_SUB_EOF__'
 import glob, os
 sym = os.environ.get("GE_CURRENCY") or "$"
-for p in glob.glob("adk_agent/app/examples/0.8/*.json"):
+for p in glob.glob("adk_agent/app/examples/0.9/*.json"):
     s = open(p, encoding="utf-8").read()
     if "[CURRENCY]" in s:
         open(p, "w", encoding="utf-8").write(s.replace("[CURRENCY]", sym))
@@ -5707,9 +5708,21 @@ data = {
             "defaultOutputModes": ["text/plain", "application/json"],
             "capabilities": {
                 "streaming": True,
+                # GE does NOT fetch the live agent card at request time - it
+                # reads THIS registered inline card. The A2UI version GE
+                # requests in X-A2A-Extensions comes from here, so this MUST
+                # stay in lockstep with _build_static_agent_card() in
+                # fast_api_app.py. A stale v0.8 URI here made GE request v0.8
+                # and silently ignore every v0.9 part (2026-08-19).
                 "extensions": [
                     {
-                        "uri": "https://a2ui.org/a2a-extension/a2ui/v0.8"
+                        "uri": "https://a2ui.org/a2a-extension/a2ui/v0.9",
+                        "description": "Provides agent driven UI using the A2UI JSON format.",
+                        "params": {
+                            "supportedCatalogIds": [
+                                "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+                            ]
+                        }
                     }
                 ]
             },

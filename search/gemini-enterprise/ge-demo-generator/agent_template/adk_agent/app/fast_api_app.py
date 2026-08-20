@@ -72,13 +72,21 @@ from google.adk.sessions import InMemorySessionService
 from google.cloud import logging as google_cloud_logging
 from google.genai import types as genai_types
 from a2a import types as a2a_types
-from a2ui.schema.constants import VERSION_0_8
+from a2ui.schema.constants import VERSION_0_9
 from a2ui.schema.manager import A2uiSchemaManager
-from a2ui.basic_catalog.provider import BasicCatalog
+from a2ui.schema.catalog import CatalogConfig
+from a2ui.schema.common_modifiers import remove_strict_validation
 from a2ui.parser.streaming import A2uiStreamParser
 from a2ui.parser.response_part import ResponsePart
 from a2ui.a2a.parts import create_a2ui_part as _original_create_a2ui_part
 from a2ui.a2a.extension import get_a2ui_agent_extension
+
+# Must match agent.py exactly - a2ui_selected_catalog below drives both the
+# runtime schema gate and the healer, so a divergent catalog silently drops
+# surfaces the model was told it could render.
+A2UI_COMPOSITE_CATALOG_PATH = "adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json"
+A2UI_EXAMPLES_PATH = "adk_agent/app/examples/0.9"
+A2UI_PROTOCOL_VERSION = "v0.9"
 
 def _find_balanced_block(text: str, start_pos: int, open_char: str = '{', close_char: str = '}') -> int:
     # Find the end position (exclusive) of a balanced block starting from start_pos.
@@ -126,405 +134,151 @@ def _parse_loose_json(sub_str: str):
         
     return None
 
-def _rewrite_suggestions_a2ui(msg):
-    """Insert spacer before button groups in A2UI surfaces.
-    Two strategies:
-    1. surfaceId='suggestions': Wrap in Column with spacer (proven v10.32 approach)
-    2. Other surfaces: Find existing Column and insert spacer before button children
-    """
-    if not isinstance(msg, dict):
-        return msg
+# =============================================================================
+# A2UI v0.9 accessor layer
+# =============================================================================
+# v0.9 renamed every server-to-client message key and flattened the component
+# discriminator from a wrapper object ({"component": {"Text": {...}}}) to a
+# plain string ({"component": "MaterialText", ...props}). Everything below
+# reads surfaces through these accessors instead of hardcoding either shape,
+# so a future rename is one edit rather than forty.
+_A2UI_MSG_KEYS = ('createSurface', 'updateComponents', 'updateDataModel', 'deleteSurface')
+# Sniffer key set: the v0.9 keys PLUS their v0.8 spellings. The untagged-JSON
+# safety nets must still RECOGNISE a model that regressed to the old dialect -
+# _normalize_a2ui_shapes upgrades the keys immediately afterwards, so refusing
+# to sniff them would silently drop a recoverable card.
+_A2UI_SNIFF_KEYS = _A2UI_MSG_KEYS + ('beginRendering', 'surfaceUpdate', 'dataModelUpdate')
 
-    # --- Strategy 1: suggestions surface (flat button list) ---
-    # Wrap with a Column that has a spacer above the original root.
-    if "beginRendering" in msg:
-        _br = msg["beginRendering"]
-        if _br.get("surfaceId") == "suggestions" and _br.get("root") == "root":
-            _br["root"] = "suggestions_wrapper"
-        return msg
+# Buttons, chips and the actionable Material inputs. Used to decide whether a
+# surface actually gives the user something to press.
+_A2UI_ACTIONABLE = ('MaterialButton', 'MaterialIconButton', 'MaterialChips',
+                    'MaterialMenu', 'MaterialButtonToggle', 'Button')
 
-    if "surfaceUpdate" not in msg:
-        return msg
+def _a2ui_kind(msg):
+    # -> 'createSurface' | 'updateComponents' | 'updateDataModel' | 'deleteSurface' | None
+    if isinstance(msg, dict):
+        for _k in _A2UI_MSG_KEYS:
+            if isinstance(msg.get(_k), dict):
+                return _k
+    return None
 
-    _su = msg["surfaceUpdate"]
-    _comps = _su.get("components", [])
-    if not _comps:
-        return msg
+def _a2ui_body(msg):
+    _k = _a2ui_kind(msg)
+    return msg[_k] if _k else None
 
-    if _su.get("surfaceId") == "suggestions":
-        _has_wrapper = any(c.get("id") == "suggestions_wrapper" for c in _comps)
-        if not _has_wrapper:
-            _has_root = any(c.get("id") == "root" for c in _comps)
-            if _has_root:
-                _wrapper = {
-                    "id": "suggestions_wrapper",
-                    "component": {
-                        "Column": {
-                            "children": {"explicitList": ["suggestions_spacer", "root"]},
-                            "alignment": "stretch",
-                            "distribution": "start"
-                        }
-                    }
-                }
-                _spacer = {
-                    "id": "suggestions_spacer",
-                    "component": {
-                        "Text": {
-                            "text": {"literalString": " "},
-                            "usageHint": "body"
-                        }
-                    }
-                }
-                _comps.insert(0, _wrapper)
-                _comps.insert(1, _spacer)
-        return msg
+def _a2ui_surface_id(msg):
+    _b = _a2ui_body(msg)
+    if isinstance(_b, dict) and _b.get('surfaceId'):
+        return str(_b['surfaceId'])
+    return None
 
-    # --- Strategy 2: other surfaces (Card + buttons in same surface) ---
-    # Find the first Column and insert spacer before button children.
-    _cmap = {}
-    for _c in _comps:
-        if isinstance(_c, dict) and _c.get('id'):
-            _cmap[_c['id']] = _c
+def _comp_type(comp):
+    # v0.9: the discriminator is a plain string property named 'component'.
+    _t = comp.get('component') if isinstance(comp, dict) else None
+    return _t if isinstance(_t, str) else None
 
-    def _leads_to_buttons(_child_id):
-        _cc = _cmap.get(_child_id, {}).get('component', {})
-        if 'Button' in _cc:
-            return True
-        if 'Row' in _cc:
-            _rc = _cc['Row'].get('children', {}).get('explicitList', [])
-            return any('Button' in _cmap.get(_r, {}).get('component', {}) for _r in _rc if _r in _cmap)
-        return False
+def _children_ids(comp):
+    # Explicit child id list, or None for a data-bound template
+    # ({"componentId": ..., "path": ...}) which cannot be walked statically.
+    _kids = comp.get('children') if isinstance(comp, dict) else None
+    if isinstance(_kids, list):
+        return [_k for _k in _kids if isinstance(_k, str)]
+    return None
 
-    for _c in _comps:
-        _ct = _c.get('component', {})
-        if 'Column' not in _ct:
-            continue
-        _children = _ct['Column'].get('children', {}).get('explicitList')
-        if not _children or len(_children) < 2:
-            break
+def _mk_msg(_kind, **_body):
+    # Every v0.9 message is version-stamped; deleteSurface now requires it too.
+    return {'version': A2UI_PROTOCOL_VERSION, _kind: _body}
 
-        _btn_start = None
-        for _i, _cid in enumerate(_children):
-            if _leads_to_buttons(_cid):
-                _btn_start = _i
-                break
-
-        if _btn_start is not None and _btn_start > 0:
-            _sp_id = 'sp_' + _c.get('id', 'root')
-            _children.insert(_btn_start, _sp_id)
-            _comps.append({
-                'id': _sp_id,
-                'component': {
-                    'Text': {
-                        'text': {'literalString': ' '},
-                        'usageHint': 'body'
-                    }
-                }
-            })
-        break
-
-    return msg
+def _mk_text(_cid, _s, _hint='body'):
+    return {'id': _cid, 'component': 'MaterialText', 'text': _s, 'usageHint': _hint}
 
 def _heal_buttons_in_a2ui(msg):
-    if not isinstance(msg, dict):
+    """Make sure every actionable component in an updateComponents can be read.
+
+    v0.9 shrank this pass dramatically. MaterialButton carries a FLAT 'label'
+    string, so the v0.8 failure class - a Button whose separately-defined child
+    Text component was never emitted, rendering as a blank pill - simply cannot
+    happen anymore. What remains is the label being absent altogether, which we
+    recover from the button's own event context.prompt (GE uses that same string
+    as the user's chat message, so it always reads as intent).
+    """
+    if _a2ui_kind(msg) != 'updateComponents':
         return msg
-    if 'surfaceUpdate' in msg:
-        su = msg['surfaceUpdate']
-        if 'components' in su and isinstance(su['components'], list):
-            comps = su['components']
-            new_comps = []
-            for comp in comps:
-                if not isinstance(comp, dict):
-                    continue
-                if 'component' in comp and isinstance(comp['component'], dict):
-                    c_type = list(comp['component'].keys())[0] if comp['component'] else None
-                    if c_type == 'Button':
-                        btn = comp['component']['Button']
-                        if isinstance(btn, dict):
-                            # Capture and remove accidental usageHint on the Button component itself to prevent validation failure
-                            btn_usage_hint = btn.pop('usageHint', None)
-                            
-                            has_child = 'child' in btn
-                            label_val = btn.get('label') or btn.get('text')
-                            
-                            if has_child and isinstance(btn['child'], dict):
-                                child_obj = btn['child']
-                                c_type = list(child_obj.keys())[0] if child_obj else None
-                                if c_type == 'Text':
-                                    text_body = child_obj['Text']
-                                    if isinstance(text_body, dict) and 'usageHint' not in text_body:
-                                        if btn_usage_hint:
-                                            text_body['usageHint'] = btn_usage_hint
-                                        else:
-                                            text_body['usageHint'] = 'body'
-                                    
-                                    parent_id = comp.get('id') or 'btn'
-                                    child_id = parent_id + '_lbl'
-                                    btn['child'] = child_id
-                                    new_text = {
-                                        'id': child_id,
-                                        'component': child_obj
-                                    }
-                                    new_comps.append(new_text)
-                            elif not has_child and label_val:
-                                label_str = ''
-                                if isinstance(label_val, dict):
-                                    label_str = label_val.get('literalString') or ''
-                                else:
-                                    label_str = str(label_val)
-                                if label_str:
-                                    parent_id = comp.get('id') or 'btn'
-                                    child_id = parent_id + '_lbl'
-                                    btn['child'] = child_id
-                                    if 'label' in btn:
-                                        del btn['label']
-                                    if 'text' in btn:
-                                        del btn['text']
-                                    
-                                    # Use the captured usageHint for the child Text component, or default to 'body'
-                                    target_hint = btn_usage_hint if btn_usage_hint else 'body'
-                                    
-                                    new_text = {
-                                        'id': child_id,
-                                        'component': {
-                                            'Text': {
-                                                'text': { 'literalString': label_str },
-                                                'usageHint': target_hint
-                                            }
-                                        }
-                                    }
-                                    new_comps.append(new_text)
-            comps.extend(new_comps)
-
-            # --- Dangling-label pass (v11.4) ---
-            # A Button whose 'child' is a string id with NO matching component in
-            # this surfaceUpdate renders as an EMPTY pill in GE (confirmed live
-            # 2026-07-15: Next Actions chips showed as blank blue ovals because
-            # the model emitted the Buttons but omitted their label Text
-            # components). Synthesize the missing Text from the button's own
-            # label/text property, a literalString nested in an inline child
-            # object, or its sendText context text (every chip carries one),
-            # truncated to a chip-sized label.
-            _defined_ids = set()
-            for _dc in comps:
-                if isinstance(_dc, dict) and isinstance(_dc.get('id'), str):
-                    _defined_ids.add(_dc['id'])
-            def _find_literal(_n):
-                if isinstance(_n, dict):
-                    _ls = _n.get('literalString')
-                    if isinstance(_ls, str) and _ls.strip():
-                        return _ls
-                    for _v in _n.values():
-                        _r = _find_literal(_v)
-                        if _r:
-                            return _r
-                elif isinstance(_n, list):
-                    for _v in _n:
-                        _r = _find_literal(_v)
-                        if _r:
-                            return _r
-                return ''
-            _extra_labels = []
-            for comp in comps:
-                if not isinstance(comp, dict):
-                    continue
-                _cd = comp.get('component')
-                if not (isinstance(_cd, dict) and isinstance(_cd.get('Button'), dict)):
-                    continue
-                btn = _cd['Button']
-                _child = btn.get('child')
-                if isinstance(_child, str) and _child in _defined_ids:
-                    continue  # healthy: the label Text exists in this surfaceUpdate
-                # Label source 1: leftover label/text property on the Button
-                _label = ''
-                _lv = btn.get('label') or btn.get('text')
-                if isinstance(_lv, dict):
-                    _label = str(_lv.get('literalString') or '')
-                elif _lv:
-                    _label = str(_lv)
-                # Label source 2: literalString nested inside an inline child object
-                if (not _label) and isinstance(_child, dict):
-                    _label = _find_literal(_child)
-                # Label source 3: the button's own sendText context text
-                if not _label:
-                    _act = btn.get('action')
-                    _ctx = _act.get('context') if isinstance(_act, dict) else None
-                    for _ce in (_ctx or []):
-                        if isinstance(_ce, dict) and _ce.get('key') == 'text':
-                            _cv = _ce.get('value')
-                            if isinstance(_cv, dict) and isinstance(_cv.get('literalString'), str):
-                                _label = _cv['literalString']
-                            elif isinstance(_cv, str):
-                                _label = _cv
-                            break
-                _label = ' '.join(str(_label).split())
-                if len(_label) > 48:
-                    _label = _label[:47] + '...'
-                if not _label:
-                    continue  # nothing usable - leave the button untouched
-                _cid = _child if (isinstance(_child, str) and _child) else (str(comp.get('id') or 'btn') + '_lbl')
-                if _cid in _defined_ids:
-                    _cid = _cid + '_x'
-                btn.pop('label', None)
-                btn.pop('text', None)
-                btn['child'] = _cid
-                _extra_labels.append({'id': _cid, 'component': {'Text': {'text': {'literalString': _label}, 'usageHint': 'body'}}})
-                _defined_ids.add(_cid)
-            if _extra_labels:
-                comps.extend(_extra_labels)
-                try:
-                    logger.log_text('[button_heal] synthesized ' + str(len(_extra_labels)) + ' missing button label Text component(s)')
-                except Exception:
-                    pass
-
-            # Normalize Text.text given as a bare string: GE requires the
-            # {'literalString': ...} shape; a bare string renders as empty.
-            for _tc in comps:
-                if not isinstance(_tc, dict):
-                    continue
-                _tcd = _tc.get('component')
-                if isinstance(_tcd, dict) and isinstance(_tcd.get('Text'), dict):
-                    _tv = _tcd['Text'].get('text')
-                    if isinstance(_tv, str):
-                        _tcd['Text']['text'] = {'literalString': _tv}
+    _comps = msg['updateComponents'].get('components')
+    if not isinstance(_comps, list):
+        return msg
+    _fixed = 0
+    for _comp in _comps:
+        _ctype = _comp_type(_comp)
+        if _ctype not in ('MaterialButton', 'Button'):
+            continue
+        _label = _comp.get('label') if _ctype == 'MaterialButton' else _comp.get('child')
+        if isinstance(_label, dict):
+            continue  # a data binding: resolved client-side, nothing to check
+        if isinstance(_label, str) and _label.strip():
+            continue
+        # Derive the label from the press payload the model DID emit.
+        _text = ''
+        _act = _comp.get('action')
+        _ev = _act.get('event') if isinstance(_act, dict) else None
+        _ctx = _ev.get('context') if isinstance(_ev, dict) else None
+        if isinstance(_ctx, dict):
+            for _key in ('prompt', 'label', 'text'):
+                _cand = _ctx.get(_key)
+                if isinstance(_cand, str) and _cand.strip():
+                    _text = _cand.strip()
+                    break
+        if not _text and isinstance(_ev, dict) and isinstance(_ev.get('name'), str):
+            _text = _ev['name'].replace('_', ' ').strip().capitalize()
+        if not _text:
+            continue
+        _text = ' '.join(_text.split())
+        if len(_text) > 48:
+            _text = _text[:47].rstrip() + chr(0x2026)
+        _comp.pop('child', None)
+        _comp['component'] = 'MaterialButton'
+        _comp['label'] = _text
+        _fixed += 1
+    if _fixed:
+        try:
+            logger.log_text('[button_heal] labelled ' + str(_fixed) + ' unreadable button(s) from their event context')
+        except Exception:
+            pass
     return msg
 
-# --- A2UI Icon Normalization ---
-# The A2UI stream parser validates icon names against a strict enum.
-# LLMs frequently generate icon names outside this list (e.g. 'analytics',
-# 'dashboard', 'trending_up'), causing ValueError that triggers the
-# fallback+safety-net duplicate parts bug.
-# This pre-processor maps common invalid icons to the closest valid icon.
+# --- A2UI Icon Normalization (v0.9) ---
+# The composite catalog exposes two icon components with opposite rules:
+#   MaterialIcon.icon - free-form, any name in the Material Icons font set;
+#   Icon.name         - a closed enum, and Icon is one of the 18 basic
+#                       components that keep unevaluatedProperties: false.
+# Models reach for real Material names ('analytics', 'trending_up') far more
+# often than for the enum's camelCase spellings, so an out-of-enum basic Icon
+# is upgraded to a MaterialIcon carrying the SAME name rather than degraded to
+# a generic fallback glyph. This is why the v0.8 _ICON_FALLBACK_MAP is gone:
+# under v0.9 there is nothing left to fall back to.
 _VALID_A2UI_ICONS = frozenset([
     'accountCircle', 'add', 'arrowBack', 'arrowForward', 'attachFile',
     'calendarToday', 'call', 'camera', 'check', 'close', 'delete',
-    'download', 'edit', 'event', 'error', 'favorite', 'favoriteOff',
-    'folder', 'help', 'home', 'info', 'locationOn', 'lock', 'lockOpen',
-    'mail', 'menu', 'moreVert', 'moreHoriz', 'notificationsOff',
-    'notifications', 'payment', 'person', 'phone', 'photo', 'print',
-    'refresh', 'search', 'send', 'settings', 'share', 'shoppingCart',
-    'star', 'starHalf', 'starOff', 'upload', 'visibility', 'visibilityOff',
-    'warning',
+    'download', 'edit', 'event', 'error', 'fastForward', 'favorite',
+    'favoriteOff', 'folder', 'help', 'home', 'info', 'locationOn', 'lock',
+    'lockOpen', 'mail', 'menu', 'moreVert', 'moreHoriz', 'notificationsOff',
+    'notifications', 'pause', 'payment', 'person', 'phone', 'photo', 'play',
+    'print', 'refresh', 'rewind', 'search', 'send', 'settings', 'share',
+    'shoppingCart', 'skipNext', 'skipPrevious', 'star', 'starHalf',
+    'starOff', 'stop', 'upload', 'visibility', 'visibilityOff', 'warning',
 ])
-_ICON_FALLBACK_MAP = {
-    'analytics': 'info',
-    'bar_chart': 'info',
-    'dashboard': 'home',
-    'trending_up': 'arrowForward',
-    'trending_down': 'arrowBack',
-    'inventory': 'shoppingCart',
-    'inventory_2': 'shoppingCart',
-    'local_shipping': 'send',
-    'receipt': 'folder',
-    'receipt_long': 'folder',
-    'description': 'attachFile',
-    'assessment': 'info',
-    'insights': 'info',
-    'query_stats': 'search',
-    'monitoring': 'visibility',
-    'schedule': 'calendarToday',
-    'access_time': 'calendarToday',
-    'timer': 'calendarToday',
-    'group': 'person',
-    'groups': 'person',
-    'people': 'person',
-    'support_agent': 'person',
-    'handshake': 'person',
-    'savings': 'payment',
-    'account_balance': 'payment',
-    'credit_card': 'payment',
-    'monetization_on': 'payment',
-    'attach_money': 'payment',
-    'money': 'payment',
-    'currency_exchange': 'payment',
-    'price_check': 'payment',
-    'store': 'shoppingCart',
-    'storefront': 'shoppingCart',
-    'shopping_bag': 'shoppingCart',
-    'construction': 'settings',
-    'build': 'settings',
-    'tune': 'settings',
-    'manage_accounts': 'settings',
-    'admin_panel_settings': 'settings',
-    'speed': 'info',
-    'task': 'check',
-    'task_alt': 'check',
-    'check_circle': 'check',
-    'done': 'check',
-    'verified': 'check',
-    'assignment': 'folder',
-    'article': 'folder',
-    'note': 'edit',
-    'data_usage': 'info',
-    'pie_chart': 'info',
-    'show_chart': 'info',
-    'leaderboard': 'info',
-    'table_chart': 'info',
-    'auto_graph': 'info',
-    'stacked_bar_chart': 'info',
-    'donut_large': 'info',
-    'map': 'locationOn',
-    'place': 'locationOn',
-    'my_location': 'locationOn',
-    'explore': 'locationOn',
-    'public': 'locationOn',
-    'language': 'locationOn',
-    'flag': 'info',
-    'bookmark': 'star',
-    'label': 'info',
-    'category': 'folder',
-    'list': 'menu',
-    'list_alt': 'menu',
-    'view_list': 'menu',
-    'format_list_bulleted': 'menu',
-    'toc': 'menu',
-    'link': 'attachFile',
-    'open_in_new': 'arrowForward',
-    'launch': 'arrowForward',
-    'cloud': 'upload',
-    'cloud_upload': 'upload',
-    'cloud_download': 'download',
-    'security': 'lock',
-    'shield': 'lock',
-    'verified_user': 'lock',
-    'gpp_good': 'lock',
-    'policy': 'lock',
-    'emoji_objects': 'info',
-    'lightbulb': 'info',
-    'tips_and_updates': 'info',
-    'school': 'info',
-    'workspace_premium': 'star',
-    'military_tech': 'star',
-    'grade': 'star',
-    'thumb_up': 'favorite',
-    'recommend': 'favorite',
-    'sentiment_satisfied': 'favorite',
-    'local_offer': 'info',
-    'sell': 'payment',
-    'point_of_sale': 'payment',
-    'electric_bolt': 'warning',
-    'flash_on': 'warning',
-    'report': 'warning',
-    'report_problem': 'warning',
-    'priority_high': 'warning',
-    'crisis_alert': 'warning',
-    'notifications_active': 'notifications',
-    'campaign': 'notifications',
-    'announcement': 'notifications',
-    'mark_email_read': 'mail',
-    'forward_to_inbox': 'mail',
-    'drafts': 'mail',
-    'contact_mail': 'mail',
-    'chat': 'mail',
-    'forum': 'mail',
-    'comment': 'mail',
-    'sms': 'mail',
-    'message': 'mail',
-    'contact_support': 'help',
-    'quiz': 'help',
-    'live_help': 'help',
-    'question_answer': 'help',
-}
+
+def _normalize_a2ui_icon_component(comp):
+    """Upgrade a basic Icon with an out-of-enum name to a MaterialIcon."""
+    if not isinstance(comp, dict) or _comp_type(comp) != 'Icon':
+        return False
+    _name = comp.get('name')
+    if not isinstance(_name, str) or _name in _VALID_A2UI_ICONS:
+        return False
+    comp.pop('name', None)
+    comp['component'] = 'MaterialIcon'
+    comp['icon'] = _name
+    return True
 
 import re as _a2ui_debris_re_mod
 # Stray A2UI tag debris emitted as TEXT (e.g. a leaked "a2ui-json>" fragment) when
@@ -553,234 +307,100 @@ def _normalize_a2ui_icons_in_data(data):
     if isinstance(data, list):
         return [_normalize_a2ui_icons_in_data(item) for item in data]
     if isinstance(data, dict):
-        if 'Icon' in data and isinstance(data['Icon'], dict):
-            name_obj = data['Icon'].get('name', {})
-            if isinstance(name_obj, dict):
-                lit = name_obj.get('literalString', '')
-                if lit and lit not in _VALID_A2UI_ICONS:
-                    mapped = _ICON_FALLBACK_MAP.get(lit, 'info')
-                    name_obj['literalString'] = mapped
+        _normalize_a2ui_icon_component(data)
         return {k: _normalize_a2ui_icons_in_data(v) for k, v in data.items()}
     return data
-
-_A2UI_CONTAINERS = ('Row', 'Column', 'Card', 'List', 'Box')
-
-
-def _a2ui_is_blank(_cid, _by_id, _depth=0):
-    """True only when the subtree at _cid PROVABLY puts nothing on screen.
-
-    Deliberately conservative: a component type this does not recognise counts
-    as renderable, so the repair below can never blank out a label it merely
-    failed to understand. Only a missing id, an empty spec, an empty Text, or a
-    container whose every child is itself blank returns True.
-    """
-    if _depth > 6:
-        return False
-    _entry = _by_id.get(_cid) if _cid else None
-    if _entry is None:
-        return True  # dangling child ref - there is nothing to render
-    _spec = _entry.get('component')
-    if not isinstance(_spec, dict) or not _spec:
-        return True
-    for _ctype, _cbody in _spec.items():
-        if _ctype in ('Text', 'Heading'):
-            if not isinstance(_cbody, dict):
-                return False
-            _tv = _cbody.get('text')
-            if isinstance(_tv, dict) and not str(_tv.get('literalString', '')).strip() and not _tv.get('path'):
-                continue
-            return False
-        if _ctype in _A2UI_CONTAINERS:
-            if not isinstance(_cbody, dict):
-                return False
-            _kids = _cbody.get('children')
-            if not isinstance(_kids, dict):
-                return False
-            if _kids.get('template'):
-                return False  # data-bound, cannot be judged statically
-            for _k in (_kids.get('explicitList') or []):
-                if not _a2ui_is_blank(_k, _by_id, _depth + 1):
-                    return False
-            continue
-        return False
-    return True
-
-
-def _heal_blank_buttons(_messages):
-    """Give a Button a readable label when its child subtree renders nothing.
-
-    v11.53, observed live 2026-08-04: the model emitted three suggestion chips
-    whose child ids ('loading_chip1Lbl' ...) it then defined as Row components
-    with an empty explicitList. Nothing dangled, so the dangling-ref diagnostic
-    stayed clean and the healer passed it straight through; GE rendered three
-    blank pills the user could press but not read.
-
-    The button's own sendText payload is the one piece of intent guaranteed to
-    be present, so derive the label from it instead of dropping the chip - a
-    long label is a far smaller failure than an unreadable one. Buttons with no
-    text payload are left alone for the a2ui_diag line to report.
-    """
-    _by_surface = {}
-    for _m in _messages:
-        _su = _m.get('surfaceUpdate') if isinstance(_m, dict) else None
-        if not isinstance(_su, dict) or not isinstance(_su.get('components'), list):
-            continue
-        _bucket = _by_surface.setdefault(str(_su.get('surfaceId', '')), {})
-        for _c in _su['components']:
-            if isinstance(_c, dict) and _c.get('id'):
-                _bucket[str(_c['id'])] = _c
-    for _sid, _by_id in _by_surface.items():
-        for _cid, _entry in list(_by_id.items()):
-            _spec = _entry.get('component')
-            if not isinstance(_spec, dict) or not isinstance(_spec.get('Button'), dict):
-                continue
-            _btn = _spec['Button']
-            _child = _btn.get('child')
-            if not _a2ui_is_blank(_child, _by_id):
-                continue
-            _label = ''
-            _act = _btn.get('action')
-            if isinstance(_act, dict):
-                for _ctx in (_act.get('context') or []):
-                    if isinstance(_ctx, dict) and _ctx.get('key') == 'text':
-                        _val = _ctx.get('value')
-                        if isinstance(_val, dict):
-                            _label = str(_val.get('literalString', '')).strip()
-                        break
-            if not _label:
-                continue
-            if len(_label) > 40:
-                _label = _label[:39].rstrip() + chr(0x2026)
-            _text_spec = {'Text': {'text': {'literalString': _label}, 'usageHint': 'body'}}
-            if _child and _child in _by_id:
-                _by_id[_child]['component'] = _text_spec
-            else:
-                _new_id = str(_cid) + '_healedLbl'
-                _btn['child'] = _new_id
-                _by_id[_new_id] = {'id': _new_id, 'component': _text_spec}
-                for _m in _messages:
-                    _su = _m.get('surfaceUpdate') if isinstance(_m, dict) else None
-                    if isinstance(_su, dict) and str(_su.get('surfaceId', '')) == _sid \
-                            and isinstance(_su.get('components'), list):
-                        _su['components'].append(_by_id[_new_id])
-                        break
-            logger.log_text("[healer] blank Button '" + str(_cid) + "' on surface '" + _sid
-                            + "' - labelled from its sendText payload")
-    return _messages
-
-
 def _heal_a2ui_message_list(messages):
+    """Whole-list repairs applied to MODEL-authored A2UI before delivery.
+
+    v0.9 lost most of what this used to do: the blank-button pass is obsolete
+    (MaterialButton.label is a flat string, so a button cannot render label-less
+    without the schema catching it), and Divider no longer needs its properties
+    scrubbed. What remains is the surfaceId typo normalization and the basic-Icon
+    upgrade, both of which are cheap and still observed in the wild.
+    """
     import json as _json
     try:
         logger.log_text("[healer_input] messages: " + _json.dumps(messages))
     except Exception as _le:
         logger.log_text("[healer_input] failed to log: " + str(_le))
-        
+
     if not isinstance(messages, list):
         return messages
-        
+
     healed_messages = []
-    
-    # Normalize surfaceId typos and sanitize Divider components.
     # NOTE: Root IDs are intentionally left as the LLM produced them.
     # GE expects the model's original root IDs; renaming them breaks rendering.
     for m in messages:
         if not isinstance(m, dict):
             healed_messages.append(m)
             continue
-            
-        if 'beginRendering' in m:
-            br = m['beginRendering']
-            if isinstance(br, dict) and 'surfaceId' in br:
-                if br['surfaceId'] == 'welcome-root':
-                    br['surfaceId'] = 'welcome-card'
-                
-        elif 'surfaceUpdate' in m:
-            su = m['surfaceUpdate']
-            if isinstance(su, dict) and 'surfaceId' in su:
-                if su['surfaceId'] == 'welcome-root':
-                    su['surfaceId'] = 'welcome-card'
-                
-                # --- DIVIDER FAILSAFE ---
-                # Clean up all Divider properties to strictly {} to prevent speculative property crashes in browser
-                comps = su.get('components')
-                if comps and isinstance(comps, list):
-                    for comp in comps:
-                        if isinstance(comp, dict) and 'component' in comp:
-                            if isinstance(comp['component'], dict) and 'Divider' in comp['component']:
-                                comp['component']['Divider'] = {}
-                            # --- ICON NORMALIZATION ---
-                            # Map invalid icon names to valid ones to prevent parser crashes
-                            if isinstance(comp['component'], dict) and 'Icon' in comp['component']:
-                                _icon_data = comp['component']['Icon']
-                                if isinstance(_icon_data, dict):
-                                    _name_obj = _icon_data.get('name', {})
-                                    if isinstance(_name_obj, dict):
-                                        _lit = _name_obj.get('literalString', '')
-                                        if _lit and _lit not in _VALID_A2UI_ICONS:
-                                            _name_obj['literalString'] = _ICON_FALLBACK_MAP.get(_lit, 'info')
-                
-        healed_messages.append(m)
 
-    try:
-        healed_messages = _heal_blank_buttons(healed_messages)
-    except Exception as _bb_err:
-        logger.log_text("[healer] blank-button pass failed (non-fatal): " + str(_bb_err)[:200])
+        _body = _a2ui_body(m)
+        if isinstance(_body, dict) and _body.get('surfaceId') == 'welcome-root':
+            _body['surfaceId'] = 'welcome-card'
+
+        if _a2ui_kind(m) == 'updateComponents':
+            for comp in (_body.get('components') or []):
+                _normalize_a2ui_icon_component(comp)
+
+        healed_messages.append(m)
 
     try:
         logger.log_text("[healer_output] messages: " + _json.dumps(healed_messages))
     except Exception as _le:
         logger.log_text("[healer_output] failed to log: " + str(_le))
-        
+
     return healed_messages
 
-def _is_suggestions_part(part) -> bool:
+def _a2ui_iter_msgs(part):
+    # Yields every A2UI message dict carried by an a2a DataPart.
     try:
         _root = getattr(part, 'root', None)
-        if _root and isinstance(_root, a2a_types.DataPart):
-            _data = _root.data
-            _items = _data if isinstance(_data, list) else [_data]
-            for _item in _items:
-                if isinstance(_item, dict):
-                    for _k in ('beginRendering', 'surfaceUpdate', 'deleteSurface'):
-                        if _k in _item and isinstance(_item[_k], dict):
-                            # Matches both the bare 'suggestions' id and the
-                            # per-turn scoped 'suggestions-<task_id>' (see
-                            # _scope_suggestions_surface).
-                            if (_item[_k].get('surfaceId') or '').startswith('suggestions'):
-                                return True
+        if not (_root and isinstance(_root, a2a_types.DataPart)):
+            return
+        _data = _root.data
+        for _item in (_data if isinstance(_data, list) else [_data]):
+            if isinstance(_item, dict) and _a2ui_kind(_item):
+                yield _item
     except Exception:
-        pass
+        return
+
+
+def _is_suggestions_part(part) -> bool:
+    # Matches both the bare 'suggestions' id and the per-turn scoped
+    # 'suggestions-<task_id>' (see _scope_suggestions_surface).
+    for _m in _a2ui_iter_msgs(part):
+        if (_a2ui_surface_id(_m) or '').startswith('suggestions'):
+            return True
     return False
 
 
 def _iter_surface_updates(parts):
-    # Yields every surfaceUpdate dict found in a list of a2a Parts.
+    # Yields every updateComponents body found in a list of a2a Parts.
     for _p in parts:
-        try:
-            _root = getattr(_p, 'root', None)
-            if not (_root and isinstance(_root, a2a_types.DataPart)):
-                continue
-            _data = _root.data
-            _items = _data if isinstance(_data, list) else [_data]
-            for _item in _items:
-                if isinstance(_item, dict) and isinstance(_item.get('surfaceUpdate'), dict):
-                    yield _item['surfaceUpdate']
-        except Exception:
-            continue
+        for _m in _a2ui_iter_msgs(_p):
+            if _a2ui_kind(_m) == 'updateComponents':
+                yield _m['updateComponents']
 
 
 def _surface_update_has_button(_su) -> bool:
+    # The chip bar is a MaterialRow of MaterialButtons (one action, and so one
+    # context.prompt, per chip - MaterialChips carries a SINGLE action for all
+    # of its options, which sent the first chip's prompt whichever chip was
+    # pressed). Other cards make their own components clickable, so this counts
+    # every actionable type rather than looking for a Button specifically.
     for _c in (_su.get('components') or []):
-        if isinstance(_c, dict) and isinstance(_c.get('component'), dict) and 'Button' in _c['component']:
+        if _comp_type(_c) in _A2UI_ACTIONABLE:
             return True
     return False
 
 
 def _has_populated_suggestions(parts) -> bool:
-    # True iff some part carries a surfaceUpdate on a 'suggestions*' surface
-    # that actually contains at least one Button (a begin-only suggestions
-    # surface, or an update with no Buttons, renders as nothing in GE).
+    # True iff some part carries an updateComponents on a 'suggestions*' surface
+    # that actually contains something clickable (a created-but-never-populated
+    # suggestions surface, or an update with no actionable component, renders
+    # as nothing in GE).
     for _su in _iter_surface_updates(parts):
         if (_su.get('surfaceId') or '').startswith('suggestions') and _surface_update_has_button(_su):
             return True
@@ -788,26 +408,18 @@ def _has_populated_suggestions(parts) -> bool:
 
 
 def _iter_begin_renderings(parts):
-    # Yields every beginRendering dict found in a list of a2a Parts.
+    # Yields every createSurface body found in a list of a2a Parts.
     for _p in parts:
-        try:
-            _root = getattr(_p, 'root', None)
-            if not (_root and isinstance(_root, a2a_types.DataPart)):
-                continue
-            _data = _root.data
-            _items = _data if isinstance(_data, list) else [_data]
-            for _item in _items:
-                if isinstance(_item, dict) and isinstance(_item.get('beginRendering'), dict):
-                    yield _item['beginRendering']
-        except Exception:
-            continue
+        for _m in _a2ui_iter_msgs(_p):
+            if _a2ui_kind(_m) == 'createSurface':
+                yield _m['createSurface']
 
 
 def _orphan_card_surface_ids(parts):
-    # Surface ids that were OPENED with beginRendering but never populated by a
-    # surfaceUpdate anywhere in the same artifact. GE renders such a surface as
+    # Surface ids that were OPENED with createSurface but never populated by an
+    # updateComponents anywhere in the same artifact. GE renders such a surface as
     # nothing, so the card silently disappears and only the prose survives - the
-    # exact failure mode when a model emits [beginRendering, dataModelUpdate] and
+    # exact failure mode when a model emits [createSurface, updateDataModel] and
     # then moves straight on to the next block. Suggestions are excluded: they
     # have their own dedicated recovery path (_chips_ok / [chip_reprompt]).
     _opened, _filled = [], set()
@@ -823,30 +435,17 @@ def _orphan_card_surface_ids(parts):
 def _is_surface_part(part, surface_ids) -> bool:
     # True iff EVERY a2ui message carried by this part targets one of surface_ids
     # (so dropping the part cannot take an unrelated surface down with it).
-    try:
-        _root = getattr(part, 'root', None)
-        if not (_root and isinstance(_root, a2a_types.DataPart)):
+    _seen = False
+    for _m in _a2ui_iter_msgs(part):
+        _seen = True
+        if (_a2ui_surface_id(_m) or '') not in surface_ids:
             return False
-        _data = _root.data
-        _items = _data if isinstance(_data, list) else [_data]
-        _seen = False
-        for _item in _items:
-            if not isinstance(_item, dict):
-                continue
-            for _k in ('beginRendering', 'surfaceUpdate', 'dataModelUpdate', 'deleteSurface'):
-                _m = _item.get(_k)
-                if isinstance(_m, dict):
-                    _seen = True
-                    if (_m.get('surfaceId') or '') not in surface_ids:
-                        return False
-        return _seen
-    except Exception:
-        return False
+    return _seen
 
 
 def _has_populated_card(parts) -> bool:
-    # True iff some NON-suggestions surface carries a surfaceUpdate with at least
-    # one component (i.e. a card that will actually render).
+    # True iff some NON-suggestions surface carries an updateComponents with at
+    # least one component (i.e. a card that will actually render).
     for _su in _iter_surface_updates(parts):
         if not (_su.get('surfaceId') or '').startswith('suggestions') and (_su.get('components') or []):
             return True
@@ -854,7 +453,7 @@ def _has_populated_card(parts) -> bool:
 
 
 def _has_interactive_card(parts) -> bool:
-    # True iff some NON-suggestions surface contains Button components.
+    # True iff some NON-suggestions surface contains an actionable component.
     # Mirrors the prompt's A2UI CARD INTERACTION EXCEPTION: when a card carries
     # its own control buttons, suggestion chips are intentionally absent and
     # must NOT be re-prompted for.
@@ -882,12 +481,11 @@ _current_suggestions_suffix = contextvars.ContextVar('suggestions_suffix', defau
 
 def _scope_suggestions_surface(msg):
     _suffix = _current_suggestions_suffix.get()
-    if not _suffix or not isinstance(msg, dict):
+    if not _suffix:
         return msg
-    for _k in ('beginRendering', 'surfaceUpdate', 'dataModelUpdate', 'deleteSurface'):
-        _v = msg.get(_k)
-        if isinstance(_v, dict) and _v.get('surfaceId') == 'suggestions':
-            _v['surfaceId'] = 'suggestions-' + _suffix
+    _v = _a2ui_body(msg)
+    if isinstance(_v, dict) and _v.get('surfaceId') == 'suggestions':
+        _v['surfaceId'] = 'suggestions-' + _suffix
     return msg
 
 
@@ -901,11 +499,11 @@ def _scope_suggestions_surface(msg):
 # turns earlier and its own turn rendered no card). _rescope_replay_parts only
 # covers REPLAYED cached parts (G1/H1); this guard covers FRESH model output.
 # Rules (deliberately narrow to avoid regressions):
-#   - Only a beginRendering that reuses an id first rendered by a PRIOR
+#   - Only a createSurface that reuses an id first rendered by a PRIOR
 #     invocation is renamed (re-anchored to THIS turn). First renders and
 #     same-invocation re-begins keep their id; streaming updates within a
 #     turn are untouched.
-#   - surfaceUpdate / dataModelUpdate / deleteSurface are rewritten to the
+#   - updateComponents / updateDataModel / deleteSurface are rewritten to the
 #     LATEST incarnation of their surface (identity rewrite when never
 #     renamed), so the prompt's confirmation-surface lifecycle (render turn
 #     N, deleteSurface turn N+1) keeps working even after a rename, and a
@@ -932,69 +530,77 @@ def _a2ui_components(_v):
     return _c if isinstance(_c, list) else []
 
 def _a2ui_is_full_card_tree(_v):
-    # A self-contained card re-render declares its root component (conventionally
-    # id 'root'); a partial in-place patch updates specific components and does
-    # NOT re-send the root. Used to distinguish "model re-rendered the whole card
-    # via surfaceUpdate (forgot beginRendering)" from "legitimate partial patch".
+    # A self-contained card re-render declares its root component (v0.9 requires
+    # the id to literally be 'root'); a partial in-place patch updates specific
+    # components and does NOT re-send the root. Used to distinguish "model
+    # re-rendered the whole card via updateComponents (forgot createSurface)"
+    # from "legitimate partial patch".
     _ids = [str(_c.get('id')) for _c in _a2ui_components(_v) if isinstance(_c, dict) and _c.get('id')]
     return 'root' in _ids
 
-def _a2ui_root_id(_v):
-    _ids = [str(_c.get('id')) for _c in _a2ui_components(_v) if isinstance(_c, dict) and _c.get('id')]
-    return 'root' if 'root' in _ids else (_ids[0] if _ids else 'root')
+def _a2ui_catalog_id(_v=None):
+    # createSurface carries the catalogId in v0.9. Prefer the one the model used
+    # (it may legitimately differ if GE ever offers a second catalog); fall back
+    # to the catalog this agent was actually built against.
+    if isinstance(_v, dict) and isinstance(_v.get('catalogId'), str) and _v['catalogId']:
+        return _v['catalogId']
+    try:
+        return a2ui_selected_catalog.catalog_id
+    except Exception:
+        return None
 
 def _rescope_one(msg, _allow_promote=False):
     # Rescope a single A2UI message against the per-session surface registry.
     # Returns a LIST of messages: normally [msg]; when _allow_promote and an
-    # ORPHAN cross-turn full-tree surfaceUpdate is detected (a surface owned by a
-    # PRIOR invocation, no beginRendering for it this turn, full card tree), it is
-    # promoted to [synthetic beginRendering, msg] with a fresh re-anchored id so
+    # ORPHAN cross-turn full-tree updateComponents is detected (a surface owned by
+    # a PRIOR invocation, no createSurface for it this turn, full card tree), it is
+    # promoted to [synthetic createSurface, msg] with a fresh re-anchored id so
     # GE renders it as a NEW card this turn instead of silently patching the old
     # one (which left the new turn blank - the vanishing progress card, v10.85).
     _guard = _current_surface_guard.get()
-    if not _guard or not isinstance(msg, dict):
+    _kind = _a2ui_kind(msg)
+    if not _guard or not _kind:
         return [msg]
     try:
         _reg = _guard['registry']
         _task = _guard['task']
         _begun = _guard.setdefault('begun', set())
-        for _k in ('beginRendering', 'surfaceUpdate', 'dataModelUpdate', 'deleteSurface'):
-            _v = msg.get(_k)
-            if not (isinstance(_v, dict) and _v.get('surfaceId')):
-                continue
-            _sid = str(_v['surfaceId'])
-            if _sid.startswith('suggestions'):
-                continue
-            # The model may echo an already-renamed id back from history;
-            # strip guard suffixes so it resolves to the same logical surface
-            # (also prevents '-u' suffix chaining across turns).
-            _logical = re.sub(r'(-u[0-9a-f]{4,32})+$', '', _sid) or _sid
-            _entry = _reg.get(_logical)
-            if _k == 'beginRendering':
-                if _entry is None:
-                    _reg[_logical] = {'current': _sid, 'owner': _task}
-                elif _entry.get('owner') == _task:
-                    _v['surfaceId'] = _entry['current']
-                else:
-                    _new = _logical + '-u' + _guard['suffix']
-                    _reg[_logical] = {'current': _new, 'owner': _task}
-                    _v['surfaceId'] = _new
-                    logger.log_text('[surface_rescope] cross-turn beginRendering reuse of ' + _logical + ' -> ' + _new)
-                _begun.add(_logical)
-            elif (_k == 'surfaceUpdate' and _allow_promote and _entry is not None
-                    and _entry.get('owner') != _task and _logical not in _begun
-                    and _a2ui_is_full_card_tree(_v)):
-                # Orphan cross-turn full-tree re-render with no begin this turn:
-                # GE would patch the prior card and render nothing here. Promote.
+        _v = msg[_kind]
+        if not _v.get('surfaceId'):
+            return [msg]
+        _sid = str(_v['surfaceId'])
+        if _sid.startswith('suggestions'):
+            return [msg]
+        # The model may echo an already-renamed id back from history;
+        # strip guard suffixes so it resolves to the same logical surface
+        # (also prevents '-u' suffix chaining across turns).
+        _logical = re.sub(r'(-u[0-9a-f]{4,32})+$', '', _sid) or _sid
+        _entry = _reg.get(_logical)
+        if _kind == 'createSurface':
+            if _entry is None:
+                _reg[_logical] = {'current': _sid, 'owner': _task}
+            elif _entry.get('owner') == _task:
+                _v['surfaceId'] = _entry['current']
+            else:
                 _new = _logical + '-u' + _guard['suffix']
                 _reg[_logical] = {'current': _new, 'owner': _task}
-                _begun.add(_logical)
                 _v['surfaceId'] = _new
-                _begin = {'beginRendering': {'surfaceId': _new, 'root': _a2ui_root_id(_v)}}
-                logger.log_text('[surface_rescope] promoted orphan surfaceUpdate ' + _logical + ' -> begin+update ' + _new)
-                return [_begin, msg]
-            elif _entry is not None:
-                _v['surfaceId'] = _entry['current']
+                logger.log_text('[surface_rescope] cross-turn createSurface reuse of ' + _logical + ' -> ' + _new)
+            _begun.add(_logical)
+        elif (_kind == 'updateComponents' and _allow_promote and _entry is not None
+                and _entry.get('owner') != _task and _logical not in _begun
+                and _a2ui_is_full_card_tree(_v)):
+            # Orphan cross-turn full-tree re-render with no createSurface this
+            # turn: GE would patch the prior card and render nothing here. Promote.
+            _new = _logical + '-u' + _guard['suffix']
+            _reg[_logical] = {'current': _new, 'owner': _task}
+            _begun.add(_logical)
+            _v['surfaceId'] = _new
+            _begin = _mk_msg('createSurface', surfaceId=_new, catalogId=_a2ui_catalog_id())
+            logger.log_text('[surface_rescope] promoted orphan updateComponents ' + _logical + ' -> create+update ' + _new)
+            return [_begin, msg]
+        elif _entry is not None:
+            _v['surfaceId'] = _entry['current']
     except Exception:
         pass
     return [msg]
@@ -1004,27 +610,62 @@ def _rescope_reused_surfaces(msg):
     return _rescope_one(msg, _allow_promote=False)[0]
 
 
-# --- A2UI shape normalization (v11.4) ---
-# The model emits three recurring SHAPE malformations that the A2UI schema
-# rejects and the GE client cannot render (confirmed live 2026-07-15,
-# demo-tech-distributi: the stream parser refused the card, the regex
-# fallback then shipped it UNVALIDATED, and GE hung the whole turn on
-# permanent "thinking"):
-#   (a) stray scalar keys at the component-dict level, sibling of the type
-#       key (e.g. {"component": {"Text": {...}, "usageHint": "h2"}});
-#   (b) Text missing the text wrapper ({"Text": {"literalString": "X"}})
-#       or text given as a bare string;
-#   (c) layout props nested INSIDE the children object
-#       ({"children": {"explicitList": [...], "distribution": ..., "alignment": ...}}).
-# This normalizer repairs all three in place. Verified against the live
-# failing card: raw -> schema INVALID, normalized -> schema VALID.
+# --- A2UI v0.9 shape normalization ---
+# Models trained on a mixed corpus regress to the v0.8 dialect under load, and a
+# v0.8-shaped message is not "slightly wrong" under v0.9 - it fails validation
+# outright and the gate below drops the whole card, leaving prose only. So every
+# model-authored message is upgraded in place before it is validated:
+#   (a) message keys       beginRendering/surfaceUpdate/dataModelUpdate
+#                          -> createSurface/updateComponents/updateDataModel
+#                          (+ the now-mandatory "version" stamp);
+#   (b) the component discriminator  {"component": {"Text": {...}}}
+#                          -> {"component": "Text", ...props};
+#   (c) value wrappers     {"literalString": "x"} -> "x",
+#                          {"explicitList": [...]} -> [...],
+#                          {"template": {"componentId", "dataBinding"}}
+#                          -> {"componentId", "path"};
+#   (d) layout props       distribution/alignment -> justify/align;
+#   (e) actions            {"name": "sendText", "context": [{"key", "value"}]}
+#                          -> {"event": {"name", "context": {...}}} with the
+#                          literal context.prompt GE needs (without it the user
+#                          sees "User action triggered" instead of their intent);
+#   (f) unknown properties pruned, schema-driven - see _a2ui_component_props.
 _A2UI_CHILD_PROP_LIFT = {
-    'Row': ('distribution', 'alignment'),
-    'Column': ('distribution', 'alignment'),
-    'List': ('direction', 'alignment'),
+    'Row': {'distribution': 'justify', 'alignment': 'align'},
+    'Column': {'distribution': 'justify', 'alignment': 'align'},
+    'List': {'direction': 'direction', 'alignment': 'align'},
+}
+
+# v0.8 component names that no longer exist under any spelling in the composite
+# catalog, mapped to their closest v0.9 equivalent.
+_A2UI_COMPONENT_RENAME = {
+    'Heading': 'Text',
+    'Box': 'Column',
+    'MultipleChoice': 'ChoicePicker',
 }
 
 _A2UI_COMPONENT_PROPS = {}
+
+def _a2ui_collect_props(_schema, _defs, _common_defs, _depth=0):
+    # Union of every property name a component schema accepts, following allOf
+    # composition and $refs into the catalog's and common_types' $defs. v0.9
+    # composite components are built from allOf branches, so the v0.8 approach
+    # of reading a single flat 'properties' dict sees almost nothing.
+    _out = set()
+    if not isinstance(_schema, dict) or _depth > 8:
+        return _out
+    _ref = _schema.get('$ref')
+    if isinstance(_ref, str):
+        _name = _ref.split('/')[-1]
+        _target = _common_defs.get(_name) if 'common_types' in _ref else _defs.get(_name)
+        _out |= _a2ui_collect_props(_target, _defs, _common_defs, _depth + 1)
+    _props = _schema.get('properties')
+    if isinstance(_props, dict):
+        _out |= set(_props.keys())
+    for _key in ('allOf', 'anyOf', 'oneOf'):
+        for _branch in (_schema.get(_key) or []):
+            _out |= _a2ui_collect_props(_branch, _defs, _common_defs, _depth + 1)
+    return _out
 
 def _a2ui_component_props():
     # Lazily index the selected catalog's per-component property names so the
@@ -1033,78 +674,274 @@ def _a2ui_component_props():
     if _A2UI_COMPONENT_PROPS:
         return _A2UI_COMPONENT_PROPS
     try:
-        _cs = getattr(a2ui_selected_catalog, 'catalog_schema', None)
-        _comps = _cs.get('components') if isinstance(_cs, dict) else None
-        if isinstance(_comps, dict):
-            for _cn, _csch in _comps.items():
-                if (isinstance(_csch, dict) and isinstance(_csch.get('properties'), dict)
-                        and _csch.get('additionalProperties') is False):
-                    _A2UI_COMPONENT_PROPS[_cn] = set(_csch['properties'].keys())
+        _cs = getattr(a2ui_selected_catalog, 'catalog_schema', None) or {}
+        _ct = getattr(a2ui_selected_catalog, 'common_types_schema', None) or {}
+        _defs = _cs.get('$defs') or {}
+        _common = _ct.get('$defs') or {}
+        for _cn, _csch in (_cs.get('components') or {}).items():
+            if not isinstance(_csch, dict):
+                continue
+            # remove_strict_validation deletes additionalProperties:false, so
+            # unevaluatedProperties:false is the remaining strictness signal -
+            # and it marks exactly the 18 basic v0.9 primitives. Every Material*
+            # component is open, so nothing is ever pruned from one.
+            if (_csch.get('unevaluatedProperties') is not False
+                    and _csch.get('additionalProperties') is not False):
+                continue
+            _names = _a2ui_collect_props(_csch, _defs, _common)
+            if _names:
+                _A2UI_COMPONENT_PROPS[_cn] = _names | {'id', 'component'}
     except Exception:
         _A2UI_COMPONENT_PROPS = {}
     return _A2UI_COMPONENT_PROPS
 
+def _a2ui_unwrap_value(_v):
+    # {"literalString": "x"} / {"literalNumber": 1} / {"literalBoolean": true} -> the scalar.
+    # A {"path": ...} data binding is already valid v0.9 and passes through.
+    # Recursive, because v0.8 also wrapped the label of every entry inside an
+    # 'options' array - a top-level-only unwrap left those wrappers in place and
+    # the whole choice component failed validation.
+    if isinstance(_v, list):
+        return [_a2ui_unwrap_value(_e) for _e in _v]
+    if isinstance(_v, dict):
+        for _k in ('literalString', 'literalNumber', 'literalBoolean'):
+            if _k in _v:
+                return _v[_k]
+        if 'path' in _v:
+            return _v
+        return dict((_k, _a2ui_unwrap_value(_e)) for _k, _e in _v.items())
+    return _v
+
+def _a2ui_upgrade_action(_a):
+    # v0.8 action -> v0.9 {"event": {"name", "context"}}.
+    if not isinstance(_a, dict) or isinstance(_a.get('event'), dict):
+        return _a
+    _name = _a.get('name') or 'action'
+    _raw = _a.get('context')
+    _ctx = {}
+    if isinstance(_raw, dict):
+        _ctx = dict(_raw)
+    elif isinstance(_raw, list):
+        for _e in _raw:
+            if isinstance(_e, dict) and isinstance(_e.get('key'), str):
+                _ctx[_e['key']] = _a2ui_unwrap_value(_e.get('value'))
+    # v0.8 encoded the user's intent as a 'sendText' action carrying a 'text'
+    # context value. v0.9 GE reads context.prompt instead, so carry it across.
+    if 'prompt' not in _ctx and isinstance(_ctx.get('text'), str):
+        _ctx['prompt'] = _ctx.pop('text')
+    if _name == 'sendText':
+        _name = 'send_text'
+    return {'event': {'name': _name, 'context': _ctx}}
+
+def _a2ui_flatten_component(_comp):
+    # {"id": x, "component": {"Text": {...props}}} -> {"id": x, "component": "Text", ...props}
+    _cd = _comp.get('component')
+    if not isinstance(_cd, dict):
+        return
+    _typed = [(_k, _v) for _k, _v in _cd.items() if isinstance(_v, dict)]
+    if not _typed:
+        _comp.pop('component', None)
+        return
+    _cname, _spec = _typed[0]
+    # Stray scalar keys sat beside the type key in the v0.8 wrapper
+    # (e.g. {"Text": {...}, "usageHint": "h2"}); fold them into the props.
+    _stray = {_k: _v for _k, _v in _cd.items() if not isinstance(_v, dict)}
+    _comp['component'] = _A2UI_COMPONENT_RENAME.get(_cname, _cname)
+    for _k, _v in list(_spec.items()) + list(_stray.items()):
+        _comp.setdefault(_k, _v)
+
+def _a2ui_normalize_component(_comp):
+    if not isinstance(_comp, dict):
+        return
+    _a2ui_flatten_component(_comp)
+    _ctype = _comp_type(_comp)
+    if not _ctype:
+        return
+    if _ctype in _A2UI_COMPONENT_RENAME:
+        _ctype = _A2UI_COMPONENT_RENAME[_ctype]
+        _comp['component'] = _ctype
+    # (c) value wrappers
+    for _k, _v in list(_comp.items()):
+        if _k in ('id', 'component', 'action', 'children'):
+            continue
+        _comp[_k] = _a2ui_unwrap_value(_v)
+    _kids = _comp.get('children')
+    if isinstance(_kids, dict):
+        _lift = _A2UI_CHILD_PROP_LIFT.get(_ctype, {})
+        for _k in [_k for _k in _kids.keys() if _k not in ('explicitList', 'template', 'componentId', 'path')]:
+            _v = _kids.pop(_k)
+            _tgt = _lift.get(_k)
+            if _tgt and _tgt not in _comp:
+                _comp[_tgt] = _v
+        if isinstance(_kids.get('explicitList'), list):
+            _comp['children'] = _kids['explicitList']
+        elif isinstance(_kids.get('template'), dict):
+            _tpl = _kids['template']
+            _comp['children'] = {
+                'componentId': _tpl.get('componentId'),
+                'path': _tpl.get('path') or _tpl.get('dataBinding') or '/items',
+            }
+        elif 'componentId' in _kids:
+            _comp['children'] = {
+                'componentId': _kids.get('componentId'),
+                'path': _kids.get('path') or _kids.get('dataBinding') or '/items',
+            }
+    # (d) layout props at the component level
+    for _old, _new in _A2UI_CHILD_PROP_LIFT.get(_ctype, {}).items():
+        if _old != _new and _old in _comp and _new not in _comp:
+            _comp[_new] = _comp.pop(_old)
+        elif _old != _new:
+            _comp.pop(_old, None)
+    # v0.8 Text carried usageHint; the basic v0.9 Text renames it to variant.
+    # MaterialText kept usageHint, so only the basic component is rewritten.
+    if _ctype == 'Text' and 'usageHint' in _comp:
+        _comp.setdefault('variant', _comp.pop('usageHint'))
+        if _comp.get('variant') in ('subtitle1', 'subtitle2', 'body1', 'body2'):
+            _comp['variant'] = 'body'
+    if _ctype == 'MaterialText' and 'variant' in _comp and 'usageHint' not in _comp:
+        _comp['usageHint'] = _comp.pop('variant')
+    # v0.8 MultipleChoice -> v0.9 ChoicePicker (see _A2UI_COMPONENT_RENAME): the
+    # selection binding moved from 'selections' to 'value', and 'variant' swapped
+    # enums entirely - 'chips'/'dropdown' were presentation hints, whereas v0.9
+    # encodes cardinality. Without this the renamed component keeps a dead
+    # binding and an out-of-enum variant, and the gate drops the card.
+    if _ctype == 'ChoicePicker':
+        _sel = _comp.pop('selections', None)
+        if _sel is not None and 'value' not in _comp:
+            _comp['value'] = _sel
+        _max = _comp.pop('maxAllowedSelections', None)
+        if _comp.get('variant') not in ('multipleSelection', 'mutuallyExclusive'):
+            _comp['variant'] = 'multipleSelection' if (isinstance(_max, int) and _max > 1) else 'mutuallyExclusive'
+    # (e) actions
+    if isinstance(_comp.get('action'), dict):
+        _comp['action'] = _a2ui_upgrade_action(_comp['action'])
+    _normalize_a2ui_icon_component(_comp)
+    # A v0.8 Button carried a flat 'label'. The BASIC v0.9 Button has no label
+    # at all - it requires a 'child' id pointing at a Text component - so the
+    # pruner below would delete the caption and leave a childless Button, which
+    # the gate then drops along with the whole card. MaterialButton is the
+    # component whose label IS flat, so promote instead of prune.
+    if _comp_type(_comp) == 'Button' and not isinstance(_comp.get('child'), str):
+        _lbl = _comp.get('label')
+        if isinstance(_lbl, str) and _lbl.strip():
+            _comp['component'] = 'MaterialButton'
+    # (f) prune model-invented properties (v11.50, carried forward).
+    # Confirmed live on a batch-editor turn: a top-level 'label' on a component
+    # that does not declare one fails validation, and the gate then drops the
+    # WHOLE card - the user gets prose plus chips and nothing else, on the
+    # original turn AND on every re-prompt, because the model keeps making the
+    # same mistake. The stray property is decoration; the card is not.
+    _known = _a2ui_component_props().get(_comp_type(_comp))
+    if _known:
+        _extras = [_k for _k in _comp.keys() if _k not in _known]
+        for _k in _extras:
+            _comp.pop(_k, None)
+        if _extras:
+            try:
+                logger.log_text('[a2ui_heal] pruned unknown prop(s) ' + ', '.join(sorted(_extras))
+                                + ' from ' + str(_comp_type(_comp)))
+            except Exception:
+                pass
+
 def _normalize_a2ui_shapes(msg):
     if not isinstance(msg, dict):
         return msg
-    _su = msg.get('surfaceUpdate')
-    if not isinstance(_su, dict):
+    # (a) v0.8 message keys -> v0.9
+    _br = msg.pop('beginRendering', None)
+    if isinstance(_br, dict):
+        _br.pop('root', None)  # v0.9 requires a component with id 'root' instead
+        _br.setdefault('catalogId', _a2ui_catalog_id(_br))
+        msg['createSurface'] = _br
+    _su = msg.pop('surfaceUpdate', None)
+    if isinstance(_su, dict):
+        msg['updateComponents'] = _su
+    _dm = msg.pop('dataModelUpdate', None)
+    if isinstance(_dm, dict):
+        _contents = _dm.pop('contents', None)
+        if isinstance(_contents, list) and 'value' not in _dm:
+            _value = {}
+            for _e in _contents:
+                if isinstance(_e, dict) and isinstance(_e.get('key'), str):
+                    _value[_e['key']] = _e.get('valueString', _e.get('value'))
+            _dm['value'] = _value
+        msg['updateDataModel'] = _dm
+    _kind = _a2ui_kind(msg)
+    if not _kind:
         return msg
-    for _comp in _su.get('components') or []:
-        if not isinstance(_comp, dict):
-            continue
-        _cd = _comp.get('component')
-        if not isinstance(_cd, dict):
-            continue
-        # (a) stray scalar keys beside the component-type key
-        _stray = [_k for _k, _v in list(_cd.items()) if not isinstance(_v, dict)]
-        for _k in _stray:
-            _v = _cd.pop(_k)
-            if _k == 'usageHint' and isinstance(_cd.get('Text'), dict):
-                _cd['Text'].setdefault('usageHint', _v)
-        for _cname, _spec in _cd.items():
-            if not isinstance(_spec, dict):
-                continue
-            # (b) Text shape repairs
-            if _cname == 'Text':
-                _tv = _spec.get('text')
-                if isinstance(_tv, str):
-                    _spec['text'] = {'literalString': _tv}
-                if 'literalString' in _spec:
-                    if not isinstance(_spec.get('text'), dict):
-                        _spec['text'] = {'literalString': str(_spec['literalString'])}
-                    _spec.pop('literalString', None)
-            # (c) lift layout props out of the children object
-            _ch = _spec.get('children')
-            if isinstance(_ch, dict):
-                _allowed = _A2UI_CHILD_PROP_LIFT.get(_cname, ())
-                for _k in [_k for _k in _ch.keys() if _k != 'explicitList']:
-                    _v = _ch.pop(_k)
-                    if _k in _allowed and _k not in _spec:
-                        _spec[_k] = _v
-            # (d) prune model-invented top-level properties (v11.50).
-            # Confirmed live on a batch-editor turn: MultipleChoice with a
-            # top-level 'label' (legal on TextField/CheckBox/Slider, NOT on
-            # MultipleChoice in the 0.8 catalog) fails validation with
-            # "Additional properties are not allowed" and the gate then
-            # drops the WHOLE surfaceUpdate - the user gets prose plus
-            # chips and no card, on the original turn AND on every
-            # re-prompt, because the model keeps making the same mistake.
-            # The stray property is decoration; the card is not. Schema
-            # driven: only prunes when the selected catalog declares the
-            # component with additionalProperties=false, so a legal
-            # property can never be stripped.
-            _known = _a2ui_component_props().get(_cname)
-            if _known:
-                _extras = [_k for _k in _spec.keys() if _k not in _known]
-                for _k in _extras:
-                    _spec.pop(_k, None)
-                if _extras:
-                    try:
-                        logger.log_text('[a2ui_heal] pruned unknown prop(s) ' + ', '.join(sorted(_extras)) + ' from ' + _cname)
-                    except Exception:
-                        pass
+    msg['version'] = A2UI_PROTOCOL_VERSION
+    if _kind == 'createSurface':
+        msg['createSurface'].setdefault('catalogId', _a2ui_catalog_id(msg['createSurface']))
+    if _kind != 'updateComponents':
+        return msg
+    for _comp in (msg['updateComponents'].get('components') or []):
+        _a2ui_normalize_component(_comp)
     return msg
+
+# --- MaterialTabs reachability shim ---
+# a2ui.schema.validator.get_refs_recursively follows {"...": "<id>"} entries via
+# a 'child' key inside nested arrays, but a MaterialTabs tab is {label, content}.
+# Without this, every component referenced ONLY from a tab looks unreachable from
+# 'root' and _a2ui_msg_schema_ok drops the entire surface - i.e. any tabbed card
+# the model emits silently becomes prose. Mirrors the shim in validate_examples.py
+# so the offline check and this runtime gate agree. No-op once upstream lands it.
+try:
+    import a2ui.schema.validator as _a2ui_validator_mod
+    _a2ui_orig_get_refs = _a2ui_validator_mod.get_refs_recursively
+
+    def _a2ui_get_refs_with_tab_content(_comp_type_name, _props, _ref_fields_map):
+        for _pair in _a2ui_orig_get_refs(_comp_type_name, _props, _ref_fields_map):
+            yield _pair
+        for _key, _value in (_props or {}).items():
+            if isinstance(_value, list):
+                for _idx, _item in enumerate(_value):
+                    if isinstance(_item, dict) and isinstance(_item.get('content'), str):
+                        yield _item['content'], _key + '[' + str(_idx) + '].content'
+
+    _a2ui_validator_mod.get_refs_recursively = _a2ui_get_refs_with_tab_content
+except Exception as _shim_err:
+    print('[a2ui] MaterialTabs reachability shim not installed: ' + str(_shim_err))
+
+# --- v0.9 stream-parser cross-surface component bleed fix ---
+# A2uiStreamParserV09._seen_components is a PARSER-LIFETIME cache keyed by
+# component id, but component ids are SURFACE-scoped and v0.9 requires every
+# surface's root to be literally 'root'. So when the second surface of a turn
+# opens, _handle_complete_object() calls yield_reachable() while the cache still
+# holds the FIRST surface's tree, analyze_topology() walks from the first card's
+# 'root', and the whole card is re-emitted as an updateComponents on the NEW
+# surface. Observed live 2026-08-20 (demo-saas-support): the Next Actions
+# surface received a byte-identical copy of the 24-component incident card
+# before its own chips, leaving every stale card button registered on the chip
+# surface. A later patch to the FIRST surface is corrupted the same way in
+# reverse - it ships the chip bar's 'root' instead of the card's.
+# Fix: give each surface its own component cache, swapped in the surface_id
+# setter (the single choke point - _handle_complete_object AND _sniff_metadata
+# both assign through it). Reproduced and verified offline at every chunk
+# boundary of a card+chips stream; see AGENTS.md 25.7f.
+# NOTE: _sniff_metadata assigns None between objects, so the previous surface is
+# tracked separately instead of read back from _surface_id.
+try:
+    from a2ui.parser.streaming import A2uiStreamParser as _A2uiParserBase
+    from a2ui.parser.streaming_v09 import A2uiStreamParserV09 as _A2uiParserV09
+    _a2ui_base_sid_prop = _A2uiParserBase.surface_id
+
+    def _a2ui_sid_get(self):
+        return _a2ui_base_sid_prop.fget(self)
+
+    def _a2ui_sid_set(self, value):
+        if value:
+            _prev = self.__dict__.get('_bleed_sid')
+            if value != _prev:
+                _store = self.__dict__.setdefault('_bleed_store', {})
+                if _prev:
+                    _store[_prev] = dict(self._seen_components)
+                self._seen_components.clear()
+                self._seen_components.update(_store.get(value) or {})
+                self.__dict__['_bleed_sid'] = value
+        _a2ui_base_sid_prop.fset(self, value)
+
+    _A2uiParserV09.surface_id = property(_a2ui_sid_get, _a2ui_sid_set)
+except Exception as _bleed_err:
+    print('[a2ui] v0.9 cross-surface bleed fix not installed: ' + str(_bleed_err))
 
 def _a2ui_msg_schema_ok(msg):
     """Schema gate for MODEL-authored A2UI (used by create_a2ui_parts).
@@ -1114,19 +951,19 @@ def _a2ui_msg_schema_ok(msg):
     extracted, unvalidated - and one schema-invalid card is enough to hang
     the GE client's rendering of the entire turn. After healing, anything
     that STILL fails validation is dropped (the turn keeps its text and
-    other surfaces). Only surfaceUpdate carries components; other message
+    other surfaces). Only updateComponents carries components; other message
     kinds pass through. Fail-open: if the validation machinery itself
     errors, deliver as before."""
     try:
-        if not (isinstance(msg, dict) and isinstance(msg.get('surfaceUpdate'), dict)):
+        if _a2ui_kind(msg) != 'updateComponents':
             return True
         _vp = A2uiStreamParser(catalog=a2ui_selected_catalog)
         _vp.process_chunk('<a2ui-json>' + json.dumps([msg]) + '</a2ui-json>')
         return True
     except ValueError as _ve:
         try:
-            _sid = str((msg.get('surfaceUpdate') or {}).get('surfaceId', '?'))
-            logger.log_text('[a2ui_gate] dropped schema-invalid surfaceUpdate (surface=' + _sid + '): ' + str(_ve)[:200])
+            logger.log_text('[a2ui_gate] dropped schema-invalid updateComponents (surface='
+                            + str(_a2ui_surface_id(msg) or '?') + '): ' + str(_ve)[:200])
         except Exception:
             pass
         return False
@@ -1136,38 +973,33 @@ def _a2ui_msg_schema_ok(msg):
 def _prep_a2ui_msg(msg):
     _shaped = _normalize_a2ui_shapes(msg)
     _healed = _heal_buttons_in_a2ui(_shaped)
-    _rewritten = _rewrite_suggestions_a2ui(_healed)
-    _rewritten = _scope_suggestions_surface(_rewritten)
-    return _rewritten
+    return _scope_suggestions_surface(_healed)
 
 def _build_a2ui_part(msg):
-    try:
-        return _original_create_a2ui_part(msg, version='0.8')
-    except TypeError:
-        # Fallback: SDK removed version param (e.g., PyPI 0.2.1)
-        logger.log_text("[a2ui_compat] version param removed, using fallback MIME fix")
-        _part = _original_create_a2ui_part(msg)
-        # Force GE-compatible MIME type
-        try:
-            if hasattr(_part, 'root') and hasattr(_part.root, 'inline_data') and _part.root.inline_data:
-                _part.root.inline_data.mime_type = 'application/json+a2ui'
-            elif hasattr(_part, 'root') and hasattr(_part.root, 'data_part') and _part.root.data_part:
-                _part.root.data_part.mime_type = 'application/json+a2ui'
-        except Exception:
-            pass
-        return _part
+    # Pass version=VERSION_0_9 ("0.9"). The SDK's create_a2ui_part() maps every
+    # version in ("0.8", "0.9", "v0.8", "v0.9") to 'application/json+a2ui' and
+    # anything else to 'application/a2ui+json'. Those constants are named
+    # DEPRECATED_A2UI_MIME_TYPE and A2UI_MIME_TYPE respectively, which reads
+    # backwards - but 'application/a2ui+json' is the FUTURE spelling that no
+    # shipping client reads yet. Gemini Enterprise still only renders
+    # 'application/json+a2ui', and the reference GE v0.9 agent
+    # (samples/community/agent/adk/gemini_enterprise/v0_9/agent.py) threads
+    # A2UI_VERSION = VERSION_0_9 into create_a2ui_part for exactly this reason.
+    # Observed live 2026-08-19: with the extension negotiated (requested and
+    # echoed v0.9), a schema-clean createSurface + updateComponents pair still
+    # rendered as text only, purely because of this MIME string.
+    return _original_create_a2ui_part(msg, version=VERSION_0_9)
 
 def _diag_a2ui(msg, _tag):
-    # TEMP DIAGNOSTIC (v10.92): surface dangling child refs / empty tab content in
-    # model-authored A2UI. Remove once the empty-card-body bug is pinned.
+    # Diagnostic (v10.92, ported to v0.9): surface dangling child refs and empty
+    # containers in model-authored A2UI, so an empty-looking card in GE can be
+    # traced from the logs instead of guessed at.
     try:
-        if not isinstance(msg, dict):
+        if _a2ui_kind(msg) != 'updateComponents':
             return
-        su = msg.get("surfaceUpdate")
-        if not isinstance(su, dict):
-            return
-        _sid = su.get("surfaceId")
-        _comps = su.get("components") or []
+        _su = msg['updateComponents']
+        _sid = _su.get('surfaceId')
+        _comps = _su.get('components') or []
         _defined = set()
         _refs = set()
         _has_tabs = False
@@ -1175,58 +1007,60 @@ def _diag_a2ui(msg, _tag):
         for _c in _comps:
             if not isinstance(_c, dict):
                 continue
-            _cid = _c.get("id")
+            _cid = _c.get('id')
             if isinstance(_cid, str):
                 _defined.add(_cid)
-            _comp = _c.get("component") or {}
-            if not isinstance(_comp, dict):
-                continue
-            for _name, _spec in _comp.items():
-                if _name == "Tabs":
-                    _has_tabs = True
-                if not isinstance(_spec, dict):
+            _ctype = _comp_type(_c)
+            if _ctype in ('MaterialTabs', 'Tabs'):
+                _has_tabs = True
+            # Single-id references: Card.child, Modal.trigger/content, Button.child, ...
+            for _key in ('child', 'trigger', 'content', 'contentChild', 'entryPointChild', 'detail', 'summary'):
+                _v = _c.get(_key)
+                if isinstance(_v, str):
+                    _refs.add(_v)
+            _kids = _children_ids(_c)
+            if _kids is not None:
+                if not _kids:
+                    _empty_lists.append(_cid)
+                _refs.update(_kids)
+            elif isinstance(_c.get('children'), dict):
+                _tpl = _c['children'].get('componentId')
+                if isinstance(_tpl, str):
+                    _refs.add(_tpl)
+            # MaterialTabs tabs[].content / basic Tabs tabs[].child
+            for _key, _v in _c.items():
+                if not isinstance(_v, list):
                     continue
-                _child = _spec.get("child")
-                if isinstance(_child, str):
-                    _refs.add(_child)
-                _children = _spec.get("children")
-                if isinstance(_children, dict):
-                    _el = _children.get("explicitList")
-                    if isinstance(_el, list):
-                        if len(_el) == 0:
-                            _empty_lists.append(_cid)
-                        for _r in _el:
-                            if isinstance(_r, str):
-                                _refs.add(_r)
-                _items = _spec.get("tabItems")
-                if isinstance(_items, list):
-                    for _it in _items:
-                        if isinstance(_it, dict) and isinstance(_it.get("child"), str):
-                            _refs.add(_it.get("child"))
+                for _it in _v:
+                    if not isinstance(_it, dict):
+                        continue
+                    for _rk in ('content', 'child'):
+                        if isinstance(_it.get(_rk), str):
+                            _refs.add(_it[_rk])
         _dangling = sorted(_refs - _defined)
         print("[a2ui_diag] " + str(_tag) + " surface=" + str(_sid)
               + " tabs=" + str(_has_tabs) + " defined=" + str(len(_defined))
               + " refs=" + str(len(_refs)) + " DANGLING=" + json.dumps(_dangling)
               + " empty_lists=" + json.dumps(_empty_lists))
-        if _dangling or _has_tabs or _empty_lists:
+        if _dangling or _empty_lists:
             print("[a2ui_diag] FULL surface=" + str(_sid) + " json=" + json.dumps(msg)[:12000])
     except Exception as _e:
         print("[a2ui_diag] error " + str(_e))
 
 def create_a2ui_part(msg):
-    # Single-part entry (no orphan-surfaceUpdate promotion) - back-compat.
+    # Single-part entry (no orphan-updateComponents promotion) - back-compat.
     _diag_a2ui(msg, "single")
     return _build_a2ui_part(_rescope_reused_surfaces(_prep_a2ui_msg(msg)))
 
 def create_a2ui_parts(msg):
-    # List-returning entry (v10.85): may return [begin, update] when an orphan
-    # cross-turn full-tree surfaceUpdate is promoted to a fresh card so it renders
-    # this turn. Use this for MODEL-authored A2UI in the stream / drain / salvage
-    # paths. Server-authored begin+update pairs are unaffected (the begin marks
-    # the surface begun, so its update never promotes).
+    # List-returning entry (v10.85): may return [create, update] when an orphan
+    # cross-turn full-tree updateComponents is promoted to a fresh card so it
+    # renders this turn. Use this for MODEL-authored A2UI in the stream / drain /
+    # salvage paths. Server-authored create+update pairs are unaffected (the
+    # createSurface marks the surface begun, so its update never promotes).
     _diag_a2ui(msg, "list")
     _prepped = _prep_a2ui_msg(msg)
-    # v11.4: never ship a schema-invalid card - one poison surfaceUpdate hangs
+    # v11.4: never ship a schema-invalid card - one poison updateComponents hangs
     # the GE client's rendering of the whole turn. Empty list is safe for every
     # caller (they all .extend()).
     if not _a2ui_msg_schema_ok(_prepped):
@@ -1395,11 +1229,13 @@ PREFLIGHT_CLASSIFIER_PROMPT = (
 )
 
 def _extract_user_text(run_args):
-    # Returns the user's INTENT text. A button / chip press arrives as a text part
-    # whose body is a userAction JSON ({"userAction":{"sourceComponentId":...,
-    # "context":{"text":"..."}}}) - we must unwrap it to its context text, NOT feed
-    # the raw JSON to the gate (otherwise "Run Inline: ..." is never recognized and
-    # the gate re-cards forever). Typed messages are returned as-is.
+    # Returns the user's INTENT text. A button / chip press arrives as an A2UI
+    # v0.9 action DataPart, which part_converters folds into a text part whose
+    # body is the userAction JSON ({"userAction":{"name":...,
+    # "sourceComponentId":..., "context":{"prompt":"...","text":"..."}}}) - we
+    # must unwrap it to its context text, NOT feed the raw JSON to the gate
+    # (otherwise "Run Inline: ..." is never recognized and the gate re-cards
+    # forever). Typed messages are returned as-is.
     try:
         _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
         if _nm is None:
@@ -1419,7 +1255,11 @@ def _extract_user_text(run_args):
                 try:
                     _ua = json.loads(_t).get("userAction", {}) or {}
                     _ctx = _ua.get("context", {}) or {}
+                    # An unresolved {"path": ...} binding arrives as a dict; fall
+                    # through to the literal prompt rather than dropping the turn.
                     _ctext = _ctx.get("text")
+                    if not (isinstance(_ctext, str) and _ctext.strip()):
+                        _ctext = _ctx.get("prompt")
                     if isinstance(_ctext, str) and _ctext.strip():
                         _ua_text = _ctext.strip()
                 except Exception:
@@ -1498,6 +1338,12 @@ def _is_preflight_confirmed_press(run_args):
     # explicit, already-confirmed inline choice, so the gate must let it run
     # (re-carding it would loop). A plain "Run Inline:" drill-down chip has NO
     # pf marker, so it is re-classified and may be carded if it is heavy (v10.96).
+    #
+    # v0.9: the card's own buttons also carry the stable event name
+    # "preflight_confirm", which is checked FIRST. An event name cannot be lost
+    # to a context-key collision the way a context value can (see the
+    # "[object Object]" note on _build_autonomous_briefing_card_parts), so the
+    # name is the primary signal and the pf context marker the fallback.
     try:
         _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
         if _nm is None:
@@ -1507,6 +1353,8 @@ def _is_preflight_confirmed_press(run_args):
             if _t and "userAction" in _t:
                 try:
                     _ua = json.loads(_t).get("userAction", {}) or {}
+                    if str(_ua.get("name", "")).startswith("preflight_confirm"):
+                        return True
                     if str((_ua.get("context", {}) or {}).get("pf", "")) == "1":
                         return True
                 except Exception:
@@ -1517,7 +1365,7 @@ def _is_preflight_confirmed_press(run_args):
 
 async def _classify_for_preflight(text, prev_user_text=""):
     # v11.6: prev_user_text is a short sample of the last HUMAN-TYPED message,
-    # passed as a language reference so fixed-English chip sendTexts do not
+    # passed as a language reference so fixed-English chip prompts do not
     # flip the card language mid-conversation (see STEP 1 EXCEPTION).
     try:
         from google.genai import client as _genai_client
@@ -1644,9 +1492,9 @@ def _build_preflight_card_parts(plan, scope_text):
         _clock = chr(0x1F552)
         _children = ["title", "intro"]
         _comps = [
-            {"id": "root", "component": {"Card": {"child": "col"}}},
-            {"id": "title", "component": {"Text": {"text": {"literalString": _title}, "usageHint": "h2"}}},
-            {"id": "intro", "component": {"Text": {"text": {"literalString": _intro}, "usageHint": "body"}}},
+            {"id": "root", "component": "MaterialCard", "children": ["col"]},
+            {"id": "title", "component": "MaterialText", "text": _title, "usageHint": "h2"},
+            {"id": "intro", "component": "MaterialText", "text": _intro, "usageHint": "body"},
         ]
         if _steps:
             for _i in range(len(_steps)):
@@ -1660,34 +1508,39 @@ def _build_preflight_card_parts(plan, scope_text):
                 _marker = _keycap + " " + _clock
                 _body_children = [_tid] + ([_did] if _sdetail else [])
                 _children.append(_rid)
-                _comps.append({"id": _rid, "component": {"Row": {"children": {"explicitList": [_mid, _bid]}, "distribution": "start", "alignment": "start"}}})
-                _comps.append({"id": _mid, "component": {"Text": {"text": {"literalString": _marker}, "usageHint": "body"}}})
-                _comps.append({"id": _bid, "component": {"Column": {"children": {"explicitList": _body_children}, "distribution": "start", "alignment": "stretch"}}})
-                _comps.append({"id": _tid, "component": {"Text": {"text": {"literalString": _stitle}, "usageHint": "body"}}})
+                _comps.append({"id": _rid, "component": "MaterialRow", "children": [_mid, _bid], "justify": "start", "align": "start", "style": {"gap": "8px"}})
+                _comps.append({"id": _mid, "component": "MaterialText", "text": _marker, "usageHint": "body"})
+                _comps.append({"id": _bid, "component": "MaterialColumn", "children": _body_children, "justify": "start", "align": "stretch"})
+                _comps.append({"id": _tid, "component": "MaterialText", "text": _stitle, "usageHint": "subtitle2"})
                 if _sdetail:
-                    _comps.append({"id": _did, "component": {"Text": {"text": {"literalString": _sdetail}, "usageHint": "caption"}}})
+                    _comps.append({"id": _did, "component": "MaterialText", "text": _sdetail, "usageHint": "caption"})
             if _estimate:
                 _children.append("eta")
-                _comps.append({"id": "eta", "component": {"Text": {"text": {"literalString": chr(0x23F1) + " " + _estimate}, "usageHint": "caption"}}})
+                _comps.append({"id": "eta", "component": "MaterialText", "text": chr(0x23F1) + " " + _estimate, "usageHint": "caption"})
         else:
             _why_bits = [b for b in [_g("data", ""), _g("method", ""), _g("output", ""), _estimate] if b]
             _why = " | ".join(_why_bits) if _why_bits else "This may take a few minutes."
             _children.append("why")
-            _comps.append({"id": "why", "component": {"Text": {"text": {"literalString": _why}, "usageHint": "caption"}}})
+            _comps.append({"id": "why", "component": "MaterialText", "text": _why, "usageHint": "caption"})
         _children.extend(["scopeField", "actions"])
-        _comps.append({"id": "col", "component": {"Column": {"children": {"explicitList": _children}, "distribution": "start", "alignment": "stretch"}}})
-        _comps.append({"id": "scopeField", "component": {"TextField": {"label": {"literalString": _g("label_field", "Adjust scope")}, "text": {"path": "/form/scope"}, "textFieldType": "longText"}}})
-        _comps.append({"id": "actions", "component": {"Row": {"children": {"explicitList": ["bInline", "bBg", "bRefine"]}, "distribution": "spaceEvenly", "alignment": "center"}}})
-        _comps.append({"id": "bInline", "component": {"Button": {"child": "bInlineL", "primary": True, "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": "Run Inline: " + scope_text}}, {"key": "pf", "value": {"literalString": "1"}}]}}}})
-        _comps.append({"id": "bInlineL", "component": {"Text": {"text": {"literalString": _g("label_inline", "Run inline now")}, "usageHint": "body"}}})
-        _comps.append({"id": "bBg", "component": {"Button": {"child": "bBgL", "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": "Run in Background: " + scope_text}}]}}}})
-        _comps.append({"id": "bBgL", "component": {"Text": {"text": {"literalString": _g("label_background", "Run in background")}, "usageHint": "body"}}})
-        _comps.append({"id": "bRefine", "component": {"Button": {"child": "bRefineL", "action": {"name": "sendText", "context": [{"key": "text", "value": {"path": "/form/scope"}}]}}}})
-        _comps.append({"id": "bRefineL", "component": {"Text": {"text": {"literalString": _g("label_adjust", "Adjust & re-propose")}, "usageHint": "body"}}})
+        _comps.append({"id": "col", "component": "MaterialColumn", "children": _children, "justify": "start", "align": "stretch", "style": {"gap": "10px"}})
+        _comps.append({"id": "scopeField", "component": "MaterialInput", "label": _g("label_field", "Adjust scope"), "value": {"path": "/form/scope"}})
+        _comps.append({"id": "actions", "component": "MaterialRow", "children": ["bInline", "bBg", "bRefine"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px", "marginTop": "8px"}})
+        # v0.9 presses: the intent lives in the EVENT NAME (which cannot be lost to
+        # a context-key collision) and context.prompt is the literal string GE
+        # shows as the user's chat message. context.text is what this runtime's
+        # gate reads - identical to prompt here, except on Adjust, where it is a
+        # data binding the client resolves to whatever the user typed in the box.
+        _comps.append({"id": "bInline", "component": "MaterialButton", "label": _g("label_inline", "Run inline now"), "color": "primary", "variant": "raised",
+                       "action": {"event": {"name": "preflight_confirm_inline", "context": {"prompt": "Run Inline: " + scope_text, "text": "Run Inline: " + scope_text, "pf": "1"}}}})
+        _comps.append({"id": "bBg", "component": "MaterialButton", "label": _g("label_background", "Run in background"),
+                       "action": {"event": {"name": "preflight_background", "context": {"prompt": "Run in Background: " + scope_text, "text": "Run in Background: " + scope_text}}}})
+        _comps.append({"id": "bRefine", "component": "MaterialButton", "label": _g("label_adjust", "Adjust & re-propose"),
+                       "action": {"event": {"name": "preflight_refine", "context": {"prompt": _g("label_adjust", "Adjust & re-propose"), "text": {"path": "/form/scope"}}}}})
         _card = [
-            {"beginRendering": {"surfaceId": "analysis-plan", "root": "root"}},
-            {"dataModelUpdate": {"surfaceId": "analysis-plan", "path": "/form", "contents": [{"key": "scope", "valueString": scope_text}]}},
-            {"surfaceUpdate": {"surfaceId": "analysis-plan", "components": _comps}},
+            {"version": "v0.9", "createSurface": {"surfaceId": "analysis-plan", "catalogId": _a2ui_catalog_id()}},
+            {"version": "v0.9", "updateDataModel": {"surfaceId": "analysis-plan", "path": "/form", "value": {"scope": scope_text}}},
+            {"version": "v0.9", "updateComponents": {"surfaceId": "analysis-plan", "components": _comps}},
         ]
         _parts = []
         for _m in _card:
@@ -1700,8 +1553,9 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
 
     def _is_autonomous_confirmed_press(run_args):
         # True when the press came from the Autonomous Briefing card's buttons,
-        # which carry context {"ra": "1"} - same mechanism as the Analysis
-        # card's pf marker.
+        # which carry the stable v0.9 event name "autonomous_start" and, as a
+        # fallback, context {"ra": "1"} - same mechanism as the Analysis card's
+        # pf marker.
         try:
             _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
             if _nm is None:
@@ -1711,6 +1565,8 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 if _t and "userAction" in _t:
                     try:
                         _ua = json.loads(_t).get("userAction", {}) or {}
+                        if str(_ua.get("name", "")).startswith("autonomous_"):
+                            return True
                         if str((_ua.get("context", {}) or {}).get("ra", "")) == "1":
                             return True
                     except Exception:
@@ -1772,55 +1628,60 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             _intro_line = (chr(0x1F4E6) + " " + _deliv + " - " + _intro) if _deliv else _intro
             _comps = []
             _children = ["title"]
-            _comps.append({"id": "root", "component": {"Card": {"child": "col"}}})
-            _comps.append({"id": "title", "component": {"Text": {"text": {"literalString": chr(0x1F6F0) + chr(0xFE0F) + " " + _title}, "usageHint": "h2"}}})
+            _comps.append({"id": "root", "component": "MaterialCard", "children": ["col"]})
+            _comps.append({"id": "title", "component": "MaterialText", "text": chr(0x1F6F0) + chr(0xFE0F) + " " + _title, "usageHint": "h2"})
             if _goal and _goal != _title:
                 _children.append("goal")
-                _comps.append({"id": "goal", "component": {"Text": {"text": {"literalString": _goal}, "usageHint": "body"}}})
+                _comps.append({"id": "goal", "component": "MaterialText", "text": _goal, "usageHint": "body"})
             _children.append("intro")
-            _comps.append({"id": "intro", "component": {"Text": {"text": {"literalString": _intro_line}, "usageHint": "caption"}}})
-            _dm = []
-            _start_ctx = [{"key": "text", "value": {"literalString": scope_text}}, {"key": "ra", "value": {"literalString": "1"}}]
+            _comps.append({"id": "intro", "component": "MaterialText", "text": _intro_line, "usageHint": "caption"})
+            _dm = {}
+            _start_ctx = {"prompt": scope_text, "text": scope_text, "ra": "1"}
             for _qi in range(len(_qs)):
                 _q, _s, _opts = _qs[_qi]
                 _ak = "a" + str(_qi)
                 _fid = "f" + str(_qi)
                 if _opts:
                     # Chips answer: question as a body line, choices as single-select
-                    # chips bound to /form/a<i>. No pre-selection (the chip data-model
-                    # shape is client-managed); an untouched question falls back to
-                    # its suggestion server-side via the s<i> context key.
+                    # MaterialChips bound to /form/a<i>. An untouched question falls
+                    # back to its suggestion server-side via the s<i> context key.
                     _qid = "qt" + str(_qi)
                     _children.append(_qid)
-                    _comps.append({"id": _qid, "component": {"Text": {"text": {"literalString": _q}, "usageHint": "body"}}})
+                    _comps.append({"id": _qid, "component": "MaterialText", "text": _q, "usageHint": "body"})
                     _oitems = []
                     for _o in _opts:
-                        _oitems.append({"label": {"literalString": _o}, "value": _o})
+                        _oitems.append({"label": _o, "value": _o})
                     _children.append(_fid)
-                    _comps.append({"id": _fid, "component": {"MultipleChoice": {"selections": {"path": "/form/" + _ak}, "options": _oitems, "maxAllowedSelections": 1, "variant": "chips"}}})
+                    _comps.append({"id": _fid, "component": "MaterialChips", "value": {"path": "/form/" + _ak}, "options": _oitems})
                 else:
                     # Free-text answer: the question itself is the field label, the
                     # suggestion is pre-filled so the user only edits what differs.
                     _children.append(_fid)
-                    _comps.append({"id": _fid, "component": {"TextField": {"label": {"literalString": _q}, "text": {"path": "/form/" + _ak}}}})
+                    _comps.append({"id": _fid, "component": "MaterialInput", "label": _q, "value": {"path": "/form/" + _ak}})
                     if _s:
-                        _dm.append({"key": _ak, "valueString": _s})
-                _start_ctx.append({"key": "bq" + str(_qi), "value": {"literalString": _q}})
-                _start_ctx.append({"key": _ak, "value": {"path": "/form/" + _ak}})
+                        _dm[_ak] = _s
+                _start_ctx["bq" + str(_qi)] = _q
+                _start_ctx[_ak] = {"path": "/form/" + _ak}
                 if _s:
-                    _start_ctx.append({"key": "s" + str(_qi), "value": {"literalString": _s}})
+                    _start_ctx["s" + str(_qi)] = _s
             _children.extend(["sep", "actions"])
-            _comps.append({"id": "sep", "component": {"Divider": {}}})
-            _comps.append({"id": "col", "component": {"Column": {"children": {"explicitList": _children}, "distribution": "start", "alignment": "stretch"}}})
-            _comps.append({"id": "actions", "component": {"Row": {"children": {"explicitList": ["bStart", "bAsis"]}, "distribution": "spaceEvenly", "alignment": "center"}}})
-            _comps.append({"id": "bStart", "component": {"Button": {"child": "bStartL", "primary": True, "action": {"name": "sendText", "context": _start_ctx}}}})
-            _comps.append({"id": "bStartL", "component": {"Text": {"text": {"literalString": chr(0x1F680) + " " + _g("label_start", "Confirm & start autonomous task")}, "usageHint": "body"}}})
-            _comps.append({"id": "bAsis", "component": {"Button": {"child": "bAsisL", "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": scope_text}}, {"key": "ra", "value": {"literalString": "1"}}]}}}})
-            _comps.append({"id": "bAsisL", "component": {"Text": {"text": {"literalString": _g("label_asis", "Start as-is")}, "usageHint": "body"}}})
-            _card = [{"beginRendering": {"surfaceId": "autonomous-briefing", "root": "root"}}]
+            _comps.append({"id": "sep", "component": "MaterialDivider"})
+            _comps.append({"id": "col", "component": "MaterialColumn", "children": _children, "justify": "start", "align": "stretch", "style": {"gap": "10px"}})
+            _comps.append({"id": "actions", "component": "MaterialRow", "children": ["bStart", "bAsis"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px"}})
+            # The model routinely leads label_start with its own emoji, and prefixing
+            # ours unconditionally rendered "[rocket] [rocket] Confirm and start"
+            # live. Only decorate a label that starts with plain ASCII.
+            _lbl_start = _g("label_start", "Confirm & start autonomous task")
+            if _lbl_start[:1].isascii():
+                _lbl_start = chr(0x1F680) + " " + _lbl_start
+            _comps.append({"id": "bStart", "component": "MaterialButton", "label": _lbl_start, "color": "primary", "variant": "raised",
+                           "action": {"event": {"name": "autonomous_start", "context": _start_ctx}}})
+            _comps.append({"id": "bAsis", "component": "MaterialButton", "label": _g("label_asis", "Start as-is"),
+                           "action": {"event": {"name": "autonomous_start_asis", "context": {"prompt": scope_text, "text": scope_text, "ra": "1"}}}})
+            _card = [{"version": "v0.9", "createSurface": {"surfaceId": "autonomous-briefing", "catalogId": _a2ui_catalog_id()}}]
             if _dm:
-                _card.append({"dataModelUpdate": {"surfaceId": "autonomous-briefing", "path": "/form", "contents": _dm}})
-            _card.append({"surfaceUpdate": {"surfaceId": "autonomous-briefing", "components": _comps}})
+                _card.append({"version": "v0.9", "updateDataModel": {"surfaceId": "autonomous-briefing", "path": "/form", "value": _dm}})
+            _card.append({"version": "v0.9", "updateComponents": {"surfaceId": "autonomous-briefing", "components": _comps}})
             _parts = []
             for _m in _card:
                 _parts.extend(create_a2ui_parts(_m))
@@ -1916,13 +1777,17 @@ background_runner = Runner(
 # A2UI SDK — Shared Schema Manager & Catalog (matches agent.py config)
 # =============================================================================
 a2ui_schema_manager = A2uiSchemaManager(
-    version=VERSION_0_8,
+    version=VERSION_0_9,
     catalogs=[
-        BasicCatalog.get_config(
-            version=VERSION_0_8,
-            examples_path="adk_agent/app/examples/0.8"
+        CatalogConfig.from_path(
+            name="ge_composite",
+            catalog_path=A2UI_COMPOSITE_CATALOG_PATH,
+            examples_path=A2UI_EXAMPLES_PATH,
         )
     ],
+    # The composite catalog composes components with allOf + unevaluatedProperties;
+    # without this the generated schema over-rejects otherwise valid surfaces.
+    schema_modifiers=[remove_strict_validation],
 )
 a2ui_selected_catalog = a2ui_schema_manager.get_selected_catalog()
 
@@ -2109,7 +1974,7 @@ def _rescope_replay_parts(_parts, _suffix):
     GE anchors a surfaceId to the message where it FIRST rendered
     (conversation-level singleton). Replaying a cached artifact verbatim on a
     different task therefore re-renders NOTHING for its card surfaces: the
-    beginRendering/surfaceUpdate just patch the ORIGINAL turn's card in place
+    createSurface/updateComponents just patch the ORIGINAL turn's card in place
     and the replay turn shows text only (confirmed 2026-06-10: a duplicate
     press turn displayed the prior turn's text while its 'flex-form' card
     never appeared). Renaming every surfaceId with a per-replay suffix forces
@@ -2125,7 +1990,7 @@ def _rescope_replay_parts(_parts, _suffix):
         return _parts
     def _rename(_obj):
         if isinstance(_obj, dict):
-            for _k in ('beginRendering', 'surfaceUpdate', 'dataModelUpdate'):
+            for _k in ('createSurface', 'updateComponents', 'updateDataModel'):
                 _v = _obj.get(_k)
                 if isinstance(_v, dict) and _v.get('surfaceId'):
                     _v['surfaceId'] = str(_v['surfaceId']) + '-r' + _sfx
@@ -2572,7 +2437,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         _ma_note_text = ('SYSTEM NOTE (auto-generated; the user did NOT type this): a background task just finished. '
                                          'BEFORE addressing the user message above, announce this result briefly in the user language, '
                                          'and include a suggestion chip labelled with the localized equivalent of View Full Report whose '
-                                         'sendText is: Show the full detailed report for task <ticket-id>. Details: ' + ' | '.join(_ma_notes))
+                                         'action event context.prompt is: Show the full detailed report for task <ticket-id>. Details: ' + ' | '.join(_ma_notes))
                         if (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1"):
                             _ma_note_text = (_ma_note_text
                                              + ' DRIVE HANDLING: if the summary or the Workspace links above show the autonomous '
@@ -2584,7 +2449,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                                'not_found, it only means no staged copies exist - NEVER tell the user the task '
                                                'produced no files; check get_autonomous_task_status for the full report instead. '
                                                'For deliverables NOT yet in Drive, offer a chip labelled with the localized '
-                                               'equivalent of Save to Google Drive, whose sendText is: '
+                                               'equivalent of Save to Google Drive, whose action event context.prompt is: '
                                                'Save the deliverables of task <ticket-id> to Google Drive.')
                         _ma_nm.parts.append(genai_types.Part(text=_ma_note_text))
                         logger.log_text('[managed_agent] appended completion note for ' + str(len(_ma_notes)) + ' task(s) to the user message')
@@ -2683,7 +2548,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
 
         # =============================================================================
         # Y1/G1 (v10.65): Duplicate chip/button-press handling with REPLAY.
-        # A single A2UI press arrives as 3-5 identical sendText invocations
+        # A single A2UI press arrives as 3-5 identical action invocations
         # (multi-fire / GE stream retries) on the same session, all carrying the
         # SAME userAction.timestamp. We serialize on the per-session lock (Y2),
         # then INSIDE the lock claim that timestamp once in Firestore: the first
@@ -2914,12 +2779,12 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             _gate_is_inline = _gate_l.startswith("run inline:")
             _gate_is_bg = _gate_l.startswith("run in background:")
             _gate_skip = _gate_is_bg or _is_preflight_confirmed_press(run_args)
-            # v11.6: fixed-English COMMAND chips (mandated verbatim sendTexts)
+            # v11.6: fixed-English COMMAND chips (mandated verbatim prompts)
             # must go straight to the agent, never to the classifier. Confirmed
             # live 2026-07-16: "Save the deliverables..." was classified as
             # AUTONOMOUS, hijacking the inline save_deliverables_to_drive flow
             # into a sandbox delegation AND rendering the briefing card in
-            # English mid-Japanese conversation (the fixed English sendText is
+            # English mid-Japanese conversation (the fixed English prompt is
             # the only language signal the classifier sees). The other two
             # command chips waste a classifier LLM call per press the same way.
             _CMD_CHIP_PREFIXES = (
@@ -2989,12 +2854,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 if _bg_scope:
                     async def _emit_bg_terminal(_t, _chip_specs):
                         _parts = [a2a_types.Part(root=a2a_types.TextPart(text=_t))]
-                        _comps = [{'id': 'root', 'component': {'Row': {'children': {'explicitList': ['bg_chip' + str(_i) for _i in range(len(_chip_specs))]}, 'distribution': 'spaceEvenly', 'alignment': 'center'}}}]
+                        _comps = [{'id': 'root', 'component': 'MaterialRow', 'children': ['bg_chip' + str(_i) for _i in range(len(_chip_specs))], 'justify': 'spaceEvenly', 'align': 'center', 'style': {'gap': '8px'}}]
                         for _i in range(len(_chip_specs)):
                             _ct, _cl = _chip_specs[_i]
-                            _comps.append({'id': 'bg_chip' + str(_i), 'component': {'Button': {'child': 'bg_chip' + str(_i) + 'Lbl', 'action': {'name': 'sendText', 'context': [{'key': 'text', 'value': {'literalString': _ct}}]}}}})
-                            _comps.append({'id': 'bg_chip' + str(_i) + 'Lbl', 'component': {'Text': {'text': {'literalString': _cl}, 'usageHint': 'body'}}})
-                        for _m in ({'beginRendering': {'surfaceId': 'suggestions', 'root': 'root'}}, {'surfaceUpdate': {'surfaceId': 'suggestions', 'components': _comps}}):
+                            _comps.append({'id': 'bg_chip' + str(_i), 'component': 'MaterialButton', 'label': _cl, 'variant': 'stroked', 'action': {'event': {'name': 'suggestion_chip_' + str(_i), 'context': {'prompt': _ct, 'text': _ct}}}})
+                        for _m in ({'version': 'v0.9', 'createSurface': {'surfaceId': 'suggestions', 'catalogId': _a2ui_catalog_id()}}, {'version': 'v0.9', 'updateComponents': {'surfaceId': 'suggestions', 'components': _comps}}):
                             _parts.append(create_a2ui_part(_m))
                         await event_queue.enqueue_event(TaskStatusUpdateEvent(task_id=context.task_id, context_id=context.context_id, status=TaskStatus(state=TaskState.working, message=Message(message_id=str(uuid.uuid4()), role=Role.agent, parts=_parts), timestamp=datetime.now(timezone.utc).isoformat()), final=False))
                         await event_queue.enqueue_event(TaskArtifactUpdateEvent(task_id=context.task_id, last_chunk=True, context_id=context.context_id, artifact=Artifact(artifact_id=str(uuid.uuid4()), parts=_parts)))
@@ -3019,7 +2883,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     except Exception as _bg_reg_err:
                         _bg_reg = {'status': 'error', 'message': str(_bg_reg_err)[:200]}
                     # This path answers WITHOUT the agent, so nothing here matches
-                    # the conversation language by itself. The sendText payloads
+                    # the conversation language by itself. The chip prompt payloads
                     # stay English on purpose - they are instructions to the agent
                     # and GE never shows them ("User action triggered.").
                     # v11.53: _bg_scope FIRST, session history only as a backstop.
@@ -3059,7 +2923,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
 
             if _gate_scope and not _gate_skip:
                 # v11.6: pass the last human-typed message as a language
-                # reference so an English chip sendText cannot flip the
+                # reference so an English chip prompt cannot flip the
                 # card language (STEP 1 EXCEPTION in the classifier prompt).
                 _plan = await _classify_for_preflight(_gate_scope, _last_typed_user_text(session))
                 if isinstance(_plan, dict) and _plan.get("category") == "ANALYSIS":
@@ -3335,15 +3199,14 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     _conv_chip_specs = [("Narrow the analysis to a single entity or metric and run it again", "🎯 Narrow scope")]
                 _conv_parts = [a2a_types.Part(root=a2a_types.TextPart(text=_conv_text))]
                 _chip_components = [
-                    {'id': 'root', 'component': {'Row': {'children': {'explicitList': ['ic_chip' + str(_ci) for _ci in range(len(_conv_chip_specs))]}, 'distribution': 'spaceEvenly', 'alignment': 'center'}}},
+                    {'id': 'root', 'component': 'MaterialRow', 'children': ['ic_chip' + str(_ci) for _ci in range(len(_conv_chip_specs))], 'justify': 'spaceEvenly', 'align': 'center', 'style': {'gap': '8px'}},
                 ]
                 for _ci in range(len(_conv_chip_specs)):
                     _chip_text, _chip_label = _conv_chip_specs[_ci]
-                    _chip_components.append({'id': 'ic_chip' + str(_ci), 'component': {'Button': {'child': 'ic_chip' + str(_ci) + 'Lbl', 'action': {'name': 'sendText', 'context': [{'key': 'text', 'value': {'literalString': _chip_text}}]}}}})
-                    _chip_components.append({'id': 'ic_chip' + str(_ci) + 'Lbl', 'component': {'Text': {'text': {'literalString': _chip_label}, 'usageHint': 'body'}}})
+                    _chip_components.append({'id': 'ic_chip' + str(_ci), 'component': 'MaterialButton', 'label': _chip_label, 'variant': 'stroked', 'action': {'event': {'name': 'suggestion_chip_' + str(_ci), 'context': {'prompt': _chip_text, 'text': _chip_text}}}})
                 for _conv_msg in (
-                    {'beginRendering': {'surfaceId': 'suggestions', 'root': 'root'}},
-                    {'surfaceUpdate': {'surfaceId': 'suggestions', 'components': _chip_components}},
+                    {'version': 'v0.9', 'createSurface': {'surfaceId': 'suggestions', 'catalogId': _a2ui_catalog_id()}},
+                    {'version': 'v0.9', 'updateComponents': {'surfaceId': 'suggestions', 'components': _chip_components}},
                 ):
                     _conv_parts.append(create_a2ui_part(_conv_msg))
                 # Stream text + chips as a WORKING event first (chips that exist
@@ -3976,7 +3839,8 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                       # -------------------------------------------------------
                       if not _parser_found_a2ui and '<a2ui-json>' not in part.text:
                           import json as _json2
-                          _a2ui_keys = ('"beginRendering"', '"surfaceUpdate"', '"surfaceId"', '"deleteSurface"')
+                          _q = chr(34)
+                          _a2ui_keys = tuple(_q + _k + _q for _k in _A2UI_SNIFF_KEYS) + (_q + 'surfaceId' + _q,)
                           if any(k in part.text for k in _a2ui_keys):
                               logger.log_text(f"[a2ui_robust_safety] Scanning untagged A2UI in {len(part.text)} chars")
 
@@ -4014,11 +3878,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                       # Validate: is this an A2UI component structure?
                                       _is_a2ui = False
                                       if isinstance(_obj, dict):
-                                          _is_a2ui = any(k in _obj for k in ("beginRendering", "surfaceUpdate", "dataModelUpdate", "deleteSurface")) or ("id" in _obj and "component" in _obj)
+                                          _is_a2ui = any(k in _obj for k in _A2UI_SNIFF_KEYS) or ("id" in _obj and "component" in _obj)
                                       elif isinstance(_obj, list):
                                           _is_a2ui = any(
                                               isinstance(i, dict) and (
-                                                  any(k in i for k in ("beginRendering", "surfaceUpdate", "dataModelUpdate", "deleteSurface"))
+                                                  any(k in i for k in _A2UI_SNIFF_KEYS)
                                                   or ("id" in i and "component" in i)
                                               ) for i in _obj
                                           )
@@ -4515,13 +4379,25 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             if hasattr(_r, 'data'):
                 _d = _r.data
                 if isinstance(_d, dict):
-                    for _dk in ('beginRendering', 'surfaceUpdate', 'deleteSurface'):
+                    # _A2UI_MSG_KEYS, not a local tuple: updateDataModel used to
+                    # be missing here and logged as a bare 'data', hiding both
+                    # its kind and its surfaceId.
+                    for _dk in _A2UI_MSG_KEYS:
                         if _dk in _d:
-                            return _dk + ':' + str(_d[_dk].get('surfaceId', '?'))
+                            _b = _d[_dk]
+                            _sid = _b.get('surfaceId', '?') if isinstance(_b, dict) else '?'
+                            return _dk + ':' + str(_sid)
                 return 'data'
             if hasattr(_r, 'inline_data'):
                 return 'inline_data'
-            return 'other'
+            # A FilePart (generated chart or image) carries neither .text nor
+            # .data, so it used to log as a bare 'other' - a missing image and
+            # a missing card looked identical in the one log line that matters.
+            _f = getattr(_r, 'file', None)
+            if _f is not None:
+                return 'file:' + str(getattr(_f, 'mime_type', None)
+                                     or getattr(_f, 'mimeType', None) or '?')
+            return 'other:' + str(getattr(_r, 'kind', None) or type(_r).__name__)
         _part_labels = [_part_type_label(p) for p in artifact_parts]
         logger.log_text(f"[final_artifact] text={len(artifact_text_parts)} normal_media={len(_normal_media)} suggestion_media={len(_suggestion_media)} total={len(artifact_parts)}")
         logger.log_text(f"[final_artifact_parts] {_part_labels}")
@@ -4617,7 +4493,8 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         _mp.extend(create_a2ui_parts(_m))
                         _found = True
             # Untagged A2UI safety net (model omitted <a2ui-json> tags).
-            if not _found and '<a2ui-json>' not in _text and any(_k in _text for _k in ('"beginRendering"', '"surfaceUpdate"', '"deleteSurface"')):
+            _q = chr(34)
+            if not _found and '<a2ui-json>' not in _text and any((_q + _k + _q) in _text for _k in _A2UI_SNIFF_KEYS):
                 _pos = 0
                 while _pos < len(_text):
                     _sb = _text.find('{', _pos)
@@ -4634,9 +4511,9 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     _obj = _parse_loose_json(_text[_start:_end])
                     _ok = False
                     if isinstance(_obj, list):
-                        _ok = any(isinstance(_i, dict) and (any(_kk in _i for _kk in ("beginRendering", "surfaceUpdate", "deleteSurface")) or ("id" in _i and "component" in _i)) for _i in _obj)
+                        _ok = any(isinstance(_i, dict) and (any(_kk in _i for _kk in _A2UI_SNIFF_KEYS) or ("id" in _i and "component" in _i)) for _i in _obj)
                     elif isinstance(_obj, dict):
-                        _ok = any(_kk in _obj for _kk in ("beginRendering", "surfaceUpdate", "deleteSurface")) or ("id" in _obj and "component" in _obj)
+                        _ok = any(_kk in _obj for _kk in _A2UI_SNIFF_KEYS) or ("id" in _obj and "component" in _obj)
                     if _ok:
                         _items = _obj if isinstance(_obj, list) else [_obj]
                         for _it in _heal_a2ui_message_list(_items):
@@ -4694,23 +4571,26 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             "Your previous response was delivered to the user, but its suggestion "
             "chips were missing. Output ONLY the suggestion chip bar now: a single "
             "<a2ui-json> block using surfaceId 'suggestions', containing BOTH the "
-            "beginRendering message AND the surfaceUpdate message with a Row of 3-4 "
-            "Buttons whose sendText actions reflect natural next actions in this "
-            "conversation. Do NOT repeat the report, do NOT output any other text, "
-            "cards, or tool calls. Write the button labels in the SAME language you "
-            "have been using with the user."
+            "createSurface message AND the updateComponents message with a "
+            "MaterialRow of 3-4 MaterialButtons. Each button needs a flat label and "
+            "an action shaped like 'event' -> 'name' plus 'context' -> 'prompt', "
+            "where prompt is the literal message to send as the user and reflects a "
+            "natural next action in this conversation. Do NOT repeat the report, do "
+            "NOT output any other text, cards, or tool calls. Write the button "
+            "labels in the SAME language you have been using with the user."
         )
         # v11.45: card-only re-prompt for the orphan-surface recovery below.
         _SYNTH_CARD_MSG = (
-            "Your previous response opened an A2UI surface with beginRendering but "
-            "never sent its surfaceUpdate, so the card rendered as nothing and the "
-            "user saw only your text. Output ONLY that card now, complete, in a "
-            "single <a2ui-json> block: the beginRendering message, the "
-            "dataModelUpdate message if the card binds form values, AND the "
-            "surfaceUpdate message whose components array defines the full "
-            "component tree including the root id. Do NOT repeat the report, do NOT "
-            "output suggestion chips, other text, or tool calls. Write any labels "
-            "in the SAME language you have been using with the user."
+            "Your previous response opened an A2UI surface with createSurface but "
+            "never sent its updateComponents, so the card rendered as nothing and "
+            "the user saw only your text. Output ONLY that card now, complete, in a "
+            "single <a2ui-json> block: the createSurface message, the "
+            "updateDataModel message if the card binds form values, AND the "
+            "updateComponents message whose components array defines the full "
+            "component tree including the root id. Every message must carry the "
+            "version field set to v0.9. Do NOT repeat the report, do NOT output "
+            "suggestion chips, other text, or tool calls. Write any labels in the "
+            "SAME language you have been using with the user."
         )
         _MAX_SYNTH_RETRIES = 3
         _synth_try = 0
@@ -4837,13 +4717,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             artifact_text_parts.clear()
             artifact_text_parts.append(_b1_part)
             _b1_suggestions = [
-                { 'beginRendering': { 'surfaceId': 'suggestions', 'root': 'root' } },
-                { 'surfaceUpdate': { 'surfaceId': 'suggestions', 'components': [
-                    { 'id': 'root', 'component': { 'Row': { 'children': { 'explicitList': ['b1_chip1', 'b1_chip2'] }, 'distribution': 'spaceEvenly', 'alignment': 'center' } } },
-                    { 'id': 'b1_chip1', 'component': { 'Button': { 'child': 'b1_chip1Lbl', 'action': { 'name': 'sendText', 'context': [{ 'key': 'text', 'value': { 'literalString': _b1_c1_text } }] } } } },
-                    { 'id': 'b1_chip1Lbl', 'component': { 'Text': { 'text': { 'literalString': _b1_c1_label }, 'usageHint': 'body' } } },
-                    { 'id': 'b1_chip2', 'component': { 'Button': { 'child': 'b1_chip2Lbl', 'action': { 'name': 'sendText', 'context': [{ 'key': 'text', 'value': { 'literalString': _b1_c2_text } }] } } } },
-                    { 'id': 'b1_chip2Lbl', 'component': { 'Text': { 'text': { 'literalString': _b1_c2_label }, 'usageHint': 'body' } } }
+                { 'version': 'v0.9', 'createSurface': { 'surfaceId': 'suggestions', 'catalogId': _a2ui_catalog_id() } },
+                { 'version': 'v0.9', 'updateComponents': { 'surfaceId': 'suggestions', 'components': [
+                    { 'id': 'root', 'component': 'MaterialRow', 'children': ['b1_chip1', 'b1_chip2'], 'justify': 'spaceEvenly', 'align': 'center', 'style': { 'gap': '8px' } },
+                    { 'id': 'b1_chip1', 'component': 'MaterialButton', 'label': _b1_c1_label, 'variant': 'stroked', 'action': { 'event': { 'name': 'suggestion_chip_narrow', 'context': { 'prompt': _b1_c1_text, 'text': _b1_c1_text } } } },
+                    { 'id': 'b1_chip2', 'component': 'MaterialButton', 'label': _b1_c2_label, 'variant': 'stroked', 'action': { 'event': { 'name': 'suggestion_chip_retry', 'context': { 'prompt': _b1_c2_text, 'text': _b1_c2_text } } } }
                 ] } }
             ]
             artifact_media_parts = []
@@ -4909,8 +4787,8 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         # =============================================================================
         # Card recovery (v11.45): the mirror image of the chip recovery below, for
         # ordinary card surfaces. Confirmed in logs on a batch-editor turn: the
-        # model emitted [beginRendering, dataModelUpdate] and then moved straight
-        # on to the suggestions block, never sending the surfaceUpdate. GE opened
+        # model emitted [createSurface, updateDataModel] and then moved straight
+        # on to the suggestions block, never sending the updateComponents. GE opened
         # an empty surface, so the user got prose plus chips and no card at all.
         # (a) Drop the orphan parts - an unpopulated surface can only render blank
         # and, being a real surfaceId, it would also pin that id for later turns.
@@ -4928,7 +4806,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 artifact_media_parts = [p for p in artifact_media_parts if not _is_surface_part(p, _oc_ids)]
                 artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
             logger.log_text(
-                "[card_reprompt] orphan surface(s) opened without surfaceUpdate: "
+                "[card_reprompt] orphan surface(s) opened without updateComponents: "
                 + ", ".join(_orphan_cards) + " - dropped " + str(len(_oc_dropped)) + " part(s)"
             )
             if (not _auth_flow) and (not _fatal_config_error):
@@ -4986,7 +4864,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
 
         # =============================================================================
         # Chip recovery (v10.70): intermittently the model omits the Next Actions
-        # chips - either a begin-only 'suggestions' surface with no surfaceUpdate
+        # chips - either a create-only 'suggestions' surface with no updateComponents
         # (renders as nothing), or no suggestions block at all (confirmed in logs:
         # a long text-only answer with suggestion_media=0 under degraded context).
         # (a) Drop orphan begin-only suggestion surfaces. (b) If the turn has a
@@ -5004,7 +4882,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             _suggestion_media = []
             artifact_media_parts = [p for p in artifact_media_parts if not _is_suggestions_part(p)]
             artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
-            logger.log_text("[chip_reprompt] dropped " + str(_orphan_count) + " orphan suggestion part(s) (no populated surfaceUpdate)")
+            logger.log_text("[chip_reprompt] dropped " + str(_orphan_count) + " orphan suggestion part(s) (no populated updateComponents)")
         if ((not _chips_ok) and (not _timed_out) and (not _auth_flow)
                 and (not _fatal_config_error) and (not _inline_converted)
                 and (not _has_interactive_card(_normal_media))):
@@ -5218,7 +5096,7 @@ def _build_static_agent_card() -> AgentCard:
 
     # Advertise A2UI capability via SDK extension helper
     a2ui_extension = get_a2ui_agent_extension(
-        version="0.8",
+        version="0.9",
         supported_catalog_ids=a2ui_schema_manager.supported_catalog_ids,
     )
 
@@ -5366,8 +5244,40 @@ class DisableBufferingMiddleware(BaseHTTPMiddleware):
             response.headers['Cache-Control'] = 'no-cache, no-transform'
         return response
 
+# The one A2UI extension URI this agent advertises (see _build_static_agent_card).
+_A2UI_EXT_URI = 'https://a2ui.org/a2a-extension/a2ui/v0.9'
+
+class A2uiExtensionEchoMiddleware(BaseHTTPMiddleware):
+    # A2UI v0.9 activation echo. Per the A2A extension protocol, GE requests
+    # the extension via the X-A2A-Extensions REQUEST header and treats it as
+    # INACTIVE - silently ignoring every A2UI DataPart in the response - until
+    # the server echoes the URI back in the RESPONSE header. The SDK's own
+    # echo path (RequestContext.add_activated_extension ->
+    # jsonrpc_app._create_response) cannot work on message/stream: the SSE
+    # response headers are built BEFORE the agent executor runs, so an
+    # executor-side activation is always too late there. This middleware sits
+    # where BOTH the streaming and non-streaming paths pass through while
+    # headers are still mutable. Observed live 2026-08-19: a perfect welcome
+    # card ([final_artifact_parts] text+createSurface+updateComponents,
+    # gate-clean) rendered as text-only until this echo existed.
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        try:
+            _req = request.headers.get('X-A2A-Extensions', '')
+            if _req:
+                _wanted = [u.strip() for u in _req.split(',') if u.strip()]
+                if _A2UI_EXT_URI in _wanted and 'X-A2A-Extensions' not in response.headers:
+                    response.headers['X-A2A-Extensions'] = _A2UI_EXT_URI
+            if request.method == 'POST' and request.url.path.startswith('/a2a/'):
+                print('[a2ui_ext] requested=' + (_req or '(none)')
+                      + ' echoed=' + response.headers.get('X-A2A-Extensions', '(none)'))
+        except Exception as _ext_err:
+            print('[a2ui_ext] echo failed: ' + str(_ext_err))
+        return response
+
 app.add_middleware(DisableBufferingMiddleware)
 app.add_middleware(TokenExtractionMiddleware)
+app.add_middleware(A2uiExtensionEchoMiddleware)
 
 # =============================================================================
 # Background Task Worker & Trigger Endpoints (Long-Running Agent Orchestration)
