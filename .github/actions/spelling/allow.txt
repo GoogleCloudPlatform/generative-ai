@@ -758,6 +758,7 @@ gsm
 GSM
 gsod
 gspread
+gstatic
 gsutil
 gtk
 guanciale
@@ -2029,6 +2030,7 @@ vdb
 vectoral
 vectordb
 veo
+vendored
 Verbinski
 Verilog
 versioned
