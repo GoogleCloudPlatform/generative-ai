@@ -1,0 +1,88 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "contacts",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "contacts",
+      "path": "/contacts",
+      "value": [
+        {
+          "name": "Kenta Takahashi",
+          "role": "Operations",
+          "email": "kenta@example.com"
+        },
+        {
+          "name": "Aiko Sato",
+          "role": "Store Manager",
+          "email": "aiko@example.com"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "contacts",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "table"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "👤 Contacts",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "table",
+          "component": "MaterialTable",
+          "caption": "Contacts",
+          "columns": [
+            {
+              "header": "Name",
+              "field": "name"
+            },
+            {
+              "header": "Role",
+              "field": "role"
+            },
+            {
+              "header": "Email",
+              "field": "email"
+            }
+          ],
+          "rows": {
+            "path": "/contacts"
+          },
+          "style": {
+            "marginTop": "8px"
+          }
+        }
+      ]
+    }
+  }
+]

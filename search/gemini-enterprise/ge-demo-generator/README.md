@@ -14,7 +14,7 @@ The **Gemini Enterprise Demo Generator** is a low-code web application built on 
 - **Triple-Agent Autonomous Architecture**: Features a multi-agent execution framework powered by **Gemini 3.7 Flash** by default. Consists of a coordinator (`root_agent`) for chat, simple retrieval, and A2UI card rendering; an analytical sub-agent (`deep_analysis_agent`) for complex inline calculations; and a standalone background worker (`background_agent`) run asynchronously for long-running background tasks and recurring cron scheduled tasks. Models are configurable via `--model-analysis-agent` and `--model-root-agent` CLI flags.
 - **Autonomous Workflow Pipelines & Guardrails**: Incorporates advanced background pipelines for both workflow-based operations (`SCAN -> ANALYZE -> PLAN -> EXECUTE -> VERIFY -> REPORT` with human-in-the-loop escalations) and deep analytical tasks. All background tasks are protected by an **Anti-Shallow Guard** self-check to ensure rigorous statistical results and extensive data tool coverage.
 - **MCP Server Catalog**: A curated catalog of pre-configured MCP servers (Government & Legal, Finance, Social, Japan-Specific, Environment & Weather, Google Official) with one-click add, recipe bundles, and custom URL import.
-- **A2UI (Agent-to-UI) Compliant**: Streams interactive Bento Grid layouts, Analytics Charts, and interactive confirmation cards using the A2UI SDK (`a2ui-agent-sdk`) via `<a2ui-json>` tags embedded in model responses. Integrates rich Welcome Card onboarding and step-by-step Workflow Execution Plan patterns.
+- **A2UI v0.9 + Material Catalog**: Streams interactive dashboards, data tables, Vega-Lite charts, sandboxed HTML panels, and confirmation cards using the A2UI SDK (`a2ui-agent-sdk`) on **A2UI v0.9** with the Gemini Enterprise **composite catalog** (`Material*` components plus `Canvas`, `IFrameSrcdoc`, `VegaChart`, `GcbpTable`), delivered via `<a2ui-json>` tags in model responses. Integrates rich Welcome Card onboarding and step-by-step Workflow Execution Plan patterns.
 - **A2A Protocol Server**: The synthesized agent runs as a FastAPI-based A2A server on Cloud Run, compatible with Gemini Enterprise agent registration, and features a standalone `/execute_task` worker for background processing.
 - **Real-Time Persistence Layer**: The agent modifies Firestore via MCP, and a synthesized **Data Viewer** dashboard (Flask on Cloud Run Functions Gen2) watches Firestore collections and updates in real-time.
 - **Automated Cloud Run Deployment**: Containerized deployment to Cloud Run (with `--min-instances 0` to control standby costs) and automated Discovery Engine registration for Gemini Enterprise compatibility.
@@ -706,14 +706,16 @@ A lightweight Flask application deployed as a **Cloud Run Function (Gen2)** that
 
 The A2UI integration provides rich interactive UI components in Gemini Enterprise:
 
-- **Schema Management**: `A2uiSchemaManager` with `BasicCatalog` provides schema validation and example injection into the system prompt.
+- **Protocol Version**: **A2UI v0.9** (`VERSION_0_9`). Every server-to-client message is stamped `"version": "v0.9"` and carries exactly one of `createSurface` / `updateComponents` / `updateDataModel` / `deleteSurface`. `DataPart`s use the `application/json+a2ui` MIME type — despite the SDK naming it `DEPRECATED_A2UI_MIME_TYPE`, it is the only one Gemini Enterprise renders.
+- **Schema Management**: `A2uiSchemaManager(version=VERSION_0_9, catalogs=[CatalogConfig.from_path(...)], schema_modifiers=[remove_strict_validation])` loads the **Gemini Enterprise composite catalog** (52 components: 28 `Material*`, the 18 basic v0.9 primitives, and the Gemini Enterprise-only `Canvas`, `IFrameSrcdoc`, `IFrameUrl`, `VegaChart`, `GcbpTable`, `InteractiveChart`). The catalog JSON is fetched into `adk_agent/app/catalogs/` at setup time; its `catalogId` is the gstatic URL it was fetched from.
 - **Tag-Based Extraction**: The agent wraps UI payloads in `<a2ui-json>` tags. The stream parser extracts, heals, and validates these payloads.
 - **DataPart Conversion**: A2UI JSON payloads are converted to A2A `DataPart` objects for proper rendering in Gemini Enterprise.
-- **Interactive Components**: Cards, Columns, Rows, Buttons (with `sendText` actions), Dividers, Tabs, Text, Icons, Images, Modals, Forms (with `dataModelUpdate` for data binding), Lists, and suggestion chip bars.
-- **Form Data Binding**: Interactive forms use `dataModelUpdate` messages for initial values and `path`-based bindings for TextField (supporting `shortText` and multi-line `longText`), Slider, CheckBox, and DateTimeInput components.
-- **Welcome Onboarding Card**: Rendered on the first user interaction. Features a customized list of key capabilities using Icon + Text rows and action buttons designed to initiate immediate/background operations.
+- **Interactive Components**: `MaterialCard`, `MaterialColumn`/`MaterialRow`, `MaterialButton` (flat `label`), `MaterialDivider`, `MaterialTabs`, `MaterialText`, `MaterialIcon`, `MaterialImage`, `MaterialDialog`, `MaterialTable`, `MaterialChips`/`MaterialSelect`/`MaterialInput`, `VegaChart`, `IFrameSrcdoc`, `Canvas`, and suggestion chip bars. A component is flat — `{"id", "component": "MaterialText", "text": "..."}` — with plain JSON values and a plain array of child ids; the client renders the component whose id is `root`.
+- **Form Data Binding**: Interactive forms use `updateDataModel` messages (`{surfaceId, path, value}` with plain JSON values) for initial state, and `{"path": "/form/..."}` bindings on `MaterialInput`, `MaterialSelect`, `MaterialChips`, `MaterialSlider`, `MaterialCheckbox`, and `MaterialDatepicker`.
+- **Actions & Presses**: An interactive component dispatches `{"action": {"event": {"name", "context": {"prompt": "..."}}}}`. Gemini Enterprise posts the literal `context.prompt` as the user's chat message (omit it and the user sees "User action triggered"), and the intent is encoded in the event `name` so it survives a lost context value. The press comes back as an A2A **DataPart** `{"version": "v0.9", "action": {...}}`; `part_converters.py` folds it into this runtime's `{"userAction": {...}}` text envelope at the edge, so every downstream press consumer is unchanged.
+- **Welcome Onboarding Card**: Rendered on the first user interaction. Features a customized list of key capabilities using `MaterialIcon` + `MaterialText` rows and action buttons designed to initiate immediate/background operations.
 - **Workflow Execution Plan**: Standardized layout for batch operations. Features a mandatory subtitle declaring sequential pipeline step order, connector arrows (` ↓ `), numbered step prefixes (`Step N/M :`), real-time status icons (`play_arrow`, `check_circle`, `hourglass_empty`, `pan_tool`, `error`), and dual control rows (Execution Mode buttons and Control buttons). Employs a progress variant for real-time console status sync.
-- **Context-Aware Suggestion Chips**: Section added at the end of every response using a dedicated Column schema (root -> Column [Divider, Section Title '💡 Next Actions', chipRow]) with context-aware labels to expand conversation paths.
+- **Context-Aware Suggestion Chips**: Section added at the end of every response on its own `suggestions` surface (root -> `MaterialRow` of `MaterialButton`s) with context-aware labels to expand conversation paths. Spacing comes from the `style` allowlist (`gap`, `marginTop`, ...), not from spacer components.
 - **Fallback**: If the stream parser fails, a regex-based fallback extracts A2UI blocks to prevent data loss.
 
 ---
@@ -916,7 +918,8 @@ After running the setup script, the following directory structure is created:
 │       │                              # + Workspace MCP + Slack MCP
 │       ├── fast_api_app.py            # A2A server, background task runner, streaming, middleware
 │       ├── part_converters.py         # A2A↔Gen AI type conversion utilities
-│       └── examples/0.8/              # A2UI BasicCatalog example JSONs
+│       ├── examples/0.9/              # A2UI v0.9 composite-catalog example JSONs
+│       └── catalogs/                  # gemini_enterprise_composite_catalog.json (fetched at setup)
 └── viewer_app/
     └── main.py                        # Flask Data Viewer (deployed to Cloud Run Functions)
 ```
@@ -931,8 +934,8 @@ After running the setup script, the following directory structure is created:
 2. **A2A Routing**: Gemini Enterprise sends the message via A2A JSON-RPC to the Cloud Run FastAPI server.
 3. **Model Announcement**: The server emits a `🧠 Model: gemini-3.7-flash` status event in the thinking accordion.
 4. **Reasoning**: The `root_agent` identifies a write request and plans to use the Firestore MCP toolset.
-5. **Confirmation**: The agent renders an A2UI confirmation card (via `<a2ui-json>` tags) showing before/after data with Approve/Reject buttons and a `dataModelUpdate` for pre-populated fields.
-6. **User Approval**: The user clicks "Approve" in the interactive card, which sends a `sendText` action back to the agent.
+5. **Confirmation**: The agent renders an A2UI confirmation card (via `<a2ui-json>` tags) showing before/after data with Approve/Reject buttons and an `updateDataModel` for pre-populated fields.
+6. **User Approval**: The user clicks "Approve" in the interactive card, which sends an action DataPart (`action.event.name` plus a `context.prompt` string) back to the agent.
 7. **Tool Execution**: The agent invokes the Firestore MCP `update_document` tool.
 8. **A2UI Cleanup**: The agent issues a `deleteSurface` command to remove the confirmation card, then renders a success summary card with follow-up suggestion chips.
 9. **Real-time Sync**: The Data Viewer dashboard independently detects the Firestore change and updates its Bento Grid display.

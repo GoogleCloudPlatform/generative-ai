@@ -1,0 +1,284 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "batch-editor",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "batch-editor",
+      "path": "/form",
+      "value": {
+        "item_0_selected_sku": "SKU_A",
+        "item_0_qty": "2",
+        "item_1_selected_sku": "SKU_C",
+        "item_1_qty": "4"
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "batch-editor",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "companyHeader1",
+            "row_container_0",
+            "dividerRow1",
+            "row_container_1",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📝 Bulk Mapping & Editing Editor",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "companyHeader1",
+          "component": "MaterialText",
+          "text": "🏢 Kansai Air Conditioning Services Co., Ltd.",
+          "usageHint": "h3"
+        },
+        {
+          "id": "row_container_0",
+          "component": "MaterialColumn",
+          "children": [
+            "main_row_0",
+            "reason_text_0"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "main_row_0",
+          "component": "MaterialRow",
+          "children": [
+            "left_stack_0",
+            "sku_select_0",
+            "qty_field_0"
+          ],
+          "justify": "spaceBetween",
+          "align": "center",
+          "style": {
+            "gap": "12px"
+          }
+        },
+        {
+          "id": "left_stack_0",
+          "component": "MaterialColumn",
+          "children": [
+            "orig_name_0",
+            "orig_qty_0"
+          ],
+          "align": "start",
+          "weight": 2
+        },
+        {
+          "id": "orig_name_0",
+          "component": "MaterialText",
+          "text": "エアコン5馬力 (SZRC140BC)",
+          "usageHint": "body"
+        },
+        {
+          "id": "orig_qty_0",
+          "component": "MaterialText",
+          "text": "Original Qty: 2",
+          "usageHint": "caption"
+        },
+        {
+          "id": "sku_select_0",
+          "component": "MaterialSelect",
+          "label": "Mapped SKU",
+          "weight": 2,
+          "value": {
+            "path": "/form/item_0_selected_sku"
+          },
+          "options": [
+            {
+              "label": "SKU_A (Recommended)",
+              "value": "SKU_A"
+            },
+            {
+              "label": "SKU_B (Alternative)",
+              "value": "SKU_B"
+            }
+          ]
+        },
+        {
+          "id": "qty_field_0",
+          "component": "MaterialInput",
+          "label": "Qty",
+          "type": "number",
+          "weight": 1,
+          "value": {
+            "path": "/form/item_0_qty"
+          }
+        },
+        {
+          "id": "reason_text_0",
+          "component": "MaterialText",
+          "text": "💡 Recommended because SKU_A is a direct replacement of the legacy model",
+          "usageHint": "caption"
+        },
+        {
+          "id": "dividerRow1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "row_container_1",
+          "component": "MaterialColumn",
+          "children": [
+            "main_row_1",
+            "reason_text_1"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "main_row_1",
+          "component": "MaterialRow",
+          "children": [
+            "left_stack_1",
+            "sku_select_1",
+            "qty_field_1"
+          ],
+          "justify": "spaceBetween",
+          "align": "center",
+          "style": {
+            "gap": "12px"
+          }
+        },
+        {
+          "id": "left_stack_1",
+          "component": "MaterialColumn",
+          "children": [
+            "orig_name_1",
+            "orig_qty_1"
+          ],
+          "align": "start",
+          "weight": 2
+        },
+        {
+          "id": "orig_name_1",
+          "component": "MaterialText",
+          "text": "エアコン3馬力 (PROD012)",
+          "usageHint": "body"
+        },
+        {
+          "id": "orig_qty_1",
+          "component": "MaterialText",
+          "text": "Original Qty: 4",
+          "usageHint": "caption"
+        },
+        {
+          "id": "sku_select_1",
+          "component": "MaterialSelect",
+          "label": "Mapped SKU",
+          "weight": 2,
+          "value": {
+            "path": "/form/item_1_selected_sku"
+          },
+          "options": [
+            {
+              "label": "SKU_C (Recommended)",
+              "value": "SKU_C"
+            },
+            {
+              "label": "SKU_D (Alternative)",
+              "value": "SKU_D"
+            }
+          ]
+        },
+        {
+          "id": "qty_field_1",
+          "component": "MaterialInput",
+          "label": "Qty",
+          "type": "number",
+          "weight": 1,
+          "value": {
+            "path": "/form/item_1_qty"
+          }
+        },
+        {
+          "id": "reason_text_1",
+          "component": "MaterialText",
+          "text": "💡 Matches master catalog with 95% confidence",
+          "usageHint": "caption"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnSubmit",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnSubmit",
+          "component": "MaterialButton",
+          "label": "💾 Save Changes",
+          "action": {
+            "event": {
+              "name": "submit_batch_mapping",
+              "context": {
+                "prompt": "Submit proposed changes",
+                "a_item_0_sku": {
+                  "path": "/form/item_0_selected_sku"
+                },
+                "a_item_0_qty": {
+                  "path": "/form/item_0_qty"
+                },
+                "a_item_1_sku": {
+                  "path": "/form/item_1_selected_sku"
+                },
+                "a_item_1_qty": {
+                  "path": "/form/item_1_qty"
+                }
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "🚫 Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_edit",
+              "context": {
+                "prompt": "Cancel editing"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

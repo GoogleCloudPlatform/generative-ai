@@ -1,0 +1,198 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "comparison-matrix",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "comparison-matrix",
+      "path": "/faculties",
+      "value": [
+        {
+          "faculty": "🏗️ Engineering",
+          "donations": "[CURRENCY]1.97M",
+          "score": "79.0",
+          "members": "6"
+        },
+        {
+          "faculty": "⚖️ Law",
+          "donations": "[CURRENCY]1.77M",
+          "score": "75.5",
+          "members": "8"
+        },
+        {
+          "faculty": "💰 Economics",
+          "donations": "[CURRENCY]1.20M",
+          "score": "67.0",
+          "members": "8"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "comparison-matrix",
+      "path": "/chartSpec",
+      "value": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "description": "Average engagement score by faculty",
+        "data": {
+          "values": [
+            {
+              "faculty": "Engineering",
+              "score": 79.0
+            },
+            {
+              "faculty": "Law",
+              "score": 75.5
+            },
+            {
+              "faculty": "Economics",
+              "score": 67.0
+            }
+          ]
+        },
+        "mark": "bar",
+        "encoding": {
+          "x": {
+            "field": "faculty",
+            "type": "nominal",
+            "title": "Faculty"
+          },
+          "y": {
+            "field": "score",
+            "type": "quantitative",
+            "title": "Avg engagement score"
+          }
+        }
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "comparison-matrix",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "table",
+            "chart",
+            "summaryText",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📊 Faculty Performance Comparison",
+          "usageHint": "h2"
+        },
+        {
+          "id": "table",
+          "component": "MaterialTable",
+          "columns": [
+            {
+              "header": "Faculty",
+              "field": "faculty"
+            },
+            {
+              "header": "Donations",
+              "field": "donations"
+            },
+            {
+              "header": "Avg Score",
+              "field": "score"
+            },
+            {
+              "header": "Members",
+              "field": "members"
+            }
+          ],
+          "rows": {
+            "path": "/faculties"
+          },
+          "style": {
+            "marginTop": "8px"
+          }
+        },
+        {
+          "id": "chart",
+          "component": "VegaChart",
+          "height": 220,
+          "style": {
+            "marginTop": "12px"
+          },
+          "spec": {
+            "path": "/chartSpec"
+          }
+        },
+        {
+          "id": "summaryText",
+          "component": "MaterialText",
+          "text": "💡 Engineering leads in both donations and score. Economics has more members but lower scores — engagement strategy reinforcement recommended.",
+          "usageHint": "body",
+          "style": {
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnEcon",
+            "btnReport"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnEcon",
+          "component": "MaterialButton",
+          "label": "📉 Deep-Dive Economics",
+          "action": {
+            "event": {
+              "name": "deep_dive_faculty",
+              "context": {
+                "prompt": "Analyze the root cause of low engagement in Economics"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnReport",
+          "component": "MaterialButton",
+          "label": "📋 All Faculties Report",
+          "action": {
+            "event": {
+              "name": "generate_faculty_report",
+              "context": {
+                "prompt": "Generate a detailed report for all faculties"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

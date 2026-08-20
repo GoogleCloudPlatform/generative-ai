@@ -1,0 +1,120 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "action-plan",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "action-plan",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "subtitle",
+            "divider1",
+            "step1",
+            "step2",
+            "step3",
+            "step4",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "🎯 Recommended Action Plan",
+          "usageHint": "h2"
+        },
+        {
+          "id": "subtitle",
+          "component": "MaterialText",
+          "text": "Economics Engagement Improvement — 4-Step Strategy",
+          "usageHint": "subtitle1"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "step1",
+          "component": "MaterialText",
+          "text": "1️⃣ [Immediate] Personal outreach email from the Dean to Takahashi (CFO) — Expected: Engagement Score +15pt",
+          "usageHint": "body"
+        },
+        {
+          "id": "step2",
+          "component": "MaterialText",
+          "text": "2️⃣ [Within 1 month] Plan & invite to VIP dinner event — Target: 5 mid-tier alumni (Score 40-60)",
+          "usageHint": "body"
+        },
+        {
+          "id": "step3",
+          "component": "MaterialText",
+          "text": "3️⃣ [Within 3 months] Launch Economics-exclusive mentoring program — Goal: Faculty avg Score 67→75",
+          "usageHint": "body"
+        },
+        {
+          "id": "step4",
+          "component": "MaterialText",
+          "text": "4️⃣ [At 6 months] Impact assessment & next strategy — KPI: Donations +20% YoY, Avg Score ≥75",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnStep1",
+            "btnSchedule"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnStep1",
+          "component": "MaterialButton",
+          "label": "✉️ Draft Email",
+          "action": {
+            "event": {
+              "name": "draft_step_email",
+              "context": {
+                "prompt": "Draft the outreach email for Step 1"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnSchedule",
+          "component": "MaterialButton",
+          "label": "📅 Create Schedule",
+          "action": {
+            "event": {
+              "name": "create_plan_schedule",
+              "context": {
+                "prompt": "Create a detailed schedule for this plan"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

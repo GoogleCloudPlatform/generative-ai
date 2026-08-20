@@ -1,0 +1,58 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "html-dashboard",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "html-dashboard",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "frame",
+            "note"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📈 Live Dashboard",
+          "usageHint": "h2"
+        },
+        {
+          "id": "frame",
+          "component": "IFrameSrcdoc",
+          "height": 260,
+          "htmlContent": "<!DOCTYPE html><html><head><meta charset='utf-8'><style>body{font-family:Roboto,Arial,sans-serif;margin:0;padding:16px;background:#f8f9fa}.kpis{display:flex;gap:12px}.kpi{flex:1;background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}.kpi b{display:block;font-size:24px;color:#1a73e8}h2{margin:0 0 12px;font-size:16px}</style></head><body><h2>Regional Performance</h2><div class='kpis'><div class='kpi'><b>$12.4M</b>Total revenue</div><div class='kpi'><b>+8.2%</b>YoY growth</div><div class='kpi'><b>23</b>Open anomalies</div></div></body></html>",
+          "style": {
+            "marginTop": "8px"
+          }
+        },
+        {
+          "id": "note",
+          "component": "MaterialText",
+          "text": "Rendered inline in a sandboxed frame — no separate browser tab needed.",
+          "usageHint": "caption",
+          "style": {
+            "marginTop": "8px"
+          }
+        }
+      ]
+    }
+  }
+]
