@@ -1,0 +1,162 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "tabbed-view",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "tabbed-view",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "tabs",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📋 Data Update Preview",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "tabs",
+          "component": "MaterialTabs",
+          "tabs": [
+            {
+              "label": "Before",
+              "content": "beforeContent"
+            },
+            {
+              "label": "After",
+              "content": "afterContent"
+            }
+          ]
+        },
+        {
+          "id": "beforeContent",
+          "component": "MaterialColumn",
+          "children": [
+            "beforeTitle",
+            "beforeRole",
+            "beforeScore"
+          ],
+          "align": "stretch",
+          "style": {
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "beforeTitle",
+          "component": "MaterialText",
+          "text": "Name: Kenta Takahashi",
+          "usageHint": "body"
+        },
+        {
+          "id": "beforeRole",
+          "component": "MaterialText",
+          "text": "Title: Head of Corporate Planning",
+          "usageHint": "body"
+        },
+        {
+          "id": "beforeScore",
+          "component": "MaterialText",
+          "text": "Score: 45",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterContent",
+          "component": "MaterialColumn",
+          "children": [
+            "afterTitle",
+            "afterRole",
+            "afterScore"
+          ],
+          "align": "stretch",
+          "style": {
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "afterTitle",
+          "component": "MaterialText",
+          "text": "Name: Kenta Takahashi",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterRole",
+          "component": "MaterialText",
+          "text": "Title: CFO ✏️",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterScore",
+          "component": "MaterialText",
+          "text": "Score: 60 ✏️",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnApprove",
+            "btnReject"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnApprove",
+          "component": "MaterialButton",
+          "label": "✅ Approve & Execute",
+          "action": {
+            "event": {
+              "name": "confirm_update",
+              "context": {
+                "prompt": "Approved"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnReject",
+          "component": "MaterialButton",
+          "label": "❌ Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_update",
+              "context": {
+                "prompt": "Rejected"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

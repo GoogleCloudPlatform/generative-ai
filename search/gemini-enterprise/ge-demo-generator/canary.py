@@ -56,6 +56,27 @@ CONSTRAINT_KEYS = [
     "cuOtelGcpResourceDetector",
 ]
 
+# The A2UI v0.9 wiring the generated agent depends on. A plain module import
+# cannot see a dropped symbol, and these four are exactly what agent.py and
+# fast_api_app.py build the schema manager and the DataPart from. Kept in sync
+# with the equivalent RUN line in the generated Dockerfile (Code.gs).
+A2UI_INTERFACE_CHECK = (
+    "from a2ui.schema.constants import VERSION_0_9; "
+    "from a2ui.schema.catalog import CatalogConfig; "
+    "from a2ui.schema.common_modifiers import remove_strict_validation; "
+    "from a2ui.a2a.parts import create_a2ui_part; "
+    "assert hasattr(CatalogConfig, 'from_path'), 'FAIL: CatalogConfig.from_path missing'; "
+    # Pin the MIME the DataPart actually carries, not just the signature.
+    # Gemini Enterprise renders 'application/json+a2ui' and ignores
+    # 'application/a2ui+json'; the SDK picks between them off the version
+    # kwarg, so a silent flip in that mapping turns every card into plain text
+    # with nothing else to see.
+    "_p = create_a2ui_part({'version': 'v0.9'}, version=VERSION_0_9); "
+    "_m = (_p.root.metadata or {}).get('mimeType'); "
+    "assert _m == 'application/json+a2ui', 'FAIL: unexpected A2UI mimeType ' + repr(_m); "
+    "print('a2ui v0.9 interface OK (mimeType=' + _m + ')')"
+)
+
 
 def heredoc(name, lines):
     """Return the body of a quoted heredoc in Code.gs, verbatim."""
@@ -185,9 +206,7 @@ def write_context(out, variant):
         'RUN uv pip freeze | grep -iE "^(google-adk|a2ui|mcp|google-genai|a2a-sdk)"'
         " | tee /app/.dep-versions\n"
         "RUN python dep_smoke_test.py\n"
-        'RUN python -c "from a2ui.a2a.parts import create_a2ui_part; import inspect;'
-        " assert 'version' in inspect.signature(create_a2ui_part).parameters,"
-        " 'FAIL: a2ui version param missing'; print('a2ui interface OK')\"\n",
+        'RUN python -c "' + A2UI_INTERFACE_CHECK + '"\n',
         encoding="utf-8")
 
     # --run-venv drops a .venv into this directory; without this, a later
@@ -229,9 +248,7 @@ def run_venv(out, uv_version):
     failed = 0
     for command, label in (
         ([python, "dep_smoke_test.py"], "dependency import smoke test"),
-        ([python, "-c", "from a2ui.a2a.parts import create_a2ui_part; import inspect; "
-          "assert 'version' in inspect.signature(create_a2ui_part).parameters; "
-          "print('a2ui interface OK')"], "a2ui interface check"),
+        ([python, "-c", A2UI_INTERFACE_CHECK], "a2ui interface check"),
     ):
         proc = subprocess.run(command, cwd=str(out), capture_output=True, text=True)
         output = (proc.stdout + proc.stderr).strip()

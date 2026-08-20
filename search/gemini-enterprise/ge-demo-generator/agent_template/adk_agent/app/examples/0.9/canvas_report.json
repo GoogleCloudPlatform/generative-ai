@@ -1,0 +1,119 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "canvas-report",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "canvas-report",
+      "components": [
+        {
+          "id": "root",
+          "component": "Canvas",
+          "cardTitle": "Q4 Revenue Deep-Dive",
+          "autoOpen": true,
+          "cardDescription": "Full analysis report — opens in a side panel",
+          "cardIcon": "analytics",
+          "children": [
+            "reportCol"
+          ]
+        },
+        {
+          "id": "reportCol",
+          "component": "MaterialColumn",
+          "children": [
+            "repTitle",
+            "repDiv",
+            "repSec1",
+            "repBody1",
+            "repSec2",
+            "repBody2",
+            "repSec3",
+            "repBody3",
+            "repActions"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "repTitle",
+          "component": "MaterialText",
+          "text": "Q4 Revenue Deep-Dive",
+          "usageHint": "h2"
+        },
+        {
+          "id": "repDiv",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "repSec1",
+          "component": "MaterialText",
+          "text": "1. Executive summary",
+          "usageHint": "h3"
+        },
+        {
+          "id": "repBody1",
+          "component": "MaterialText",
+          "text": "Revenue reached $12.4M in Q4, up 8.2% year over year. Growth was concentrated in APAC (+15.3%), while EMEA was flat and the Americas declined 1.1%.",
+          "usageHint": "body"
+        },
+        {
+          "id": "repSec2",
+          "component": "MaterialText",
+          "text": "2. Anomalies",
+          "usageHint": "h3"
+        },
+        {
+          "id": "repBody2",
+          "component": "MaterialText",
+          "text": "23 anomalies were detected in billing reconciliation, of which 3 are critical. Invoice IDs INV-4521 and INV-4589 account for 62% of the total variance and should be escalated to the finance team this week.",
+          "usageHint": "body"
+        },
+        {
+          "id": "repSec3",
+          "component": "MaterialText",
+          "text": "3. Recommendations",
+          "usageHint": "h3"
+        },
+        {
+          "id": "repBody3",
+          "component": "MaterialText",
+          "text": "Prioritise the APAC expansion budget, freeze discretionary discounting in the Americas until the reconciliation gaps close, and add an automated variance check to the nightly billing job.",
+          "usageHint": "body"
+        },
+        {
+          "id": "repActions",
+          "component": "MaterialRow",
+          "children": [
+            "repBtn"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "repBtn",
+          "component": "MaterialButton",
+          "label": "Escalate to finance",
+          "action": {
+            "event": {
+              "name": "escalate_anomalies",
+              "context": {
+                "prompt": "Escalate invoices INV-4521 and INV-4589 to the finance team"
+              }
+            }
+          },
+          "variant": "raised"
+        }
+      ]
+    }
+  }
+]

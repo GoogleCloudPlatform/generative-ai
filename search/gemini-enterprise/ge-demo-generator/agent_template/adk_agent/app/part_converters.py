@@ -55,6 +55,17 @@ A2A_DATA_PART_METADATA_TYPE_FUNCTION_RESPONSE = 'function_response'
 A2A_DATA_PART_METADATA_TYPE_CODE_EXECUTION_RESULT = 'code_execution_result'
 A2A_DATA_PART_METADATA_TYPE_EXECUTABLE_CODE = 'executable_code'
 
+# A2UI v0.9 server-to-client message keys. Exactly one of these is present per
+# message, alongside the mandatory {"version": "v0.9"} stamp.
+A2UI_SERVER_MSG_KEYS = ("createSurface", "updateComponents", "updateDataModel", "deleteSurface")
+
+# A2UI v0.9 client-to-server envelope. A button press no longer arrives as a
+# TextPart: GE posts a DataPart shaped like
+#   {"version": "v0.9", "action": {"name", "surfaceId", "sourceComponentId",
+#                                  "timestamp", "context": {...}}}
+# The wire value "v0.9" intentionally differs from the SDK's VERSION_0_9 ("0.9").
+A2UI_CLIENT_MESSAGE_VERSION = "v0.9"
+
 # --- HELPERS ---
 def _get_adk_metadata_key(key: str) -> str:
     """Returns the ADK-prefixed metadata key."""
@@ -72,14 +83,67 @@ def is_a2ui_part(a2a_part: a2a_types.Part) -> bool:
     if hasattr(a2a_part, 'root') and isinstance(a2a_part.root, a2a_types.DataPart):
         data = a2a_part.root.data
         if isinstance(data, dict):
-            # Check for common A2UI keys
-            return any(key in data for key in ["beginRendering", "surfaceUpdate", "dataModelUpdate", "deleteSurface"])
+            # Check for common A2UI v0.9 server-to-client keys
+            return any(key in data for key in A2UI_SERVER_MSG_KEYS)
         if isinstance(data, list) and len(data) > 0:
             # Check first item of a list (A2UI often sends a list of messages)
             first = data[0]
             if isinstance(first, dict):
-                return any(key in first for key in ["beginRendering", "surfaceUpdate", "dataModelUpdate", "deleteSurface"])
+                return any(key in first for key in A2UI_SERVER_MSG_KEYS)
     return False
+
+
+def a2ui_client_action(a2a_part: a2a_types.Part) -> Optional[Dict[str, Any]]:
+    """Extracts an A2UI v0.9 client action from an inbound A2A part.
+
+    On v0.8 a button press reached us as a TextPart whose body was a
+    {"userAction": {...}} JSON blob. On v0.9 GE posts a DataPart instead:
+
+        {"version": "v0.9",
+         "action": {"name", "surfaceId", "sourceComponentId", "timestamp",
+                    "context": {"prompt": "...", ...}}}
+
+    Returns the action dict, or None when the part is not a press.
+    """
+    root = getattr(a2a_part, 'root', None)
+    if not isinstance(root, a2a_types.DataPart):
+        return None
+    data = root.data
+    if not isinstance(data, dict):
+        return None
+    if data.get('version') != A2UI_CLIENT_MESSAGE_VERSION:
+        return None
+    action = data.get('action')
+    if isinstance(action, dict) and action.get('name'):
+        return action
+    return None
+
+
+def a2ui_action_to_user_action(action: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalizes a v0.9 client action into this runtime's userAction envelope.
+
+    Every press consumer downstream (the pre-flight gate, the briefing-answer
+    harvester, the duplicate-press dedup keyed on sourceComponentId+timestamp)
+    was written against the v0.8 {"userAction": {...}} shape. Rather than
+    teach each of them a second dialect, the v0.9 payload is folded into that
+    same shape here, once, at the edge.
+
+    context.prompt is GE's user-visible chat message for the press and is
+    mirrored onto context.text -- the key the v0.8 gate reads as intent.
+    """
+    context = action.get('context')
+    context = dict(context) if isinstance(context, dict) else {}
+    prompt = context.get('prompt')
+    _text = context.get('text')
+    if isinstance(prompt, str) and prompt.strip() and not (isinstance(_text, str) and _text.strip()):
+        context['text'] = prompt.strip()
+    return {
+        'name': action.get('name') or '',
+        'surfaceId': action.get('surfaceId') or '',
+        'sourceComponentId': action.get('sourceComponentId') or '',
+        'timestamp': action.get('timestamp') or '',
+        'context': context,
+    }
 
 
 def convert_a2a_part_to_genai_part(
@@ -93,6 +157,12 @@ def convert_a2a_part_to_genai_part(
     Returns:
         The corresponding Gen AI part, or None if conversion fails.
     """
+    _action = a2ui_client_action(a2a_part)
+    if _action is not None:
+        return genai_types.Part(
+            text=json.dumps({'userAction': a2ui_action_to_user_action(_action)})
+        )
+
     if is_a2ui_part(a2a_part):
         return genai_types.Part(text=a2a_part.model_dump_json())
 

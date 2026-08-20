@@ -1,0 +1,150 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "file-compose",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "file-compose",
+      "path": "/form",
+      "value": {
+        "name": "Weekly Inventory Report",
+        "type": "Document",
+        "content": "Summary of this week's inventory reconciliation."
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "file-compose",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "fName",
+            "selectType",
+            "fContent",
+            "actions"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📄 Create Drive File",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "fName",
+          "component": "MaterialInput",
+          "label": "File name",
+          "value": {
+            "path": "/form/name"
+          }
+        },
+        {
+          "id": "selectType",
+          "component": "MaterialSelect",
+          "label": "File type",
+          "value": {
+            "path": "/form/type"
+          },
+          "options": [
+            {
+              "label": "Document",
+              "value": "Document"
+            },
+            {
+              "label": "Spreadsheet",
+              "value": "Spreadsheet"
+            },
+            {
+              "label": "Presentation",
+              "value": "Presentation"
+            }
+          ]
+        },
+        {
+          "id": "fContent",
+          "component": "MaterialInput",
+          "label": "Content",
+          "value": {
+            "path": "/form/content"
+          }
+        },
+        {
+          "id": "actions",
+          "component": "MaterialRow",
+          "children": [
+            "btnCreate",
+            "btnCancel"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnCreate",
+          "component": "MaterialButton",
+          "label": "✅ Create",
+          "action": {
+            "event": {
+              "name": "submit_drive_file",
+              "context": {
+                "prompt": "Create this Drive file",
+                "aName": {
+                  "path": "/form/name"
+                },
+                "aType": {
+                  "path": "/form/type"
+                },
+                "aContent": {
+                  "path": "/form/content"
+                }
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCancel",
+          "component": "MaterialButton",
+          "label": "🚫 Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_drive_file",
+              "context": {
+                "prompt": "Cancel creating the file"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

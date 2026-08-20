@@ -1,0 +1,231 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "profile-dashboard",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "profile-dashboard",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainColumn"
+          ]
+        },
+        {
+          "id": "mainColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "headerTitle",
+            "profileSubtitle",
+            "divider1",
+            "kpiRow",
+            "divider2",
+            "timelineTitle",
+            "timelineItem1",
+            "timelineItem2",
+            "divider3",
+            "insightTitle",
+            "insightBody",
+            "divider4",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "headerTitle",
+          "component": "MaterialText",
+          "text": "📊 Kenta Takahashi (ALM-005) Profile Analysis",
+          "usageHint": "h2"
+        },
+        {
+          "id": "profileSubtitle",
+          "component": "MaterialText",
+          "text": "Class of 2000, Economics | Mitsubishi UFJ Bank, Head of Corporate Planning",
+          "usageHint": "subtitle1"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "kpiRow",
+          "component": "MaterialRow",
+          "children": [
+            "kpiScore",
+            "kpiDonation",
+            "kpiRank"
+          ],
+          "justify": "spaceEvenly",
+          "align": "center"
+        },
+        {
+          "id": "kpiScore",
+          "component": "MaterialColumn",
+          "children": [
+            "kpiScoreValue",
+            "kpiScoreLabel"
+          ],
+          "align": "center"
+        },
+        {
+          "id": "kpiScoreValue",
+          "component": "MaterialText",
+          "text": "45",
+          "usageHint": "h2"
+        },
+        {
+          "id": "kpiScoreLabel",
+          "component": "MaterialText",
+          "text": "Engagement",
+          "usageHint": "caption"
+        },
+        {
+          "id": "kpiDonation",
+          "component": "MaterialColumn",
+          "children": [
+            "kpiDonationValue",
+            "kpiDonationLabel"
+          ],
+          "align": "center"
+        },
+        {
+          "id": "kpiDonationValue",
+          "component": "MaterialText",
+          "text": "[CURRENCY]50,000",
+          "usageHint": "h2"
+        },
+        {
+          "id": "kpiDonationLabel",
+          "component": "MaterialText",
+          "text": "Lifetime Donations",
+          "usageHint": "caption"
+        },
+        {
+          "id": "kpiRank",
+          "component": "MaterialColumn",
+          "children": [
+            "kpiRankValue",
+            "kpiRankLabel"
+          ],
+          "align": "center"
+        },
+        {
+          "id": "kpiRankValue",
+          "component": "MaterialText",
+          "text": "CFO",
+          "usageHint": "h2"
+        },
+        {
+          "id": "kpiRankLabel",
+          "component": "MaterialText",
+          "text": "Current Title",
+          "usageHint": "caption"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "timelineTitle",
+          "component": "MaterialText",
+          "text": "📅 Event Attendance History",
+          "usageHint": "h3"
+        },
+        {
+          "id": "timelineItem1",
+          "component": "MaterialText",
+          "text": "✅ 2024/03/05 Global Career Seminar — Attended",
+          "usageHint": "body"
+        },
+        {
+          "id": "timelineItem2",
+          "component": "MaterialText",
+          "text": "❌ 2024/04/10 Spring Gala 2024 — Absent (coincided with CFO appointment)",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider3",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "insightTitle",
+          "component": "MaterialText",
+          "text": "💡 Cross-Silo Insights & Recommended Actions",
+          "usageHint": "h3"
+        },
+        {
+          "id": "insightBody",
+          "component": "MaterialText",
+          "text": "Post-CFO appointment workload likely caused the absence. As things stabilize, now is the ideal time for a 1-on-1 outreach from the Dean or a VIP dinner invitation.",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider4",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnDeepDive",
+            "btnSchedule",
+            "btnUpdateDb"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnDeepDive",
+          "component": "MaterialButton",
+          "label": "🔍 Deep-Dive",
+          "action": {
+            "event": {
+              "name": "deep_dive_donations",
+              "context": {
+                "prompt": "Analyze Takahashi's donation history in detail"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnSchedule",
+          "component": "MaterialButton",
+          "label": "✉️ Draft Email",
+          "action": {
+            "event": {
+              "name": "draft_outreach_email",
+              "context": {
+                "prompt": "Draft an outreach email for Takahashi"
+              }
+            }
+          }
+        },
+        {
+          "id": "btnUpdateDb",
+          "component": "MaterialButton",
+          "label": "📝 Update DB",
+          "action": {
+            "event": {
+              "name": "update_engagement_score",
+              "context": {
+                "prompt": "Update Takahashi's Engagement Score"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

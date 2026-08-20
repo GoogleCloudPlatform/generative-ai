@@ -1,0 +1,94 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "confirmation-surface",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "confirmation-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainColumn"
+          ]
+        },
+        {
+          "id": "mainColumn",
+          "component": "MaterialColumn",
+          "children": [
+            "titleText",
+            "beforeText",
+            "afterText",
+            "actionRow"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "titleText",
+          "component": "MaterialText",
+          "text": "Confirm Data Update",
+          "usageHint": "h2"
+        },
+        {
+          "id": "beforeText",
+          "component": "MaterialText",
+          "text": "Before: [Previous Data Summary]",
+          "usageHint": "body"
+        },
+        {
+          "id": "afterText",
+          "component": "MaterialText",
+          "text": "After: [New Data Summary]",
+          "usageHint": "body"
+        },
+        {
+          "id": "actionRow",
+          "component": "MaterialRow",
+          "children": [
+            "btnApprove",
+            "btnReject"
+          ],
+          "justify": "end",
+          "align": "center",
+          "style": {
+            "gap": "8px",
+            "marginTop": "12px"
+          }
+        },
+        {
+          "id": "btnApprove",
+          "component": "MaterialButton",
+          "label": "Approve",
+          "action": {
+            "event": {
+              "name": "confirm_update",
+              "context": {
+                "prompt": "Approved"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnReject",
+          "component": "MaterialButton",
+          "label": "Cancel",
+          "action": {
+            "event": {
+              "name": "cancel_update",
+              "context": {
+                "prompt": "Rejected"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,136 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "chat-conversations",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "chat-conversations",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "row1",
+            "row2",
+            "row3"
+          ],
+          "align": "stretch",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "💬 Your Chat Conversations",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "row1",
+          "component": "MaterialRow",
+          "children": [
+            "t1",
+            "b1"
+          ],
+          "justify": "spaceBetween",
+          "align": "center"
+        },
+        {
+          "id": "t1",
+          "component": "MaterialText",
+          "text": "Engineering (Space)",
+          "usageHint": "body"
+        },
+        {
+          "id": "b1",
+          "component": "MaterialButton",
+          "label": "📤 Send here",
+          "action": {
+            "event": {
+              "name": "compose_chat_message",
+              "context": {
+                "prompt": "Send a message to the Engineering space"
+              }
+            }
+          }
+        },
+        {
+          "id": "row2",
+          "component": "MaterialRow",
+          "children": [
+            "t2",
+            "b2"
+          ],
+          "justify": "spaceBetween",
+          "align": "center"
+        },
+        {
+          "id": "t2",
+          "component": "MaterialText",
+          "text": "Operations (Space)",
+          "usageHint": "body"
+        },
+        {
+          "id": "b2",
+          "component": "MaterialButton",
+          "label": "📤 Send here",
+          "action": {
+            "event": {
+              "name": "compose_chat_message",
+              "context": {
+                "prompt": "Send a message to the Operations space"
+              }
+            }
+          }
+        },
+        {
+          "id": "row3",
+          "component": "MaterialRow",
+          "children": [
+            "t3",
+            "b3"
+          ],
+          "justify": "spaceBetween",
+          "align": "center"
+        },
+        {
+          "id": "t3",
+          "component": "MaterialText",
+          "text": "Store Managers (Space)",
+          "usageHint": "body"
+        },
+        {
+          "id": "b3",
+          "component": "MaterialButton",
+          "label": "📤 Send here",
+          "action": {
+            "event": {
+              "name": "compose_chat_message",
+              "context": {
+                "prompt": "Send a message to the Store Managers space"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

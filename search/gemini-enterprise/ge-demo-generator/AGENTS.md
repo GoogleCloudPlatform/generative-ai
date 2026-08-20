@@ -25,7 +25,9 @@ agent_template/ (real, testable files — fetched at setup run time)
   ├─ adk_agent/app/tools.py            toolsets (env-gated feature blocks)
   ├─ adk_agent/app/fast_api_app.py     A2A/FastAPI runtime
   ├─ adk_agent/app/part_converters.py  A2UI part conversion
-  ├─ adk_agent/app/examples/0.8/*.json A2UI few-shot examples
+  ├─ adk_agent/app/examples/0.9/*.json A2UI v0.9 few-shot examples
+  │                                    (the composite catalog itself is fetched
+  │                                     into adk_agent/app/catalogs/ at setup time)
   ├─ managed_agent/                    Managed Agent provisioning helpers
   │                                    (create_managed_agent.py, warmup_managed_agent.py)
   ├─ demo_skills/                      Deliverable craft skills mounted into the
@@ -170,6 +172,10 @@ English without a trace -- the only way to tell it apart from a successful no-op
 was that the emit landed 1 ms after the call.
 
 ### 2.5 A2UI card delivery and press context
+
+> These were found on A2UI v0.8 and are written in its vocabulary
+> (`beginRendering`/`surfaceUpdate`/`sendText`). The lessons still hold; section
+> 13 gives the v0.9 spelling of each protocol name.
 
 Two failure modes found together on one live turn (a scanned-fax-to-quote
 workflow): the card the model tried to draw never appeared, and the answers the
@@ -435,6 +441,10 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
   requirements and actually run the imports (see section 8.4);
   `docker build /tmp/canary` for the full image.
 - `bash -n` any generated setup script before running it.
+- `python3 probe_wire.py --service <cloud-run-service>` — talk to a deployed
+  agent the way Gemini Enterprise does and print the wire (extension echo,
+  part kinds, `metadata.mimeType`, A2UI message keys). Reach for it the moment
+  the logs are clean but the client renders nothing (see section 13.6).
 - After deploy: Cloud Run startup logs, `✅ N/N MCP sidecars ready`,
   `/.well-known/agent.json` responds, model name shows in the thinking
   accordion.
@@ -1020,3 +1030,243 @@ body instead of `substring(0, 200)`. **A truncated upstream error reads as a bug
 in your own app.** The old message cut off at "Remove Google search tool from",
 which is advice this app cannot take — ungrounded research would invent the
 company facts the feature exists to ground.
+
+## 13. A2UI v0.8 → v0.9 and the composite catalog (v11.61)
+
+Gemini Enterprise now speaks A2UI **v0.9**, which unlocks a Gemini
+Enterprise-specific **composite catalog** (52 components) that v0.8's bundled
+*basic* catalog (18 primitives) could not reach. This was a **hard cutover** —
+there is no dual-version switch and no v0.8 code path left. Four things the
+generator used to fake are now native:
+
+| Faked on v0.8 | Native on v0.9 |
+|---|---|
+| Tables built from nested `Row`/`Column` of `Text` | `MaterialTable` / `GcbpTable` |
+| Charts rendered as generated PNG images | `VegaChart` |
+| Dashboards opened in a separate browser tab | `IFrameSrcdoc` (sandboxed, inline) |
+| Long reports crammed into the chat stream | `Canvas` (resizable side panel) |
+
+No dependency bump: the already-pinned `a2ui-agent-sdk` revision ships
+everything v0.9 needs.
+
+### 13.1 The protocol delta
+
+| v0.8 | v0.9 |
+|---|---|
+| `{"beginRendering": {"surfaceId", "root": "root"}}` | `{"version":"v0.9","createSurface":{"surfaceId","catalogId"}}` — **no `root` key**; a component with `id == "root"` is required instead |
+| `{"surfaceUpdate": {...}}` | `{"version":"v0.9","updateComponents":{...}}` |
+| `{"dataModelUpdate":{"path","contents":[{"key","valueString"}]}}` | `{"version":"v0.9","updateDataModel":{"surfaceId","path","value": <plain JSON>}}` |
+| `{"deleteSurface":{...}}` | same, but `version` is now **required** |
+| `"component": {"Text": {…}}` (key wrapper) | `"component": "Text", …props` (flat discriminator) |
+| `{"literalString": "x"}` | `"x"` (a `{"path": "/a"}` binding is unchanged) |
+| `"children": {"explicitList": [...]}` | `"children": [...]` |
+| `distribution` / `alignment` | `justify` / `align` |
+| `"action": {"name":"sendText","context":[{"key","value"}]}` | `"action": {"event": {"name", "context": {…}}}` |
+| press arrives as a **TextPart** | press arrives as a **DataPart** (13.4) |
+
+**`"v0.9"` is not `VERSION_0_9`.** The wire value stamped on every message is
+the string `"v0.9"`; the SDK constant `a2ui.schema.constants.VERSION_0_9` is
+`"0.9"`. They are not interchangeable. `A2UI_CLIENT_MESSAGE_VERSION` in
+`agent_template/adk_agent/app/part_converters.py` holds the wire spelling.
+
+### 13.2 Catalog wiring — three sites that must agree
+
+1. **The setup script** fetches the catalog into the build context and *fails
+   the setup* if it is missing or unparseable
+   (`adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json`). A
+   missing catalog is otherwise a fatal `A2uiSchemaManager` error three to five
+   minutes later at Cloud Run start. The Dockerfile re-asserts it parses and
+   has a `catalogId`.
+2. **`agent.py` and `fast_api_app.py`** build byte-identical managers
+   (`A2uiSchemaManager(version=VERSION_0_9, catalogs=[CatalogConfig.from_path(...)],
+   schema_modifiers=[remove_strict_validation])`). They must match: the second
+   one produces the selected catalog that the healer and the runtime validation
+   gate read. `remove_strict_validation` is required — without it the composite
+   catalog's `allOf` composition over-rejects.
+3. **The agent card**: extension URI `.../a2a-extension/a2ui/v0.9`, with the
+   catalog's own `catalogId` (the gstatic URL) advertised as a supported
+   catalog and repeated on every `createSurface`.
+
+**MIME**: `_build_a2ui_part` calls `create_a2ui_part(msg, version=VERSION_0_9)`.
+The SDK maps every version in `("0.8", "0.9", "v0.8", "v0.9")` to
+`application/json+a2ui` and everything else to `application/a2ui+json`. The
+constant names read backwards (`DEPRECATED_A2UI_MIME_TYPE` vs `A2UI_MIME_TYPE`)
+— `application/a2ui+json` is the *future* spelling that no shipping client
+reads yet. Dropping the kwarg degrades every card to plain text with a
+completely clean log. The Dockerfile `RUN` and `canary.py` both assert the
+resulting MIME.
+
+### 13.3 Only 18 components are strict — the rest of the healer is migration
+
+`remove_strict_validation` deletes `additionalProperties: false` but leaves
+`unevaluatedProperties: false`, which marks exactly the 18 basic v0.9
+primitives. **Every `Material*` component is schema-open**, so the unknown-property
+pruner can only ever fire on a basic component, and for Material components the
+healer's job is **shape migration**, not pruning. Two migrations are
+non-obvious, and both were found by feeding the healer real v0.8 payloads
+offline rather than by reading the diff:
+
+- **A v0.8 `Button` with a flat `label` must be promoted to `MaterialButton`,
+  not pruned.** The *basic* v0.9 `Button` has no `label` at all and *requires*
+  `child`, so pruning the label produced a childless `Button` that the gate
+  rejected, taking the whole card with it.
+- **`MultipleChoice`→`ChoicePicker` is more than a rename.** The selection
+  binding moved `selections`→`value`, and `variant` swapped enums entirely:
+  v0.8's `chips`/`dropdown` were presentation hints, v0.9's
+  `multipleSelection`/`mutuallyExclusive` encode cardinality. Without both, the
+  renamed component keeps a dead binding and an out-of-enum variant.
+
+Prop signatures verified against the catalog, each contradicting a plausible
+guess: **`MaterialSlider` has no `label`**; **`MaterialChips` has no `label`**;
+`MaterialTable` requires `columns` (`{header, field}`) + `rows`; `MaterialCard`
+requires `children`; `MaterialText.usageHint` is `h1..h5, caption, body,
+subtitle1/2, body1/2` — **`title` is not in it**; basic `Button` requires
+`child`; `MaterialIcon.icon` is a free-form Material Icons font name with **no
+enum**, so the old icon allowlist is gone. A dangling child id does **not** fail
+validation — the parser only enforces reachability from `root`; it renders as a
+hole in the card.
+
+### 13.4 The inbound press is a DataPart now — folded back to one shape
+
+This is the only genuinely new code path. Gemini Enterprise returns a press as
+
+```json
+{"version": "v0.9", "action": {"name": "...", "surfaceId": "...",
+ "sourceComponentId": "...", "timestamp": "...", "context": {"prompt": "...", ...}}}
+```
+
+The agents use ADK's `A2aAgentExecutor`, which maps parts 1:1 — an action
+DataPart would otherwise reach the model as raw JSON. `a2ui_client_action()`
+recognises it in `convert_a2a_part_to_genai_part`, and
+`a2ui_action_to_user_action()` folds it into the **existing**
+`{"userAction": {...}}` text envelope. **Converting at the edge instead of
+teaching each consumer a second dialect** is the load-bearing decision: the
+pre-flight gate, the briefing-answer harvester and the duplicate-press dedup all
+keep working unchanged. Presses are matched on the stable event name first
+(`preflight_confirm*`, `autonomous_start*`) with the text path as a fallback;
+per section 2.5, never gate a handler on a decorative context key.
+
+**`context.prompt` is the user's chat message.** Gemini Enterprise renders that
+literal string as what the user "said". Omit it and the user sees "User action
+triggered." Corollary: **encode intent in the event `name` too**, never only in
+the context — a name survives a model that forgets to bind a context value.
+
+### 13.5 Verification order (all four are cheap; do not skip them)
+
+1. `node --check` on a `.js` copy of Code.gs — the template-literal scan of
+   section 2. **A bare backtick inside generated Python shreds the heredoc**;
+   several crept in during this migration and most of them happened to
+   *balance*, so they parsed and would have failed only at runtime.
+2. `python3 validate_examples.py` — every example JSON parses, every template
+   Python file compiles, and no surface sends one prompt from two presses.
+3. **Offline protocol harness** — push each *server-authored* card (pre-flight,
+   autonomous briefing, suggestion chips, `deleteSurface`) through
+   `A2uiStreamParser(catalog=...).process_chunk('<a2ui-json>' + json + '</a2ui-json>')`.
+   That is the identical gate the runtime applies, and it covers the cards
+   `validate_examples.py` cannot see because they are built in Python. Write
+   negative controls too — a harness that accepts v0.8 keys is not testing
+   anything.
+4. **Feed the healer v0.8 input** and assert the healed result passes the real
+   gate.
+
+### 13.6 Six live-deploy failures the offline gates could not see
+
+None of these is a property of any card the generator authors.
+
+**(a) The `MaterialTabs` reachability shim must be installed in `agent.py`, not
+only where the healer lives.** `agent.py` runs
+`generate_system_prompt(validate_examples=True)` at IMPORT time, and
+`adk_agent/app/__init__.py` imports it before `fast_api_app.py` — so a shim that
+only exists next to the runtime gate installs too late, and any tabbed example
+kills the container at startup: `Component 'afterContent' is not reachable from
+'root'`. Meta-lesson: `validate_examples.py` had the shim while the runtime did
+not, making the **offline gate more permissive than production** — exactly
+backwards. When a validator needs a patch to pass, first prove the runtime
+applies the same patch on the same code path, in import order.
+
+**(b) A plain-string ADK instruction is a TEMPLATE, and the catalog contains
+`{expression}`.** ADK's `inject_session_state` raises `KeyError: Context
+variable not found` for any brace-wrapped identifier not in session state. The
+composite catalog's dynamic-string documentation contains a literal
+`` `${expression}` `` in a component description; once
+`generate_system_prompt(include_schema=True)` embeds the catalog into the
+instruction, **every turn dies before the model runs**. The fix is
+`bypass_state_injection`: pass an `InstructionProvider` (callable) instead of a
+string. Never hand ADK a string instruction that embeds third-party text
+(catalog, tool descriptions, fetched docs) — you do not control its braces, and
+the catalog is re-fetched at every setup, so a token can appear upstream at any
+time.
+
+**(c) v0.9 A2UI parts are ignored without the extension-activation echo.** A
+perfect turn server-side — `text`, `createSurface`, `updateComponents`,
+gate-clean, correct agent card — rendered as text-only. Per the A2A extension
+protocol, the client sends the extension URI in the `X-A2A-Extensions` REQUEST
+header and treats the extension as INACTIVE unless the server echoes it in the
+RESPONSE header. The v0.8 client rendered cards without the echo; the v0.9
+client does not. The SDK's own mechanism (`RequestContext.add_activated_extension`)
+**cannot work on the `message/stream` path**: `jsonrpc_app._create_response`
+builds the SSE response headers BEFORE the agent executor has run, so
+executor-side activation echoes only on non-streaming `message/send`. The fix is
+`A2uiExtensionEchoMiddleware` in `fast_api_app.py`, which echoes on both paths
+and logs `[a2ui_ext]`.
+
+**(d) The A2UI version is read from the REGISTERED inline agent card, not the
+live one.** With the echo in place the log showed `requested=...a2ui/v0.8`. The
+version in `X-A2A-Extensions` comes from the `jsonAgentCard` embedded in the
+Discovery Engine agent registration, **not** from
+`/.well-known/agent-card.json`, which is never re-fetched. Rule: **the agent
+card exists in two places; any capability change must touch both.** The
+registration is idempotent-overwrite, so re-running the setup script propagates
+the fix.
+
+> Corollary: **"re-run the setup script" means REGENERATE it first.** The script
+> is a self-contained artifact frozen at download time. Re-running an
+> already-downloaded `.sh` re-applies the *old* card and looks exactly like the
+> fix not working (registration `updateTime` advances, content does not).
+> Diagnose by reading `a2aAgentDefinition.jsonAgentCard` back from the API
+> rather than trusting that the script ran.
+
+**(e) The renderer reads `application/json+a2ui`, the MIME the SDK calls
+DEPRECATED.** With the extension negotiated end to end the cards *still* did not
+render. Everything observable server-side was clean, so the next step was to
+read the wire rather than the logs: `probe_wire.py` sends a real `message/stream`
+POST carrying the client's own `X-A2A-Extensions` header and dumps
+`metadata.mimeType` for every part. It showed `application/a2ui+json` — the
+value the migration deliberately chose, because `A2UI_MIME_TYPE` sounds current
+and `DEPRECATED_A2UI_MIME_TYPE` sounds obsolete. The names are aspirational.
+Two lessons: **when a symbol's name and its behaviour disagree, believe the
+reference implementation**, and **when the server logs are clean but the client
+shows nothing, stop reading logs and read the wire.**
+
+**(f) `A2uiStreamParserV09` bleeds one surface's components into the next.**
+Live symptom: pressing *any* Next Actions chip sent the *first* chip's prompt.
+`probe_wire.py` showed the turn's artifact carrying the card's 24 components a
+second time under the suggestions surface. `_seen_components` in the SDK parser
+is a **parser-lifetime cache keyed by component id**, but component ids are
+surface-scoped and v0.9 requires every surface's root to be literally `root`, so
+the second surface of a turn is filled by walking the topology from the *first*
+card's `root`. Fixed in `fast_api_app.py` by giving each surface its own
+component cache, swapped in the `surface_id` setter — the one choke point both
+`_handle_complete_object` and `_sniff_metadata` assign through.
+
+Two traps here, and the second cost the whole first day of the hunt:
+
+- **`A2uiStreamParser(catalog=None)` silently returns the v0.8 parser.** The
+  class is a factory: `__new__` dispatches on `catalog.version` and falls
+  through to `A2uiStreamParserV08` for anything that is not `VERSION_0_9`,
+  including no catalog at all. Six offline reproductions came back clean because
+  all six were exercising v0.8 code. Any repro of parser behaviour must assert
+  `type(parser).__name__ == 'A2uiStreamParserV09'` before it is worth anything.
+- **The SDK's own over-yield guard is v0.8-only.** `process_chunk` dedupes
+  repeated updates per surface by looking for the key `surfaceUpdate`, which no
+  longer exists under v0.9.
+
+**One press, one prompt.** The other half of that report was
+`examples/0.9/suggestion_chips.json` teaching a single `MaterialChips` with
+three `options` behind one `action`. `MaterialChips` carries ONE action for ALL
+of its options, so it structurally cannot give each chip its own prompt —
+whichever chip the user presses, the client sends that one action's prompt. A
+navigation chip bar must be a `MaterialRow` of `MaterialButton`s;
+`MaterialChips` stays correct for *bound selection* inside a form, where the
+value flows through the data model rather than the action. No schema can express
+this, so `validate_examples.py` checks it directly.

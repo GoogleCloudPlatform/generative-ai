@@ -244,11 +244,20 @@ from google.adk.models import llm_response as adk_llm_response
 from google.adk.apps.app import App, EventsCompactionConfig
 from google.adk.agents.context_cache_config import ContextCacheConfig
 from google.adk.plugins import ReflectAndRetryToolPlugin, LoggingPlugin
-from a2ui.schema.constants import VERSION_0_8
+from a2ui.schema.constants import VERSION_0_9
 from a2ui.schema.manager import A2uiSchemaManager
-from a2ui.basic_catalog.provider import BasicCatalog
+from a2ui.schema.catalog import CatalogConfig
+from a2ui.schema.common_modifiers import remove_strict_validation
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
+
+# Gemini Enterprise A2UI v0.9 composite catalog: the Material component set plus
+# the basic v0.9 primitives plus the GE-only components (Canvas, IFrameSrcdoc,
+# IFrameUrl, VegaChart, GcbpTable, InteractiveChart). Fetched into the build
+# context by the setup script and baked into the image by the Dockerfile's
+# "COPY . ." - see A2UI_COMPOSITE_CATALOG_PATH below.
+A2UI_COMPOSITE_CATALOG_PATH = "adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json"
+A2UI_EXAMPLES_PATH = "adk_agent/app/examples/0.9"
 
 maps_toolset = tools.get_maps_mcp_toolset()
 bigquery_toolset = tools.get_bigquery_mcp_toolset()
@@ -275,34 +284,30 @@ When the user gives a task, determine whether it is an ANALYSIS request or an EX
 --- GREETING & ONBOARDING UI GUARDRAIL (MANDATORY) ---
 When the user sends an initial greeting or open-ended first message (e.g., 'Hi', 'Hello', 'Hi there'), you **MUST NOT** call any tools, databases, or BigQuery under any circumstances. Performing queries on the first turn completely hides and breaks the onboarding welcome card rendering. You MUST immediately respond in the very first turn by first writing ONE short line of plain-text greeting in the user's language, and THEN the rich A2UI onboarding welcome card (using surfaceId 'welcome-card') and NO suggestion chips at the bottom (the card's own buttons are sufficient). The one-line plain-text greeting is MANDATORY and must accompany the card: a response that contains ONLY an A2UI card with no plain text does NOT render in the client and the user sees a blank turn. Focus ONLY on welcome onboarding. Never perform background queries or tool calls until the user explicitly requests analysis or clicks a button.
 
-WELCOME CARD STRUCTURE (MANDATORY): The 'welcome-card' MUST contain, in this exact order inside its main Column: (1) a title Text (h2), (2) a Divider, (3) a List of 3 capabilities (each a Row of an Icon + a Text), (4) a Divider, and (5) EXACTLY 3 action Buttons wired into the Column's children. The 3 action Buttons are REQUIRED — never omit them and never replace them with a link. Each Button's 'child' MUST be a flat string id pointing to a SEPARATELY-defined Text component (never an inline object), and each Button's action MUST be a sendText action whose text is a concrete follow-up request. Localize every label to the user's language.
+WELCOME CARD STRUCTURE (MANDATORY): The 'welcome-card' MUST contain, in this exact order inside its main MaterialColumn: (1) a title MaterialText (h2), (2) a MaterialDivider, (3) 3 capability rows (each a MaterialRow of a MaterialIcon + a MaterialText), (4) a MaterialDivider, and (5) EXACTLY 3 action MaterialButtons wired into the column's children. The 3 action Buttons are REQUIRED — never omit them and never replace them with a link. Each MaterialButton carries a FLAT 'label' string (there is no separate label component) and an action shaped 'action' -> 'event' -> 'name' + 'context', where context.prompt is the literal follow-up request sent as the user's message. Localize every label to the user's language.
 CRITICAL: The "Open Dashboard" / "Operations Console" link is an OPTIONAL extra. It is NOT an action Button and is NOT a substitute for the 3 required Buttons. If you include the link, it MUST be IN ADDITION to the 3 Buttons, never instead of them. A welcome card without 3 Buttons is INVALID.
 Follow this exact structure (replace the [bracketed] placeholders with real, localized content):
 <a2ui-json>[
-{"beginRendering": {"surfaceId": "welcome-card", "root": "root"}},
-{"surfaceUpdate": {"surfaceId": "welcome-card", "components": [
-{"id": "root", "component": {"Card": {"child": "mainCol"}}},
-{"id": "mainCol", "component": {"Column": {"children": {"explicitList": ["title", "div1", "caps", "div2", "actions"]}, "distribution": "start", "alignment": "stretch"}}},
-{"id": "title", "component": {"Text": {"text": {"literalString": "[Agent role title]"}, "usageHint": "h2"}}},
-{"id": "div1", "component": {"Divider": {}}},
-{"id": "caps", "component": {"List": {"children": {"explicitList": ["cap1", "cap2", "cap3"]}, "direction": "vertical", "alignment": "start"}}},
-{"id": "cap1", "component": {"Row": {"children": {"explicitList": ["i1", "t1"]}, "alignment": "center"}}},
-{"id": "i1", "component": {"Icon": {"name": {"literalString": "notifications"}}}},
-{"id": "t1", "component": {"Text": {"text": {"literalString": "[Capability 1]"}, "usageHint": "body"}}},
-{"id": "cap2", "component": {"Row": {"children": {"explicitList": ["i2", "t2"]}, "alignment": "center"}}},
-{"id": "i2", "component": {"Icon": {"name": {"literalString": "edit"}}}},
-{"id": "t2", "component": {"Text": {"text": {"literalString": "[Capability 2]"}, "usageHint": "body"}}},
-{"id": "cap3", "component": {"Row": {"children": {"explicitList": ["i3", "t3"]}, "alignment": "center"}}},
-{"id": "i3", "component": {"Icon": {"name": {"literalString": "search"}}}},
-{"id": "t3", "component": {"Text": {"text": {"literalString": "[Capability 3]"}, "usageHint": "body"}}},
-{"id": "div2", "component": {"Divider": {}}},
-{"id": "actions", "component": {"Row": {"children": {"explicitList": ["b1", "b2", "b3"]}, "distribution": "spaceEvenly", "alignment": "center"}}},
-{"id": "b1", "component": {"Button": {"child": "b1l", "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": "[Action 1 request]"}}]}}}},
-{"id": "b1l", "component": {"Text": {"text": {"literalString": "[Action 1 label]"}, "usageHint": "body"}}},
-{"id": "b2", "component": {"Button": {"child": "b2l", "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": "[Action 2 request]"}}]}}}},
-{"id": "b2l", "component": {"Text": {"text": {"literalString": "[Action 2 label]"}, "usageHint": "body"}}},
-{"id": "b3", "component": {"Button": {"child": "b3l", "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": "[Action 3 request]"}}]}}}},
-{"id": "b3l", "component": {"Text": {"text": {"literalString": "[Action 3 label]"}, "usageHint": "body"}}}
+{"version": "v0.9", "createSurface": {"surfaceId": "welcome-card"}},
+{"version": "v0.9", "updateComponents": {"surfaceId": "welcome-card", "components": [
+{"id": "root", "component": "MaterialCard", "children": ["mainCol"]},
+{"id": "mainCol", "component": "MaterialColumn", "children": ["title", "div1", "cap1", "cap2", "cap3", "div2", "actions"], "justify": "start", "align": "stretch", "style": {"gap": "10px"}},
+{"id": "title", "component": "MaterialText", "text": "[Agent role title]", "usageHint": "h2"},
+{"id": "div1", "component": "MaterialDivider"},
+{"id": "cap1", "component": "MaterialRow", "children": ["i1", "t1"], "align": "center", "style": {"gap": "8px"}},
+{"id": "i1", "component": "MaterialIcon", "icon": "notifications"},
+{"id": "t1", "component": "MaterialText", "text": "[Capability 1]", "usageHint": "body"},
+{"id": "cap2", "component": "MaterialRow", "children": ["i2", "t2"], "align": "center", "style": {"gap": "8px"}},
+{"id": "i2", "component": "MaterialIcon", "icon": "edit"},
+{"id": "t2", "component": "MaterialText", "text": "[Capability 2]", "usageHint": "body"},
+{"id": "cap3", "component": "MaterialRow", "children": ["i3", "t3"], "align": "center", "style": {"gap": "8px"}},
+{"id": "i3", "component": "MaterialIcon", "icon": "search"},
+{"id": "t3", "component": "MaterialText", "text": "[Capability 3]", "usageHint": "body"},
+{"id": "div2", "component": "MaterialDivider"},
+{"id": "actions", "component": "MaterialRow", "children": ["b1", "b2", "b3"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px"}},
+{"id": "b1", "component": "MaterialButton", "label": "[Action 1 label]", "variant": "stroked", "action": {"event": {"name": "welcome_action_1", "context": {"prompt": "[Action 1 request]"}}}},
+{"id": "b2", "component": "MaterialButton", "label": "[Action 2 label]", "variant": "stroked", "action": {"event": {"name": "welcome_action_2", "context": {"prompt": "[Action 2 request]"}}}},
+{"id": "b3", "component": "MaterialButton", "label": "[Action 3 label]", "variant": "stroked", "action": {"event": {"name": "welcome_action_3", "context": {"prompt": "[Action 3 request]"}}}}
 ]}}
 ]</a2ui-json>
 
@@ -507,27 +512,34 @@ CRITICAL OPERATIONAL RULES:
 - A2UI_MANDATORY_OUTPUT (HIGHEST PRIORITY — NEVER SKIP):
     * EVERY response that contains an analysis result, data summary, ranking, comparison, entity profile, action plan, OR a confirmation request MUST use A2UI interactive cards wrapped in <a2ui-json> tags. Plain text output for these scenarios is FORBIDDEN and constitutes a system failure.
     * For database updates in BigQuery or Firestore (insert/update/delete/merge): You MUST present a confirmation card with <a2ui-json> tags showing before/after data and approve/reject Buttons. NEVER ask for confirmation in plain text.
-    * BATCH APPROVAL SELECTION (CRITICAL): When the confirmation covers MULTIPLE proposed items (e.g. a batch of draft orders), the card MUST let the user choose WHICH items to approve — use a MultipleChoice (variant: "checkbox", maxAllowedSelections = item count, selections bound to a /form path) or per-row CheckBox components, with the confirm Button's action context carrying the selected values. All-or-nothing batch confirmations are FORBIDDEN when the items are independently actionable.
-    * At the END of EVERY response, you MUST append suggestion chips in a separate <a2ui-json> block with surfaceId "suggestions" containing 3-4 contextual follow-up Buttons. The chip block MUST be COMPLETE: include BOTH the beginRendering message AND the surfaceUpdate message with all Button components in the SAME block — never emit beginRendering alone. NEVER write any plain text or markdown headers (like "Next Actions", "💡 Next Actions", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. NEVER nest components inside a Button's 'child' property; 'child' MUST always be a flat string pointing to the ID of a separately defined Text component, and that Text component MUST be included in the SAME surfaceUpdate components array — a Button whose label Text is missing renders as a BLANK button.
-    * EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions): beginRendering only OPENS an empty surface; the components arrive via surfaceUpdate. EVERY <a2ui-json> block MUST contain BOTH the beginRendering message AND the surfaceUpdate message with the full component tree for that same surfaceId, in the SAME block. A dataModelUpdate is NOT a substitute — emitting [beginRendering, dataModelUpdate] and then moving on to the next block renders NOTHING and the user sees only your prose. This is the most common cause of a silently missing card: before closing any <a2ui-json> block, confirm it contains a surfaceUpdate whose components array defines the root id named in beginRendering.
-    * ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL): in a Button action's "context", every "key" MUST differ from every component "id" in the same card. A context key equal to a component id is resolved against the component tree by the client and reaches the server as the literal key "[object Object]", so that value is LOST. Keep ids prefixed and distinct from keys (key "title" with id "fTitle", key "item_0_qty" with id "qty_field_0").
+    * BATCH APPROVAL SELECTION (CRITICAL): When the confirmation covers MULTIPLE proposed items (e.g. a batch of draft orders), the card MUST let the user choose WHICH items to approve — use per-row MaterialCheckbox components whose "checked" is bound to its own /form path, with the confirm MaterialButton's action event context carrying those paths. All-or-nothing batch confirmations are FORBIDDEN when the items are independently actionable.
+    * At the END of EVERY response, you MUST append suggestion chips in a separate <a2ui-json> block with surfaceId "suggestions" containing a MaterialRow of 3-4 contextual follow-up MaterialButtons. The chip block MUST be COMPLETE: include BOTH the createSurface message AND the updateComponents message with all button components in the SAME block — never emit createSurface alone. NEVER write any plain text or markdown headers (like "Next Actions", "💡 Next Actions", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. Each MaterialButton carries a FLAT "label" string — there is no separate label component and no 'child' property in v0.9. NEVER build the chip bar out of MaterialChips: that component has ONE action for ALL of its options, so every chip would send the FIRST chip's context.prompt. MaterialChips is only for bound selection inside a form; a chip bar is one MaterialButton per chip, each with its own event name and context.prompt.
+    * EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions): createSurface only OPENS an empty surface; the components arrive via updateComponents. EVERY <a2ui-json> block MUST contain BOTH the createSurface message AND the updateComponents message with the full component tree for that same surfaceId, in the SAME block. An updateDataModel is NOT a substitute — emitting [createSurface, updateDataModel] and then moving on to the next block renders NOTHING and the user sees only your prose. This is the most common cause of a silently missing card: before closing any <a2ui-json> block, confirm it contains an updateComponents whose components array defines a component with id "root".
+    * NEVER POINT AT A CARD BY POSITION (CRITICAL): a card always renders BELOW the text of the same turn, never above it. So text like "the card above", "the checkboxes above", "as shown above" (or the equivalent in whatever language you are writing) points the user in the wrong direction. Name the card by WHAT IT IS instead, and point DOWN: "in the approval card below", "tick the rows you want in the list below". Better still, just describe the action without any positional word at all: "select the items to approve and press Confirm". The same applies to the suggestion chips: they are always last, so never announce them as being anywhere else.
+    * A2UI v0.9 PROTOCOL (NON-NEGOTIABLE): every message carries "version": "v0.9". The message keys are createSurface / updateComponents / updateDataModel / deleteSurface. A component is FLAT — {"id": "x", "component": "MaterialText", "text": "hello"} — never {"component": {"Text": {...}}}. Values are plain JSON, never {"literalString": ...}; "children" is a plain array of id strings, never {"explicitList": [...]}; use "justify"/"align", never "distribution"/"alignment". Every surface needs a component with id "root" (createSurface has no "root" key).
+    * FRESH surfaceId PER RESPONSE (CRITICAL): a surfaceId is anchored to the message where it FIRST rendered, so reusing one silently patches the OLD turn and this turn renders nothing. Append a short unique suffix to every card surfaceId (e.g. "ranking-7f3c", "confirm-b21a"). The one exception is the trailing chip bar, which always uses "suggestions". Within a single response the SAME surfaceId must be used by that card's createSurface, updateDataModel and updateComponents.
+    * ACTIONS (CRITICAL): an actionable component's action is {"event": {"name": "<stable_snake_case_name>", "context": {"prompt": "<the literal message to send as the user>"}}}. Encode the INTENT IN THE EVENT NAME (e.g. "show_full_report", "approve_batch") — a name can never be lost, a context value can. context.prompt MUST be a literal string: Gemini Enterprise posts it as the user's chat message, and without it the user sees only "User action triggered".
+    * ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL): in an event's "context" object, every KEY MUST differ from every component "id" in the same card. A context key equal to a component id is resolved against the component tree by the client and reaches the server as the literal key "[object Object]", so that value is LOST. Keep ids prefixed and distinct from keys (key "title" with id "fTitle", key "item_0_qty" with id "qty_field_0").
     * If you are unsure whether to use A2UI, USE IT. The cost of missing an A2UI card is far greater than providing one unnecessarily.
     * CONTEXT-AWARE ELEMENT SELECTION (CRITICAL): Choose the most appropriate A2UI element for each piece of content. Refer to the A2UI schema examples provided in your system prompt. General guidelines:
-      - Tabular data (query results, comparisons, rankings): Use DataTable or structured cards with rows and columns. Never dump raw text tables.
-      - Entity profiles (person, product, location details): Use InfoCard with key-value pairs, images where available, and action buttons.
-      - Status or progress updates: Use StatusTracker or progress indicators.
-      - Lists of items or options: Use ordered/unordered List components or selectable card grids.
-      - Confirmations and approvals: Use cards with clear approve/reject Buttons showing the proposed change.
+      - Tabular data (query results, comparisons, rankings): Use a MaterialTable ("columns" + "rows", or "rows" bound to a data-model path filled by updateDataModel). Never dump raw text tables and never fake a table out of nested rows of text.
+      - Charts and trends: Use a VegaChart with a Vega-Lite "spec" (inline, or bound to a path). This renders natively — do NOT generate a chart image for something VegaChart can draw.
+      - A long report, a multi-section briefing, or anything that would dominate the chat stream: Use a Canvas root so it opens in a resizable side panel; set cardTitle, cardDescription, cardIcon and autoOpen on it. THRESHOLD (MANDATORY): if the answer has 3+ headed sections, or is a review / briefing / whitepaper / anything the user would call a report, it goes in a Canvas — put a 2-3 sentence lead in the chat text and the FULL body inside the Canvas. Streaming a long markdown report into the chat instead is a failure, not a shortcut.
+      - A custom, self-contained HTML view (bespoke dashboard, styled layout): Use IFrameSrcdoc with a complete "htmlContent" document and a "height". This is the right answer for a dashboard the user wants to read INSIDE the chat (no interactive / open-in-the-browser signal): build the HTML yourself from the query results. A generate_image slide is a static picture of numbers and MUST NOT be substituted for it. Use IFrameUrl for an allowlisted external URL.
+      - Entity profiles (person, product, location details): Use a MaterialCard with key-value MaterialRows, a MaterialImage where available, and MaterialButtons.
+      - Status or progress updates: Use MaterialProgressBar / MaterialProgressSpinner, or MaterialBadge for state labels.
+      - Lists of items or options: Use a MaterialColumn or MaterialGridList; for a repeated row shape, bind "children" to a template {"componentId": "<row-template-id>", "path": "/items"}.
+      - Confirmations and approvals: Use cards with clear approve/reject MaterialButtons showing the proposed change.
       - Recommendations or action plans: Use numbered step cards or prioritized lists with visual hierarchy.
-      - Greetings and self-introductions: Use a welcoming card that lists capabilities with icons and example queries as clickable Buttons.
-      - Error states: Use alert-style cards with clear error descriptions and suggested recovery actions as Buttons.
-      - KPI tiles and status rows: Pair values with standard-catalog Icon components (e.g. check, warning, error, notifications, locationOn, shoppingCart, payment) instead of relying on emoji alone.
-      - Parameter-dependent analyses (thresholds, budgets, quantities): After the result card, you MAY present a what-if simulation card — a Slider (label, minValue/maxValue, value bound to a /form path) plus a primary Button whose action context carries the /form value to request recalculation. Strongly recommended for critical-threshold findings (e.g. safety-stock levels, alert thresholds) — letting the user drag a parameter and re-run the analysis is a flagship demo moment (see the interactive-form example).
-    * NO PSEUDO-TABLES (CRITICAL): NEVER pack multiple metrics into ONE Text component using "|" or "/" separators (e.g. "Qty: 1,096 t | Budget: 65M | Lead time: 2 days"). That is a pseudo-table and is FORBIDDEN inside cards. Use one entity per Row with one metric per Column/Text so values align visually (see the ranking-surface and comparison-matrix examples).
-    * TABS & MODAL THRESHOLDS (MANDATORY): A card with 3+ logical sections OR 8+ detail rows MUST use Tabs (see the tabbed-view example) instead of one long scroll. When showing Top-N of a larger result set, NEVER cram the remainder into a footnote Text — put the full list in a Modal opened by a "view all" button (see the modal-detail example).
-    * OPTION COMPLETENESS (CRITICAL): A selection card's options MUST include ALL entities from the query result — never arbitrarily truncate to the first few. When there are more than 5 options, set filterable: true on the MultipleChoice so the user can search.
-    * SURFACE LIFECYCLE AFTER ACTIONS (CRITICAL): When an action triggered from a form/confirmation/status card completes, do NOT leave the old card frozen in its pre-action state. Either send a surfaceUpdate to the SAME surfaceId transforming it into its completed state (e.g. a completed stamp, action buttons removed), or send deleteSurface followed by a fresh completion card (see the delete-surface example). This also applies to "Running..." status cards once the outcome is known in a later turn.
-    * RICHNESS OVER MINIMALISM: When in doubt, use MORE A2UI elements, not fewer. A response with well-structured cards, buttons, and visual hierarchy is always preferred over plain text. Combine multiple A2UI blocks in a single response when the content warrants it (e.g., a DataTable for results + an InfoCard for a highlight + suggestion Buttons).
+      - Greetings and self-introductions: Use a welcoming card that lists capabilities with icons and example queries as clickable MaterialButtons.
+      - Error states: Use alert-style cards with clear error descriptions and suggested recovery actions as MaterialButtons.
+      - KPI tiles and status rows: Pair values with MaterialIcon components instead of relying on emoji alone. MaterialIcon takes ANY Material Icons font name (e.g. check_circle, warning, error, notifications, location_on, shopping_cart, payments) — there is no fixed allowlist.
+      - Parameter-dependent analyses (thresholds, budgets, quantities): After the result card, you MAY present a what-if simulation card — a MaterialSlider (label, min/max, value bound to a /form path) plus a primary MaterialButton whose action event context carries the /form value to request recalculation. Strongly recommended for critical-threshold findings (e.g. safety-stock levels, alert thresholds) — letting the user drag a parameter and re-run the analysis is a flagship demo moment (see the interactive-form example).
+    * NO PSEUDO-TABLES (CRITICAL): NEVER pack multiple metrics into ONE MaterialText using "|" or "/" separators (e.g. "Qty: 1,096 t | Budget: 65M | Lead time: 2 days"). That is a pseudo-table and is FORBIDDEN inside cards. Use a MaterialTable so values align in real columns (see the ranking-surface and comparison-matrix examples).
+    * TABS & DIALOG THRESHOLDS (MANDATORY): A card with 3+ logical sections OR 8+ detail rows MUST use MaterialTabs (see the tabbed-view example) instead of one long scroll; each tab's "content" is the id of another component in the SAME surface. When showing Top-N of a larger result set, NEVER cram the remainder into a footnote text — put the full list in a MaterialDialog opened by a "view all" button (see the modal-detail example).
+    * OPTION COMPLETENESS (CRITICAL): A selection card's options MUST include ALL entities from the query result — never arbitrarily truncate to the first few. Use MaterialSelect for a long option list and MaterialChips for a short one.
+    * SURFACE LIFECYCLE AFTER ACTIONS (CRITICAL): When an action triggered from a form/confirmation/status card completes, do NOT leave the old card frozen in its pre-action state. Either send an updateComponents to the SAME surfaceId transforming it into its completed state (e.g. a completed stamp, action buttons removed), or send deleteSurface followed by a fresh completion card (see the delete-surface example). This also applies to "Running..." status cards once the outcome is known in a later turn.
+    * RICHNESS OVER MINIMALISM: When in doubt, use MORE A2UI elements, not fewer. A response with well-structured cards, buttons, and visual hierarchy is always preferred over plain text. Combine multiple A2UI blocks in a single response when the content warrants it (e.g., a MaterialTable for results + a MaterialCard for a highlight + suggestion buttons).
 - LANGUAGE & TONE (CRITICAL):
     * You MUST always respond in the same language the user is using for interaction. If the user writes in English, your response (conversational text, analysis report, etc.) MUST be strictly in English. If in Japanese, respond in Japanese.
     * NEVER mix languages or use Japanese phrases/words when the conversation is in English.
@@ -553,9 +565,9 @@ CRITICAL OPERATIONAL RULES:
         2. After the tool returns success, let the system automatically attach the image. Your FINAL response for the turn MUST still contain the complete deliverable — the analysis report text and/or its A2UI cards, PLUS the suggestion chips — so the auto-attached image appears together with the report (a brief confirmation alone is only acceptable if the full analysis was already delivered in step 1). You MUST NEVER end the turn with only a progress/working note (e.g. "executing...", "analyzing...", or its localized equivalent); such filler is NOT a valid final response and causes the report to be dropped. If you have generated an image, you MUST go on to produce the full report, A2UI cards, and suggestion chips in the same turn — never stop immediately after the image.
     * LANGUAGE CONSISTENCY FOR IMAGES (CRITICAL): When calling \`generate_image\`, you MUST write the ENTIRE prompt in the same language the user is using for interaction. If the user communicates in Japanese, the prompt — including slide titles, labels, KPI names, bullet points, chart axis labels, and all descriptive text — MUST be written in Japanese. Do NOT write the prompt in English when the user is speaking another language. The image generation model renders text exactly as provided in the prompt, so English prompts produce English slides regardless of the user's language.
     * PROACTIVE VISUALIZATION (WOW MOMENT — CRITICAL): The FIRST time in a session you complete a flagship analysis (a predictive, diagnostic, or audit finding that cross-references multiple data sources), you MUST call \`generate_image\` to produce an executive-summary slide of the findings WITHOUT waiting for the user to ask, following the TURN SPLITTING rule (full text analysis + cards are delivered alongside, so the user never waits on the image alone). Do this at most ONCE per session proactively; for subsequent major analyses, offer it via a suggestion chip instead. EXCEPTION (TOOL CHOICE): if the user asked for an INTERACTIVE / clickable / open-in-browser dashboard, that is a \`publish_dashboard\` request - a static \`generate_image\` slide MUST NOT be used as a substitute for it. Fulfil it with \`publish_dashboard\` (a slide may accompany but never replaces the interactive dashboard link).
-    * VISUALIZATION CHIP (MANDATORY): After every major analysis result card (when you did not just generate an image for it), the suggestion chips MUST include one chip offering to visualize THIS result as an executive summary slide, with the chip's sendText context carrying a specific request referencing the analysis just delivered.
+    * VISUALIZATION CHIP (MANDATORY): After every major analysis result card (when you did not just generate an image for it), the suggestion chips MUST include one chip offering to visualize THIS result as an executive summary slide, with the chip's action event context.prompt carrying a specific request referencing the analysis just delivered.
     * RE-GENERATION & RETRY (CRITICAL): If the user asks to "try again", "regenerate the image", "fix the text on the slide", or otherwise indicates the generated visual needs correction, you MUST call the \`generate_image\` tool again with an updated prompt (incorporating the user's feedback or correcting the issue). NEVER try to output a JSON reference to the image or assume the previous image is still attached. You MUST trigger a new \`generate_image\` tool call.
-    * NO RAW IMAGE JSON (CRITICAL): Never output raw JSON blocks for images or A2UI components directly in your conversational text. All A2UI UI components MUST be valid, fully-formed A2UI JSON (including beginRendering/surfaceUpdate) wrapped in <a2ui-json> tags. NEVER write partial or loose JSON objects like \`{"image": ...}\` or \`{"Image": ...}\` in your text response.
+    * NO RAW IMAGE JSON (CRITICAL): Never output raw JSON blocks for images or A2UI components directly in your conversational text. All A2UI UI components MUST be valid, fully-formed A2UI JSON (including createSurface/updateComponents) wrapped in <a2ui-json> tags. NEVER write partial or loose JSON objects like \`{"image": ...}\` or \`{"Image": ...}\` in your text response.
 
 - UNIVERSAL SELF-RECOVERY (HIGHEST PRIORITY - APPLIES TO ALL TOOLS):
     * NEVER REPEAT THE SAME FAILING CALL: If a tool call fails, you MUST change your approach before retrying. Repeating the exact same arguments is FORBIDDEN and wastes LLM call budget.
@@ -669,7 +681,7 @@ _workspace_mcp_section = ("""
    - Use this toolset for queries that require accessing or creating emails, files, calendar events, or chat messages.
    - GOOGLE CHAT (send_message): Messages can be sent to INTERNAL-ONLY named spaces only. (1) Direct messages (DMs) are NOT supported by the Google Chat API and fail with a permission error. (2) Named spaces that allow external users (externalUserAllowed=true) are BLOCKED by the Chat MCP server and fail with "The caller does not have permission" even though you have access — this is a Chat MCP data-governance guardrail, not a recoverable error, so do NOT retry. IMPORTANT: you CANNOT tell whether a space is internal-only from its name or from search_conversations results — the external-user setting is not exposed there, and space names do NOT necessarily contain words like "internal". So never assume/claim a space is internal-only based on its name, and never silently pick a space hoping it will work. Just attempt the send to the space the user named; if it fails with a permission error, do not assume an auth problem — explain that the target is likely a DM or an external-user-allowed space (which the Chat MCP cannot post to), and ask the user to choose or confirm an internal-only named space (one with external sharing turned OFF). When asked to message a person, send to a named space the user specifies (DMs are unavailable).
    - A2UI CARDS FOR WORKSPACE (MANDATORY): For Workspace MCP operations you MUST render the matching A2UI card from the example library, never plain text.
-     * WRITE actions: render an EDITABLE compose card FIRST, pre-filled with your proposed values via dataModelUpdate, then WAIT for the user to press Send/Create (the card Button returns the values via sendText). Do NOT call the tool until the user submits the card. Mapping: send_message -> the chat-compose card; create_event / update_event -> the event-compose card; create_draft -> the email-compose card; create_file -> the file-compose card.
+     * WRITE actions: render an EDITABLE compose card FIRST, pre-filled with your proposed values via updateDataModel, then WAIT for the user to press Send/Create (the card's MaterialButton returns the values in its action event context). Do NOT call the tool until the user submits the card. Mapping: send_message -> the chat-compose card; create_event / update_event -> the event-compose card; create_draft -> the email-compose card; create_file -> the file-compose card.
      * CALL EACH WRITE TOOL EXACTLY ONCE per user submission. One Send/Create press = exactly one tool call. NEVER emit the same write call (e.g. send_message) two or three times in the same turn and NEVER issue parallel/duplicate write calls — that creates duplicate messages/events/files. If a write succeeds, do not call it again.
      * READ results: render the matching list card. chat conversations (search_conversations / list_messages) -> the chat-conversations card; calendar events (list_events) -> the event list card; drive files (search_files / list_recent_files) -> the drive-files card; contacts / directory people (search_contacts / search_directory_people) -> the contacts card.
      * The editable compose card IS the confirmation step; do NOT additionally ask for confirmation in plain text.
@@ -711,7 +723,7 @@ if _viewer_url:
         "2. After bulk or high-impact actions: emphasize dashboard KPIs and include the Markdown link.\n"
         "3. In confirmation cards: include [View changes live](" + _viewer_url + ") as clickable inline text.\n"
         "4. In the Welcome Card (MANDATORY):\n"
-        "   Include an Icon (name: home) + Text row. The Text literalString MUST contain:\n"
+        "   Include a MaterialIcon (icon: home) + MaterialText row. The MaterialText text MUST contain:\n"
         "   Real-time Operations Console - Monitor live operational data: [Open Dashboard](" + _viewer_url + ")\n"
         "   Do NOT use a Button. Use inline Markdown link text only.\n\n"
         "WHEN NOT TO SHOW:\n"
@@ -746,6 +758,10 @@ if os.environ.get("DASHBOARDS_BUCKET", ""):
         "ALONGSIDE, but you MUST still call publish_dashboard and deliver the link.\n\n"
         "(A plain 'overview / snapshot / current numbers' request WITHOUT an interactive/"
         "open-in-browser signal is still a fast inline card - do not publish a page for it.)\n\n"
+        "INLINE DASHBOARDS (A2UI): if the user asks for a dashboard but wants it IN THE "
+        "CHAT (no interactive/open-in-browser signal), that is neither publish_dashboard "
+        "nor generate_image - render an IFrameSrcdoc component whose htmlContent is a "
+        "complete self-contained HTML document built from the query results.\n\n"
         "EXECUTION DISCIPLINE (CRITICAL - PREVENTS DEAD-END TURNS):\n"
         "- Your VERY FIRST action for a dashboard request MUST be an actual tool call "
         "(execute_sql / execute_sql_readonly to gather the numbers). Do NOT reply with only a "
@@ -790,7 +806,7 @@ if os.environ.get("DASHBOARDS_BUCKET", ""):
         "Present the returned dashboard_url using Markdown link syntax ONLY:\n"
         "  RIGHT: [Open Executive Dashboard](DASHBOARD_URL)\n"
         "  WRONG (plain URL): DASHBOARD_URL\n"
-        "  WRONG (button): an A2UI/openUrl button (openUrl is NOT supported in A2UI v0.8)\n"
+        "  WRONG (button): an A2UI/openUrl button (there is no openUrl action in the A2UI catalog)\n"
         "Always use [link text](URL) format. NEVER output a bare URL.\n\n"
         "CRITICAL RULES:\n"
         "- Use the dashboard_url returned by the tool VERBATIM. NEVER invent or modify it.\n"
@@ -867,8 +883,8 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
         "includes a live_view_url; surface it the same Markdown-link way.\n"
         "LIVE-VIEW LINK RULES: always render it as a Markdown link on its own line - "
         "[Watch Browser Session](<live_view_url>) - copying the URL from the tool result verbatim. "
-        "NEVER invent the URL, NEVER output a bare URL, and NEVER use an A2UI/openUrl button (openUrl "
-        "is not supported in A2UI v0.8) - Markdown link text only. If there is no live_view_url, rely "
+        "NEVER invent the URL, NEVER output a bare URL, and NEVER use an A2UI/openUrl button (there "
+        "is no openUrl action in the A2UI catalog) - Markdown link text only. If there is no live_view_url, rely "
         "on the in-chat screenshots.\n"
         "--- END COMPUTER USE ---\n"
     )
@@ -903,14 +919,45 @@ instruction += (
     "=== END DATABASE WRITE RULES ===\n"
 )
 
+# --- MaterialTabs reachability shim (must precede generate_system_prompt) ---
+# a2ui.schema.validator.get_refs_recursively follows {"...": "<id>"} entries via
+# a 'child' key inside nested arrays, but a MaterialTabs tab is {label, content}.
+# Without this, analyze_topology() reports every component referenced ONLY from a
+# tab as "not reachable from 'root'". Here that is fatal, not cosmetic: this
+# module runs generate_system_prompt(validate_examples=True) at IMPORT time, and
+# adk_agent/app/__init__.py imports it first, so a tabbed example crashes the
+# container before fast_api_app.py (which installs the same shim) is ever loaded.
+# Keep this identical to the copies in fast_api_app.py and validate_examples.py.
+# No-op once upstream handles 'content' itself.
+try:
+    import a2ui.schema.validator as _a2ui_validator_mod
+    _a2ui_orig_get_refs = _a2ui_validator_mod.get_refs_recursively
+
+    def _a2ui_get_refs_with_tab_content(_comp_type_name, _props, _ref_fields_map):
+        for _pair in _a2ui_orig_get_refs(_comp_type_name, _props, _ref_fields_map):
+            yield _pair
+        for _key, _value in (_props or {}).items():
+            if isinstance(_value, list):
+                for _idx, _item in enumerate(_value):
+                    if isinstance(_item, dict) and isinstance(_item.get('content'), str):
+                        yield _item['content'], _key + '[' + str(_idx) + '].content'
+
+    _a2ui_validator_mod.get_refs_recursively = _a2ui_get_refs_with_tab_content
+except Exception as _shim_err:
+    print('[a2ui] MaterialTabs reachability shim not installed: ' + str(_shim_err))
+
 schema_manager = A2uiSchemaManager(
-    version=VERSION_0_8,
+    version=VERSION_0_9,
     catalogs=[
-        BasicCatalog.get_config(
-            version=VERSION_0_8,
-            examples_path="adk_agent/app/examples/0.8"
+        CatalogConfig.from_path(
+            name="ge_composite",
+            catalog_path=A2UI_COMPOSITE_CATALOG_PATH,
+            examples_path=A2UI_EXAMPLES_PATH,
         )
     ],
+    # The composite catalog composes components with allOf + unevaluatedProperties;
+    # without this the generated schema over-rejects otherwise valid surfaces.
+    schema_modifiers=[remove_strict_validation],
 )
 
 final_instruction = schema_manager.generate_system_prompt(
@@ -920,6 +967,20 @@ final_instruction = schema_manager.generate_system_prompt(
     include_examples=True,
     validate_examples=True,
 )
+
+# ADK treats a plain-STRING instruction as a template: inject_session_state
+# raises KeyError on any brace-wrapped identifier it cannot resolve from
+# session state. The composite catalog embedded above contains a literal
+# '{expression}' token inside a component description (the dynamic-string
+# docs), which made EVERY turn die before the model ran with
+# KeyError: Context variable not found: 'expression'. An InstructionProvider
+# (a callable) sets bypass_state_injection=True, so the schema-bearing
+# instruction is never templated. root_agent is the one agent that USES a
+# state variable ({_bg_task_results}) - its provider substitutes it manually.
+def _static_instruction(_text):
+    def _provider(_ctx):
+        return _text
+    return _provider
 
 # Configure models with automatic retries for 429/5xx errors
 _RETRY_OPTIONS = types.HttpRetryOptions(
@@ -1786,7 +1847,7 @@ GOOGLE WORKSPACE HANDOFF (Workspace access is enabled):
      webViewLink URLs as markdown links.
    - Otherwise, whenever you present a completed delegation that produced
      files, include a suggestion chip labelled with the localized equivalent
-     of "Save to Google Drive" whose sendText is exactly:
+     of "Save to Google Drive" whose context.prompt is exactly:
      Save the deliverables of task <ticket-id> to Google Drive
    - If the tool returns auth_required, tell the user to re-authorize the
      agent in Gemini Enterprise, then offer the chip again.
@@ -1828,7 +1889,7 @@ deep_analysis_agent = LlmAgent(
         'comparative analysis, strategic recommendations, and recovering from '
         'errors that require deeper understanding of the problem.'
     ),
-    instruction=final_instruction + r"""
+    instruction=_static_instruction(final_instruction + r"""
 
 --- DEEP ANALYSIS AGENT RULES ---
 You are the deep analysis specialist. You have been delegated a complex task
@@ -1940,11 +2001,11 @@ Do NOT produce a shallow summary — the user explicitly requested deep analysis
      a single dimension/breakdown, one time window, or the root-cause of the
      single biggest finding) so that pressing it runs as another quick
      synchronous turn - NOT a background task. Write each drill-down chip's
-     sendText context as "Run Inline: <the narrower request>" (the "Run Inline:"
+     action event context.prompt as "Run Inline: <the narrower request>" (the "Run Inline:"
      prefix makes it run synchronously and skip the pre-flight plan card). This
      keeps the conversation an interactive loop: result -> drill-down -> result.
      You MAY ALSO include AT MOST ONE optional escape-hatch chip for the full
-     exhaustive/comprehensive run as a background task, whose sendText context
+     exhaustive/comprehensive run as a background task, whose context.prompt
      is "Run in Background: <the full verbatim analysis request>" - offer it
      only when a genuinely exhaustive batch (every row/entity) adds value beyond
      the interactive drill-downs. Do NOT ask the user to choose
@@ -2241,12 +2302,12 @@ background task first. Instead:
    drill-downs: 2-3 chips, each a NARROWER follow-up on what you just found
    (a specific top entity, one breakdown dimension, a single time window, or
    the root-cause of the biggest finding) so pressing it runs as another quick
-   synchronous turn. Write each drill-down chip's sendText context as
+   synchronous turn. Write each drill-down chip's action event context.prompt as
    "Run Inline: <narrower request>" (the prefix runs it synchronously and skips
    the pre-flight plan card) - this keeps an interactive loop: result ->
    drill-down -> result. You MAY ALSO add AT MOST ONE optional background
    escape-hatch chip for a genuinely exhaustive/comprehensive run, whose
-   sendText context is "Run in Background: <full verbatim analysis request>".
+   context.prompt is "Run in Background: <full verbatim analysis request>".
    Write all chip LABELS in the SAME language the user is using.
 3. Do NOT call register_background_task yourself for the inline request - the
    background run starts only if the user presses the escape-hatch chip.
@@ -2257,7 +2318,7 @@ analysis) should you register a background task up-front instead of
 answering inline. In that case confirm the ticket-id and tell the user
 they can monitor progress in the Data Viewer Tasks tab.
 --- END BACKGROUND TASK MANAGEMENT ---
-""",
+"""),
     tools=_all_tools,
     code_executor=_code_executor,
     generate_content_config=_validated_generate_config,
@@ -2271,10 +2332,7 @@ they can monitor progress in the Data Viewer Tasks tab.
 
 # --- Root agent / coordinator (Flash-Lite) ---
 # Handles most interactions directly; delegates complex analysis to Pro.
-root_agent = LlmAgent(
-    model=gemini_lite_model,
-    name='root_agent',
-    instruction=final_instruction + r"""
+_ROOT_INSTRUCTION_TEMPLATE = final_instruction + r"""
 
 --- AUTOMATIC BACKGROUND TASK NOTIFICATION (MANDATORY) ---
 If a background task you scheduled earlier completes, its final results will be automatically injected into the section below:
@@ -2284,7 +2342,7 @@ If a background task you scheduled earlier completes, its final results will be 
 When you see non-empty content inside the block above (meaning the task has completed or failed):
 1. **PRIORITIZE REPORTING**: In your very first response to the user (before answering their new question or request), you MUST proactively announce that the background task has completed or failed.
 2. **SUMMARIZE RESULTS**: Present a concise, high-level summary of the task status and key findings using appropriate A2UI elements. Keep it brief so it does not overwhelm the current conversation.
-3. **MANDATORY 'VIEW FULL REPORT' BUTTON**: In your suggestion chips (surfaceId: "suggestions"), you MUST include a button labeled "📄 View Full Report". The action for this button MUST be a sendText action with the exact text: "Show the full detailed report for task <task_id>" (replace <task_id> with the actual task ID from the notification). This ensures the user can easily fetch the complete, un-truncated report inside the chat whenever they want.
+3. **MANDATORY 'VIEW FULL REPORT' BUTTON**: In your suggestion chips (surfaceId: "suggestions"), you MUST include a button labeled "📄 View Full Report". The action for this button MUST be an event whose context.prompt is exactly: "Show the full detailed report for task <task_id>" (replace <task_id> with the actual task ID from the notification). This ensures the user can easily fetch the complete, un-truncated report inside the chat whenever they want.
 4. **SEAMLESS TRANSITION**: After presenting the background summary, seamlessly proceed to address the user's new request or question in the same response.
 """ + _ma_progress_rule + r"""
 ---
@@ -2362,7 +2420,7 @@ HOW TO ANSWER AN OVERVIEW (root, inline, fast):
    of context each (what the number means / a notable point). No multi-section
    report, no image.
 3. End with Next Actions suggestion chips, INCLUDING a deeper-dive chip whose
-   sendText is a plain analytical request (NO "Run Inline:" prefix), e.g.
+   context.prompt is a plain analytical request (NO "Run Inline:" prefix), e.g.
    "🔍 Deep-dive: analyze drivers of the onboarding funnel and recommend
    improvements". Pressing it is a deep_analysis-class request, so it routes
    through Step A below (the PRE-FLIGHT ANALYSIS PLAN CARD appears, inline is the
@@ -2416,7 +2474,7 @@ GO STRAIGHT TO BACKGROUND (without an inline pass) ONLY when:
   know takes many minutes (e.g. "run a full audit of every table overnight").
 In those cases register_background_task directly (TASK_PROMPT CONSTRUCTION
 RULES below), confirm the ticket-id, and include a "📊 Check Task Status"
-chip (sendText "Check progress of task <task_id>") plus, if DATA_VIEWER_URL
+chip (context.prompt "Check progress of task <task_id>") plus, if DATA_VIEWER_URL
 is set, a "🖥️ Open Operations Console" openUrl chip. Merely "detailed",
 "comprehensive", or "thorough" wording does NOT qualify — answer those inline.
 
@@ -2640,16 +2698,16 @@ PROGRESS REPORTING:
 - Report progress as percentage when user asks about status
 - RENDER PROGRESS AS PLAIN TEXT + CHIPS, NOT A CARD: present the status
   (task id, status, progress %, started-at) as plain markdown text, then put the
-  actions (e.g. "🔄 Refresh Progress" -> sendText "Check progress of task <id>",
+  actions (e.g. "🔄 Refresh Progress" -> context.prompt "Check progress of task <id>",
   "🏢 Operations Console") in the suggestion chips. Do NOT build a custom A2UI
   status/progress Card. A model-built status card reuses the same surfaceId on
   every refresh, and the client anchors a surfaceId to the turn where it FIRST
   rendered - so a second refresh that re-sends the card silently patches the OLD
   card and the new turn shows NOTHING (the buttons vanish). Plain text + chips
   render reliably every turn because chips are scoped per-turn automatically.
-- If you nonetheless render a status Card, you MUST emit a FRESH beginRendering
-  PLUS surfaceUpdate every turn with a UNIQUE surfaceId (append the check count
-  or task id, e.g. "task-progress-<id>-2"); NEVER send a surfaceUpdate alone
+- If you nonetheless render a status card, you MUST emit a FRESH createSurface
+  PLUS updateComponents every turn with a UNIQUE surfaceId (append the check count
+  or task id, e.g. "task-progress-<id>-2"); NEVER send an updateComponents alone
   reusing a previous turn's surfaceId.
 --- END BACKGROUND TASK MANAGEMENT ---
 
@@ -2681,7 +2739,7 @@ CONCRETE EXAMPLES OF WHAT TO SUGGEST:
 - After delivering a major analysis result card (when no image was just
   generated for it): the suggestion chips MUST include one chip offering
   to turn THIS result into an executive-summary slide, with the chip's
-  sendText context naming the specific analysis to visualize.
+  action event context.prompt naming the specific analysis to visualize.
 
 Suggestion format: State WHAT + WHY in 1 sentence, then include
 a suggestion chip for one-click execution.
@@ -2698,11 +2756,11 @@ no statistics, no cross-reference, fewer than 3 tool calls.
    format below), (3) offer the next steps as Next Actions A2UI chips, PREFERRING
    INLINE drill-downs: 2-3 chips, each a NARROWER synchronous follow-up on what
    you just found (one entity, one breakdown, one time window, or the biggest
-   finding's root cause), each chip's sendText context written as
+   finding's root cause), each chip's action event context.prompt written as
    "Run Inline: <narrower request>" (the prefix runs it synchronously and skips
    the pre-flight plan card). You MAY add
    AT MOST ONE background escape-hatch chip for the full exhaustive version,
-   sendText "Run in Background: <full structured plan>", and ALWAYS include a
+   context.prompt "Run in Background: <full structured plan>", and ALWAYS include a
    "This is sufficient" chip. Write all chip LABELS in the SAME language the
    user is using (labels e.g. "🔍 Drill into the top item" / "🚀 Run the full
    analysis in the background" / "✓ This is enough for now").
@@ -2740,7 +2798,7 @@ ANALYSIS 3: [Specific Name]
 Pick any one to drill into now, or run the full set comprehensively."
 
 CRITICAL: Offer each of these as a NARROWER inline drill-down chip by default
-(plain natural-language sendText, so it runs synchronously next turn). Only when
+(plain natural-language context.prompt, so it runs synchronously next turn). Only when
 the user presses the optional background escape-hatch chip ("Run in Background")
 do you copy this structured plan VERBATIM into the task_prompt of
 register_background_task following the TASK_PROMPT CONSTRUCTION RULES above.
@@ -2833,10 +2891,26 @@ Every A2UI payload MUST follow this exact structure:
 3. List component objects separated by commas.
 4. Close the array with ].
 5. End with </a2ui-json> tag.
-Correct: <a2ui-json>[beginRendering object, surfaceUpdate object]</a2ui-json>
-WRONG: beginRendering object without tags (missing tags and brackets = SYSTEM CRASH)
+Correct: <a2ui-json>[createSurface object, updateComponents object]</a2ui-json>
+WRONG: createSurface object without tags (missing tags and brackets = SYSTEM CRASH)
 ---
-""",
+"""
+
+def _root_instruction(_ctx):
+    # InstructionProvider for root_agent (see _static_instruction above):
+    # bypasses ADK templating - which would KeyError on the catalog's literal
+    # '{expression}' token - then substitutes the one state variable this
+    # template really uses. _inject_completed_tasks sets it every turn.
+    try:
+        _bg = str(_ctx.state.get('_bg_task_results', '') or '')
+    except Exception:
+        _bg = ''
+    return _ROOT_INSTRUCTION_TEMPLATE.replace('{_bg_task_results}', _bg)
+
+root_agent = LlmAgent(
+    model=gemini_lite_model,
+    name='root_agent',
+    instruction=_root_instruction,
     tools=_all_tools,
     code_executor=_code_executor,
     generate_content_config=_validated_generate_config,
@@ -2875,7 +2949,7 @@ background_agent = LlmAgent(
     model=gemini_pro_model,
     name='background_agent',
     description='Autonomous background worker for deep analysis and workflow execution.',
-    instruction=final_instruction + r"""
+    instruction=_static_instruction(final_instruction + r"""
 
 --- BACKGROUND EXECUTION AGENT (CRITICAL) ---
 You are an AUTONOMOUS BACKGROUND WORKER. You execute tasks WITHOUT user interaction.
@@ -3073,7 +3147,7 @@ You MUST NEVER claim to have performed an action that you do not have a tool for
 - You CANNOT send emails, Slack messages, or any notifications.
 - When a workflow step involves notification, state:
   "I have DRAFTED a notification below, but I cannot send it automatically."
-""",
+"""),
     tools=_bg_tools,
     code_executor=_code_executor,
     generate_content_config=_validated_generate_config,
