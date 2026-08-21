@@ -1272,10 +1272,28 @@ def _inject_completed_tasks(callback_context):
         for _doc in _docs:
             _d = _doc.to_dict()
             _status_icon = "completed" if _d.get("status") == "completed" else "failed"
-            _summaries.append(
-                "[" + _status_icon.upper() + "] Task '" + _d.get("task_id", "") + "': "
-                + _d.get("result_summary", "")[:300]
-            )
+            _entry = ("[" + _status_icon.upper() + "] Task '" + _d.get("task_id", "") + "': "
+                      + _d.get("result_summary", "")[:300])
+            # The excerpt is truncated at 300 chars, so the link block that
+            # completion appends to result_summary never survives into this
+            # announcement - and those signatures would be stale by now anyway.
+            # Re-list storage and attach fresh links, or the first thing the
+            # user hears about a finished task is that it finished, with no way
+            # to open what it produced (v11.62). deliver_tid, not task_id: an
+            # upload-only follow-up writes into the ORIGINAL ticket's prefix.
+            _collect = getattr(tools, "_ma_collect_deliverables", None)
+            if _collect is not None and _d.get("status") == "completed":
+                try:
+                    _dl_links = _collect(_d.get("deliver_tid") or _d.get("task_id", ""))
+                except Exception:
+                    _dl_links = []
+                if _dl_links:
+                    _entry = (_entry + chr(10)
+                              + "DELIVERABLE DOWNLOADS for this task (freshly signed, valid 7 days). "
+                                "You MUST reproduce EVERY link below verbatim as markdown links "
+                                "whenever you tell the user this task finished - the user cannot see "
+                                "this block:" + chr(10) + chr(10).join(_dl_links))
+            _summaries.append(_entry)
             _doc.reference.update({"reported_to_user": True})
         if _summaries:
             _msg = "--- BACKGROUND TASK RESULTS ---" + chr(10) + chr(10).join(_summaries) + chr(10) + "--- END RESULTS ---"

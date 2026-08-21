@@ -2349,7 +2349,11 @@ def get_task_result(task_id: str, tool_context: ToolContext) -> dict:
             _attach = globals().get("_ma_attach_live_deliverables")
             if _attach is not None:
                 try:
-                    _attach(_res, task_id, "result_summary")
+                    # deliver_tid, not task_id: an upload-only follow-up writes
+                    # into the ORIGINAL ticket's storage prefix, so a status
+                    # check on the follow-up must look there or it reports a
+                    # finished upload with no links (v11.62).
+                    _attach(_res, _d.get("deliver_tid") or task_id, "result_summary")
                 except Exception:
                     pass  # status reporting must never fail on link refresh
         return _res
@@ -4058,13 +4062,33 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     "When telling the user about progress, lead with elapsed_minutes and the latest "
                     "concrete activity from recent_activity; never phrase the percentage as "
                     "'almost done'.")
+                # Files can reach storage well before the run ends - an upload-only
+                # follow-up in particular finishes its uploads and then spends
+                # minutes tidying up. Surfacing them mid-run is what the user asked
+                # for when they asked about the task at all (v11.62).
+                try:
+                    _wip_links = _ma_collect_deliverables(_d.get("deliver_tid") or task_id)
+                except Exception:
+                    _wip_links = []
+                if _wip_links:
+                    _out["deliverable_downloads"] = _wip_links
+                    _out["_MANDATORY_ACTION"] = (
+                        "The task is STILL RUNNING - say so - but files it produced are ALREADY in "
+                        "storage. Your response MUST list EVERY link in deliverable_downloads, verbatim, "
+                        "as markdown links under a short heading meaning 'Deliverables' in the "
+                        "conversation language. The user cannot see this tool result; a link you do not "
+                        "copy does not exist for them. More files may follow when the task completes.")
             if _d.get("status") in ("completed", "failed"):
                 _out["report"] = _d.get("result_summary", "")
                 _out["_MANDATORY_ACTION"] = ("Present the report as formatted markdown text, verbatim, "
                                              "including any deliverable download links.")
                 if _d.get("status") == "completed":
                     try:
-                        _ma_attach_live_deliverables(_out, task_id, "report")
+                        # deliver_tid, not task_id (v11.62): see the same call in
+                        # get_task_status. An upload-only follow-up delegated with
+                        # deliverables_for_task_id uploads into the ORIGINAL
+                        # ticket's prefix, and the user asks about the FOLLOW-UP.
+                        _ma_attach_live_deliverables(_out, _d.get("deliver_tid") or task_id, "report")
                     except Exception:
                         pass  # status reporting must never fail on link refresh
             return _out

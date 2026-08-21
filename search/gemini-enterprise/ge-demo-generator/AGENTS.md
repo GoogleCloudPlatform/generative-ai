@@ -1000,6 +1000,32 @@ verbatim. `find /.agent/skills -name SKILL.md` fails; `ls .agent/skills` from
 if there are none" hedge. Leave the env spec `target` alone — the platform
 interprets it.
 
+### 11.4 Deliverable links follow `deliver_tid`, not the ticket you asked about (v11.62)
+
+An upload-only follow-up task is delegated with `deliverables_for_task_id` set
+to the ORIGINAL ticket, so its uploads land under `autonomous/<original>/`. The
+follow-up's execution doc records that prefix as `deliver_tid`, but both status
+tools re-collected links under the ticket id they were *called* with — so asking
+about the upload task reported "finished" with no links, and only an explicit
+"…and show me the download link" made the model go hunting for the donor ticket.
+`get_task_status` and `get_autonomous_task_status` now both resolve
+`_d.get("deliver_tid") or task_id`.
+
+Two related gaps closed in the same round:
+
+- `_inject_completed_tasks` truncates `result_summary` to 300 characters, which
+  cut off the link block completion appends to it (and those signatures would be
+  stale by the time the announcement fires anyway). The announcement now
+  re-lists storage through `_ma_collect_deliverables` and appends freshly signed
+  links, so the *first* mention of a finished task already carries them.
+- A task still at `working` can already have uploaded its files — an upload-only
+  follow-up finishes its uploads minutes before its run ends. That branch now
+  returns the links too, with a note that the task is still running.
+
+The general form: **a status tool is the only place the user's question lands,
+so it must answer with everything already true**, not with what was true when
+the record was written.
+
 ---
 
 ## 12. The domain-research 429 is a shared bucket, not a bug (v11.59)
