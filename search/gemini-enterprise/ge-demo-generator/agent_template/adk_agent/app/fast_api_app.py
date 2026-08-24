@@ -1078,44 +1078,42 @@ def create_a2ui_parts(msg):
     return [_build_a2ui_part(_m) for _m in _rescope_one(_prepped, _allow_promote=True)]
 
 # =============================================================================
-# PRESS-SCROLL LANDING (v11.87, corrected in v11.89 - read to the end)
+# PRESS-SCROLL (v11.83-v11.90) - WHAT IS ACTUALLY WRONG
 # At the instant a button is pressed, Gemini Enterprise scrolls the conversation
-# backwards. Three live rounds pinned what looked like the rule:
+# backwards. Six rounds of emission-side fixes moved the symptom around without
+# curing it. The test that finally pinned it (2026-08-24) changed nothing in the
+# agent: press a button in the NEWEST turn, then scroll up and press a button in
+# a MUCH OLDER one. The view jumped DOWN - onto the surface pressed a moment
+# earlier. Repeating it from an even higher card jumped down again.
 #
-#   on a press, GE scrolls to the LAST surface of the PREVIOUS turn whose root
-#   renders as a card. Surfaces in the pressed button's own turn are not
-#   candidates, and a surface whose root is not a card is skipped.
+#   on a press, GE scrolls to the element of the user's PREVIOUS press.
 #
-# The second sentence turned out to be wrong - see the v11.89 note below, which
-# supersedes it. The first is a special case of what replaced it.
+# The direction is the tell: no rule phrased as "the nearest/last surface ABOVE
+# the pressed one" can ever scroll downward. Every earlier report collapses into
+# this one - pressing at the bottom of the conversation lands on the previous
+# turn's chip bar because that is where the previous press was, which is what
+# "it jumps one card back" has meant all along.
 #
-# The evidence, from the persisted wire of one session per round:
+# The readings this file carried before (v11.87's "last card of the PREVIOUS
+# turn", v11.89's "nearest card-rooted surface above") are both withdrawn. The
+# second one rested on a live test that never happened; the only real reports
+# are v11.83, v11.86, v11.87 and v11.89, and all four fit the rule above.
 #
-#   v11.83 appended a MaterialText anchor AFTER the card. No effect: not a card,
-#          and same-turn anyway.
-#   v11.84 moved it BEFORE the card, with a visible marker. The marker AND the
-#          card both rendered - so a turn's second surface is NOT dropped, and
-#          the v11.68 chip-bar failure was about the reserved 'suggestions'
-#          surfaceId, not a one-surface-per-turn rule - yet the press still
-#          landed on the previous turn's card. A bare MaterialText is skipped.
-#   v11.86 made the anchor a MaterialCard with a button. The landing MOVED onto
-#          it: previous turn = [anchor(MaterialCard), chips(MaterialRow)] and
-#          the press landed on the anchor, passing over the MaterialRow. That
-#          confirms both halves of the rule at once.
+# The anchor is client state, so no arrangement of surfaces can move it. The one
+# lever left is that a surface which no longer exists cannot be scrolled to -
+# see _pressed_surface_delete_parts() below.
 #
-# So the jump is not fixable by adding an anchor - it is fixable by making the
-# previous turn END in a card, which is what v0.8 did without knowing it: back
-# then the chip bar was a trailing surface of its own, so the last card of the
-# previous turn sat at that turn's very bottom and the scroll went nowhere
-# visible. v11.68 moved the chips INSIDE the card, the turn's last card became
-# the content card at the TOP of the turn, and every press has jumped since.
-#
-# v11.87 restores the v0.8 shape: the chips go back to a trailing surface, and
-# this wraps that surface's root in a MaterialCard so it qualifies as a landing.
-# The wrap is styled transparent and borderless, so the chip bar looks exactly
-# as it did while becoming the lowest card in the turn. Doing it here rather
-# than in the prompt means a model that emits the older MaterialRow root still
-# gets a landing.
+# What the earlier rounds bought, and why the code stays:
+#   v11.87 chips in their own trailing surface, card-wrapped by the helper below.
+#          The landing rationale is dead; the wrap is kept because the chip bar
+#          renders identically with it and removing it is pure churn.
+#   v11.89 gate cards emit their fields and buttons in a trailing surface
+#          (_action_surface_parts). Also shipped as a scroll fix, and also not
+#          one - but next actions outside the answer card is the layout that was
+#          asked for, and it reads better, so it stays.
+# Dead ends, do not retry: an anchor surface before the card (v11.83/84/86) and
+# an invisible zero-width-space landing (v11.88 - GE does not draw a component
+# tree with no visible text, v10.68).
 # =============================================================================
 _CHIP_CARD_ROOT_ID = 'chipBarRoot'
 # Only these are in the catalog's style allowlist (additionalProperties: false);
@@ -1150,29 +1148,12 @@ def _card_wrap_chip_surface(msg):
                         + str(_cw_err)[:200])
         return msg
 
-# v11.89: the live test of v11.88 (2026-08-24) refuted the "previous turn" half
-# of the rule above, and it did so with two presses on the SAME card. The card
-# carried a footer button row inside it and a chip bar below it. Pressing the
-# footer button jumped back to the previous turn's card; pressing a chip, one
-# surface lower in the same turn, did not move the view at all. Same turn, same
-# predecessor, different outcome - so the target is not chosen per turn:
-#
-#   on a press, GE scrolls to the nearest surface BEFORE the pressed one whose
-#   root renders as a card, crossing the turn boundary only when there is no
-#   earlier card-rooted surface in the pressed button's own turn.
-#
-# Every earlier observation still fits: the chip press lands on the content card
-# directly above it (no visible movement), a press from a turn's FIRST surface
-# has nothing above it and falls through to the previous turn, and a bare
-# MaterialRow or MaterialText in between is passed over.
-#
-# So the fix is not an invisible landing appended to the turn - v11.88's
-# zero-width-space card was emitted (the log line proves it) and never became a
-# target, most likely because GE does not draw a component tree whose only text
-# is a ZWSP (v10.68). The fix is positional: a pressable button must never sit
-# in the first card of its turn. Buttons go BELOW the card, in their own
-# trailing card-rooted surface - exactly the shape the chip bar has had since
-# v11.87, and the one shape a press has been observed to leave the view alone.
+# A card's buttons ship BELOW the card, in their own trailing surface. This was
+# introduced in v11.89 as a scroll fix and is not one (see the block above), but
+# it is the layout the demos want: the answer card stays a clean read, and the
+# next actions read as a footer under it rather than as part of the answer.
+# The fields have to travel with the buttons, because a {"path": ...} binding
+# only resolves inside the surface the button lives in.
 _ACTION_SURFACE_STYLE = {"border": "none", "background": "transparent",
                          "padding": "0px", "margin": "0px"}
 
@@ -1181,8 +1162,8 @@ def _action_surface_parts(surface_id, comps, children, data_model=None):
 
     comps are the components below the root, children their ids in render
     order. The root is a transparent MaterialCard, so the block reads as a
-    footer detached from the card above while still counting as a landing for
-    the NEXT press. data_model is applied to this surface's /form, because a
+    footer detached from the card above rather than as a second card.
+    data_model is applied to this surface's /form, because a
     button's {"path": ...} binding resolves against the surface it lives in -
     moving a bound button out of the card means moving its fields out with it.
     """
@@ -1209,6 +1190,54 @@ def _action_surface_parts(surface_id, comps, children, data_model=None):
         return _parts
     except Exception as _as_err:
         logger.log_text('[action_surface] build failed: ' + str(_as_err)[:200])
+        return []
+
+def _pressed_surface_delete_parts(run_args, emitted_parts):
+    """Retire the surface whose button started this turn (v11.90).
+
+    GE scrolls a press to the element of the PREVIOUS press, so the jump is
+    aimed at a surface we rendered one turn ago. We cannot move the client's
+    anchor, but we can delete what it points at: this turn deletes the surface
+    the press came from, which is exactly the anchor the NEXT press will use.
+    The choice itself stays visible - a press arrives with query.text (the
+    action's prompt), which GE renders as the user's message.
+
+    Skipped for a surface this turn is also rendering: gate cards reuse their
+    ids and the rescoper hands the new incarnation a '-u<suffix>' name, but a
+    replay or a partial patch can still put the pressed id back on the wire,
+    and deleting a surface we just drew would blank the answer.
+
+    Kill switch: A2UI_KEEP_PRESSED_SURFACE=1 leaves every pressed surface in
+    place (the pre-v11.90 behaviour).
+    """
+    if os.environ.get('A2UI_KEEP_PRESSED_SURFACE') == '1':
+        return []
+    try:
+        _sid = ''
+        _nm = run_args.get('new_message') if isinstance(run_args, dict) else None
+        for _p in (getattr(_nm, 'parts', None) or []):
+            _t = getattr(_p, 'text', None)
+            if not (_t and 'userAction' in _t):
+                continue
+            try:
+                _ua = json.loads(_t).get('userAction', {}) or {}
+            except Exception:
+                continue
+            if _ua.get('surfaceId'):
+                _sid = str(_ua['surfaceId'])
+                break
+        if not _sid:
+            return []
+        for _p in (emitted_parts or []):
+            for _m in _a2ui_iter_msgs(_p):
+                if _a2ui_surface_id(_m) == _sid:
+                    logger.log_text('[press_retire] kept ' + _sid
+                                    + ' - this turn renders it')
+                    return []
+        logger.log_text('[press_retire] deleting the surface the press came from: ' + _sid)
+        return [_build_a2ui_part(_mk_msg('deleteSurface', surfaceId=_sid))]
+    except Exception as _pd_err:
+        logger.log_text('[press_retire] skipped (non-fatal): ' + str(_pd_err)[:200])
         return []
 
 from adk_agent.app.agent import app as adk_app, background_agent, INLINE_TOOL_DEADLINE, INLINE_IMAGE_DEADLINE
@@ -5155,14 +5184,16 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 else:
                     logger.log_text("[chip_reprompt] re-prompt yielded no usable chips - leaving turn as-is")
 
-        # v11.88 appended an invisible "press landing" surface here, on the
-        # theory that a press targets the previous TURN and so every turn had to
-        # end in a card. The live test refuted both halves: the landing was
-        # emitted and never drawn (a card whose only text is a zero-width space
-        # is not rendered - v10.68), and the target turned out to be the nearest
-        # card-rooted surface ABOVE the pressed one, same turn included. Nothing
-        # is appended here any more; the fix lives where the buttons are built.
-        # See the PRESS-SCROLL LANDING block near _card_wrap_chip_surface.
+        # v11.90: retire the surface this press came from, so the next press has
+        # no stale anchor to scroll to. Last thing appended to the artifact -
+        # artifact_parts is final from here on, and the delete has to travel
+        # with the deliverable (the G1/H1 caches below store what we send, and a
+        # replayed deleteSurface of an already-gone surface is a no-op).
+        # See the PRESS-SCROLL block near _card_wrap_chip_surface for why this
+        # is the only lever left, and v11.88 for the invisible-landing dead end.
+        _press_retire = _pressed_surface_delete_parts(run_args, artifact_parts)
+        if _press_retire:
+            artifact_parts = artifact_parts + _press_retire
 
         # Inline overrun conversion (v10.79), exit B: the deadline watchdog may
         # have fired DURING a salvage phase above. If it converted, it already

@@ -298,34 +298,44 @@ which is exactly why this looked handled -- **a filter on one reader is not a
 filter on the class.** When an injection targets the user's own message, audit
 every function that reads `new_message.parts`.
 
-### 2.6 Where a button sits decides where a press leaves the reader (v11.89)
+### 2.6 A press scrolls to the element of the PREVIOUS press (v11.90)
 
-**On a press, Gemini Enterprise scrolls to the nearest surface ABOVE the pressed
-one whose root renders as a card**, crossing into the previous turn only when
-there is no earlier card-rooted surface in the pressed button's own turn. A root
-that is not a card (a bare `MaterialRow` chip bar, a `MaterialText`) is passed
-over. This is client behaviour; nothing the agent emits during the turn changes
-it.
+**On a press, Gemini Enterprise scrolls to the element of the user's previous
+press.** That target is client state, and nothing the agent emits during the
+turn can move it.
 
-So a button inside the turn's FIRST card has nothing above it and throws the
-view back to the previous turn, while a button in a surface that *trails* that
-card lands on the card immediately above and the view does not move. The
-evidence is one session with two presses on the same card: its in-card footer
-button jumped back a turn, and its chip -- one surface lower, same turn, same
-predecessor -- did not move at all. A per-turn rule cannot produce two answers
-for two presses in the same turn.
+The test that settled this changed nothing in the agent: press a button in the
+newest turn, then scroll up and press one in a much older turn. The view jumps
+DOWN, onto the surface pressed a moment earlier. Direction is the tell -- no
+rule phrased as "the nearest surface ABOVE the pressed one" can scroll
+downward, so every reading this file carried through v11.83-v11.89 is
+withdrawn, and "it jumps one card back" was always this: at the bottom of a
+conversation, the previous press was the previous turn's chip bar.
 
-Three consequences, all shipped:
+**What v11.90 does.** A surface that no longer exists cannot be scrolled to, so
+a press-initiated turn retires the surface its button lived in.
+`_pressed_surface_delete_parts()` in `fast_api_app.py` reads
+`userAction.surfaceId` off the press payload and appends a `deleteSurface`
+message as the last part of the artifact -- exactly the anchor the NEXT press
+would aim at. Live-verified: the backwards jump stops.
+
+- The choice stays visible. A press also carries `query.text` (the action's
+  prompt), which the client renders as the user's own message.
+- A surface this turn is also rendering is never deleted -- gate cards reuse
+  their ids -- and `A2UI_KEEP_PRESSED_SURFACE=1` restores the old behaviour.
+- `test_press_retire.py` covers the helper off-line: chip, gate and welcome
+  presses, the re-render guard, typed messages, malformed payloads, kill switch.
+
+**The layout stays, on its own merits** -- its scroll rationale is dead, but
+next actions below the answer card is what the demos want and it reads better:
 
 - **Suggestion chips are their own trailing surface** (surfaceId
   `suggestions`), never a `MaterialRow` inside the card, and
-  `_card_wrap_chip_surface` gives that surface a `MaterialCard` root -- styled
-  `border: none` / `background: transparent`, so it looks unchanged -- which is
-  what makes it count as a landing. Do not "clean that up".
+  `_card_wrap_chip_surface` gives that surface a `MaterialCard` root, styled
+  `border: none` / `background: transparent` so it looks unchanged.
 - **Model-authored result cards carry no footer action row.** The prompt used to
-  demand one, which contradicted the chips rule in the same prompt; the model
-  followed the footer rule and every follow-up press scrolled backwards. The
-  few-shot examples move their follow-up row out to the trailing surface too.
+  demand one, which contradicted the chips rule in the same prompt. The few-shot
+  examples keep their follow-up row in the trailing surface.
 - **Server-built gate cards use `_action_surface_parts()`.** The analysis-plan
   and autonomous-briefing cards keep only their heading and prose; their input
   fields and buttons are emitted below as one transparent card-rooted surface.
@@ -335,12 +345,12 @@ Three consequences, all shipped:
 The one case where buttons stay INSIDE a card is a compose, confirmation or
 what-if card whose button reads that card's own bound fields -- it cannot be
 split, for the binding reason above. The welcome card is the other exception:
-its buttons are its own content, and nothing precedes turn one.
+its buttons are its own content.
 
-An invisible trailing "landing" surface is not a substitute: a transparent card
-holding a zero-width space is emitted but never drawn, and Gemini Enterprise has
-never been seen to render a component tree with no text in it. A landing that is
-not drawn is not a landing.
+Dead ends, do not retry: an anchor surface emitted before the card
+(v11.83/84/86), and an invisible trailing "landing" (v11.88) -- a transparent
+card holding a zero-width space is emitted but never drawn, and Gemini
+Enterprise has never been seen to render a component tree with no text in it.
 
 ## 3. Managed Autonomous Agent (`enableManagedAgent`)
 
@@ -487,6 +497,8 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
 
 - `python3 validate_examples.py` — template JSON + Python compile checks.
 - `python3 check_deps.py` — dependency cap audit (see section 8).
+- `python3 test_press_retire.py` — the press-retire helper deletes a surface the
+  user can see, so its guards are covered off-line (see section 2.6).
 - `python3 canary.py --out /tmp/canary --run-venv` — resolve today's
   requirements and actually run the imports (see section 8.4);
   `docker build /tmp/canary` for the full image.
