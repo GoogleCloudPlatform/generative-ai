@@ -486,6 +486,14 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
   Gemini Enterprise app itself lives. Binding an agent to
   `locations/<app-location>/...` points a `us`/`eu` app at a resource that does
   not exist, which reproduces the endless re-authorization prompt.
+- **A broken authorization costs the agent, not just its Workspace tools**:
+  Discovery Engine resolves `authorizationConfig.agentAuthorization` when the
+  agent is created and rejects the whole registration with 404 NOT_FOUND when
+  it names nothing, so the deploy ends with no agent and no direct chat link.
+  Read the authorization back with a GET before naming it, and if a registration
+  that names one produces no agent, retry once without it — a demo whose
+  Workspace tools run as the service account beats a demo with no agent.
+  `test_register_fallback.py` covers both guards off-line.
 - **A failed OAuth token exchange is invisible**: Gemini Enterprise performs
   the code-to-token exchange server-side after consent and surfaces nothing
   when it fails — no UI error, no Cloud Run log, no agent-side signal. Probe
@@ -499,6 +507,11 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
 - `python3 check_deps.py` — dependency cap audit (see section 8).
 - `python3 test_press_retire.py` — the press-retire helper deletes a surface the
   user can see, so its guards are covered off-line (see section 2.6).
+- `python3 test_register_fallback.py` — slices the authorization read-back gate
+  and `register_ge_agent_with_fallback` out of `app/Code.gs` and runs them under
+  `bash -e` against a stubbed `curl` and a stubbed `register_agent.py`. The only
+  way to exercise a path whose real trigger is a broken Discovery Engine
+  authorization (see section 6).
 - `python3 canary.py --out /tmp/canary --run-venv` — resolve today's
   requirements and actually run the imports (see section 8.4);
   `docker build /tmp/canary` for the full image.
