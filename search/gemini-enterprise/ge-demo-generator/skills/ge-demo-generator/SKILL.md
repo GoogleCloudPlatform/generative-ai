@@ -690,7 +690,7 @@ Upon deployment completion, ALWAYS output the structured results containing dire
 ### 🔗 Quick Access Links
 > [!IMPORTANT]
 > **Account Notice:**
-> Open these links in a browser signed in to Google Cloud / Workspace as the deploying account **`${GCP_ACCOUNT}`**. Opening them as a different account returns a permission error (403 Forbidden).
+> Open these links in a browser whose Google Cloud / Workspace session is the deploying account **`${GCP_ACCOUNT}`**. Opening them as a different account returns a permission error (403 Forbidden).
 
 > Write this hand-off summary in the language the user is conversing in - the wording above is the English form, not a fixed string.
 

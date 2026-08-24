@@ -1254,9 +1254,7 @@ body = {
     "endDate": {"year": end.year, "month": end.month, "day": end.day},
     "freeTrial": True,
 }
-url = (
-    api + "projects/" + project_id
-    + "/locations/global/licenseConfigs?licenseConfigId=free_trial_agent_space")
+url = api + "projects/" + project_id + "/locations/global/licenseConfigs?licenseConfigId=free_trial_agent_space"
 req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers)
 try:
     with urllib.request.urlopen(req) as resp:
@@ -1839,8 +1837,8 @@ echo ""
 echo "🔗 Quick Access Links"
 echo "--------------------------------------------------------------------------------"
 echo "⚠️  IMPORTANT - Account Notice:"
-echo "   Open every link below in a browser signed in to Google Cloud / Workspace"
-echo "   as the deploying account [${GCP_ACCOUNT}]."
+echo "   Open every link below in a browser whose Google Cloud / Workspace session"
+echo "   is the deploying account [${GCP_ACCOUNT}]."
 echo "   Opening them as a different account returns 403 Forbidden or 'agent not found'."
 echo ""
 if [ ! -z "$GE_DIRECT_CHAT_URL" ]; then
