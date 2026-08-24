@@ -329,6 +329,7 @@ colorway
 colurna
 colvis
 colwidth
+Copyable
 counterparties
 counterparty
 Cómo
@@ -419,6 +420,7 @@ deliv
 Demis
 Demme
 demoable
+demoed
 demouser
 denorm
 dente
@@ -1412,6 +1414,7 @@ onsen
 ood
 OOD
 OOM
+OOMs
 Oort
 OOTB
 openai
@@ -1933,6 +1936,7 @@ tbadge
 tbd
 Tbk
 Tbl
+tbl
 tbtn
 TBY
 tcard
@@ -1952,6 +1956,7 @@ termcolor
 terraform
 Testables
 Tetsuo
+TEXTCOLOR
 texting
 textno
 tfhub
