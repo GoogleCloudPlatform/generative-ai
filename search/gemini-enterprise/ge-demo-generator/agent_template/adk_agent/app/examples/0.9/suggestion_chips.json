@@ -14,7 +14,6 @@
         {
           "id": "root",
           "component": "MaterialRow",
-          "ariaLabel": "Suggested follow-up questions",
           "justify": "spaceEvenly",
           "align": "center",
           "style": {
@@ -26,13 +25,13 @@
         {
           "id": "chip_ranking",
           "component": "MaterialButton",
-          "label": "📊 Donation Ranking",
+          "label": "📊 Value Ranking",
           "variant": "stroked",
           "action": {
             "event": {
               "name": "suggestion_ranking",
               "context": {
-                "prompt": "Show the donation ranking"
+                "prompt": "Show the account value ranking"
               }
             }
           }
@@ -46,7 +45,7 @@
             "event": {
               "name": "suggestion_low_score",
               "context": {
-                "prompt": "Analyze alumni with low engagement scores"
+                "prompt": "Analyze accounts with low engagement scores"
               }
             }
           }

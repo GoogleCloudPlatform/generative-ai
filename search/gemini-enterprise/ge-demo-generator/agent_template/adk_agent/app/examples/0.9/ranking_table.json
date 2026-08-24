@@ -15,35 +15,35 @@
         {
           "rank": "🥇 1",
           "name": "Taro Tanaka",
-          "faculty": "Engineering",
+          "segment": "Enterprise",
           "amount": "[CURRENCY]1,200,000",
           "score": "92"
         },
         {
           "rank": "🥈 2",
           "name": "Hanako Sato",
-          "faculty": "Law",
+          "segment": "SMB",
           "amount": "[CURRENCY]980,000",
           "score": "88"
         },
         {
           "rank": "🥉 3",
           "name": "Ichiro Suzuki",
-          "faculty": "Medicine",
+          "segment": "Strategic",
           "amount": "[CURRENCY]750,000",
           "score": "85"
         },
         {
           "rank": "4",
           "name": "Misaki Yamada",
-          "faculty": "Economics",
+          "segment": "Mid-Market",
           "amount": "[CURRENCY]520,000",
           "score": "76"
         },
         {
           "rank": "5",
           "name": "Kenta Takahashi",
-          "faculty": "Economics",
+          "segment": "Mid-Market",
           "amount": "[CURRENCY]50,000",
           "score": "45"
         }
@@ -68,27 +68,26 @@
           "children": [
             "title",
             "subtitle",
-            "table",
-            "actionRow"
+            "table"
           ],
           "align": "stretch"
         },
         {
           "id": "title",
           "component": "MaterialText",
-          "text": "🏆 Donation Ranking TOP 5",
+          "text": "🏆 Top 5 Accounts by Value",
           "usageHint": "h2"
         },
         {
           "id": "subtitle",
           "component": "MaterialText",
-          "text": "FY2024 — Cumulative Donations",
+          "text": "FY2024 — Cumulative Value",
           "usageHint": "caption"
         },
         {
           "id": "table",
           "component": "MaterialTable",
-          "caption": "Top 5 donors by cumulative amount",
+          "caption": "Top 5 accounts by cumulative value",
           "columns": [
             {
               "header": "#",
@@ -99,11 +98,11 @@
               "field": "name"
             },
             {
-              "header": "Faculty",
-              "field": "faculty"
+              "header": "Segment",
+              "field": "segment"
             },
             {
-              "header": "Donations",
+              "header": "Value",
               "field": "amount"
             },
             {
@@ -117,19 +116,33 @@
           "style": {
             "marginTop": "8px"
           }
-        },
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
         {
-          "id": "actionRow",
+          "id": "root",
           "component": "MaterialRow",
           "children": [
             "btnDetail",
             "btnExport"
           ],
-          "justify": "end",
+          "justify": "start",
           "align": "center",
           "style": {
-            "gap": "8px",
-            "marginTop": "12px"
+            "gap": "8px"
           }
         },
         {
@@ -138,7 +151,7 @@
           "label": "🔍 Deep-Dive #1",
           "action": {
             "event": {
-              "name": "deep_dive_top_donor",
+              "name": "deep_dive_top_account",
               "context": {
                 "prompt": "Analyze #1 Taro Tanaka in detail"
               }
@@ -154,7 +167,7 @@
             "event": {
               "name": "show_full_ranking",
               "context": {
-                "prompt": "Show the full alumni ranking"
+                "prompt": "Show the full account ranking"
               }
             }
           }

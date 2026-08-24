@@ -39,6 +39,7 @@
             "fName",
             "selectType",
             "fContent",
+            "footerDivider",
             "actions"
           ],
           "align": "stretch",
@@ -93,6 +94,10 @@
           "value": {
             "path": "/form/content"
           }
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actions",

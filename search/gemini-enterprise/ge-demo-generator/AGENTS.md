@@ -27,7 +27,13 @@ agent_template/ (real, testable files — fetched at setup run time)
   ├─ adk_agent/app/part_converters.py  A2UI part conversion
   ├─ adk_agent/app/examples/0.9/*.json A2UI v0.9 few-shot examples
   │                                    (the composite catalog itself is fetched
-  │                                     into adk_agent/app/catalogs/ at setup time)
+  │                                     into adk_agent/app/catalogs/ at setup time;
+  │                                     a2ui globs this directory, so the setup
+  │                                     script deletes the seven Workspace surfaces
+  │                                     when Workspace MCP is off — about 5.5k
+  │                                     prefill tokens of surfaces with no tool
+  │                                     behind them. A2UI_KEEP_ALL_EXAMPLES=1
+  │                                     keeps them.)
   ├─ managed_agent/                    Managed Agent provisioning helpers
   │                                    (create_managed_agent.py, warmup_managed_agent.py)
   ├─ demo_skills/                      Deliverable craft skills mounted into the
@@ -292,6 +298,60 @@ which is exactly why this looked handled -- **a filter on one reader is not a
 filter on the class.** When an injection targets the user's own message, audit
 every function that reads `new_message.parts`.
 
+### 2.6 A press scrolls to the element of the PREVIOUS press (v11.90)
+
+**On a press, Gemini Enterprise scrolls to the element of the user's previous
+press.** That target is client state, and nothing the agent emits during the
+turn can move it.
+
+The test that settled this changed nothing in the agent: press a button in the
+newest turn, then scroll up and press one in a much older turn. The view jumps
+DOWN, onto the surface pressed a moment earlier. Direction is the tell -- no
+rule phrased as "the nearest surface ABOVE the pressed one" can scroll
+downward, so every reading this file carried through v11.83-v11.89 is
+withdrawn, and "it jumps one card back" was always this: at the bottom of a
+conversation, the previous press was the previous turn's chip bar.
+
+**What v11.90 does.** A surface that no longer exists cannot be scrolled to, so
+a press-initiated turn retires the surface its button lived in.
+`_pressed_surface_delete_parts()` in `fast_api_app.py` reads
+`userAction.surfaceId` off the press payload and appends a `deleteSurface`
+message as the last part of the artifact -- exactly the anchor the NEXT press
+would aim at. Live-verified: the backwards jump stops.
+
+- The choice stays visible. A press also carries `query.text` (the action's
+  prompt), which the client renders as the user's own message.
+- A surface this turn is also rendering is never deleted -- gate cards reuse
+  their ids -- and `A2UI_KEEP_PRESSED_SURFACE=1` restores the old behaviour.
+- `test_press_retire.py` covers the helper off-line: chip, gate and welcome
+  presses, the re-render guard, typed messages, malformed payloads, kill switch.
+
+**The layout stays, on its own merits** -- its scroll rationale is dead, but
+next actions below the answer card is what the demos want and it reads better:
+
+- **Suggestion chips are their own trailing surface** (surfaceId
+  `suggestions`), never a `MaterialRow` inside the card, and
+  `_card_wrap_chip_surface` gives that surface a `MaterialCard` root, styled
+  `border: none` / `background: transparent` so it looks unchanged.
+- **Model-authored result cards carry no footer action row.** The prompt used to
+  demand one, which contradicted the chips rule in the same prompt. The few-shot
+  examples keep their follow-up row in the trailing surface.
+- **Server-built gate cards use `_action_surface_parts()`.** The analysis-plan
+  and autonomous-briefing cards keep only their heading and prose; their input
+  fields and buttons are emitted below as one transparent card-rooted surface.
+  The fields have to move with the buttons, because a `{"path": ...}` binding is
+  resolved against the surface the button lives in, not the turn.
+
+The one case where buttons stay INSIDE a card is a compose, confirmation or
+what-if card whose button reads that card's own bound fields -- it cannot be
+split, for the binding reason above. The welcome card is the other exception:
+its buttons are its own content.
+
+Dead ends, do not retry: an anchor surface emitted before the card
+(v11.83/84/86), and an invisible trailing "landing" (v11.88) -- a transparent
+card holding a zero-width space is emitted but never drawn, and Gemini
+Enterprise has never been seen to render a component tree with no text in it.
+
 ## 3. Managed Autonomous Agent (`enableManagedAgent`)
 
 Optional feature (default ON in the UI) that provisions a Pre-GA **Managed
@@ -426,6 +486,14 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
   Gemini Enterprise app itself lives. Binding an agent to
   `locations/<app-location>/...` points a `us`/`eu` app at a resource that does
   not exist, which reproduces the endless re-authorization prompt.
+- **A broken authorization costs the agent, not just its Workspace tools**:
+  Discovery Engine resolves `authorizationConfig.agentAuthorization` when the
+  agent is created and rejects the whole registration with 404 NOT_FOUND when
+  it names nothing, so the deploy ends with no agent and no direct chat link.
+  Read the authorization back with a GET before naming it, and if a registration
+  that names one produces no agent, retry once without it — a demo whose
+  Workspace tools run as the service account beats a demo with no agent.
+  `test_register_fallback.py` covers both guards off-line.
 - **A failed OAuth token exchange is invisible**: Gemini Enterprise performs
   the code-to-token exchange server-side after consent and surfaces nothing
   when it fails — no UI error, no Cloud Run log, no agent-side signal. Probe
@@ -437,6 +505,13 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
 
 - `python3 validate_examples.py` — template JSON + Python compile checks.
 - `python3 check_deps.py` — dependency cap audit (see section 8).
+- `python3 test_press_retire.py` — the press-retire helper deletes a surface the
+  user can see, so its guards are covered off-line (see section 2.6).
+- `python3 test_register_fallback.py` — slices the authorization read-back gate
+  and `register_ge_agent_with_fallback` out of `app/Code.gs` and runs them under
+  `bash -e` against a stubbed `curl` and a stubbed `register_agent.py`. The only
+  way to exercise a path whose real trigger is a broken Discovery Engine
+  authorization (see section 6).
 - `python3 canary.py --out /tmp/canary --run-venv` — resolve today's
   requirements and actually run the imports (see section 8.4);
   `docker build /tmp/canary` for the full image.

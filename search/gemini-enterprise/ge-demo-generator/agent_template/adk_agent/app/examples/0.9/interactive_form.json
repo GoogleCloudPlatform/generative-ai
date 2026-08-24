@@ -14,11 +14,11 @@
       "value": {
         "name": "Kenta Takahashi",
         "dept": "Corporate Planning",
-        "faculty": "Economics",
+        "segment": "Mid-Market",
         "score": 45,
         "contactDate": "2024-03-05",
         "vip": false,
-        "notes": "Key contact for CFO network.\nSchedule follow-up after Autumn Gala."
+        "notes": "Key contact for the CFO network.\nSchedule follow-up after the Q3 review."
       }
     }
   },
@@ -42,12 +42,13 @@
             "divider1",
             "fieldName",
             "fieldDept",
-            "selectFaculty",
+            "selectSegment",
             "scoreLabel",
             "sliderScore",
             "dateContact",
             "toggleVip",
             "fieldNotes",
+            "footerDivider",
             "actionRow"
           ],
           "align": "stretch",
@@ -58,7 +59,7 @@
         {
           "id": "title",
           "component": "MaterialText",
-          "text": "📝 Edit Alumni Record",
+          "text": "📝 Edit Contact Record",
           "usageHint": "h2"
         },
         {
@@ -82,32 +83,32 @@
           }
         },
         {
-          "id": "selectFaculty",
+          "id": "selectSegment",
           "component": "MaterialSelect",
-          "label": "Faculty",
+          "label": "Segment",
           "value": {
-            "path": "/form/faculty"
+            "path": "/form/segment"
           },
           "options": [
             {
-              "label": "Economics",
-              "value": "Economics"
+              "label": "Mid-Market",
+              "value": "Mid-Market"
             },
             {
-              "label": "Engineering",
-              "value": "Engineering"
+              "label": "Enterprise",
+              "value": "Enterprise"
             },
             {
-              "label": "Law",
-              "value": "Law"
+              "label": "SMB",
+              "value": "SMB"
             },
             {
-              "label": "Medicine",
-              "value": "Medicine"
+              "label": "Strategic",
+              "value": "Strategic"
             },
             {
-              "label": "Literature",
-              "value": "Literature"
+              "label": "Other",
+              "value": "Other"
             }
           ]
         },
@@ -153,6 +154,10 @@
           }
         },
         {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
+        },
+        {
           "id": "actionRow",
           "component": "MaterialRow",
           "children": [
@@ -172,7 +177,7 @@
           "label": "💾 Save",
           "action": {
             "event": {
-              "name": "submit_alumni_record",
+              "name": "submit_contact_record",
               "context": {
                 "prompt": "Update the record with the following values",
                 "aName": {
@@ -181,8 +186,8 @@
                 "aDept": {
                   "path": "/form/dept"
                 },
-                "aFaculty": {
-                  "path": "/form/faculty"
+                "aSegment": {
+                  "path": "/form/segment"
                 },
                 "aScore": {
                   "path": "/form/score"

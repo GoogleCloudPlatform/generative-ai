@@ -22,6 +22,7 @@
 # mypy: ignore-errors
 # ruff: noqa
 
+import logging
 import os
 import time
 import uuid
@@ -207,7 +208,7 @@ def delete_task(task_id):
     defn_doc = defn_ref.get()
     if defn_doc.exists:
         defn_data = defn_doc.to_dict()
-        if defn_data.get("task_type") == "scheduled":
+        if defn_data.get("task_type") in ("scheduled", "scheduled_autonomous"):
             try:
                 from google.cloud import scheduler_v1
                 _sc = scheduler_v1.CloudSchedulerClient()
@@ -245,7 +246,11 @@ def list_activity():
             })
         return jsonify({"activities": activities})
     except Exception as _e:
-        return jsonify({"activities": [], "error": str(_e)})
+        # The detail goes to the log, not to the browser: this endpoint is on a
+        # public Cloud Run URL and the exception text can carry Firestore paths
+        # and project identifiers.
+        logging.exception("activity feed failed: %s", _e)
+        return jsonify({"activities": [], "error": "Could not load the activity feed."})
 
 # --- Computer Use live-view (screencast of the sandbox browser) ---
 BROWSER_VIEW_HTML = _load_template("browser_view.html")
@@ -289,5 +294,6 @@ def main(request):
         try:
             return app.full_dispatch_request()
         except Exception as e:
-            return str(e), 500
+            logging.exception("request failed: %s", e)
+            return "Internal Server Error", 500
 

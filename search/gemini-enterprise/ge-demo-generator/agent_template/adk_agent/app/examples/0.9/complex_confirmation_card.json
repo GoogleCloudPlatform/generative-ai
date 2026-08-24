@@ -25,6 +25,7 @@
             "titleText",
             "beforeText",
             "afterText",
+            "footerDivider",
             "actionRow"
           ],
           "align": "stretch"
@@ -46,6 +47,10 @@
           "component": "MaterialText",
           "text": "After: [New Data Summary]",
           "usageHint": "body"
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actionRow",

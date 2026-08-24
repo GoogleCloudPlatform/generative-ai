@@ -25,21 +25,20 @@
             "title",
             "subtitle",
             "divider1",
-            "eventList",
-            "actionRow"
+            "eventList"
           ],
           "align": "stretch"
         },
         {
           "id": "title",
           "component": "MaterialText",
-          "text": "📅 Event Attendance History",
+          "text": "📅 Engagement History",
           "usageHint": "h2"
         },
         {
           "id": "subtitle",
           "component": "MaterialText",
-          "text": "Kenta Takahashi (ALM-005) — Past 12 Months",
+          "text": "Kenta Takahashi (ACC-005) — Past 12 Months",
           "usageHint": "caption"
         },
         {
@@ -82,7 +81,7 @@
         {
           "id": "ev1Text",
           "component": "MaterialText",
-          "text": "2024/03/05  Global Career Seminar — Attended",
+          "text": "2024/03/05  Quarterly Business Review — Attended",
           "usageHint": "body"
         },
         {
@@ -107,7 +106,7 @@
         {
           "id": "ev2Text",
           "component": "MaterialText",
-          "text": "2024/04/10  Spring Gala 2024 — No-Show",
+          "text": "2024/04/10  Product Webinar — No-Show",
           "usageHint": "body"
         },
         {
@@ -132,7 +131,7 @@
         {
           "id": "ev3Text",
           "component": "MaterialText",
-          "text": "2024/06/15  Alumni Summer Meetup — Attended",
+          "text": "2024/06/15  User Group Meetup — Attended",
           "usageHint": "body"
         },
         {
@@ -157,21 +156,35 @@
         {
           "id": "ev4Text",
           "component": "MaterialText",
-          "text": "2024/09/20  Autumn Gala 2024 — Invited (Pending)",
+          "text": "2024/09/20  Q3 Executive Briefing — Invited (Pending)",
           "usageHint": "body"
-        },
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
         {
-          "id": "actionRow",
+          "id": "root",
           "component": "MaterialRow",
           "children": [
             "btnAll",
             "btnInvite"
           ],
-          "justify": "end",
+          "justify": "start",
           "align": "center",
           "style": {
-            "gap": "8px",
-            "marginTop": "12px"
+            "gap": "8px"
           }
         },
         {
@@ -182,7 +195,7 @@
             "event": {
               "name": "show_full_event_history",
               "context": {
-                "prompt": "Show the full event attendance history for Takahashi"
+                "prompt": "Show the full engagement history for Takahashi"
               }
             }
           }
@@ -195,7 +208,7 @@
             "event": {
               "name": "draft_rsvp_email",
               "context": {
-                "prompt": "Draft an RSVP confirmation email for Autumn Gala 2024"
+                "prompt": "Draft an RSVP confirmation email for the Q3 Executive Briefing"
               }
             }
           },

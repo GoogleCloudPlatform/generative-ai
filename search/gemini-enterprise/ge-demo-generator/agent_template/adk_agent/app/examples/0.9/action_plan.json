@@ -28,8 +28,7 @@
             "step1",
             "step2",
             "step3",
-            "step4",
-            "actionRow"
+            "step4"
           ],
           "align": "stretch"
         },
@@ -42,7 +41,7 @@
         {
           "id": "subtitle",
           "component": "MaterialText",
-          "text": "Economics Engagement Improvement — 4-Step Strategy",
+          "text": "Mid-Market Engagement Improvement — 4-Step Strategy",
           "usageHint": "subtitle1"
         },
         {
@@ -52,39 +51,53 @@
         {
           "id": "step1",
           "component": "MaterialText",
-          "text": "1️⃣ [Immediate] Personal outreach email from the Dean to Takahashi (CFO) — Expected: Engagement Score +15pt",
+          "text": "1️⃣ [Immediate] Personal outreach email from the account executive to Takahashi (CFO) — Expected: Engagement Score +15pt",
           "usageHint": "body"
         },
         {
           "id": "step2",
           "component": "MaterialText",
-          "text": "2️⃣ [Within 1 month] Plan & invite to VIP dinner event — Target: 5 mid-tier alumni (Score 40-60)",
+          "text": "2️⃣ [Within 1 month] Plan & invite to an executive briefing — Target: 5 mid-tier accounts (Score 40-60)",
           "usageHint": "body"
         },
         {
           "id": "step3",
           "component": "MaterialText",
-          "text": "3️⃣ [Within 3 months] Launch Economics-exclusive mentoring program — Goal: Faculty avg Score 67→75",
+          "text": "3️⃣ [Within 3 months] Launch a Mid-Market enablement program — Goal: Segment avg Score 67→75",
           "usageHint": "body"
         },
         {
           "id": "step4",
           "component": "MaterialText",
-          "text": "4️⃣ [At 6 months] Impact assessment & next strategy — KPI: Donations +20% YoY, Avg Score ≥75",
+          "text": "4️⃣ [At 6 months] Impact assessment & next strategy — KPI: Value +20% YoY, Avg Score ≥75",
           "usageHint": "body"
-        },
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
         {
-          "id": "actionRow",
+          "id": "root",
           "component": "MaterialRow",
           "children": [
             "btnStep1",
             "btnSchedule"
           ],
-          "justify": "end",
+          "justify": "start",
           "align": "center",
           "style": {
-            "gap": "8px",
-            "marginTop": "12px"
+            "gap": "8px"
           }
         },
         {

@@ -21,7 +21,7 @@
  *
  * ── What Gets Generated ──────────────────────────────────────────────
  *   • Synthetic business data (BigQuery tables + optional Firestore docs)
- *   • Dual-model ADK agent (Gemini 3.5 Flash-Lite root → Pro analysis)
+ *   • Dual-model ADK agent (Gemini 3.7 Flash root + deep analysis sub-agent)
  *   • MCP toolsets — BigQuery, Maps, Firestore, Google Workspace (Gmail,
  *     Drive, Calendar, Chat, People), plus arbitrary GitHub MCP servers
  *   • A2A (Agent-to-Agent) server with A2UI interactive components
@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.62-public',
+  APP_VERSION: 'v11.91-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -847,7 +847,7 @@ function planAndGenerateData(userGoal, options) {
   }
   if (options.enableComputerUse) {
     prompt += `\n- **🖥️ COMPUTER USE (BROWSER AGENT) AVAILABLE**:
-    - The agent can operate a real headless web browser (Gemini 3.5 Flash Computer Use) to navigate, click, type, fill forms and extract data from sites that have NO API: competitor public pages, supplier/partner portals, government/regulatory sites, public data sources, and internal web apps. Browser runs happen as autonomous background tasks and the user can watch the live session.
+    - The agent can operate a real headless web browser (Gemini 3.7 Flash Computer Use) to navigate, click, type, fill forms and extract data from sites that have NO API: competitor public pages, supplier/partner portals, government/regulatory sites, public data sources, and internal web apps. Browser runs happen as autonomous background tasks and the user can watch the live session.
     - You MUST leverage this capability when generating the 'businessInstruction' and 'demoGuide' (prompts).
     - In 'businessInstruction', mention that the agent can autonomously browse external websites via a browser-automation background task to gather or act on data that has no API.
     - You MUST design at least TWO prompts (out of the 7 required) in the 'demoGuide' that explicitly ask the agent to browse an external website or portal to accomplish the goal.
@@ -1002,7 +1002,7 @@ function getTechnicalInstruction_() {
     "to ensure the user can trace its logic back to the source data.\n" +
     "6b. **KNOWLEDGE CATALOG / METADATA-DRIVEN ANALYSIS (CRITICAL)**: Instruct the agent that it has access to the Knowledge Catalog (Dataplex) MCP tools " +
     "and MUST ground its analysis in metadata before composing BigQuery queries. Mandatory workflow: " +
-    "(a) for ANY exploratory or discovery question (e.g. 'what data do we have', 'what can you analyze', 'find data useful for X'), it MUST call 'search_entries' FIRST — before 'list_table_ids' / 'list_dataset_ids' — to discover and rank the relevant assets; " +
+    "(a) for a question ABOUT the metadata itself - how a metric is defined, what a code means, which asset is authoritative, how two assets relate - it MUST call 'search_entries' FIRST to discover and rank the relevant assets. A question about the DATA is answered from the data-asset catalog already in its prompt, or straight from SQL; a catalog call is never a warm-up for one; " +
     "(b) it MUST use 'lookup_entry' / 'lookup_context' (NOT 'get_table_info') to read column meanings, units, allowed values, data classifications, and table relationships (join keys); " +
     "(c) only then build the BigQuery query, selecting the correct tables and join keys based on the catalog metadata. Use 'get_table_info' only to confirm exact column types right before writing SQL, or during SQL error recovery. " +
     "If a catalog call returns nothing right after provisioning (metadata harvest can lag a few minutes), fall back to inspecting tables directly and retry catalog discovery later.\n" +
@@ -1101,7 +1101,7 @@ function getTechnicalInstruction_() {
     "{\n" +
     "  \"id\": \"orig_name_i\",\n" +
     "  \"component\": \"MaterialText\",\n" +
-    "  \"text\": \"[Original Item Name, e.g., 'エアコン5馬力']\",\n" +
+    "  \"text\": \"[Original Item Name, e.g., 'Line item A']\",\n" +
     "  \"usageHint\": \"body\"\n" +
     "},\n" +
     "{\n" +
@@ -1136,7 +1136,8 @@ function getTechnicalInstruction_() {
     "With more than 3 candidates use a MaterialSelect instead (it DOES take a label, and the same options array of {label, value}). " +
     "Seed every bound path in the SAME block's updateDataModel, e.g. \"value\": { \"form\": { \"item_0_selected_sku\": \"SKU_CODE_A\", \"item_0_qty\": \"2\" } } at path \"/\", or one updateDataModel at path \"/form\" carrying the whole object.\n\n" +
     
-    "11. **SUGGESTION CHIPS (CRITICAL)**: At the END of EVERY response, you MUST append a lightweight A2UI suggestion chip bar using surfaceId 'suggestions' and a MaterialRow whose id is 'root' containing 3-4 MaterialButtons. The chip block MUST be COMPLETE: a single <a2ui-json> block containing BOTH the createSurface message AND the updateComponents message with all MaterialButton components — never emit createSurface alone. NEVER write any plain text or markdown headers (like \"Next Actions\", \"💡 Next Actions\", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. " +
+    "11. **SUGGESTION CHIPS (CRITICAL)**: **CHIPS GO IN THEIR OWN TRAILING SURFACE (READ FIRST)**: the 3-4 follow-up buttons are ALWAYS a separate 'suggestions' surface emitted AFTER the card, never a MaterialRow inside the card root's children. A turn's second A2UI surface does render - the rule that once said otherwise was wrong. Keeping the follow-ups out of the card keeps the answer card a clean read and makes the next actions a footer under it. **NO FOOTER ACTION ROW** on a result card for the same reason - its follow-ups belong in the trailing surface. **FOOTER SHAPE** applies only where a button cannot leave its card: the Welcome Card, whose buttons are its own content and which opens the conversation, and a compose/confirmation card whose button reads its own \"path\" bindings (a binding resolves only inside its own surface). There the card's main MaterialColumn MUST end with exactly two children, a MaterialDivider and then the MaterialRow of buttons (\"children\": [ ..., \"footerDivider\", \"actionRow\" ]). Nothing may follow that row, and the divider must sit immediately above it.\n" +
+    "At the END of EVERY such response, you MUST append a lightweight A2UI suggestion chip bar using surfaceId 'suggestions' and a MaterialRow whose id is 'root' containing 3-4 MaterialButtons. The chip block MUST be COMPLETE: a single <a2ui-json> block containing BOTH the createSurface message AND the updateComponents message with all MaterialButton components — never emit createSurface alone. NEVER write any plain text or markdown headers (like \"Next Actions\", \"💡 Next Actions\", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. " +
     "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: a MaterialButton carries its caption in its own flat 'label' string — NEVER give it a 'child' or nest a text component inside it. A MaterialButton with no 'label' renders as a BLANK button.\n" +
     "**NEVER BUILD THE CHIP BAR OUT OF MaterialChips**: MaterialChips has ONE action for ALL of its options, so whichever chip the user presses, the client sends that single action's context.prompt — every chip fires the FIRST chip's prompt. MaterialChips is for BOUND SELECTION inside a form (its 'value' points at a data-model path); a navigation chip bar MUST be one MaterialButton per chip, each with its OWN event name and context.prompt.\n" +
     "**NEVER POINT AT A CARD BY POSITION (CRITICAL)**: a card always renders BELOW the text of the same turn, never above it, so wording like \"the card above\" / \"the checkboxes above\" / \"as shown above\" (in any language) sends the user the wrong way. Name the card by what it is and point DOWN (\"in the approval card below\"), or drop the positional word entirely (\"select the items to approve and press Confirm\"). The chip bar is always last, so never describe it as being anywhere else.\n" +
@@ -2241,6 +2242,205 @@ function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollect
   return text.split('__MA_SYSINSTR_EOF__').join('MA_SYSINSTR_EOF');
 }
 
+// ── Data asset catalog ────────────────────────────────────────────────────────
+// The generated agent's system instruction asserts that it already knows every
+// table, every column and the period the data covers, and several of its rules
+// ("the catalog above IS your schema", PATH 0, the no-rediscovery MUSTs) are only
+// true because of that. These functions are what make them true: they turn the
+// planned tables into adk_agent/app/data_assets.md, which agent.py substitutes
+// into its [DATA_ASSET_CATALOG] placeholder at import time.
+//
+// The date coverage is the reason this exists at all. Without it the model opens
+// a figure question with a MIN/MAX probe to find out what period the synthetic
+// data covers - a whole round trip the user waits through, every fresh
+// conversation.
+const CATALOG_MAX_ENUM_VALUES = 8;
+const CATALOG_MAX_ENUM_LEN = 40;
+const CATALOG_MAX_DESC = 180;
+const CATALOG_DATE_TYPES = ['DATE', 'DATETIME', 'TIMESTAMP'];
+
+/**
+ * Minimal RFC4180 CSV reader. The generated csvData carries quoted fields with
+ * embedded commas and newlines, so splitting on ',' would mis-count columns and
+ * hand the catalog garbage values to summarize.
+ * @param {string} text
+ * @return {Array<Array<string>>}
+ */
+function parseCsvRows_(text) {
+  const s = String(text || '');
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charAt(i);
+    if (inQuotes) {
+      if (c === '"') {
+        if (s.charAt(i + 1) === '"') { field += '"'; i++; } else { inQuotes = false; }
+      } else { field += c; }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ',') {
+      row.push(field); field = '';
+    } else if (c === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else if (c !== '\r') {
+      field += c;
+    }
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+/**
+ * Best-effort BigQuery type for a column the plan gave no schema entry for.
+ * @param {Array<string>} values non-empty values only
+ * @return {string}
+ */
+function inferCatalogType_(values) {
+  if (!values.length) return 'STRING';
+  const dateRe = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?)?/;
+  if (values.every(v => dateRe.test(v))) {
+    return values.some(v => v.length > 10) ? 'TIMESTAMP' : 'DATE';
+  }
+  if (values.every(v => /^-?\d+$/.test(v))) return 'INTEGER';
+  if (values.every(v => !isNaN(parseFloat(v)) && isFinite(v))) return 'FLOAT';
+  return 'STRING';
+}
+
+/**
+ * @param {string} text
+ * @param {number} limit
+ * @return {string}
+ */
+function clipCatalogText_(text, limit) {
+  const t = String(text == null ? '' : text).split(/\s+/).filter(Boolean).join(' ');
+  return t.length <= limit ? t : t.substring(0, limit - 3).replace(/\s+$/, '') + '...';
+}
+
+/**
+ * The one line of measured fact: how many rows, and what period they cover.
+ * Shared verbatim between the prompt catalog and the BigQuery table
+ * description, so Knowledge Catalog shows exactly what the agent was told.
+ * @param {number} rowCount
+ * @param {Array<string>} coverage
+ * @return {string}
+ */
+function catalogFactsLine_(rowCount, coverage) {
+  return 'Rows: ' + rowCount + '. Coverage: ' +
+         (coverage.length ? coverage.join('; ') : 'no date column');
+}
+
+/**
+ * Row count and date coverage for one table, from the CSV that will be loaded.
+ * @param {Object} table
+ * @return {string} '' when the table has no parseable rows
+ */
+function buildTableFactsLine_(table) {
+  const rows = parseCsvRows_(table.csvData);
+  if (!rows.length) return '';
+  const header = rows[0].map(h => String(h).trim());
+  const dataRows = rows.slice(1).filter(r => r.some(c => String(c).trim() !== ''));
+  const schemaByName = {};
+  (table.schema || []).forEach(f => {
+    if (f && f.name) schemaByName[String(f.name).trim()] = String(f.type || '').toUpperCase();
+  });
+  const coverage = [];
+  header.forEach((name, idx) => {
+    const present = dataRows
+      .map(r => String(idx < r.length ? r[idx] : '').trim())
+      .filter(v => v !== '');
+    const type = schemaByName[name] || inferCatalogType_(present);
+    if (CATALOG_DATE_TYPES.indexOf(type) !== -1 && present.length) {
+      const sorted = present.slice().sort();
+      coverage.push('`' + name + '` ' + sorted[0].substring(0, 10) +
+                    ' -> ' + sorted[sorted.length - 1].substring(0, 10));
+    }
+  });
+  return catalogFactsLine_(dataRows.length, coverage);
+}
+
+/**
+ * The text written to BigQuery as the table description, and from there
+ * harvested into Knowledge Catalog: the authored grain sentence plus the same
+ * facts line the agent's prompt carries.
+ * @param {Object} table
+ * @return {string} '' when there is nothing to say
+ */
+function buildBqTableDescription_(table) {
+  const authored = String(table.description || '').trim();
+  const facts = buildTableFactsLine_(table);
+  if (authored && facts) return authored + ' ' + facts;
+  return authored || facts;
+}
+
+/**
+ * Markdown for the whole dataset. Returns '' when there is nothing to describe,
+ * which leaves the agent on its runtime-discovery fallback.
+ * @param {Array<Object>} tables
+ * @return {string}
+ */
+function buildDataAssetCatalog_(tables) {
+  if (!tables || !tables.length) return '';
+  const sections = [];
+  tables.slice().sort((a, b) => String(a.tableName).localeCompare(String(b.tableName)))
+    .forEach(table => {
+      const rows = parseCsvRows_(table.csvData);
+      if (!rows.length) return;
+      const header = rows[0].map(h => String(h).trim());
+      const dataRows = rows.slice(1).filter(r => r.some(c => String(c).trim() !== ''));
+
+      const schemaByName = {};
+      (table.schema || []).forEach(f => {
+        if (f && f.name) {
+          schemaByName[String(f.name).trim()] = {
+            type: String(f.type || '').toUpperCase(),
+            description: String(f.description || '').trim()
+          };
+        }
+      });
+
+      const columnLines = [], coverage = [];
+      header.forEach((name, idx) => {
+        const present = dataRows
+          .map(r => String(idx < r.length ? r[idx] : '').trim())
+          .filter(v => v !== '');
+        const meta = schemaByName[name] || {};
+        const type = meta.type || inferCatalogType_(present);
+        // Clipped BEFORE the value list is appended, never after: a long authored
+        // description would otherwise eat the budget and leave the enum severed
+        // mid-value ("Sprouts Farmers Marke..."), which is worse than no enum -
+        // the model writes the truncated string into a WHERE clause.
+        let desc = meta.description ? clipCatalogText_(meta.description, CATALOG_MAX_DESC) : '';
+
+        if (CATALOG_DATE_TYPES.indexOf(type) !== -1 && present.length) {
+          const sorted = present.slice().sort();
+          coverage.push('`' + name + '` ' + sorted[0].substring(0, 10) +
+                        ' -> ' + sorted[sorted.length - 1].substring(0, 10));
+          if (!desc) desc = 'date column';
+        } else if (type === 'STRING' && present.length) {
+          // A categorical column is far more useful to the model as its actual
+          // value list than as "STRING": it stops the agent guessing
+          // `WHERE status = 'Completed'` when the data says 'COMPLETE'.
+          const distinct = Object.keys(present.reduce((acc, v) => { acc[v] = 1; return acc; }, {})).sort();
+          const longest = distinct.reduce((m, v) => Math.max(m, v.length), 0);
+          if (distinct.length <= CATALOG_MAX_ENUM_VALUES && longest <= CATALOG_MAX_ENUM_LEN &&
+              distinct.length < present.length) {
+            const valuesTxt = 'values: ' + distinct.join(', ');
+            desc = desc ? (desc + ' | ' + valuesTxt) : valuesTxt;
+          }
+        }
+        columnLines.push('`' + name + '` ' + type + (desc ? ' - ' + desc : ''));
+      });
+
+      const tableDesc = clipCatalogText_(table.description || '', 300);
+      const lines = [tableDesc ? '### `' + table.tableName + '` - ' + tableDesc
+                               : '### `' + table.tableName + '`'];
+      lines.push(catalogFactsLine_(dataRows.length, coverage));
+      columnLines.forEach(c => lines.push('  - ' + c));
+      sections.push(lines.join('\n'));
+    });
+  return sections.join('\n\n');
+}
+
 function generateSetupScript(params) {
   const { datasetId, systemInstruction, businessInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, operatingModel, enableWorkspaceMcp, enableComputerUse, enableManagedAgent, enableWorkspaceAuth, metadata } = params;
 
@@ -2508,6 +2708,16 @@ function generateSetupScript(params) {
     ? buildManagedAgentInstruction_(businessInstruction || '', datasetId, fsCollection, true, workspaceAuthEnabled, preBrowseEnabled, operatingModel || '')
     : '';
 
+  // Data-asset catalog. Base64 for the same reason the column descriptions
+  // below are: it is free text in an arbitrary language and must survive an
+  // unquoted heredoc without any escaping. Emitted into the project directory
+  // before the container build, so it ships inside the image.
+  const dataAssetCatalogMd = buildDataAssetCatalog_(tables);
+  const dataAssetCatalogCmd = dataAssetCatalogMd
+    ? `echo "🧾 Writing data-asset catalog for the agent prompt..."\n` +
+      `echo '${Utilities.base64Encode(dataAssetCatalogMd, Utilities.Charset.UTF_8)}' | base64 -d > adk_agent/app/data_assets.md\n`
+    : `echo "⚠️  No data-asset catalog written; the agent will discover the schema at runtime."\n`;
+
   // Build local BQ creation commands
   let bqCommands = `echo "🗄 Creating BigQuery Dataset: ${datasetId}..."\n`;
   bqCommands += `bq mk --dataset --location=US ${datasetId} 2>/dev/null || echo "    ✅ Dataset already exists."\n\n`;
@@ -2575,8 +2785,12 @@ function generateSetupScript(params) {
     const schemaB64 = Utilities.base64Encode(JSON.stringify(bqSchema), Utilities.Charset.UTF_8);
     bqCommands += `echo '${schemaB64}' | base64 -d > ${table.tableName}_schema.json\n`;
     bqCommands += `bq update ${datasetId}.${table.tableName} ${table.tableName}_schema.json >/dev/null 2>&1 && echo "    ✅ Column metadata: ${table.tableName}" || echo "    ⚠️  Column metadata skipped: ${table.tableName}"\n`;
-    if (table.description) {
-      const descB64 = Utilities.base64Encode(table.description.toString(), Utilities.Charset.UTF_8);
+    // The grain sentence plus the measured facts (row count, date coverage), so
+    // the entry Knowledge Catalog harvests says the same thing as the agent's
+    // prompt. Column descriptions alone leave "what is one row here?" unanswered.
+    const bqTableDesc = buildBqTableDescription_(table);
+    if (bqTableDesc) {
+      const descB64 = Utilities.base64Encode(bqTableDesc, Utilities.Charset.UTF_8);
       bqCommands += `bq update --description "\$(echo '${descB64}' | base64 -d)" ${datasetId}.${table.tableName} >/dev/null 2>&1 || true\n`;
     }
     bqCommands += `rm -f ${table.tableName}_schema.json\n`;
@@ -3492,6 +3706,26 @@ else
 fi
 rm -f "\$AUTH_RESP"
 
+# A write that answered 200 is not proof the resource is READABLE, and the
+# registration further down is the only thing that cares. Read it back and let
+# the answer - not the write - decide whether the agent is registered with an
+# authorization at all: Discovery Engine resolves
+# authorizationConfig.agentAuthorization at create time and rejects the WHOLE
+# registration with 404 NOT_FOUND when it names nothing, so a failed
+# authorization would otherwise cost the demo its agent and its direct chat
+# link, not just its Workspace tools.
+AUTH_GET=\$(curl -s -o /dev/null -w "%{http_code}" \
+  -H "Authorization: Bearer \$TOKEN" \
+  -H "X-Goog-User-Project: \$PROJECT_ID" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations/\$AUTH_ID" 2>/dev/null || echo "000")
+if [ "\$AUTH_GET" != "200" ]; then
+  echo "    ⚠️  Authorization \$AUTH_ID is not readable (HTTP \$AUTH_GET) - the agent will be"
+  echo "       registered WITHOUT it. The agent and its direct chat link still work;"
+  echo "       Workspace tools fall back to the service account until this is fixed"
+  echo "       and the script is re-run."
+  AUTH_ID=""
+fi
+
 `;
   }
 
@@ -4158,9 +4392,15 @@ except Exception:
       echo "   free trial subscription. Proceeding means you accept:"
       echo "   - the Terms for data use (https://cloud.google.com/retail/data-use-terms)"
       echo "   - the Gemini Enterprise (Agentspace) quality-of-service terms"
-      read -p "   Start a free trial subscription automatically? (y/n) " -n 1 -r
-      echo
-      if [[ \$REPLY =~ ^[Yy]$ ]]; then
+      # The one decision in this script that a human has to make. An unattended
+      # run can pre-answer it with GE_FREE_TRIAL_CONSENT=y; unset and with no
+      # terminal, the read below sees EOF and the answer is no.
+      _GE_TRIAL_REPLY="\${GE_FREE_TRIAL_CONSENT:-}"
+      if [ -z "\$_GE_TRIAL_REPLY" ] && [ -t 0 ]; then
+        read -p "   Start a free trial subscription automatically? (y/n) " -n 1 -r _GE_TRIAL_REPLY
+        echo
+      fi
+      if [[ "\$_GE_TRIAL_REPLY" =~ ^[Yy] ]]; then
         TRIAL_OUT=$(python3 - "\$PROJECT_ID" "\$GE_TOKEN" << 'PYEOF'
 import sys, json, time, datetime, urllib.request, urllib.error
 project_id, token = sys.argv[1], sys.argv[2]
@@ -4250,11 +4490,12 @@ PYEOF
       fi
     fi
 
-    # Active subscription: offer to create the Gemini Enterprise app automatically.
+    # Active subscription: create the Gemini Enterprise app. Not offered - done.
+    # The subscription is the part that carries terms, and it is either already
+    # accepted or was just accepted above; the app itself carries none, so a y/n
+    # here is friction with no decision behind it and it is what stopped an
+    # otherwise unattended run.
     if [ "\$GE_LICENSE_STATE" = "ACTIVE" ]; then
-      read -p "   Create a Gemini Enterprise app in this project automatically now? (y/n) " -n 1 -r
-      echo
-      if [[ \$REPLY =~ ^[Yy]$ ]]; then
         echo "   ⏳ Creating Gemini Enterprise app (this can take a minute or two)..."
         CREATE_OUT=$(python3 - "\$PROJECT_ID" "\$GE_TOKEN" << 'PYEOF'
 import sys, json, time, urllib.request, urllib.error
@@ -4326,7 +4567,6 @@ PYEOF
           echo "   ⚠️  Automatic app creation failed:"
           echo "\$CREATE_OUT" | sed 's/^/      /'
         fi
-      fi
     fi
   fi
 
@@ -4555,7 +4795,11 @@ MA_TOOLS_DIR="$(pwd)"
 # 1) Craft skills: self-authored packs (embedded at generation time from the
 #    generator repo) + the Google Chrome modern-web-guidance skill (public,
 #    Apache-2.0/CC-BY, cloned fresh at setup time).
-rm -rf skills _mwg_tmp && mkdir -p skills
+# Staged in _ma_skills/, NOT skills/: PHASE A runs before the demo asset
+# directory exists, so it operates on whatever the user's CWD happens to be.
+# This block used to \`rm -rf skills\` there, which silently destroyed a
+# same-named directory the user already owned (hit live 2026-08-23).
+rm -rf _ma_skills _mwg_tmp && mkdir -p _ma_skills
 ${managedSkillsBash}if git clone --depth 1 --quiet https://github.com/GoogleChrome/modern-web-guidance.git _mwg_tmp >/dev/null 2>&1; then
   rm -rf _mwg_tmp/.git
   # Publish-repo layout (verified 2026-07-12): skill packs live under skills/
@@ -4563,15 +4807,15 @@ ${managedSkillsBash}if git clone --depth 1 --quiet https://github.com/GoogleChro
   # SKILL.md or first-level skill dirs in case the layout changes.
   MA_MWG_COPIED=""
   if [ -f _mwg_tmp/skills/modern-web-guidance/SKILL.md ]; then
-    cp -r _mwg_tmp/skills/modern-web-guidance skills/
+    cp -r _mwg_tmp/skills/modern-web-guidance _ma_skills/
     MA_MWG_COPIED="yes"
   elif [ -f _mwg_tmp/SKILL.md ]; then
-    mkdir -p skills/modern-web-guidance
-    cp -r _mwg_tmp/. skills/modern-web-guidance/
+    mkdir -p _ma_skills/modern-web-guidance
+    cp -r _mwg_tmp/. _ma_skills/modern-web-guidance/
     MA_MWG_COPIED="yes"
   else
     for d in _mwg_tmp/*/ _mwg_tmp/skills/*/; do
-      if [ -f "\${d}SKILL.md" ]; then cp -r "$d" skills/; MA_MWG_COPIED="yes"; fi
+      if [ -f "\${d}SKILL.md" ]; then cp -r "$d" _ma_skills/; MA_MWG_COPIED="yes"; fi
     done
   fi
   rm -rf _mwg_tmp
@@ -4592,7 +4836,7 @@ if git clone --depth 1 --quiet https://github.com/googleworkspace/cli.git _gws_t
   MA_GWS_COPIED=""
   for s in gws-shared gws-drive gws-gmail gws-calendar gws-chat gws-docs gws-sheets; do
     if [ -f "_gws_tmp/skills/\$s/SKILL.md" ]; then
-      cp -r "_gws_tmp/skills/\$s" skills/
+      cp -r "_gws_tmp/skills/\$s" _ma_skills/
       MA_GWS_COPIED="yes"
     fi
   done
@@ -4608,18 +4852,18 @@ fi
 ` : ''}
 
 MA_SKILLS_SOURCE=""
-if [ -n "$(ls -A skills 2>/dev/null)" ]; then
+if [ -n "$(ls -A _ma_skills 2>/dev/null)" ]; then
   echo "  📤 Uploading skill packs to gs://$DASH_BUCKET/skills/ ..."
-  if gcloud storage cp -r skills/* "gs://$DASH_BUCKET/skills/" >/dev/null 2>&1; then
+  if gcloud storage cp -r _ma_skills/* "gs://$DASH_BUCKET/skills/" >/dev/null 2>&1; then
     MA_SKILLS_SOURCE="gs://$DASH_BUCKET/skills"
-    echo "  ✅ Skills uploaded ($(find skills -name 'SKILL.md' | wc -l) skill packs)."
+    echo "  ✅ Skills uploaded ($(find _ma_skills -name 'SKILL.md' | wc -l) skill packs)."
   else
     echo "  ⚠️  Skill upload failed (agent will run without mounted skills)."
   fi
 else
   echo "  ⚠️  No skill packs available (agent will run without mounted skills)."
 fi
-rm -rf skills
+rm -rf _ma_skills
 
 # 2) System instruction (quoted heredoc -> file; avoids argv-length limits).
 cat <<'__MA_SYSINSTR_EOF__' > managed_agent_instruction.txt
@@ -5229,6 +5473,7 @@ echo "🔧 Configuring agent..."
 
 cp "$GE_TPL/adk_agent/app/tools.py" adk_agent/app/tools.py
 
+${dataAssetCatalogCmd}
 mkdir -p adk_agent/app/catalogs
 echo '   Fetching the Gemini Enterprise A2UI v0.9 composite catalog...'
 curl -fsSL "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json" -o adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json
@@ -5248,6 +5493,25 @@ for p in glob.glob("adk_agent/app/examples/0.9/*.json"):
     if "[CURRENCY]" in s:
         open(p, "w", encoding="utf-8").write(s.replace("[CURRENCY]", sym))
 __GE_CURR_SUB_EOF__
+
+_A2UI_PRUNE_LIST="${ enableWorkspaceMcp ? '' : 'chat_compose calendar_event_compose email_compose drive_file_compose chat_conversation_list drive_file_list contact_list' }"
+# --- Prune few-shot examples for capabilities this demo does not have ---
+# a2ui's CatalogConfig globs this directory, so EVERY file left in it is loaded
+# into the system prompt whether or not the matching tools are registered. The
+# seven Workspace surfaces are 21,793 characters - about 5.5k tokens of the
+# ~100k the model prefills on every turn - teaching an agent to compose a Gmail
+# draft it has no tool to send. Maps is not on this list: a Maps key is
+# provisioned unconditionally, so maps_place_card always has a toolset behind it.
+if [ -n "$_A2UI_PRUNE_LIST" ] && [ "$A2UI_KEEP_ALL_EXAMPLES" != "1" ]; then
+  _A2UI_PRUNED=0
+  for _A2UI_EX in $_A2UI_PRUNE_LIST; do
+    if [ -f "adk_agent/app/examples/0.9/\${_A2UI_EX}.json" ]; then
+      rm -f "adk_agent/app/examples/0.9/\${_A2UI_EX}.json"
+      _A2UI_PRUNED=$((_A2UI_PRUNED + 1))
+    fi
+  done
+  echo "  OK - pruned $_A2UI_PRUNED A2UI example(s) for disabled capabilities."
+fi
 
 cp "$GE_TPL/adk_agent/app/agent.py" adk_agent/app/agent.py
 
@@ -5413,6 +5677,11 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
       "ADK_ENABLE_MCP_GRACEFUL_ERROR_HANDLING=1",
       "ADK_DISABLE_JSON_SCHEMA_FOR_FUNC_DECL=1",
       `DEMO_ID=${dirName}`,
+      // The dataset name is already baked into the generated instruction, but
+      // _bigquery_scope_gate in agent.py reads it from the environment: it is the
+      // allow-list the gate blocks cross-dataset SQL against, and without this
+      // line the gate finds an empty allow-list and disables itself.
+      `BIGQUERY_DATASET=${datasetId}`,
       `DEMO_DATASET=${datasetId}`,
       `FS_COLLECTION=${fsCollection}`,
       `REFERENCE_DATE=${referenceDate}`,
@@ -5428,6 +5697,16 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
       "WORKER_QUEUE=\$WORKER_QUEUE",
       "WORKER_QUEUE_LOCATION=\$WORKER_QUEUE_LOCATION"
     ];
+    // A public dataset hosted somewhere other than `bigquery-public-data` is
+    // still a legitimate target for this demo, and the scope gate only exempts
+    // that one project by name. Tell it about this dataset explicitly, or the
+    // first public-data join gets blocked.
+    if (publicDatasetId && publicDatasetId.split('.').length >= 2
+        && publicDatasetId.split('.')[0] !== 'bigquery-public-data') {
+      const publicParts = publicDatasetId.split('.');
+      envVars.push(`BQ_ALLOWED_DATASETS=${publicParts[0]}.${publicParts[1]}`);
+    }
+
     let secrets = [];
     let optionalSecrets = [];
 
@@ -5816,14 +6095,39 @@ print(f"Error registering agent ({create_code}): {resp.get('error', '')}", file=
 sys.exit(1)
 EOF
 
+  # One definition for both the single-app and the pick-an-app branch below.
+  # \$1 = location, \$2 = engine id, \$3 = authorization id ("" = register
+  # without one).
+  register_ge_agent() {
+    python3 register_agent.py "\$1" "$PROJECT_NUMBER" "\$1" "\$2" "$TOKEN" "${dirName}" "$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "\$3" 2>&1
+  }
+
+  # An authorization that reads back fine can still be REFUSED by the
+  # registration (bound to another agent, wrong project number). A registered
+  # agent with degraded Workspace tools beats no agent at all, so fall back
+  # once, keep the direct chat link, and say plainly what was lost.
+  register_ge_agent_with_fallback() {
+    REG_OUTPUT=\$(register_ge_agent "\$1" "\$2" "\$3" || true)
+    echo "\$REG_OUTPUT"
+    AGENT_ID=\$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+    if [ -z "\$AGENT_ID" ] && [ ! -z "\$3" ]; then
+      echo "⚠️  Registration with the authorization failed - retrying without it..."
+      REG_OUTPUT=\$(register_ge_agent "\$1" "\$2" "" || true)
+      echo "\$REG_OUTPUT"
+      AGENT_ID=\$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+      if [ ! -z "\$AGENT_ID" ]; then
+        echo "⚠️  Registered WITHOUT end-user OAuth - Workspace tools run as the service"
+        echo "    account. Fix the authorization and re-run this script to wire it in."
+      fi
+    fi
+  }
+
   if [ "$APP_COUNT" = "1" ]; then
     SELECTED_APP_ID=$(echo "\${APP_NAMES[0]}" | awk -F'/' '{print \$NF}')
     SELECTED_LOC="\${APP_LOCS[0]}"
     echo "✅ Found exactly one Gemini Enterprise app ($SELECTED_APP_ID). Automating registration..."
 
-    REG_OUTPUT=$(python3 register_agent.py "$SELECTED_LOC" "$PROJECT_NUMBER" "$SELECTED_LOC" "$SELECTED_APP_ID" "$TOKEN" "${dirName}" "$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "$AUTH_ID" 2>&1) || true
-    echo "$REG_OUTPUT"
-    AGENT_ID=$(echo "$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+    register_ge_agent_with_fallback "$SELECTED_LOC" "$SELECTED_APP_ID" "$AUTH_ID"
     rm register_agent.py
     if [ -z "\$AGENT_ID" ]; then
       echo "⚠️  Gemini Enterprise registration failed, but the Cloud Run deployment itself is COMPLETE."
@@ -5855,9 +6159,7 @@ EOF
       
       echo "✅ Selected app: \${APP_DISPLAY_NAMES[\$CHOICE]}. Automating registration..."
       
-      REG_OUTPUT=$(python3 register_agent.py "\$SELECTED_LOC" "\$PROJECT_NUMBER" "\$SELECTED_LOC" "\$SELECTED_APP_ID" "\$TOKEN" "${dirName}" "\$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "\$AUTH_ID" 2>&1) || true
-      echo "\$REG_OUTPUT"
-      AGENT_ID=$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+      register_ge_agent_with_fallback "\$SELECTED_LOC" "\$SELECTED_APP_ID" "\$AUTH_ID"
       rm register_agent.py
       if [ -z "\$AGENT_ID" ]; then
         echo "⚠️  Gemini Enterprise registration failed, but the Cloud Run deployment itself is COMPLETE."
