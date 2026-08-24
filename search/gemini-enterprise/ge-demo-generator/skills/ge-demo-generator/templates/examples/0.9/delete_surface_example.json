@@ -1,0 +1,8 @@
+[
+  {
+    "version": "v0.9",
+    "deleteSurface": {
+      "surfaceId": "confirmation-surface"
+    }
+  }
+]

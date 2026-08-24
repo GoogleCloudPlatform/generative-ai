@@ -1,0 +1,208 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "comparison-matrix",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "comparison-matrix",
+      "path": "/segments",
+      "value": [
+        {
+          "segment": "🏢 Enterprise",
+          "value": "[CURRENCY]1.97M",
+          "score": "79.0",
+          "members": "6"
+        },
+        {
+          "segment": "🏬 Mid-Market",
+          "value": "[CURRENCY]1.77M",
+          "score": "75.5",
+          "members": "8"
+        },
+        {
+          "segment": "🏪 SMB",
+          "value": "[CURRENCY]1.20M",
+          "score": "67.0",
+          "members": "8"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "comparison-matrix",
+      "path": "/chartSpec",
+      "value": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "description": "Average engagement score by segment",
+        "data": {
+          "values": [
+            {
+              "segment": "Enterprise",
+              "score": 79.0
+            },
+            {
+              "segment": "Mid-Market",
+              "score": 75.5
+            },
+            {
+              "segment": "SMB",
+              "score": 67.0
+            }
+          ]
+        },
+        "mark": "bar",
+        "encoding": {
+          "x": {
+            "field": "segment",
+            "type": "nominal",
+            "title": "Segment"
+          },
+          "y": {
+            "field": "score",
+            "type": "quantitative",
+            "title": "Avg engagement score"
+          }
+        }
+      }
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "comparison-matrix",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "table",
+            "chart",
+            "summaryText"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📊 Segment Performance Comparison",
+          "usageHint": "h2"
+        },
+        {
+          "id": "table",
+          "component": "MaterialTable",
+          "columns": [
+            {
+              "header": "Segment",
+              "field": "segment"
+            },
+            {
+              "header": "Value",
+              "field": "value"
+            },
+            {
+              "header": "Avg Score",
+              "field": "score"
+            },
+            {
+              "header": "Members",
+              "field": "members"
+            }
+          ],
+          "rows": {
+            "path": "/segments"
+          },
+          "style": {
+            "marginTop": "8px"
+          }
+        },
+        {
+          "id": "chart",
+          "component": "VegaChart",
+          "height": 220,
+          "spec": {
+            "path": "/chartSpec"
+          }
+        },
+        {
+          "id": "summaryText",
+          "component": "MaterialText",
+          "text": "💡 Enterprise leads in both value and score. SMB has more accounts but lower scores — engagement strategy reinforcement recommended.",
+          "usageHint": "body",
+          "style": {
+            "marginTop": "12px"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialRow",
+          "children": [
+            "btnEcon",
+            "btnReport"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "btnEcon",
+          "component": "MaterialButton",
+          "label": "📉 Deep-Dive SMB",
+          "action": {
+            "event": {
+              "name": "deep_dive_segment",
+              "context": {
+                "prompt": "Analyze the root cause of low engagement in SMB"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnReport",
+          "component": "MaterialButton",
+          "label": "📋 All Segments Report",
+          "action": {
+            "event": {
+              "name": "generate_segment_report",
+              "context": {
+                "prompt": "Generate a detailed report for all segments"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

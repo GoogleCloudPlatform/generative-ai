@@ -1,0 +1,178 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "ranking-surface",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "ranking-surface",
+      "path": "/ranking",
+      "value": [
+        {
+          "rank": "🥇 1",
+          "name": "Taro Tanaka",
+          "segment": "Enterprise",
+          "amount": "[CURRENCY]1,200,000",
+          "score": "92"
+        },
+        {
+          "rank": "🥈 2",
+          "name": "Hanako Sato",
+          "segment": "SMB",
+          "amount": "[CURRENCY]980,000",
+          "score": "88"
+        },
+        {
+          "rank": "🥉 3",
+          "name": "Ichiro Suzuki",
+          "segment": "Strategic",
+          "amount": "[CURRENCY]750,000",
+          "score": "85"
+        },
+        {
+          "rank": "4",
+          "name": "Misaki Yamada",
+          "segment": "Mid-Market",
+          "amount": "[CURRENCY]520,000",
+          "score": "76"
+        },
+        {
+          "rank": "5",
+          "name": "Kenta Takahashi",
+          "segment": "Mid-Market",
+          "amount": "[CURRENCY]50,000",
+          "score": "45"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "ranking-surface",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "subtitle",
+            "table"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "🏆 Top 5 Accounts by Value",
+          "usageHint": "h2"
+        },
+        {
+          "id": "subtitle",
+          "component": "MaterialText",
+          "text": "FY2024 — Cumulative Value",
+          "usageHint": "caption"
+        },
+        {
+          "id": "table",
+          "component": "MaterialTable",
+          "caption": "Top 5 accounts by cumulative value",
+          "columns": [
+            {
+              "header": "#",
+              "field": "rank"
+            },
+            {
+              "header": "Name",
+              "field": "name"
+            },
+            {
+              "header": "Segment",
+              "field": "segment"
+            },
+            {
+              "header": "Value",
+              "field": "amount"
+            },
+            {
+              "header": "Score",
+              "field": "score"
+            }
+          ],
+          "rows": {
+            "path": "/ranking"
+          },
+          "style": {
+            "marginTop": "8px"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialRow",
+          "children": [
+            "btnDetail",
+            "btnExport"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "btnDetail",
+          "component": "MaterialButton",
+          "label": "🔍 Deep-Dive #1",
+          "action": {
+            "event": {
+              "name": "deep_dive_top_account",
+              "context": {
+                "prompt": "Analyze #1 Taro Tanaka in detail"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnExport",
+          "component": "MaterialButton",
+          "label": "📊 Show All",
+          "action": {
+            "event": {
+              "name": "show_full_ranking",
+              "context": {
+                "prompt": "Show the full account ranking"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

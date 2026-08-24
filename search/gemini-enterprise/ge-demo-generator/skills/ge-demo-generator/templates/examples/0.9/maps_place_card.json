@@ -1,0 +1,150 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "maps-results",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "maps-results",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "place1",
+            "place1Detail",
+            "divider2",
+            "place2",
+            "place2Detail",
+            "divider3",
+            "place3",
+            "place3Detail"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📍 Recommended Venues Nearby — Search Results",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "place1",
+          "component": "MaterialText",
+          "text": "🏢 Riverside Conference Hotel  ⭐ 4.6",
+          "usageHint": "h3"
+        },
+        {
+          "id": "place1Detail",
+          "component": "MaterialText",
+          "text": "📌 1-1-1 Central District | ☎ +1-555-0101 — 💰 Budget: [CURRENCY]30,000+/person | Capacity: up to 200",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider2",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "place2",
+          "component": "MaterialText",
+          "text": "🏢 Garden Terrace Hotel  ⭐ 4.5",
+          "usageHint": "h3"
+        },
+        {
+          "id": "place2Detail",
+          "component": "MaterialText",
+          "text": "📌 1-23-4 Harbour District | ☎ +1-555-0102 — 💰 Budget: [CURRENCY]25,000+/person | Capacity: up to 150",
+          "usageHint": "body"
+        },
+        {
+          "id": "divider3",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "place3",
+          "component": "MaterialText",
+          "text": "🏢 Grand Park Hotel  ⭐ 4.4",
+          "usageHint": "h3"
+        },
+        {
+          "id": "place3Detail",
+          "component": "MaterialText",
+          "text": "📌 1-1-1 Parkside District | ☎ +1-555-0103 — 💰 Budget: [CURRENCY]35,000+/person | Capacity: up to 300",
+          "usageHint": "body"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialRow",
+          "children": [
+            "btnBook",
+            "btnCompare"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "btnBook",
+          "component": "MaterialButton",
+          "label": "🏢 Plan with #1",
+          "action": {
+            "event": {
+              "name": "plan_at_venue",
+              "context": {
+                "prompt": "Create a detailed event plan at Riverside Conference Hotel"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnCompare",
+          "component": "MaterialButton",
+          "label": "📊 Compare Venues",
+          "action": {
+            "event": {
+              "name": "compare_venues",
+              "context": {
+                "prompt": "Create a detailed comparison of the 3 venues"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]
