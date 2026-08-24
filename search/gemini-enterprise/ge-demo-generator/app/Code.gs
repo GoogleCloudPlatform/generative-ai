@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.90-public',
+  APP_VERSION: 'v11.91-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -3706,6 +3706,26 @@ else
 fi
 rm -f "\$AUTH_RESP"
 
+# A write that answered 200 is not proof the resource is READABLE, and the
+# registration further down is the only thing that cares. Read it back and let
+# the answer - not the write - decide whether the agent is registered with an
+# authorization at all: Discovery Engine resolves
+# authorizationConfig.agentAuthorization at create time and rejects the WHOLE
+# registration with 404 NOT_FOUND when it names nothing, so a failed
+# authorization would otherwise cost the demo its agent and its direct chat
+# link, not just its Workspace tools.
+AUTH_GET=\$(curl -s -o /dev/null -w "%{http_code}" \
+  -H "Authorization: Bearer \$TOKEN" \
+  -H "X-Goog-User-Project: \$PROJECT_ID" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/authorizations/\$AUTH_ID" 2>/dev/null || echo "000")
+if [ "\$AUTH_GET" != "200" ]; then
+  echo "    ⚠️  Authorization \$AUTH_ID is not readable (HTTP \$AUTH_GET) - the agent will be"
+  echo "       registered WITHOUT it. The agent and its direct chat link still work;"
+  echo "       Workspace tools fall back to the service account until this is fixed"
+  echo "       and the script is re-run."
+  AUTH_ID=""
+fi
+
 `;
   }
 
@@ -6075,14 +6095,39 @@ print(f"Error registering agent ({create_code}): {resp.get('error', '')}", file=
 sys.exit(1)
 EOF
 
+  # One definition for both the single-app and the pick-an-app branch below.
+  # \$1 = location, \$2 = engine id, \$3 = authorization id ("" = register
+  # without one).
+  register_ge_agent() {
+    python3 register_agent.py "\$1" "$PROJECT_NUMBER" "\$1" "\$2" "$TOKEN" "${dirName}" "$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "\$3" 2>&1
+  }
+
+  # An authorization that reads back fine can still be REFUSED by the
+  # registration (bound to another agent, wrong project number). A registered
+  # agent with degraded Workspace tools beats no agent at all, so fall back
+  # once, keep the direct chat link, and say plainly what was lost.
+  register_ge_agent_with_fallback() {
+    REG_OUTPUT=\$(register_ge_agent "\$1" "\$2" "\$3" || true)
+    echo "\$REG_OUTPUT"
+    AGENT_ID=\$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+    if [ -z "\$AGENT_ID" ] && [ ! -z "\$3" ]; then
+      echo "⚠️  Registration with the authorization failed - retrying without it..."
+      REG_OUTPUT=\$(register_ge_agent "\$1" "\$2" "" || true)
+      echo "\$REG_OUTPUT"
+      AGENT_ID=\$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+      if [ ! -z "\$AGENT_ID" ]; then
+        echo "⚠️  Registered WITHOUT end-user OAuth - Workspace tools run as the service"
+        echo "    account. Fix the authorization and re-run this script to wire it in."
+      fi
+    fi
+  }
+
   if [ "$APP_COUNT" = "1" ]; then
     SELECTED_APP_ID=$(echo "\${APP_NAMES[0]}" | awk -F'/' '{print \$NF}')
     SELECTED_LOC="\${APP_LOCS[0]}"
     echo "✅ Found exactly one Gemini Enterprise app ($SELECTED_APP_ID). Automating registration..."
 
-    REG_OUTPUT=$(python3 register_agent.py "$SELECTED_LOC" "$PROJECT_NUMBER" "$SELECTED_LOC" "$SELECTED_APP_ID" "$TOKEN" "${dirName}" "$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "$AUTH_ID" 2>&1) || true
-    echo "$REG_OUTPUT"
-    AGENT_ID=$(echo "$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+    register_ge_agent_with_fallback "$SELECTED_LOC" "$SELECTED_APP_ID" "$AUTH_ID"
     rm register_agent.py
     if [ -z "\$AGENT_ID" ]; then
       echo "⚠️  Gemini Enterprise registration failed, but the Cloud Run deployment itself is COMPLETE."
@@ -6114,9 +6159,7 @@ EOF
       
       echo "✅ Selected app: \${APP_DISPLAY_NAMES[\$CHOICE]}. Automating registration..."
       
-      REG_OUTPUT=$(python3 register_agent.py "\$SELECTED_LOC" "\$PROJECT_NUMBER" "\$SELECTED_LOC" "\$SELECTED_APP_ID" "\$TOKEN" "${dirName}" "\$SERVICE_URL/a2a/app" "\$AGENT_DISPLAY_NAME" '${safeSummary}' "\$AUTH_ID" 2>&1) || true
-      echo "\$REG_OUTPUT"
-      AGENT_ID=$(echo "\$REG_OUTPUT" | grep "AGENT_ID:" | cut -d':' -f2)
+      register_ge_agent_with_fallback "\$SELECTED_LOC" "\$SELECTED_APP_ID" "\$AUTH_ID"
       rm register_agent.py
       if [ -z "\$AGENT_ID" ]; then
         echo "⚠️  Gemini Enterprise registration failed, but the Cloud Run deployment itself is COMPLETE."
