@@ -1,6 +1,6 @@
 # Discovery Engine DataStore Connectors Reference Guide
 
-> **Purpose**: Technical architecture, API specifications, and operational patterns for provisioning, binding, querying, and cleaning up Discovery Engine (Gemini Enterprise / Discovery Engine) DataStore connectors.
+> **Purpose**: Technical architecture, API specifications, and operational patterns for provisioning, binding, querying, and cleaning up Discovery Engine (Gemini Enterprise) DataStore connectors.
 
 ---
 
