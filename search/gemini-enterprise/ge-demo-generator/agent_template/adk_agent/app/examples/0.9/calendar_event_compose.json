@@ -45,6 +45,7 @@
             "tEnd",
             "fLoc",
             "fAtt",
+            "footerDivider",
             "actions"
           ],
           "align": "stretch",
@@ -109,6 +110,10 @@
           "value": {
             "path": "/form/attendees"
           }
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actions",

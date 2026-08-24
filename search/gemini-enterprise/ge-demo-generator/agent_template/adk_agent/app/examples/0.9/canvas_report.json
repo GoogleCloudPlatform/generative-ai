@@ -34,6 +34,7 @@
             "repBody2",
             "repSec3",
             "repBody3",
+            "footerDivider",
             "repActions"
           ],
           "align": "stretch",
@@ -86,6 +87,10 @@
           "component": "MaterialText",
           "text": "Prioritise the APAC expansion budget, freeze discretionary discounting in the Americas until the reconciliation gaps close, and add an automated variance check to the nightly billing job.",
           "usageHint": "body"
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "repActions",

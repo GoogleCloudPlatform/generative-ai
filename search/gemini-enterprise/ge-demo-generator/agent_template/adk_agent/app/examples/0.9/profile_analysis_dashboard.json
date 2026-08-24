@@ -41,13 +41,13 @@
         {
           "id": "headerTitle",
           "component": "MaterialText",
-          "text": "📊 Kenta Takahashi (ALM-005) Profile Analysis",
+          "text": "📊 Kenta Takahashi (ACC-005) Profile Analysis",
           "usageHint": "h2"
         },
         {
           "id": "profileSubtitle",
           "component": "MaterialText",
-          "text": "Class of 2000, Economics | Mitsubishi UFJ Bank, Head of Corporate Planning",
+          "text": "Mid-Market segment, customer since 2000 | Example Corporation, Head of Corporate Planning",
           "usageHint": "subtitle1"
         },
         {
@@ -59,7 +59,7 @@
           "component": "MaterialRow",
           "children": [
             "kpiScore",
-            "kpiDonation",
+            "kpiValue",
             "kpiRank"
           ],
           "justify": "spaceEvenly",
@@ -87,24 +87,24 @@
           "usageHint": "caption"
         },
         {
-          "id": "kpiDonation",
+          "id": "kpiValue",
           "component": "MaterialColumn",
           "children": [
-            "kpiDonationValue",
-            "kpiDonationLabel"
+            "kpiValueAmount",
+            "kpiValueLabel"
           ],
           "align": "center"
         },
         {
-          "id": "kpiDonationValue",
+          "id": "kpiValueAmount",
           "component": "MaterialText",
           "text": "[CURRENCY]50,000",
           "usageHint": "h2"
         },
         {
-          "id": "kpiDonationLabel",
+          "id": "kpiValueLabel",
           "component": "MaterialText",
-          "text": "Lifetime Donations",
+          "text": "Lifetime Value",
           "usageHint": "caption"
         },
         {
@@ -135,19 +135,19 @@
         {
           "id": "timelineTitle",
           "component": "MaterialText",
-          "text": "📅 Event Attendance History",
+          "text": "📅 Engagement History",
           "usageHint": "h3"
         },
         {
           "id": "timelineItem1",
           "component": "MaterialText",
-          "text": "✅ 2024/03/05 Global Career Seminar — Attended",
+          "text": "✅ 2024/03/05 Quarterly Business Review — Attended",
           "usageHint": "body"
         },
         {
           "id": "timelineItem2",
           "component": "MaterialText",
-          "text": "❌ 2024/04/10 Spring Gala 2024 — Absent (coincided with CFO appointment)",
+          "text": "❌ 2024/04/10 Product Webinar — Absent (coincided with CFO appointment)",
           "usageHint": "body"
         },
         {
@@ -163,7 +163,7 @@
         {
           "id": "insightBody",
           "component": "MaterialText",
-          "text": "Post-CFO appointment workload likely caused the absence. As things stabilize, now is the ideal time for a 1-on-1 outreach from the Dean or a VIP dinner invitation.",
+          "text": "Post-CFO appointment workload likely caused the absence. As things stabilize, now is the ideal time for a 1-on-1 outreach from the account executive or an executive briefing invitation.",
           "usageHint": "body"
         },
         {
@@ -191,9 +191,9 @@
           "label": "🔍 Deep-Dive",
           "action": {
             "event": {
-              "name": "deep_dive_donations",
+              "name": "deep_dive_value",
               "context": {
-                "prompt": "Analyze Takahashi's donation history in detail"
+                "prompt": "Analyze Takahashi's value history in detail"
               }
             }
           },

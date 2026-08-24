@@ -420,6 +420,7 @@ Dexin
 dflags
 dfs
 DHH
+diffed
 diffs
 digikey
 diltiazem
@@ -633,6 +634,7 @@ Frodo
 fromarray
 frombytes
 fromiter
+fromkeys
 frontline
 Frontline
 FRONTLINE
@@ -1407,6 +1409,7 @@ paracord
 Parag
 parcoords
 parfaite
+Parkside
 parseable
 passwort
 pastiched
@@ -1746,6 +1749,7 @@ Simpsons
 sinc
 Singin
 sittin
+SIU
 Skaffold
 Sketchfab
 skillsets
@@ -1757,6 +1761,7 @@ SLAs
 slf
 Smartbuy
 Smaug
+SMB
 SMCC
 Smol
 smolagent
@@ -1840,6 +1845,7 @@ SYSINSTR
 SYSROOT
 Syunik
 SZRC
+TABLESAMPLE
 tabular
 Tadao
 Tafel
@@ -1985,6 +1991,7 @@ Uniquify
 unlabel
 unmarshal
 unparseable
+UNPIVOT
 unquote
 unrtf
 unserialisable
@@ -2212,3 +2219,4 @@ Zoomably
 Zosyn
 Zscaler
 Zuv
+ZWSP

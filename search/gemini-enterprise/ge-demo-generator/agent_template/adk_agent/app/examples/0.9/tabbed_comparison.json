@@ -25,6 +25,7 @@
             "title",
             "divider1",
             "tabs",
+            "footerDivider",
             "actionRow"
           ],
           "align": "stretch"
@@ -114,6 +115,10 @@
           "component": "MaterialText",
           "text": "Score: 60 ✏️",
           "usageHint": "body"
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actionRow",

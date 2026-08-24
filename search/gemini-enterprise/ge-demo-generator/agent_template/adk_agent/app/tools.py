@@ -49,6 +49,28 @@ def _patched_default(self, obj):
     return _orig_default(self, obj)
 json.JSONEncoder.default = _patched_default
 
+_TOK_LABELS = {}
+
+def _tok_fp(_t):
+    # Never log token material. The auth diagnostics only need to tell one
+    # token from another across log lines (stale snapshot vs freshly rotated),
+    # which a prefix did by leaking the first 30 characters of a live OAuth
+    # access token into Cloud Logging. Hand out sequential in-process labels
+    # instead: nothing derived from the secret is emitted, so there is no
+    # digest to brute-force and no value to correlate across deployments.
+    # The table is bounded because a long-lived instance rotates tokens.
+    try:
+        _k = _t or ''
+        _lbl = _TOK_LABELS.get(_k)
+        if _lbl is None:
+            if len(_TOK_LABELS) >= 64:
+                _TOK_LABELS.clear()
+            _lbl = 'tok%d' % (len(_TOK_LABELS) + 1)
+            _TOK_LABELS[_k] = _lbl
+        return _lbl
+    except Exception:
+        return 'unavailable'
+
 
 
 
@@ -299,18 +321,43 @@ def get_bigquery_mcp_url():
     # Using ?project= query parameter as the header alone was insufficient for public datasets
     return f"https://bigquery.googleapis.com/mcp?project={project_id}"
 
+# The BigQuery MCP server offers six tools. Three of them are a behavioural
+# hazard, not a token one: a 12-run A/B of the generated agent on 2026-08-23
+# had it open a plain figure question with 'list_table_ids' before its first
+# useful call, twice - a whole model round trip (~7s) spent rediscovering
+# table names the generated data-asset catalog already lists in the prompt.
+# A tool that is not declared cannot be the opening move, and after this
+# filter the listing calls stopped entirely.
+#
+# Do not sell this as a prompt-size win. Measured as sent to the model, the
+# three dropped declarations are 2,046 characters of a 421,269-character
+# prefill; the raw MCP listing is far larger, but ADK strips it down before
+# it ships. The same A/B saw no change in end-to-end latency: a turn costs
+# 4-10 sequential model round trips and this removes at most one of them.
+#
+# What survives, and why:
+#   execute_sql_readonly  every read.
+#   execute_sql           writes - INSERT/UPDATE/DELETE/MERGE have no other path.
+#   get_table_info        SQL error recovery; five places in the instruction
+#                         send the model here when a query fails on a column.
+_BIGQUERY_TOOL_FILTER = ['execute_sql', 'execute_sql_readonly', 'get_table_info']
+
+
 def get_bigquery_mcp_toolset():
     """Creates a BigQuery MCP toolset. URL is project-scoped to ensure quota/perms."""
     project_id = get_project_id()
     url = get_bigquery_mcp_url()
     if project_id == "UNKNOWN":
         print("  [CRITICAL] GOOGLE_CLOUD_PROJECT is missing! MCP calls will likely fail.")
-        
+
+    # Escape hatch for a demo whose data-asset catalog does not describe
+    # everything the agent needs to discover at runtime.
+    _filter = None if os.environ.get("BQ_TOOL_FILTER_OFF", "").lower() in ("1", "true", "yes") else _BIGQUERY_TOOL_FILTER
     return McpToolset(connection_params=StreamableHTTPConnectionParams(
-        url=url, 
+        url=url,
         headers={"x-goog-user-project": project_id},
         timeout=300
-    ))
+    ), tool_filter=_filter)
 
 def get_firestore_mcp_toolset():
     """Creates a Firestore MCP toolset (data ops only; DB/index admin excluded
@@ -324,13 +371,21 @@ def get_firestore_mcp_toolset():
         timeout=300
     ), tool_filter=[
         'get_document', 'add_document', 'update_document', 'delete_document',
-        'list_documents', 'list_collections',
+        'list_documents',
+        # list_collections is deliberately withheld. It returns project-wide
+        # metadata that bloats the context and reliably triggers
+        # MALFORMED_FUNCTION_CALL, and there is exactly one collection in this
+        # demo, whose name is already in the instruction. The prompt has told the
+        # model not to call it since v10.x and the model called it anyway on
+        # 2026-08-23; removing it from the toolset is the only thing that works.
     ])
 
 def get_maps_mcp_toolset():
     """Creates a Google Maps MCP toolset."""
     dotenv.load_dotenv()
     maps_api_key = os.getenv('MAPS_API_KEY')
+    if not maps_api_key:
+        return None
     project_id = get_project_id()
     url = get_maps_mcp_url()
     return McpToolset(connection_params=StreamableHTTPConnectionParams(
@@ -464,7 +519,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
                     t = getattr(builtins, '_ws_session_tokens', {}).get(_sid)
                     if t:
                         token = t
-                        _logger.warning(f"header_provider: OK Strategy0 - per-session registry (session={_sid}, prefix={token[:30]}..., len={len(token)})")
+                        _logger.warning(f"header_provider: OK Strategy0 - per-session registry (session={_sid}, fp={_tok_fp(token)}, len={len(token)})")
             except Exception as ex:
                 _logger.warning(f"header_provider: Strategy0 ERROR - registry lookup failed: {type(ex).__name__}: {ex}")
 
@@ -474,7 +529,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
             t = getattr(builtins, '_workspace_oauth_token', '')
             if t:
                 token = t
-                _logger.warning(f"header_provider: OK Strategy1 - token from builtins (prefix={token[:30]}..., len={len(token)})")
+                _logger.warning(f"header_provider: OK Strategy1 - token from builtins (fp={_tok_fp(token)}, len={len(token)})")
 
         # Strategy 2 (was 1): context.state - CREATE-time snapshot, may be stale.
         if not token and context and auth_id:
@@ -487,7 +542,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
                         t = state[auth_id] if auth_id in state else None
                     if t:
                         token = t
-                        _logger.warning(f"header_provider: OK Strategy2 - token from context.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
+                        _logger.warning(f"header_provider: OK Strategy2 - token from context.state (fp={_tok_fp(token)}, len={len(token)}) - CREATE-time snapshot, may be stale")
                     else:
                         _logger.warning(f"header_provider: Strategy2 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
             except Exception as ex:
@@ -505,7 +560,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
                             t = session_state[auth_id] if auth_id in session_state else None
                         if t:
                             token = t
-                            _logger.warning(f"header_provider: OK Strategy3 - token from context.session.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
+                            _logger.warning(f"header_provider: OK Strategy3 - token from context.session.state (fp={_tok_fp(token)}, len={len(token)}) - CREATE-time snapshot, may be stale")
             except Exception as ex:
                 _logger.warning(f"header_provider: Strategy3 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
 
@@ -600,7 +655,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
                     t = getattr(builtins, '_ws_session_tokens', {}).get(_sid)
                     if t:
                         token = t
-                        _logger.warning(f"header_provider: OK Strategy0 - per-session registry (session={_sid}, prefix={token[:30]}..., len={len(token)})")
+                        _logger.warning(f"header_provider: OK Strategy0 - per-session registry (session={_sid}, fp={_tok_fp(token)}, len={len(token)})")
             except Exception as ex:
                 _logger.warning(f"header_provider: Strategy0 ERROR - registry lookup failed: {type(ex).__name__}: {ex}")
 
@@ -610,7 +665,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
             t = getattr(builtins, '_workspace_oauth_token', '')
             if t:
                 token = t
-                _logger.warning(f"header_provider: OK Strategy1 - token from builtins (prefix={token[:30]}..., len={len(token)})")
+                _logger.warning(f"header_provider: OK Strategy1 - token from builtins (fp={_tok_fp(token)}, len={len(token)})")
 
         # Strategy 2 (was 1): context.state - CREATE-time snapshot, may be stale.
         if not token and context and auth_id:
@@ -623,7 +678,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
                         t = state[auth_id] if auth_id in state else None
                     if t:
                         token = t
-                        _logger.warning(f"header_provider: OK Strategy2 - token from context.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
+                        _logger.warning(f"header_provider: OK Strategy2 - token from context.state (fp={_tok_fp(token)}, len={len(token)}) - CREATE-time snapshot, may be stale")
                     else:
                         _logger.warning(f"header_provider: Strategy2 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
             except Exception as ex:
@@ -641,7 +696,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
                             t = session_state[auth_id] if auth_id in session_state else None
                         if t:
                             token = t
-                            _logger.warning(f"header_provider: OK Strategy3 - token from context.session.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
+                            _logger.warning(f"header_provider: OK Strategy3 - token from context.session.state (fp={_tok_fp(token)}, len={len(token)}) - CREATE-time snapshot, may be stale")
             except Exception as ex:
                 _logger.warning(f"header_provider: Strategy3 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
 
@@ -736,7 +791,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
                 auth_header = headers.get("Authorization", "")
                 if auth_header.startswith("Bearer "):
                     token = auth_header[7:]
-                    _logger.warning(f"httpx_factory: Got token from headers (prefix={token[:30]}..., len={len(token)})")
+                    _logger.warning(f"httpx_factory: Got token from headers (fp={_tok_fp(token)}, len={len(token)})")
         
             if not token:
                 _logger.warning("httpx_factory: No token in headers, using default client")
@@ -931,9 +986,8 @@ async def generate_image(prompt: str, tool_context: ToolContext) -> dict:
     
     Args:
         prompt: A highly detailed, descriptive prompt for the image. Include stylistic instructions (e.g., 'photorealistic', 'flat design').
-                CRITICAL: The prompt text MUST be written in the EXACT SAME language that the user is using in the current chat session.
-                If the conversation is in Japanese, you MUST write the entire prompt in Japanese (e.g., '武田電気株式会社の見積状況をまとめたスライド...').
-                This ensures all text inside the generated image is rendered in the user's language.
+                CRITICAL: The prompt text MUST be written in the EXACT SAME language that the user is using in the current chat session,
+                whatever that language is. This ensures all text inside the generated image is rendered in the user's language.
         
     Returns:
         A dictionary with status and detail keys.
@@ -942,36 +996,31 @@ async def generate_image(prompt: str, tool_context: ToolContext) -> dict:
     
     import os
     import logging
-    import re
     location = os.environ.get("GOOGLE_CLOUD_LOCATION", "global")
     project = os.environ.get("GOOGLE_CLOUD_PROJECT")
     
     logging.info(f"generate_image called with prompt: {prompt}")
     logging.info(f"Using location: {location}, project: {project}")
     
-    # 1. Automatic language detection on the prompt text (Detect Japanese characters)
-    is_japanese = bool(re.search(r'[぀-ゟ゠-ヿ一-龯]', prompt))
+    # Construct robust system-level style and language guidelines.
+    base_style_rule = (
+        "\n\nCRITICAL STYLE RULE: NEVER add headers, watermarks, logos, or invented "
+        "company, brand or organisation names to the generated image. Image models like "
+        "to stamp generic corporate boilerplate onto slides; render only the text the "
+        "prompt above actually asks for."
+    )
     
-    # 2. Construct robust system-level style and language guidelines based on detected language
-    base_style_rule = "\n\nCRITICAL STYLE RULE: NEVER include headers, watermarks, logos, or any text reading 'Consulting Firm' in the generated image."
+    # One rule for every language. Naming a language here would tilt every demo
+    # that is not in that language, and the model already knows which script the
+    # prompt is written in.
+    lang_rule = (
+        "\n\nCRITICAL LANGUAGE RULE: ALL text elements inside the generated image "
+        "(including presentation titles, headers, table labels, chart legends, data points, bullet points, annotations, captions, and company names) "
+        "MUST be rendered EXCLUSIVELY in the SAME language and script as the prompt text above. "
+        "Do NOT translate anything into English, do NOT transliterate names into Latin characters, "
+        "and do NOT mix languages. This is a strict requirement."
+    )
     
-    if is_japanese:
-        # Heavy reinforcement for Japanese rendering (Forces Imagen 3 to use Japanese fonts and text labels exclusively)
-        lang_rule = (
-            "\n\nCRITICAL LANGUAGE RULE: ALL text elements inside the generated image "
-            "(including presentation titles, headers, table labels, chart legends, data points, bullet points, annotations, and company names) "
-            "MUST be rendered EXCLUSIVELY in Japanese. Do NOT use any English or Latin characters. "
-            "For example, render company names as '武田電気株式会社' (not Takeden Co), "
-            "and use Japanese for headers like 'エグゼクティブサマリー' or '保留中の見積処理状況'. "
-            "This is a strict requirement."
-        )
-    else:
-        lang_rule = (
-            "\n\nCRITICAL LANGUAGE RULE: ALL text elements inside the generated image "
-            "(including titles, labels, axis names, legends, bullet points, annotations, captions) "
-            "MUST be rendered in the SAME language as the prompt text above. Do NOT mix languages."
-        )
-        
     final_prompt = prompt + base_style_rule + lang_rule
     
     client = genai_client.Client(
@@ -1188,7 +1237,7 @@ async def publish_dashboard(html: str, title: str, tool_context: ToolContext) ->
 if os.environ.get("ENABLE_COMPUTER_USE") == "1":
 
     # =====================================================================
-    # Computer Use (browser agent) -- Gemini 3.5 Flash built-in computer_use
+    # Computer Use (browser agent) -- Gemini 3.7 Flash built-in computer_use
     # tool driven over a self-hosted headless Chromium (Playwright). Adapted
     # from the official reference impl (github.com/google-gemini/
     # computer-use-preview, Apache-2.0): same generate_content loop, action

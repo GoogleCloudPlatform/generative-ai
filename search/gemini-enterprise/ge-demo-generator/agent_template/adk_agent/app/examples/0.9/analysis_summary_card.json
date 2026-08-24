@@ -26,8 +26,7 @@
             "divider1",
             "kpiRow",
             "divider2",
-            "summaryText",
-            "actionRow"
+            "summaryText"
           ],
           "align": "stretch"
         },
@@ -79,19 +78,33 @@
           "component": "MaterialText",
           "text": "Key findings: Revenue growth driven by APAC region (+15.3%). Three critical anomalies in billing reconciliation require immediate attention. Recommended action: escalate invoice IDs INV-4521, INV-4589 to finance team.",
           "usageHint": "body"
-        },
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
         {
-          "id": "actionRow",
+          "id": "root",
           "component": "MaterialRow",
           "children": [
             "btnDrillDown",
             "btnExport"
           ],
-          "justify": "end",
+          "justify": "start",
           "align": "center",
           "style": {
-            "gap": "8px",
-            "marginTop": "12px"
+            "gap": "8px"
           }
         },
         {

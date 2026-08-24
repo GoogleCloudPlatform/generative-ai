@@ -37,6 +37,7 @@
             "divider1",
             "selectSpace",
             "fieldMsg",
+            "footerDivider",
             "actions"
           ],
           "align": "stretch",
@@ -83,6 +84,10 @@
           "value": {
             "path": "/form/message"
           }
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actions",

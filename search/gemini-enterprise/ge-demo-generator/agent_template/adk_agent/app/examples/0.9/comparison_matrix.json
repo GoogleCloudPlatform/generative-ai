@@ -10,23 +10,23 @@
     "version": "v0.9",
     "updateDataModel": {
       "surfaceId": "comparison-matrix",
-      "path": "/faculties",
+      "path": "/segments",
       "value": [
         {
-          "faculty": "🏗️ Engineering",
-          "donations": "[CURRENCY]1.97M",
+          "segment": "🏢 Enterprise",
+          "value": "[CURRENCY]1.97M",
           "score": "79.0",
           "members": "6"
         },
         {
-          "faculty": "⚖️ Law",
-          "donations": "[CURRENCY]1.77M",
+          "segment": "🏬 Mid-Market",
+          "value": "[CURRENCY]1.77M",
           "score": "75.5",
           "members": "8"
         },
         {
-          "faculty": "💰 Economics",
-          "donations": "[CURRENCY]1.20M",
+          "segment": "🏪 SMB",
+          "value": "[CURRENCY]1.20M",
           "score": "67.0",
           "members": "8"
         }
@@ -40,19 +40,19 @@
       "path": "/chartSpec",
       "value": {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "description": "Average engagement score by faculty",
+        "description": "Average engagement score by segment",
         "data": {
           "values": [
             {
-              "faculty": "Engineering",
+              "segment": "Enterprise",
               "score": 79.0
             },
             {
-              "faculty": "Law",
+              "segment": "Mid-Market",
               "score": 75.5
             },
             {
-              "faculty": "Economics",
+              "segment": "SMB",
               "score": 67.0
             }
           ]
@@ -60,9 +60,9 @@
         "mark": "bar",
         "encoding": {
           "x": {
-            "field": "faculty",
+            "field": "segment",
             "type": "nominal",
-            "title": "Faculty"
+            "title": "Segment"
           },
           "y": {
             "field": "score",
@@ -92,15 +92,14 @@
             "title",
             "table",
             "chart",
-            "summaryText",
-            "actionRow"
+            "summaryText"
           ],
           "align": "stretch"
         },
         {
           "id": "title",
           "component": "MaterialText",
-          "text": "📊 Faculty Performance Comparison",
+          "text": "📊 Segment Performance Comparison",
           "usageHint": "h2"
         },
         {
@@ -108,12 +107,12 @@
           "component": "MaterialTable",
           "columns": [
             {
-              "header": "Faculty",
-              "field": "faculty"
+              "header": "Segment",
+              "field": "segment"
             },
             {
-              "header": "Donations",
-              "field": "donations"
+              "header": "Value",
+              "field": "value"
             },
             {
               "header": "Avg Score",
@@ -125,7 +124,7 @@
             }
           ],
           "rows": {
-            "path": "/faculties"
+            "path": "/segments"
           },
           "style": {
             "marginTop": "8px"
@@ -135,9 +134,6 @@
           "id": "chart",
           "component": "VegaChart",
           "height": 220,
-          "style": {
-            "marginTop": "12px"
-          },
           "spec": {
             "path": "/chartSpec"
           }
@@ -145,35 +141,49 @@
         {
           "id": "summaryText",
           "component": "MaterialText",
-          "text": "💡 Engineering leads in both donations and score. Economics has more members but lower scores — engagement strategy reinforcement recommended.",
+          "text": "💡 Enterprise leads in both value and score. SMB has more accounts but lower scores — engagement strategy reinforcement recommended.",
           "usageHint": "body",
           "style": {
             "marginTop": "12px"
           }
-        },
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
         {
-          "id": "actionRow",
+          "id": "root",
           "component": "MaterialRow",
           "children": [
             "btnEcon",
             "btnReport"
           ],
-          "justify": "end",
+          "justify": "start",
           "align": "center",
           "style": {
-            "gap": "8px",
-            "marginTop": "12px"
+            "gap": "8px"
           }
         },
         {
           "id": "btnEcon",
           "component": "MaterialButton",
-          "label": "📉 Deep-Dive Economics",
+          "label": "📉 Deep-Dive SMB",
           "action": {
             "event": {
-              "name": "deep_dive_faculty",
+              "name": "deep_dive_segment",
               "context": {
-                "prompt": "Analyze the root cause of low engagement in Economics"
+                "prompt": "Analyze the root cause of low engagement in SMB"
               }
             }
           },
@@ -182,12 +192,12 @@
         {
           "id": "btnReport",
           "component": "MaterialButton",
-          "label": "📋 All Faculties Report",
+          "label": "📋 All Segments Report",
           "action": {
             "event": {
-              "name": "generate_faculty_report",
+              "name": "generate_segment_report",
               "context": {
-                "prompt": "Generate a detailed report for all faculties"
+                "prompt": "Generate a detailed report for all segments"
               }
             }
           }

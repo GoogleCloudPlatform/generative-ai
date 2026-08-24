@@ -41,6 +41,7 @@
             "row_container_0",
             "dividerRow1",
             "row_container_1",
+            "footerDivider",
             "actionRow"
           ],
           "align": "stretch"
@@ -58,7 +59,7 @@
         {
           "id": "companyHeader1",
           "component": "MaterialText",
-          "text": "🏢 Kansai Air Conditioning Services Co., Ltd.",
+          "text": "🏢 Example Corporation",
           "usageHint": "h3"
         },
         {
@@ -97,7 +98,7 @@
         {
           "id": "orig_name_0",
           "component": "MaterialText",
-          "text": "エアコン5馬力 (SZRC140BC)",
+          "text": "Line item A (LEGACY-1001)",
           "usageHint": "body"
         },
         {
@@ -181,7 +182,7 @@
         {
           "id": "orig_name_1",
           "component": "MaterialText",
-          "text": "エアコン3馬力 (PROD012)",
+          "text": "Line item B (LEGACY-1002)",
           "usageHint": "body"
         },
         {
@@ -224,6 +225,10 @@
           "component": "MaterialText",
           "text": "💡 Matches master catalog with 95% confidence",
           "usageHint": "caption"
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actionRow",

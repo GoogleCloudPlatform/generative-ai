@@ -38,10 +38,7 @@
           "id": "frame",
           "component": "IFrameSrcdoc",
           "height": 260,
-          "htmlContent": "<!DOCTYPE html><html><head><meta charset='utf-8'><style>body{font-family:Roboto,Arial,sans-serif;margin:0;padding:16px;background:#f8f9fa}.kpis{display:flex;gap:12px}.kpi{flex:1;background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}.kpi b{display:block;font-size:24px;color:#1a73e8}h2{margin:0 0 12px;font-size:16px}</style></head><body><h2>Regional Performance</h2><div class='kpis'><div class='kpi'><b>$12.4M</b>Total revenue</div><div class='kpi'><b>+8.2%</b>YoY growth</div><div class='kpi'><b>23</b>Open anomalies</div></div></body></html>",
-          "style": {
-            "marginTop": "8px"
-          }
+          "htmlContent": "<!DOCTYPE html><html><head><meta charset='utf-8'><style>body{font-family:Roboto,Arial,sans-serif;margin:0;padding:16px;background:#f8f9fa}.kpis{display:flex;gap:12px}.kpi{flex:1;background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}.kpi b{display:block;font-size:24px;color:#1a73e8}h2{margin:0 0 12px;font-size:16px}</style></head><body><h2>Regional Performance</h2><div class='kpis'><div class='kpi'><b>$12.4M</b>Total revenue</div><div class='kpi'><b>+8.2%</b>YoY growth</div><div class='kpi'><b>23</b>Open anomalies</div></div></body></html>"
         },
         {
           "id": "note",

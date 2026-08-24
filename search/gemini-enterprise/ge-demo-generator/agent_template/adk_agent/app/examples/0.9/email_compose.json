@@ -39,6 +39,7 @@
             "fTo",
             "fSubject",
             "fBody",
+            "footerDivider",
             "actions"
           ],
           "align": "stretch",
@@ -80,6 +81,10 @@
           "value": {
             "path": "/form/body"
           }
+        },
+        {
+          "id": "footerDivider",
+          "component": "MaterialDivider"
         },
         {
           "id": "actions",

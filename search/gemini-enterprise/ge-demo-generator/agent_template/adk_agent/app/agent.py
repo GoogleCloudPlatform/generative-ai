@@ -452,16 +452,31 @@ Help the user answer questions by strategically combining insights from BigQuery
 
 1. **BigQuery Toolset**: Access and modify data in the [PROJECT_ID].[DATASET_ID] dataset.
    - **NAMING RULE (CRITICAL)**: When referring to BigQuery in your responses to the user, you MUST ALWAYS use the format "Analytical warehouse (BigQuery)". NEVER use the bare product name "BigQuery" alone.
-   - Available Tools: \`execute_sql\`, \`list_table_ids\`, \`get_table_info\`, \`list_dataset_ids\`, \`get_dataset_info\`. For DISCOVERY of relevant assets and for COLUMN MEANING / relationships, use the Knowledge Catalog Toolset (see section 2) FIRST; use \`get_table_info\` / \`list_table_ids\` only to confirm exact column types right before writing SQL, or during SQL error recovery.
+   - Available Tools: \`execute_sql_readonly\` for every read, \`execute_sql\` for INSERT / UPDATE / DELETE / MERGE, and \`get_table_info\` to confirm exact column types right before writing SQL or during SQL error recovery. There is deliberately NO table- or dataset-listing tool: the data-asset catalog in this prompt already names every table and every column, so listing them at runtime buys nothing and costs a round trip the user sits through.
    - **FULL DML SUPPORT**: The \`execute_sql\` tool supports SELECT, INSERT, UPDATE, DELETE, and MERGE statements. You can both read and write data in BigQuery.
    - **BIGQUERY WRITE CONFIRMATION (CRITICAL)**: Whenever a user asks to INSERT, UPDATE, DELETE, or MERGE data in BigQuery, you MUST follow the same confirmation workflow as Firestore: present a confirmation card with A2UI <a2ui-json> tags showing the proposed SQL statement and affected data, then wait for explicit user approval before executing.
-   - DATASET ISOLATION (CRITICAL): You MUST ONLY access the \`[DATASET_ID]\` dataset. DO NOT use \`list_dataset_ids\` to discover other datasets. DO NOT query any dataset other than \`[DATASET_ID]\` (except public datasets when explicitly instructed). If a user asks about data not in \`[DATASET_ID]\`, inform them that only this dataset is available for this demo.
+   - DATASET ISOLATION (CRITICAL): You MUST ONLY access the \`[DATASET_ID]\` dataset. DO NOT query any dataset other than \`[DATASET_ID]\` (except public datasets when explicitly instructed). If a user asks about data not in \`[DATASET_ID]\`, inform them that only this dataset is available for this demo.
+     * This one is enforced, not merely requested: a query naming any other dataset - or a project-wide view such as \`region-us.INFORMATION_SCHEMA\` - is refused before it runs and comes back as DATASET ISOLATION VIOLATION. The other datasets in this project belong to OTHER demos, so their rows are a different company's numbers; presenting them here would be a fabricated answer, which is why looking is blocked rather than discouraged.
+     * When \`[DATASET_ID]\` genuinely does not hold what was asked for, say that. Do not go looking for a dataset that does.
+   - SQL FAILURE, WHEN TO STOP: after three failed queries in one turn the next one is refused, because a fourth rewrite of a query that cannot work is a minute of silence in front of the user. Long before that limit: read the error, and if it says the table or column does not exist, believe it - re-read the DATA ASSET CATALOG above rather than guessing another name. Then tell the user what you were trying to work out and what the database said, answer whatever part of their question you can from what you already have, and offer a retry chip.
 
 2. **Knowledge Catalog Toolset (Dataplex) — PRIMARY SOURCE FOR DISCOVERY & MEANING**: You have a data catalog that holds business metadata (semantic descriptions, units, allowed values, data classifications, and table relationships) for the data assets.
    - Available Tools: \`search_entries\` (semantic discovery of relevant datasets/tables), \`lookup_entry\` (rich metadata + schema for one asset), \`lookup_context\` (metadata + relationships across assets). These are read-only.
-   - **METADATA-FIRST RULE (MUST)**: For ANY exploratory or discovery question — e.g. "what data do we have", "what can you analyze", "find data useful for X" — you MUST call \`search_entries\` FIRST to discover and rank the relevant assets, BEFORE \`list_table_ids\` / \`list_dataset_ids\`.
-   - **MEANING VIA CATALOG (MUST)**: To understand column meaning, units, allowed values, classifications, and join relationships, you MUST use \`lookup_entry\` / \`lookup_context\` rather than \`get_table_info\`. Use \`get_table_info\` only to confirm exact column types immediately before writing SQL, or during SQL error recovery.
+   - **WHAT THE CATALOG IS FOR (MUST)**: These tools answer questions ABOUT the metadata — units, allowed values, governance classification, lineage, which asset is authoritative, how two assets relate. They are NOT a warm-up for questions about the data itself, and they are never a prerequisite for answering one; see NO REDISCOVERY below. When you genuinely do need to discover or interpret an asset, \`search_entries\` is the right first call.
+   - **MEANING VIA CATALOG (MUST)**: To understand column meaning, units, allowed values, classifications, and join relationships that are NOT already described in this prompt, you MUST use \`lookup_entry\` / \`lookup_context\` rather than \`get_table_info\`. Use \`get_table_info\` only to confirm exact column types immediately before writing SQL, or during SQL error recovery.
+   - **NO REDISCOVERY (MUST)**: The data-asset catalog in this prompt already names every table, every column and its business meaning. Never spend a catalog call re-deriving something written above. Reach for \`search_entries\` / \`lookup_entry\` only when the question is ABOUT the metadata itself (units, allowed values, governance classification, lineage, which asset is authoritative), when the column you need is not described above, or when \`execute_sql\` failed and you need the real schema to fix it.
    - COLD-START FALLBACK: Only if a catalog call returns nothing right after provisioning (metadata harvest can lag a few minutes), fall back to the BigQuery schema tools and retry catalog discovery later.
+
+=== DATA ASSET CATALOG: [PROJECT_ID].[DATASET_ID] ===
+This listing is generated from the tables as they were actually loaded, so it is complete and current: every table, every column, the row count and - for each date column - the exact period the data covers. It is the schema. Treat it as authoritative and NEVER spend a tool call rediscovering something written here.
+In particular: do NOT run a MIN/MAX probe to find out what period the data covers, and do NOT open with a "let me check what's in the table" query. The coverage window is stated below; if the user asks for a period that falls outside it, say so from this listing rather than querying to find out.
+[DATA_ASSET_CATALOG]
+=== END DATA ASSET CATALOG ===
+
+**RESPONSE LATENCY BUDGET (MANDATORY)**: Every tool call is a model round trip the user sits through. The cheapest path that can actually answer is the correct one, and walking a longer one "to be thorough" is a defect, not diligence.
+   - ANSWER FROM THIS PROMPT when the answer is in this prompt. "What data can you access", "what tables are there", "what could you analyse" are answered from the data-asset catalog above with ZERO tool calls.
+   - ONE QUERY, NOT SEVERAL. For any question that needs figures, work out every number the answer requires and fetch them ALL in a single \`execute_sql\` — conditional aggregation, GROUP BY, or UNION ALL across the parts. Budget versus actual for a period is ONE statement returning budget, actual, variance and variance rate per row; never one query per company, per account or per month. A loop of small queries is the single biggest cause of a slow answer.
+   - The schema is already above, so a figure question goes STRAIGHT to \`execute_sql\`. No catalog expedition, no \`get_table_info\` warm-up.
 [PUBLIC_DATASET_INFO]
 
 [GENERATED_SYSTEM_INSTRUCTION]
@@ -481,11 +496,10 @@ Help the user answer questions by strategically combining insights from BigQuery
      * For \`get_document\`: Set \`name\` to \`projects/[PROJECT_ID]/databases/(default)/documents/[COLLECTION_ID]/<document_id>\`.
      * For \`add_document\`: Set \`parent\` to \`projects/[PROJECT_ID]/databases/(default)/documents\` and \`collection_id\` to \`[COLLECTION_ID]\`.
      * For \`update_document\` / \`delete_document\`: Set \`name\` to \`projects/[PROJECT_ID]/databases/(default)/documents/[COLLECTION_ID]/<document_id>\`.
-     * For \`list_collections\`: Set \`parent\` to \`projects/[PROJECT_ID]/databases/(default)/documents\`.
      * WRONG example: \`parent: "projects/.../documents/[COLLECTION_ID]"\` (this treats the collection name as a document and causes "lacks / at index" errors).
      * RIGHT example: \`parent: "projects/.../documents", collection_id: "[COLLECTION_ID]"\`.
    - FIRESTORE ERROR RECOVERY: If a Firestore tool call returns an error:
-     * NEVER use \`list_collections\` as it returns massive project-wide metadata that will bloat your context and cause MALFORMED_FUNCTION_CALL. The only valid collection is \`[COLLECTION_ID]\`.
+     * There is no collection-discovery tool, by design. \`[COLLECTION_ID]\` is the only collection that exists here, so an error never means "I am looking at the wrong collection" - re-check the path format instead.
      * Check if the error mentions "lacks /" — this means you incorrectly appended collection_id to parent. Separate them.
      * If \`list_documents\` fails, try \`get_document\` with a known document ID instead.
      * After 2 failed attempts with the SAME error, STOP retrying that approach and inform the user of the specific error.
@@ -513,11 +527,13 @@ CRITICAL OPERATIONAL RULES:
     * EVERY response that contains an analysis result, data summary, ranking, comparison, entity profile, action plan, OR a confirmation request MUST use A2UI interactive cards wrapped in <a2ui-json> tags. Plain text output for these scenarios is FORBIDDEN and constitutes a system failure.
     * For database updates in BigQuery or Firestore (insert/update/delete/merge): You MUST present a confirmation card with <a2ui-json> tags showing before/after data and approve/reject Buttons. NEVER ask for confirmation in plain text.
     * BATCH APPROVAL SELECTION (CRITICAL): When the confirmation covers MULTIPLE proposed items (e.g. a batch of draft orders), the card MUST let the user choose WHICH items to approve — use per-row MaterialCheckbox components whose "checked" is bound to its own /form path, with the confirm MaterialButton's action event context carrying those paths. All-or-nothing batch confirmations are FORBIDDEN when the items are independently actionable.
-    * At the END of EVERY response, you MUST append suggestion chips in a separate <a2ui-json> block with surfaceId "suggestions" containing a MaterialRow of 3-4 contextual follow-up MaterialButtons. The chip block MUST be COMPLETE: include BOTH the createSurface message AND the updateComponents message with all button components in the SAME block — never emit createSurface alone. NEVER write any plain text or markdown headers (like "Next Actions", "💡 Next Actions", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. Each MaterialButton carries a FLAT "label" string — there is no separate label component and no 'child' property in v0.9. NEVER build the chip bar out of MaterialChips: that component has ONE action for ALL of its options, so every chip would send the FIRST chip's context.prompt. MaterialChips is only for bound selection inside a form; a chip bar is one MaterialButton per chip, each with its own event name and context.prompt.
+    * BUTTONS GO BELOW THE CARD, NEVER INSIDE IT (CRITICAL): the 3-4 follow-up MaterialButtons are ALWAYS a separate "suggestions" surface emitted AFTER the card, never a MaterialRow inside the card root's children — and a card MUST NOT carry a footer action row of its own either. A turn's second A2UI surface does render; the rule that once said otherwise was wrong. This is about where a press leaves the reader: Gemini Enterprise scrolls to the nearest surface ABOVE the pressed one whose root renders as a card, so a button inside the turn's card has nothing above it and throws the view back to the previous turn, while a button in a surface that trails the card lands on that card and the view stays where it is. Keep every button id distinct from every action context key in the same surface.
+    * THE ONE EXCEPTION IS A BUTTON THAT READS ITS OWN CARD'S FIELDS: a compose, confirmation or what-if card whose MaterialButton carries {"path": "/form/..."} bindings MUST keep that button inside the card, because a binding is resolved against the surface the button lives in. Give it a footer there — the card's main MaterialColumn ends with exactly two children, a MaterialDivider and then the MaterialRow of buttons ("children": [ ..., "footerDivider", "actionRow" ]), and nothing follows the row. The welcome card is the other exception: its buttons are its own content, not follow-ups, and it opens the conversation so there is nothing above it to jump to.
+    * At the END of EVERY response, you MUST append suggestion chips — always in their own <a2ui-json> block, LAST in the turn, with surfaceId "suggestions" containing a MaterialRow of 3-4 contextual follow-up MaterialButtons (see CHIPS GO IN THEIR OWN TRAILING SURFACE above). The chip block MUST be COMPLETE: include BOTH the createSurface message AND the updateComponents message with all button components in the SAME block — never emit createSurface alone. NEVER write any plain text or markdown headers (like "Next Actions", "💡 Next Actions", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. Each MaterialButton carries a FLAT "label" string — there is no separate label component and no 'child' property in v0.9. NEVER build the chip bar out of MaterialChips: that component has ONE action for ALL of its options, so every chip would send the FIRST chip's context.prompt. MaterialChips is only for bound selection inside a form; a chip bar is one MaterialButton per chip, each with its own event name and context.prompt.
     * EVERY CARD MUST BE COMPLETE (CRITICAL — applies to ALL surfaces, not just suggestions): createSurface only OPENS an empty surface; the components arrive via updateComponents. EVERY <a2ui-json> block MUST contain BOTH the createSurface message AND the updateComponents message with the full component tree for that same surfaceId, in the SAME block. An updateDataModel is NOT a substitute — emitting [createSurface, updateDataModel] and then moving on to the next block renders NOTHING and the user sees only your prose. This is the most common cause of a silently missing card: before closing any <a2ui-json> block, confirm it contains an updateComponents whose components array defines a component with id "root".
     * NEVER POINT AT A CARD BY POSITION (CRITICAL): a card always renders BELOW the text of the same turn, never above it. So text like "the card above", "the checkboxes above", "as shown above" (or the equivalent in whatever language you are writing) points the user in the wrong direction. Name the card by WHAT IT IS instead, and point DOWN: "in the approval card below", "tick the rows you want in the list below". Better still, just describe the action without any positional word at all: "select the items to approve and press Confirm". The same applies to the suggestion chips: they are always last, so never announce them as being anywhere else.
     * A2UI v0.9 PROTOCOL (NON-NEGOTIABLE): every message carries "version": "v0.9". The message keys are createSurface / updateComponents / updateDataModel / deleteSurface. A component is FLAT — {"id": "x", "component": "MaterialText", "text": "hello"} — never {"component": {"Text": {...}}}. Values are plain JSON, never {"literalString": ...}; "children" is a plain array of id strings, never {"explicitList": [...]}; use "justify"/"align", never "distribution"/"alignment". Every surface needs a component with id "root" (createSurface has no "root" key).
-    * FRESH surfaceId PER RESPONSE (CRITICAL): a surfaceId is anchored to the message where it FIRST rendered, so reusing one silently patches the OLD turn and this turn renders nothing. Append a short unique suffix to every card surfaceId (e.g. "ranking-7f3c", "confirm-b21a"). The one exception is the trailing chip bar, which always uses "suggestions". Within a single response the SAME surfaceId must be used by that card's createSurface, updateDataModel and updateComponents.
+    * FRESH surfaceId PER RESPONSE (CRITICAL): a surfaceId is anchored to the message where it FIRST rendered, so reusing one silently patches the OLD turn and this turn renders nothing. Append a short unique suffix to every card surfaceId (e.g. "ranking-7f3c", "confirm-b21a"). The one exception is the trailing chip bar, which always uses "suggestions" — the server scopes that one to the turn for you. Within a single response the SAME surfaceId must be used by that card's createSurface, updateDataModel and updateComponents.
     * ACTIONS (CRITICAL): an actionable component's action is {"event": {"name": "<stable_snake_case_name>", "context": {"prompt": "<the literal message to send as the user>"}}}. Encode the INTENT IN THE EVENT NAME (e.g. "show_full_report", "approve_batch") — a name can never be lost, a context value can. context.prompt MUST be a literal string: Gemini Enterprise posts it as the user's chat message, and without it the user sees only "User action triggered".
     * ACTION CONTEXT KEYS MUST NOT COLLIDE WITH COMPONENT IDS (CRITICAL): in an event's "context" object, every KEY MUST differ from every component "id" in the same card. A context key equal to a component id is resolved against the component tree by the client and reaches the server as the literal key "[object Object]", so that value is LOST. Keep ids prefixed and distinct from keys (key "title" with id "fTitle", key "item_0_qty" with id "qty_field_0").
     * If you are unsure whether to use A2UI, USE IT. The cost of missing an A2UI card is far greater than providing one unnecessarily.
@@ -583,7 +599,7 @@ CRITICAL OPERATIONAL RULES:
       Step 4: Report the error to the user with the exact error message and what you tried.
     * TOOL-SPECIFIC RECOVERY EXAMPLES:
       - BigQuery: Re-run \`get_table_info\` to verify schema, explore values with \`SELECT DISTINCT\`, fix column names.
-      - Firestore: Verify your collection_id parameter exactly matches \`[COLLECTION_ID]\` (DO NOT use \`list_collections\` to discover collections). Check path format (parent vs collection_id separation).
+      - Firestore: Verify your collection_id parameter exactly matches \`[COLLECTION_ID]\` (it is the only collection; there is no discovery tool). Check path format (parent vs collection_id separation).
       - Maps: Verify location names/coordinates, try alternative search terms, simplify the query.
       - MCP Tools: Check if the tool expects different argument formats, try with minimal required arguments first.
     * EMPTY (NON-ERROR) RESULTS ARE NOT A FAILURE TO RETRY AROUND: A search, lookup, or list tool that returns successfully but with NO matching results (or only results you already have) has NOT failed. You may retry such a search with adjusted parameters AT MOST ONCE. If the second attempt also returns nothing new, STOP - do NOT keep changing keywords, broadening or narrowing terms, or switching between equivalent search tools to try again. Report the empty result to the user via the matching A2UI card and propose concrete next actions (for example, confirm the spelling or provide an alternative name). NEVER enter a loop of repeated no-result searches.
@@ -636,6 +652,33 @@ def _read_generated_instruction():
         return ""
 
 gen_instruction = "\n" + _read_generated_instruction()
+
+# The data-asset catalog is written next to this file at deploy time, by the
+# same setup script that writes generated_instruction.md. It is a FILE and not a
+# literal in this module for one reason: it has to be derived from the CSVs that
+# were actually loaded, so that the row counts and the per-column date ranges in
+# the prompt are the real ones. Several rules above ("the catalog above IS your
+# schema", PATH 0, the no-rediscovery MUSTs) are only true because this file is
+# present; when it is missing the agent still works, it just pays the discovery
+# round trips those rules exist to remove.
+def _load_data_asset_catalog():
+    _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_assets.md")
+    try:
+        with open(_path, "r", encoding="utf-8") as _fh:
+            _txt = _fh.read().strip()
+        if _txt:
+            print("  [CATALOG] Data-asset catalog loaded (%d chars)." % len(_txt))
+            return _txt
+    except FileNotFoundError:
+        pass
+    except Exception as _exc:  # noqa: BLE001 - never block startup on this
+        print("  [CATALOG] Could not read data_assets.md: %s" % _exc)
+    print("  [CATALOG] No data_assets.md; the agent will discover the schema at runtime.")
+    return ("(Not available in this deployment - discover the schema with "
+            "`search_entries` / `get_table_info` before writing SQL.)")
+
+
+data_asset_catalog = _load_data_asset_catalog()
 
 # --- Instruction sections for optional toolsets (replaced below) ---
 _custom_mcp_sections = ""
@@ -697,11 +740,76 @@ instruction = (
     .replace("[COLLECTION_ID]", _fs_collection)
     .replace("[REFERENCE_DATE]", _reference_date)
     .replace("[CURRENT_REAL_DATE]", _ge_real_today)
+    .replace("[DATA_ASSET_CATALOG]", data_asset_catalog)
     .replace("[PUBLIC_DATASET_INFO]", public_info.replace("[PUBLIC_DATASET_ID]", _public_dataset_id))
     .replace("[CUSTOM_MCP_SECTIONS]\n", _custom_mcp_sections)
     .replace("[WORKSPACE_MCP_SECTION]\n", _workspace_mcp_section)
     .replace("[DH_WORKSPACE_EXCEPTION]\n", _dh_workspace_exception)
     .replace("[GENERATED_SYSTEM_INSTRUCTION]", gen_instruction)
+)
+
+# --- Data exploration routing ---
+# The expensive habit this replaces is not SQL, it is the metadata expedition in
+# front of it: the model opens a figure question with search_entries ->
+# lookup_entry -> get_table_info before the first useful call. The catalog is
+# already in this prompt, so that is three round trips buying nothing, and saying
+# so is what makes the difference. Two contradictory rules in a 100k-token prompt
+# do not resolve in favour of the later one, they resolve at random, so there is
+# deliberately no competing METADATA-FIRST rule anywhere above this block.
+_ONE_QUERY_RULE = (
+    "ONE QUERY, NOT SEVERAL (MANDATORY). Before calling `execute_sql`, work out every "
+    "figure the answer needs and fetch them ALL in a single statement - conditional "
+    "aggregation, GROUP BY, or UNION ALL across the parts. Budget versus actual for a "
+    "period is ONE query returning budget, actual, variance and variance rate per row, "
+    "never one query per company, per account or per month.\n\n"
+)
+# ADK executes every function call emitted in ONE model turn concurrently
+# (asyncio.gather in google/adk/flows/llm_flows/functions.py), so N independent
+# calls issued together cost one round trip instead of N. Measured on 2026-08-23:
+# across 24 runs of the generated agent, turns == calls in every single one - the
+# model never once batched on its own. This rule exists to make it.
+_PARALLEL_CALLS_RULE = (
+    "SEVERAL CALLS? MAKE THEM IN THE SAME TURN (MANDATORY). One statement cannot always "
+    "cover it - a SQL aggregate plus a Firestore read, a query plus a place lookup, two "
+    "systems that hold different halves of the answer. When the calls do NOT depend on each "
+    "other's results, emit them ALL as function calls in ONE response: calls issued together "
+    "run concurrently, so three of them cost one round trip instead of three. Issuing one, "
+    "waiting for it, then issuing the next is the slowest possible way to ask the same "
+    "questions, and the user sits through every extra wait.\n"
+    "The exception is a real dependency: when call B needs a value only call A's result can "
+    "supply, B waits for the next turn. Never invent A's output to fake a batch.\n\n"
+)
+_NO_NARRATION_RULE = (
+    "Never narrate which path you took and never name the tool to the user - they asked "
+    "a business question, not for a query plan.\n"
+)
+
+instruction += (
+    "\n\n--- DATA EXPLORATION: ANSWER IN ONE CALL (MANDATORY) ---\n"
+    "Three paths, listed in ascending cost. Pick the cheapest one that can actually "
+    "answer the question asked, and never walk further down the list for practice.\n\n"
+    "PATH 0 - ANSWER FROM THIS PROMPT. Zero calls, instant. The data-asset catalog above "
+    "already names every table, every column and its business meaning. Any question about "
+    "WHAT DATA EXISTS or what you are able to analyse is answered from it directly.\n"
+    "PATH 1 - SQL: `execute_sql`. One call. The catalog above IS your schema, so a figure "
+    "question needs no metadata expedition first - write the query and run it.\n"
+    "PATH 2 - CATALOG: `search_entries` / `lookup_entry` / `lookup_context`, then SQL. Two "
+    "extra round trips before the user sees anything.\n\n"
+    "ROUTING:\n"
+    "- \"What data do you have\", \"what can you analyse\" -> PATH 0. Zero tool calls.\n"
+    "- EVERYTHING that touches actual records - a lookup by name or id, a profile, an "
+    "aggregate, a comparison, a ranking, a trend, a filter over a date or numeric range, "
+    "a join, or any write -> PATH 1, directly. Do not stop at PATH 2 on the way.\n"
+    "- PATH 2 ONLY when the question is about the metadata itself, when a column you need "
+    "is not described above, or when `execute_sql` failed and you need the real schema to "
+    "fix it.\n\n"
+    + _ONE_QUERY_RULE + _PARALLEL_CALLS_RULE +
+    "ANSWER THE QUESTION THAT WAS ASKED. \"Tell me about X\" asks who or what X is - ONE "
+    "query for that record's own row, NOT a full analytical work-up. Offer the sales "
+    "trend, the customer mix and the ranking as follow-up buttons; run them when the user "
+    "presses one.\n\n"
+    + _NO_NARRATION_RULE +
+    "--- END DATA EXPLORATION ---\n"
 )
 
 # --- Conditional Data Viewer integration ---
@@ -1496,6 +1604,272 @@ def _dedup_workspace_writes(tool, args, tool_context):
                        'the user and do NOT retry.',
         }
     return None
+
+# =============================================================================
+# BigQuery scope + SQL error-recovery gate
+# =============================================================================
+# Two failures observed in one diagnostic run on 2026-08-23, both of which the
+# instruction already forbade in words and neither of which the words prevented:
+#
+#   1. DATASET ISOLATION was ignored. With its own dataset returning "Not found",
+#      the agent went looking around the project and answered the user from
+#      THREE other demos' datasets - demo_shelf_inventory_*, demo_smart_shelf_*,
+#      demo_coffee_retail_* - presenting another demo's numbers as this demo's.
+#      It also read `region-us.INFORMATION_SCHEMA`, which is project-wide.
+#   2. There is no cap on SQL error recovery. The same run burned more than ten
+#      model round trips re-attempting variations of a query that could not
+#      succeed, roughly a minute and a half of silence in front of the user,
+#      and never told them anything was wrong.
+#
+# A rule in a 100k-token prompt is a suggestion. These are the enforcement.
+import re as _ge_re
+
+_BQ_SQL_TOOLS = frozenset(('execute_sql', 'execute_sql_readonly', 'query',
+                           'run_query', 'execute_query'))
+# Only identifiers in table position are inspected. Matching every dotted token
+# in the statement would trip over struct field access (`t.address.city`) and
+# string literals, and a false positive here does not slow a demo down, it
+# breaks it.
+_BQ_REF_TOKEN = r'(?:`[^`]+`|[A-Za-z_][\w\-]*)'
+_BQ_REF_AT_RE = _ge_re.compile(
+    r'\s*(' + _BQ_REF_TOKEN + r'(?:\s*\.\s*' + _BQ_REF_TOKEN + r')*)')
+_BQ_KEYWORD_RE = _ge_re.compile(r'\b(?:FROM|JOIN|INTO|UPDATE|TABLE)\b',
+                                _ge_re.IGNORECASE)
+_BQ_ALIAS_RE = _ge_re.compile(r'\s*(?:AS\s+)?([A-Za-z_]\w*)', _ge_re.IGNORECASE)
+_BQ_COMMA_RE = _ge_re.compile(r'\s*,')
+# Words that can follow a table reference but are never its alias. Consuming one
+# as an alias would let the scan walk past the end of the FROM clause.
+_BQ_NOT_AN_ALIAS = frozenset((
+    'ON', 'USING', 'WHERE', 'GROUP', 'ORDER', 'HAVING', 'LIMIT', 'OFFSET',
+    'WINDOW', 'QUALIFY', 'UNION', 'INTERSECT', 'EXCEPT', 'JOIN', 'INNER',
+    'LEFT', 'RIGHT', 'FULL', 'CROSS', 'SELECT', 'SET', 'VALUES', 'WITH',
+    'TABLESAMPLE', 'PIVOT', 'UNPIVOT', 'FOR', 'WHEN', 'USE'))
+# Comments and string literals are blanked before the scan. A note column
+# reading 'escalated from siu.queue' is not a table reference, and neither is a
+# -- comment saying where the numbers came from; both used to be blocked.
+# Backtick-quoted identifiers are deliberately NOT stripped: they are the table
+# names this is here to read.
+_BQ_SQL_NOISE_RE = _ge_re.compile(
+    r"--[^\n]*"
+    r"|/\*.*?\*/"
+    r"|'''.*?'''"
+    r'|""".*?"""'
+    r"|'(?:\\.|[^'\\\n])*'"
+    r'|"(?:\\.|[^"\\\n])*"',
+    _ge_re.DOTALL)
+# Anchored, because "error" appears in plenty of legitimate result rows - a
+# status column, an incident description, an audit note.
+_BQ_ERROR_PREFIXES = (
+    'not found', 'syntax error', 'unrecognized name', 'invalid ',
+    'access denied', 'permission denied', 'table not found',
+    'no matching signature', 'query error', 'bad request', '400 ', '403 ',
+)
+_BQ_MAX_CONSECUTIVE_ERRORS = 3
+
+
+def _bq_allowed_datasets():
+    """Datasets this agent may read, lower-cased. Its own, plus any opt-in."""
+    _allowed = {(os.environ.get("BIGQUERY_DATASET", "") or "").strip().lower()}
+    # Escape hatch for a demo that legitimately joins against another dataset
+    # (a shared reference dataset, a verified public table outside the
+    # bigquery-public-data project). Accepts `dataset` or `project.dataset`;
+    # only the dataset part is compared. Semicolons as well as commas, because
+    # this arrives through `gcloud run deploy --set-env-vars`, whose own
+    # separator is the comma - a comma-separated value there would be read as
+    # the start of the next variable.
+    for _extra in _ge_re.split(r'[,;]', os.environ.get("BQ_ALLOWED_DATASETS", "") or ""):
+        _extra = _extra.strip().lower()
+        if _extra:
+            _allowed.add(_extra.split(".")[-1])
+    _allowed.discard("")
+    return _allowed
+
+
+def _bq_skip_parens(sql, i):
+    """Index just past the parenthesised group that starts at sql[i] == '('."""
+    _depth = 0
+    while i < len(sql):
+        if sql[i] == '(':
+            _depth += 1
+        elif sql[i] == ')':
+            _depth -= 1
+            if _depth == 0:
+                return i + 1
+        i += 1
+    return len(sql)
+
+
+def _bq_refs_after_keyword(sql, pos):
+    """The table references one FROM/JOIN keyword introduces, commas included.
+
+    `FROM a.x, b.y` is a join written with a comma, and every item after the
+    first is as much a table reference as the first - reading only the first one
+    let a second dataset in through the side door. The walk stays anchored to
+    references it has already accepted, so a comma in a SELECT list, where the
+    dotted tokens are aliases and struct fields, can never reach it.
+    """
+    _refs = []
+    while True:
+        _m = _BQ_REF_AT_RE.match(sql, pos)
+        if not _m:
+            break
+        pos = _m.end()
+        if pos < len(sql) and sql[pos] == '(':
+            # UNNEST(...), EXTERNAL_QUERY(...): a call, not a table.
+            pos = _bq_skip_parens(sql, pos)
+        else:
+            _refs.append(_m.group(1))
+        _alias = _BQ_ALIAS_RE.match(sql, pos)
+        if _alias and _alias.group(1).upper() not in _BQ_NOT_AN_ALIAS:
+            pos = _alias.end()
+        _comma = _BQ_COMMA_RE.match(sql, pos)
+        if not _comma:
+            break
+        pos = _comma.end()
+    return _refs
+
+
+def _bq_out_of_scope_refs(sql):
+    """Returns the table references in `sql` that fall outside this demo.
+
+    Each entry is the offending text as it appeared, so the message handed back
+    to the model names the thing it actually wrote.
+    """
+    _allowed = _bq_allowed_datasets()
+    if not _allowed:
+        return []
+    _clean = _BQ_SQL_NOISE_RE.sub(' ', str(sql or ""))
+    _bad = []
+    _raws = []
+    for _kw in _BQ_KEYWORD_RE.finditer(_clean):
+        _raws.extend(_bq_refs_after_keyword(_clean, _kw.end()))
+    for _raw in _raws:
+        _parts = [_p.strip().strip('`').strip()
+                  for _p in _ge_re.split(r'\s*\.\s*', _raw.strip().strip('`'))]
+        _parts = [_p for _p in _parts if _p]
+        if len(_parts) < 2:
+            # A CTE name, an alias, UNNEST(...), or an unqualified table. None
+            # of them can reach another dataset.
+            continue
+        # region-us.INFORMATION_SCHEMA.JOBS and friends are project-wide by
+        # definition: there is no dataset to scope them to.
+        if _parts[0].lower().startswith('region-'):
+            _bad.append(_raw.strip())
+            continue
+        _upper = [_p.upper() for _p in _parts]
+        if 'INFORMATION_SCHEMA' in _upper:
+            # Its position, not the part count, says which token is the dataset:
+            # `ds.INFORMATION_SCHEMA.COLUMNS` and
+            # `proj.ds.INFORMATION_SCHEMA.COLUMNS` are both scoped to the part
+            # immediately before the keyword. Reading parts[1] as the dataset
+            # here would reject the agent's own dataset.
+            _idx = _upper.index('INFORMATION_SCHEMA')
+            _project = _parts[0].lower() if _idx >= 2 else ""
+            _dataset = _parts[_idx - 1].lower() if _idx >= 1 else ""
+        else:
+            _project = _parts[0].lower() if len(_parts) >= 3 else ""
+            _dataset = _parts[1].lower() if len(_parts) >= 3 else _parts[0].lower()
+        if _project == 'bigquery-public-data':
+            continue
+        if _dataset in _allowed:
+            continue
+        _bad.append(_raw.strip())
+    # The same table named twice reads as two violations otherwise, and the
+    # message quotes only the first five.
+    return list(dict.fromkeys(_bad))
+
+
+def _looks_like_sql_error(tool_response):
+    """True when a BigQuery MCP response is a failure rather than a result set."""
+    if isinstance(tool_response, dict):
+        if tool_response.get('error') or tool_response.get('isError'):
+            return True
+        if str(tool_response.get('status', '')).lower() in ('error', 'failed'):
+            return True
+    _txt = str(tool_response or "").strip().lower()[:400]
+    if not _txt:
+        return False
+    return any(_marker in _txt[:200] for _marker in _BQ_ERROR_PREFIXES)
+
+
+def _bq_error_state(tool_context):
+    """Per-invocation consecutive-failure counter.
+
+    Scoped to the invocation on purpose: a turn that ends on three failures must
+    not leave the next turn pre-blocked, and the user's follow-up question is
+    frequently the thing that fixes the query.
+    """
+    _inv = str(getattr(tool_context, 'invocation_id', '') or '')
+    _state = tool_context.state.get('_bq_err') or {}
+    if _state.get('inv') != _inv:
+        _state = {'inv': _inv, 'n': 0}
+    return _state
+
+
+def _bigquery_scope_gate(tool, args, tool_context):
+    """Block cross-dataset SQL, and stop the agent flailing after N failures."""
+    _name = getattr(tool, 'name', '') or ''
+    if _name not in _BQ_SQL_TOOLS:
+        return None
+    if os.environ.get("BQ_SCOPE_GATE_OFF", "").lower() in ("1", "true", "yes"):
+        return None
+
+    _state = _bq_error_state(tool_context)
+    if _state.get('n', 0) >= _BQ_MAX_CONSECUTIVE_ERRORS:
+        return {
+            "status": "blocked",
+            "message": (
+                "SQL RECOVERY BUDGET EXHAUSTED: " + str(_state['n']) + " queries in a "
+                "row have failed, so this one was not run. Stop rewriting the query. "
+                "Tell the user plainly, in one or two sentences, WHAT you were trying "
+                "to work out and WHAT the database said, answer whatever part of their "
+                "question the data you already have can answer, and offer a suggestion "
+                "chip to retry. Never present another demo's data, an estimate, or an "
+                "invented figure as the answer."
+            ),
+        }
+
+    _a = args or {}
+    _sql = _a.get('query') or _a.get('sql') or _a.get('statement') or ''
+    _bad = _bq_out_of_scope_refs(str(_sql))
+    if not _bad:
+        return None
+    _dataset = os.environ.get("BIGQUERY_DATASET", "")
+    print("  [SCOPE GATE] Blocked out-of-scope SQL reference(s): " + ", ".join(_bad[:5]))
+    return {
+        "status": "blocked",
+        "message": (
+            "DATASET ISOLATION VIOLATION - this query was NOT run. It references "
+            + ", ".join("`" + _b + "`" for _b in _bad[:5]) + ", which is outside this "
+            "demo. The only dataset you may read is `" + _dataset + "` (plus "
+            "`bigquery-public-data` when the instruction names a public table). Other "
+            "datasets in this project belong to OTHER demos and their numbers are not "
+            "this business's numbers - quoting them would be a fabricated answer. "
+            "Project-wide views such as `region-us.INFORMATION_SCHEMA` are off limits "
+            "for the same reason. Rewrite the query against `" + _dataset + "`, and if "
+            "the data genuinely is not there, say so instead of looking elsewhere."
+        ),
+    }
+
+
+def _bq_track_sql_errors(tool, args, tool_context, tool_response):
+    """Count consecutive BigQuery failures so _bigquery_scope_gate can cap them."""
+    _name = getattr(tool, 'name', '') or ''
+    if _name not in _BQ_SQL_TOOLS:
+        return None
+    try:
+        _state = _bq_error_state(tool_context)
+        if _looks_like_sql_error(tool_response):
+            _state['n'] = _state.get('n', 0) + 1
+            print("  [SQL RECOVERY] Failure %d/%d this turn."
+                  % (_state['n'], _BQ_MAX_CONSECUTIVE_ERRORS))
+        else:
+            _state['n'] = 0
+        tool_context.state['_bq_err'] = _state
+    except Exception:  # noqa: BLE001 - a broken counter must not break the tool
+        pass
+    return None
+
 
 def _record_workspace_write(tool, args, tool_context, tool_response):
     """After a Workspace write succeeds, record it for dedup."""
@@ -2342,8 +2716,8 @@ they can monitor progress in the Data Viewer Tasks tab.
     generate_content_config=_validated_generate_config,
     before_model_callback=_strip_part_metadata,
     after_model_callback=[inject_image_callback, a2ui_metadata_callback, _enforce_task_result_text],
-    before_tool_callback=[_inline_tool_budget_gate, _dedup_workspace_writes],
-    after_tool_callback=[_record_workspace_write, _log_bq_activity],
+    before_tool_callback=[_inline_tool_budget_gate, _dedup_workspace_writes, _bigquery_scope_gate],
+    after_tool_callback=[_record_workspace_write, _log_bq_activity, _bq_track_sql_errors],
     disallow_transfer_to_parent=False,
     disallow_transfer_to_peers=False,
 )
@@ -2936,8 +3310,8 @@ root_agent = LlmAgent(
     before_agent_callback=_inject_completed_tasks,
     before_model_callback=_strip_part_metadata,
     after_model_callback=[inject_image_callback, a2ui_metadata_callback, _enforce_task_result_text],
-    before_tool_callback=[_inline_tool_budget_gate, _dedup_workspace_writes],
-    after_tool_callback=[_record_workspace_write, _log_bq_activity],
+    before_tool_callback=[_inline_tool_budget_gate, _dedup_workspace_writes, _bigquery_scope_gate],
+    after_tool_callback=[_record_workspace_write, _log_bq_activity, _bq_track_sql_errors],
 )
 
 # --- Background execution agent (Pro) ---
@@ -3171,8 +3545,8 @@ You MUST NEVER claim to have performed an action that you do not have a tool for
     generate_content_config=_validated_generate_config,
     before_model_callback=_strip_part_metadata,
     after_model_callback=[_enforce_task_result_text],
-    before_tool_callback=_dedup_workspace_writes,
-    after_tool_callback=[_record_workspace_write, _log_bq_activity],
+    before_tool_callback=[_dedup_workspace_writes, _bigquery_scope_gate],
+    after_tool_callback=[_record_workspace_write, _log_bq_activity, _bq_track_sql_errors],
 )
 
 app = App(

@@ -681,13 +681,20 @@ def _a2ui_component_props():
         for _cn, _csch in (_cs.get('components') or {}).items():
             if not isinstance(_csch, dict):
                 continue
-            # remove_strict_validation deletes additionalProperties:false, so
-            # unevaluatedProperties:false is the remaining strictness signal -
-            # and it marks exactly the 18 basic v0.9 primitives. Every Material*
-            # component is open, so nothing is ever pruned from one.
-            if (_csch.get('unevaluatedProperties') is not False
-                    and _csch.get('additionalProperties') is not False):
-                continue
+            # Index EVERY component, not only the schema-closed ones. The
+            # catalog JSON leaves Material* components open (no
+            # unevaluatedProperties:false at the component level), but the GE
+            # renderer is strict anyway: one property outside the schema and
+            # the ENTIRE surface is silently dropped - the turn renders as its
+            # lead text with no card and no error. Proven live 2026-08-22:
+            # "color": "primary" on a MaterialButton (legal-looking, absent
+            # from the catalog, waved through by the draft-07 validator that
+            # ignores unevaluatedProperties) killed the analysis-plan and
+            # briefing cards on every attempt, while byte-identical cards
+            # without it rendered. So closed-only pruning protected exactly
+            # the components that never needed it. Pruning a legal prop is
+            # impossible as long as _a2ui_collect_props sees the full allOf /
+            # $defs / common_types composition, which it walks.
             _names = _a2ui_collect_props(_csch, _defs, _common)
             if _names:
                 _A2UI_COMPONENT_PROPS[_cn] = _names | {'id', 'component'}
@@ -973,7 +980,10 @@ def _a2ui_msg_schema_ok(msg):
 def _prep_a2ui_msg(msg):
     _shaped = _normalize_a2ui_shapes(msg)
     _healed = _heal_buttons_in_a2ui(_shaped)
-    return _scope_suggestions_surface(_healed)
+    # Wrap BEFORE scoping: the wrapper matches on the 'suggestions' prefix, which
+    # _scope_suggestions_surface keeps, but matching the bare id is one less
+    # thing to keep in step.
+    return _scope_suggestions_surface(_card_wrap_chip_surface(_healed))
 
 def _build_a2ui_part(msg):
     # Pass version=VERSION_0_9 ("0.9"). The SDK's create_a2ui_part() maps every
@@ -1067,8 +1077,143 @@ def create_a2ui_parts(msg):
         return []
     return [_build_a2ui_part(_m) for _m in _rescope_one(_prepped, _allow_promote=True)]
 
+# =============================================================================
+# PRESS-SCROLL LANDING (v11.87, corrected in v11.89 - read to the end)
+# At the instant a button is pressed, Gemini Enterprise scrolls the conversation
+# backwards. Three live rounds pinned what looked like the rule:
+#
+#   on a press, GE scrolls to the LAST surface of the PREVIOUS turn whose root
+#   renders as a card. Surfaces in the pressed button's own turn are not
+#   candidates, and a surface whose root is not a card is skipped.
+#
+# The second sentence turned out to be wrong - see the v11.89 note below, which
+# supersedes it. The first is a special case of what replaced it.
+#
+# The evidence, from the persisted wire of one session per round:
+#
+#   v11.83 appended a MaterialText anchor AFTER the card. No effect: not a card,
+#          and same-turn anyway.
+#   v11.84 moved it BEFORE the card, with a visible marker. The marker AND the
+#          card both rendered - so a turn's second surface is NOT dropped, and
+#          the v11.68 chip-bar failure was about the reserved 'suggestions'
+#          surfaceId, not a one-surface-per-turn rule - yet the press still
+#          landed on the previous turn's card. A bare MaterialText is skipped.
+#   v11.86 made the anchor a MaterialCard with a button. The landing MOVED onto
+#          it: previous turn = [anchor(MaterialCard), chips(MaterialRow)] and
+#          the press landed on the anchor, passing over the MaterialRow. That
+#          confirms both halves of the rule at once.
+#
+# So the jump is not fixable by adding an anchor - it is fixable by making the
+# previous turn END in a card, which is what v0.8 did without knowing it: back
+# then the chip bar was a trailing surface of its own, so the last card of the
+# previous turn sat at that turn's very bottom and the scroll went nowhere
+# visible. v11.68 moved the chips INSIDE the card, the turn's last card became
+# the content card at the TOP of the turn, and every press has jumped since.
+#
+# v11.87 restores the v0.8 shape: the chips go back to a trailing surface, and
+# this wraps that surface's root in a MaterialCard so it qualifies as a landing.
+# The wrap is styled transparent and borderless, so the chip bar looks exactly
+# as it did while becoming the lowest card in the turn. Doing it here rather
+# than in the prompt means a model that emits the older MaterialRow root still
+# gets a landing.
+# =============================================================================
+_CHIP_CARD_ROOT_ID = 'chipBarRoot'
+# Only these are in the catalog's style allowlist (additionalProperties: false);
+# note boxShadow is NOT, which is why appearance is left off rather than set to
+# 'raised' and undone here.
+_CHIP_CARD_STYLE = {"border": "none", "background": "transparent",
+                    "padding": "0px", "margin": "0px"}
+
+def _card_wrap_chip_surface(msg):
+    """Give the trailing chip bar a MaterialCard root, so a press lands on it."""
+    try:
+        if _a2ui_kind(msg) != 'updateComponents':
+            return msg
+        _su = msg.get('updateComponents') or {}
+        if not (_su.get('surfaceId') or '').startswith('suggestions'):
+            return msg
+        _comps = _su.get('components') or []
+        _root = next((_c for _c in _comps
+                      if isinstance(_c, dict) and _c.get('id') == 'root'), None)
+        if _root is None or _root.get('component') == 'MaterialCard':
+            return msg
+        if any(isinstance(_c, dict) and _c.get('id') == _CHIP_CARD_ROOT_ID
+               for _c in _comps):
+            return msg
+        _root['id'] = _CHIP_CARD_ROOT_ID
+        _su['components'] = [{"id": "root", "component": "MaterialCard",
+                              "children": [_CHIP_CARD_ROOT_ID],
+                              "style": dict(_CHIP_CARD_STYLE)}] + _comps
+        return msg
+    except Exception as _cw_err:
+        logger.log_text('[chip_card] wrap skipped (chips ship unwrapped): '
+                        + str(_cw_err)[:200])
+        return msg
+
+# v11.89: the live test of v11.88 (2026-08-24) refuted the "previous turn" half
+# of the rule above, and it did so with two presses on the SAME card. The card
+# carried a footer button row inside it and a chip bar below it. Pressing the
+# footer button jumped back to the previous turn's card; pressing a chip, one
+# surface lower in the same turn, did not move the view at all. Same turn, same
+# predecessor, different outcome - so the target is not chosen per turn:
+#
+#   on a press, GE scrolls to the nearest surface BEFORE the pressed one whose
+#   root renders as a card, crossing the turn boundary only when there is no
+#   earlier card-rooted surface in the pressed button's own turn.
+#
+# Every earlier observation still fits: the chip press lands on the content card
+# directly above it (no visible movement), a press from a turn's FIRST surface
+# has nothing above it and falls through to the previous turn, and a bare
+# MaterialRow or MaterialText in between is passed over.
+#
+# So the fix is not an invisible landing appended to the turn - v11.88's
+# zero-width-space card was emitted (the log line proves it) and never became a
+# target, most likely because GE does not draw a component tree whose only text
+# is a ZWSP (v10.68). The fix is positional: a pressable button must never sit
+# in the first card of its turn. Buttons go BELOW the card, in their own
+# trailing card-rooted surface - exactly the shape the chip bar has had since
+# v11.87, and the one shape a press has been observed to leave the view alone.
+_ACTION_SURFACE_STYLE = {"border": "none", "background": "transparent",
+                         "padding": "0px", "margin": "0px"}
+
+def _action_surface_parts(surface_id, comps, children, data_model=None):
+    """A card's buttons (and the fields they read) as a trailing surface.
+
+    comps are the components below the root, children their ids in render
+    order. The root is a transparent MaterialCard, so the block reads as a
+    footer detached from the card above while still counting as a landing for
+    the NEXT press. data_model is applied to this surface's /form, because a
+    button's {"path": ...} binding resolves against the surface it lives in -
+    moving a bound button out of the card means moving its fields out with it.
+    """
+    try:
+        _msgs = [
+            {"version": "v0.9",
+             "createSurface": {"surfaceId": surface_id, "catalogId": _a2ui_catalog_id()}},
+            {"version": "v0.9",
+             "updateComponents": {"surfaceId": surface_id, "components": [
+                 {"id": "root", "component": "MaterialCard",
+                  "children": ["actionCol"], "style": dict(_ACTION_SURFACE_STYLE)},
+                 {"id": "actionCol", "component": "MaterialColumn",
+                  "children": list(children), "justify": "start", "align": "stretch",
+                  "style": {"gap": "10px"}},
+             ] + list(comps)}},
+        ]
+        if data_model:
+            _msgs.append({"version": "v0.9",
+                          "updateDataModel": {"surfaceId": surface_id, "path": "/form",
+                                              "value": data_model}})
+        _parts = []
+        for _m in _msgs:
+            _parts.extend(create_a2ui_parts(_m))
+        return _parts
+    except Exception as _as_err:
+        logger.log_text('[action_surface] build failed: ' + str(_as_err)[:200])
+        return []
+
 from adk_agent.app.agent import app as adk_app, background_agent, INLINE_TOOL_DEADLINE, INLINE_IMAGE_DEADLINE
 import adk_agent.app.tools as _agent_tools
+from adk_agent.app.tools import _tok_fp  # token fingerprints for auth logs; never log token material
 import adk_agent.app.part_converters as part_converters
 
 # CRITICAL: Disable OpenTelemetry HTTPX instrumentation to prevent it from colliding
@@ -1522,29 +1667,44 @@ def _build_preflight_card_parts(plan, scope_text):
             _why = " | ".join(_why_bits) if _why_bits else "This may take a few minutes."
             _children.append("why")
             _comps.append({"id": "why", "component": "MaterialText", "text": _why, "usageHint": "caption"})
-        _children.extend(["scopeField", "actions"])
         _comps.append({"id": "col", "component": "MaterialColumn", "children": _children, "justify": "start", "align": "stretch", "style": {"gap": "10px"}})
-        _comps.append({"id": "scopeField", "component": "MaterialInput", "label": _g("label_field", "Adjust scope"), "value": {"path": "/form/scope"}})
-        _comps.append({"id": "actions", "component": "MaterialRow", "children": ["bInline", "bBg", "bRefine"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px", "marginTop": "8px"}})
+        # v11.89: the scope field and the buttons leave the card and become a
+        # trailing surface of their own, so that a press has this card sitting
+        # above it and the view stays put. The field travels WITH the buttons -
+        # bRefine reads it through {"path": "/form/scope"}, and that path is
+        # resolved against the surface the button is in.
         # v0.9 presses: the intent lives in the EVENT NAME (which cannot be lost to
         # a context-key collision) and context.prompt is the literal string GE
         # shows as the user's chat message. context.text is what this runtime's
         # gate reads - identical to prompt here, except on Adjust, where it is a
         # data binding the client resolves to whatever the user typed in the box.
-        _comps.append({"id": "bInline", "component": "MaterialButton", "label": _g("label_inline", "Run inline now"), "color": "primary", "variant": "raised",
-                       "action": {"event": {"name": "preflight_confirm_inline", "context": {"prompt": "Run Inline: " + scope_text, "text": "Run Inline: " + scope_text, "pf": "1"}}}})
-        _comps.append({"id": "bBg", "component": "MaterialButton", "label": _g("label_background", "Run in background"),
-                       "action": {"event": {"name": "preflight_background", "context": {"prompt": "Run in Background: " + scope_text, "text": "Run in Background: " + scope_text}}}})
-        _comps.append({"id": "bRefine", "component": "MaterialButton", "label": _g("label_adjust", "Adjust & re-propose"),
-                       "action": {"event": {"name": "preflight_refine", "context": {"prompt": _g("label_adjust", "Adjust & re-propose"), "text": {"path": "/form/scope"}}}}})
+        _act = [
+            {"id": "scopeField", "component": "MaterialInput", "label": _g("label_field", "Adjust scope"), "value": {"path": "/form/scope"}},
+            {"id": "actions", "component": "MaterialRow", "children": ["bInline", "bBg", "bRefine"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px", "marginTop": "8px"}},
+            {"id": "bInline", "component": "MaterialButton", "label": _g("label_inline", "Run inline now"), "variant": "raised",
+             "action": {"event": {"name": "preflight_confirm_inline", "context": {"prompt": "Run Inline: " + scope_text, "text": "Run Inline: " + scope_text, "pf": "1"}}}},
+            {"id": "bBg", "component": "MaterialButton", "label": _g("label_background", "Run in background"),
+             "action": {"event": {"name": "preflight_background", "context": {"prompt": "Run in Background: " + scope_text, "text": "Run in Background: " + scope_text}}}},
+            {"id": "bRefine", "component": "MaterialButton", "label": _g("label_adjust", "Adjust & re-propose"),
+             "action": {"event": {"name": "preflight_refine", "context": {"prompt": _g("label_adjust", "Adjust & re-propose"), "text": {"path": "/form/scope"}}}}},
+        ]
+        # The card itself no longer carries a data model - since v11.89 the only
+        # bound component, scopeField, lives in the action surface. That surface
+        # keeps v11.70's ordering: createSurface -> updateComponents ->
+        # updateDataModel, the canonical sequence in the GE reference
+        # implementation guide, and GE is the renderer that has been dropping
+        # cards over ordering before.
         _card = [
             {"version": "v0.9", "createSurface": {"surfaceId": "analysis-plan", "catalogId": _a2ui_catalog_id()}},
-            {"version": "v0.9", "updateDataModel": {"surfaceId": "analysis-plan", "path": "/form", "value": {"scope": scope_text}}},
             {"version": "v0.9", "updateComponents": {"surfaceId": "analysis-plan", "components": _comps}},
         ]
-        _parts = []
+        _lead_text = "📋 **" + _title + "**" + chr(10) + _intro
+        _parts = [a2a_types.Part(root=a2a_types.TextPart(text=_lead_text))]
         for _m in _card:
             _parts.extend(create_a2ui_parts(_m))
+        _parts.extend(_action_surface_parts(
+            "analysis-plan-actions", _act, ["scopeField", "actions"],
+            {"scope": scope_text}))
         return _parts
     except Exception as _e:
         logger.log_text("[preflight_gate] card build failed (fail-open): " + str(_e)[:200])
@@ -1635,7 +1795,14 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 _comps.append({"id": "goal", "component": "MaterialText", "text": _goal, "usageHint": "body"})
             _children.append("intro")
             _comps.append({"id": "intro", "component": "MaterialText", "text": _intro_line, "usageHint": "caption"})
+            # v11.89: the questions and the buttons go BELOW the card, in one
+            # trailing surface of their own, so that a press has the card above
+            # it and the view does not jump. The fields cannot stay behind: the
+            # Start button carries them as {"path": "/form/a<i>"} bindings, and
+            # those resolve against the surface the button is in.
             _dm = {}
+            _act = []
+            _act_children = []
             _start_ctx = {"prompt": scope_text, "text": scope_text, "ra": "1"}
             for _qi in range(len(_qs)):
                 _q, _s, _opts = _qs[_qi]
@@ -1646,45 +1813,47 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                     # MaterialChips bound to /form/a<i>. An untouched question falls
                     # back to its suggestion server-side via the s<i> context key.
                     _qid = "qt" + str(_qi)
-                    _children.append(_qid)
-                    _comps.append({"id": _qid, "component": "MaterialText", "text": _q, "usageHint": "body"})
+                    _act_children.append(_qid)
+                    _act.append({"id": _qid, "component": "MaterialText", "text": _q, "usageHint": "body"})
                     _oitems = []
                     for _o in _opts:
                         _oitems.append({"label": _o, "value": _o})
-                    _children.append(_fid)
-                    _comps.append({"id": _fid, "component": "MaterialChips", "value": {"path": "/form/" + _ak}, "options": _oitems})
+                    _act_children.append(_fid)
+                    _act.append({"id": _fid, "component": "MaterialChips", "value": {"path": "/form/" + _ak}, "options": _oitems})
                 else:
                     # Free-text answer: the question itself is the field label, the
                     # suggestion is pre-filled so the user only edits what differs.
-                    _children.append(_fid)
-                    _comps.append({"id": _fid, "component": "MaterialInput", "label": _q, "value": {"path": "/form/" + _ak}})
+                    _act_children.append(_fid)
+                    _act.append({"id": _fid, "component": "MaterialInput", "label": _q, "value": {"path": "/form/" + _ak}})
                     if _s:
                         _dm[_ak] = _s
                 _start_ctx["bq" + str(_qi)] = _q
                 _start_ctx[_ak] = {"path": "/form/" + _ak}
                 if _s:
                     _start_ctx["s" + str(_qi)] = _s
-            _children.extend(["sep", "actions"])
-            _comps.append({"id": "sep", "component": "MaterialDivider"})
             _comps.append({"id": "col", "component": "MaterialColumn", "children": _children, "justify": "start", "align": "stretch", "style": {"gap": "10px"}})
-            _comps.append({"id": "actions", "component": "MaterialRow", "children": ["bStart", "bAsis"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px"}})
+            _act_children.append("actions")
+            _act.append({"id": "actions", "component": "MaterialRow", "children": ["bStart", "bAsis"], "justify": "spaceEvenly", "align": "center", "style": {"gap": "8px"}})
             # The model routinely leads label_start with its own emoji, and prefixing
             # ours unconditionally rendered "[rocket] [rocket] Confirm and start"
             # live. Only decorate a label that starts with plain ASCII.
             _lbl_start = _g("label_start", "Confirm & start autonomous task")
             if _lbl_start[:1].isascii():
                 _lbl_start = chr(0x1F680) + " " + _lbl_start
-            _comps.append({"id": "bStart", "component": "MaterialButton", "label": _lbl_start, "color": "primary", "variant": "raised",
-                           "action": {"event": {"name": "autonomous_start", "context": _start_ctx}}})
-            _comps.append({"id": "bAsis", "component": "MaterialButton", "label": _g("label_asis", "Start as-is"),
-                           "action": {"event": {"name": "autonomous_start_asis", "context": {"prompt": scope_text, "text": scope_text, "ra": "1"}}}})
-            _card = [{"version": "v0.9", "createSurface": {"surfaceId": "autonomous-briefing", "catalogId": _a2ui_catalog_id()}}]
-            if _dm:
-                _card.append({"version": "v0.9", "updateDataModel": {"surfaceId": "autonomous-briefing", "path": "/form", "value": _dm}})
-            _card.append({"version": "v0.9", "updateComponents": {"surfaceId": "autonomous-briefing", "components": _comps}})
-            _parts = []
+            _act.append({"id": "bStart", "component": "MaterialButton", "label": _lbl_start, "variant": "raised",
+                         "action": {"event": {"name": "autonomous_start", "context": _start_ctx}}})
+            _act.append({"id": "bAsis", "component": "MaterialButton", "label": _g("label_asis", "Start as-is"),
+                         "action": {"event": {"name": "autonomous_start_asis", "context": {"prompt": scope_text, "text": scope_text, "ra": "1"}}}})
+            _card = [
+                {"version": "v0.9", "createSurface": {"surfaceId": "autonomous-briefing", "catalogId": _a2ui_catalog_id()}},
+                {"version": "v0.9", "updateComponents": {"surfaceId": "autonomous-briefing", "components": _comps}},
+            ]
+            _lead_text = "🛰️ **" + _title + "**" + chr(10) + _intro_line
+            _parts = [a2a_types.Part(root=a2a_types.TextPart(text=_lead_text))]
             for _m in _card:
                 _parts.extend(create_a2ui_parts(_m))
+            _parts.extend(_action_surface_parts(
+                "autonomous-briefing-actions", _act, _act_children, _dm))
             return _parts
         except Exception as _e:
             logger.log_text("[autonomous_briefing] card build failed (fail-open): " + str(_e)[:200])
@@ -2303,7 +2472,7 @@ def _recent_user_texts(_session, _exclude, _limit=2):
     # Pull the last few genuine user-request texts from the session (newest
     # first), skipping chip JSON, control actions, and internal re-prompts.
     # Used to give a converted background task the conversation context a terse
-    # follow-up (e.g. "しきい値分析をして") depends on.
+    # follow-up (e.g. "now run the threshold analysis") depends on.
     _out = []
     try:
         for _ev in reversed(getattr(_session, 'events', None) or []):
@@ -2581,7 +2750,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     break
             if _ua_ts:
                 import hashlib as _idem_hl
-                _idem_key_raw = _idem_hl.sha1(
+                # sha256, not sha1: this is only an idempotency cache key, never a
+                # credential digest, but session_id is in it and a weak algorithm
+                # here costs nothing to avoid. Rolling this out makes in-flight
+                # duplicate presses miss the cache exactly once, on the deploy.
+                _idem_key_raw = _idem_hl.sha256(
                     (session_id + '|' + _ua_surface + '|' + _ua_source + '|' + str(_ua_ts)).encode('utf-8')
                 ).hexdigest()
                 _idem_src = _ua_source
@@ -2628,6 +2801,35 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                 + " key=" + _idem_key_raw[:12] + " parts=" + str(len(_rp_parts) if _rp_parts else 0)
                             )
                             if _rp_parts:
+                                # v11.70: bare working transition first, then the
+                                # replayed parts in their own working message - the
+                                # executor's shape, the only one GE renders. See the
+                                # analysis-plan card note in _process_request_body.
+                                await event_queue.enqueue_event(
+                                    TaskStatusUpdateEvent(
+                                        task_id=context.task_id,
+                                        status=TaskStatus(state=TaskState.working, timestamp=datetime.now(timezone.utc).isoformat()),
+                                        context_id=context.context_id,
+                                        final=False,
+                                        metadata={
+                                            _get_adk_metadata_key('app_name'): runner.app_name,
+                                            _get_adk_metadata_key('user_id'): run_args['user_id'],
+                                            _get_adk_metadata_key('session_id'): run_args['session_id'],
+                                        },
+                                    )
+                                )
+                                await event_queue.enqueue_event(
+                                    TaskStatusUpdateEvent(
+                                        task_id=context.task_id,
+                                        status=TaskStatus(
+                                            state=TaskState.working,
+                                            message=Message(message_id=str(uuid.uuid4()), role=Role.agent, parts=_rp_parts),
+                                            timestamp=datetime.now(timezone.utc).isoformat(),
+                                        ),
+                                        context_id=context.context_id,
+                                        final=False,
+                                    )
+                                )
                                 await event_queue.enqueue_event(
                                     TaskArtifactUpdateEvent(
                                         task_id=context.task_id,
@@ -2708,7 +2910,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         if token:
             import builtins
             builtins._workspace_oauth_token = token
-            logger.log_text(f"TOKEN SET via builtins._workspace_oauth_token (prefix: {token[:20]}..., len: {len(token)})")
+            logger.log_text(f"TOKEN SET via builtins._workspace_oauth_token (fp: {_tok_fp(token)}, len: {len(token)})")
             # v11.6: per-session registry read by header_provider Strategy0.
             # This is the ONLY per-session store that stays fresh: mutating
             # session.state below does NOT persist (see comment there).
@@ -2921,7 +3123,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     logger.log_text("[preflight_gate] bg direct-registration failed, emitted retry: " + str(_bg_reg.get('message', ''))[:160])
                     return
 
-            if _gate_scope and not _gate_skip:
+            if _gate_scope and not _gate_skip and os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 # v11.6: pass the last human-typed message as a language
                 # reference so an English chip prompt cannot flip the
                 # card language (STEP 1 EXCEPTION in the classifier prompt).
@@ -2929,6 +3131,27 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 if isinstance(_plan, dict) and _plan.get("category") == "ANALYSIS":
                     _pf_parts = _build_preflight_card_parts(_plan, _gate_scope)
                     if _pf_parts:
+                        # v11.70: TWO working events, in this exact order - a
+                        # bare transition first, THEN a separate working event
+                        # whose only job is to carry the card's parts. This is
+                        # the shape the ADK executor produces on the normal path,
+                        # and the normal path is the only place GE has ever
+                        # rendered our A2UI. Both single-event variants are
+                        # confirmed dead: v11.67 sent the bare transition and put
+                        # the parts only in the artifact (card dropped - GE
+                        # treats the artifact as the turn's settled text);
+                        # v11.69 put the parts ON the transition event itself
+                        # (card dropped again, observed live 2026-08-22 -
+                        # wire-diffed against a rendering welcome-card turn, the
+                        # ONLY structural difference was one combined event vs a
+                        # bare transition followed by a parts-bearing event, so
+                        # GE evidently reads the first working event as a state
+                        # transition and never renders the message riding on
+                        # it). The short-circuit paths return before the
+                        # executor runs, so they must emit both events
+                        # themselves. Re-sending the identical parts in the
+                        # artifact is deliberate and does not double-render -
+                        # same ids, same surface.
                         await event_queue.enqueue_event(
                             TaskStatusUpdateEvent(
                                 task_id=context.task_id,
@@ -2940,6 +3163,18 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                     _get_adk_metadata_key('user_id'): run_args['user_id'],
                                     _get_adk_metadata_key('session_id'): run_args['session_id'],
                                 },
+                            )
+                        )
+                        await event_queue.enqueue_event(
+                            TaskStatusUpdateEvent(
+                                task_id=context.task_id,
+                                status=TaskStatus(
+                                    state=TaskState.working,
+                                    message=Message(message_id=str(uuid.uuid4()), role=Role.agent, parts=_pf_parts),
+                                    timestamp=datetime.now(timezone.utc).isoformat(),
+                                ),
+                                context_id=context.context_id,
+                                final=False,
                             )
                         )
                         await event_queue.enqueue_event(
@@ -2961,46 +3196,59 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         if idem_key:
                             _store_idem_result(idem_key, _pf_parts)
                         logger.log_text("[preflight_gate] rendered analysis-plan card and short-circuited (" + str(len(_pf_parts)) + " parts)")
-                        if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
-                            return
-                    elif isinstance(_plan, dict) and _plan.get("category") == "AUTONOMOUS":
-                        # Interactive briefing BEFORE delegation - only when the
-                        # classifier found material gaps; otherwise fall through
-                        # (zero friction) and the root agent delegates directly.
-                        _ab_parts = _build_autonomous_briefing_card_parts(_plan, _gate_scope)
-                        if _ab_parts:
-                            await event_queue.enqueue_event(
-                                TaskStatusUpdateEvent(
-                                    task_id=context.task_id,
-                                    status=TaskStatus(state=TaskState.working, timestamp=datetime.now(timezone.utc).isoformat()),
-                                    context_id=context.context_id,
-                                    final=False,
-                                    metadata={
-                                        _get_adk_metadata_key('app_name'): runner.app_name,
-                                        _get_adk_metadata_key('user_id'): run_args['user_id'],
-                                        _get_adk_metadata_key('session_id'): run_args['session_id'],
-                                    },
-                                )
+                        return
+                elif isinstance(_plan, dict) and _plan.get("category") == "AUTONOMOUS":
+                    # Interactive briefing BEFORE delegation - only when the
+                    # classifier found material gaps; otherwise fall through
+                    # (zero friction) and the root agent delegates directly.
+                    _ab_parts = _build_autonomous_briefing_card_parts(_plan, _gate_scope)
+                    if _ab_parts:
+                        # v11.70: bare transition, then the parts in their own
+                        # working message - see the analysis-plan card above.
+                        await event_queue.enqueue_event(
+                            TaskStatusUpdateEvent(
+                                task_id=context.task_id,
+                                status=TaskStatus(state=TaskState.working, timestamp=datetime.now(timezone.utc).isoformat()),
+                                context_id=context.context_id,
+                                final=False,
+                                metadata={
+                                    _get_adk_metadata_key('app_name'): runner.app_name,
+                                    _get_adk_metadata_key('user_id'): run_args['user_id'],
+                                    _get_adk_metadata_key('session_id'): run_args['session_id'],
+                                },
                             )
-                            await event_queue.enqueue_event(
-                                TaskArtifactUpdateEvent(
-                                    task_id=context.task_id,
-                                    last_chunk=True,
-                                    context_id=context.context_id,
-                                    artifact=Artifact(artifact_id=str(uuid.uuid4()), parts=_ab_parts),
-                                )
+                        )
+                        await event_queue.enqueue_event(
+                            TaskStatusUpdateEvent(
+                                task_id=context.task_id,
+                                status=TaskStatus(
+                                    state=TaskState.working,
+                                    message=Message(message_id=str(uuid.uuid4()), role=Role.agent, parts=_ab_parts),
+                                    timestamp=datetime.now(timezone.utc).isoformat(),
+                                ),
+                                context_id=context.context_id,
+                                final=False,
                             )
-                            await event_queue.enqueue_event(
-                                TaskStatusUpdateEvent(
-                                    task_id=context.task_id,
-                                    status=TaskStatus(state=TaskState.completed, timestamp=datetime.now(timezone.utc).isoformat()),
-                                    context_id=context.context_id,
-                                    final=True,
-                                )
+                        )
+                        await event_queue.enqueue_event(
+                            TaskArtifactUpdateEvent(
+                                task_id=context.task_id,
+                                last_chunk=True,
+                                context_id=context.context_id,
+                                artifact=Artifact(artifact_id=str(uuid.uuid4()), parts=_ab_parts),
                             )
-                            if idem_key:
-                                _store_idem_result(idem_key, _ab_parts)
-                            logger.log_text("[autonomous_briefing] rendered briefing card and short-circuited (" + str(len(_ab_parts)) + " parts)")
+                        )
+                        await event_queue.enqueue_event(
+                            TaskStatusUpdateEvent(
+                                task_id=context.task_id,
+                                status=TaskStatus(state=TaskState.completed, timestamp=datetime.now(timezone.utc).isoformat()),
+                                context_id=context.context_id,
+                                final=True,
+                            )
+                        )
+                        if idem_key:
+                            _store_idem_result(idem_key, _ab_parts)
+                        logger.log_text("[autonomous_briefing] rendered briefing card and short-circuited (" + str(len(_ab_parts)) + " parts)")
                         return
         except Exception as _pf_err:
             logger.log_text("[preflight_gate] gate error (fail-open, running agent): " + str(_pf_err)[:200])
@@ -3087,7 +3335,6 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         # stub guard / chip re-prompt must not fire extra LLM calls for it --
         # those calls re-send the same broken tool declarations and fail too.
         _fatal_config_error = False
-
 
         # =============================================================================
         # Model Name Display — show which model is processing (once per agent)
@@ -4834,27 +5081,12 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 if (_recovered_cards and _has_populated_card(_recovered_cards)
                         and (not _orphan_card_surface_ids(_recovered_cards))
                         and (not _inline_converted)):
-                    # Stream as a WORKING event so GE renders the surface from the
-                    # live stream, mirroring the chip recovery below.
-                    try:
-                        _cd_evt = TaskStatusUpdateEvent(
-                            task_id=context.task_id,
-                            context_id=context.context_id,
-                            status=TaskStatus(
-                                state=TaskState.working,
-                                message=Message(
-                                    message_id=str(uuid.uuid4()),
-                                    role=Role.agent,
-                                    parts=_recovered_cards,
-                                ),
-                                timestamp=datetime.now(timezone.utc).isoformat(),
-                            ),
-                            final=False,
-                        )
-                        task_result_aggregator.process_event(_cd_evt)
-                        await event_queue.enqueue_event(_cd_evt)
-                    except Exception as _cd_stream_err:
-                        logger.log_text("[card_reprompt] streaming recovered card failed: " + str(_cd_stream_err))
+                    # v11.63: the recovered card ships in the final artifact ONLY.
+                    # Until now it was also streamed as a WORKING event, which under
+                    # A2UI v0.9 sends createSurface twice for the same surfaceId -
+                    # an explicit spec error that makes the client drop the surface,
+                    # so the recovery rendered nothing at all. v0.8's beginRendering
+                    # had no uniqueness rule, hence the original streaming pattern.
                     artifact_media_parts.extend(_recovered_cards)
                     _normal_media = _normal_media + _recovered_cards
                     artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
@@ -4912,34 +5144,25 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 # discarded so the re-prompt can never duplicate the deliverable.
                 _recovered_chips = [p for p in _cr_media if _is_suggestions_part(p)]
                 if _has_populated_suggestions(_recovered_chips) and (not _inline_converted):
-                    # Stream the chips as a WORKING event so GE renders the
-                    # suggestions surface from the live stream (chips only in the
-                    # final artifact may not render). Mirrors the B-1 pattern.
-                    try:
-                        _cr_evt = TaskStatusUpdateEvent(
-                            task_id=context.task_id,
-                            context_id=context.context_id,
-                            status=TaskStatus(
-                                state=TaskState.working,
-                                message=Message(
-                                    message_id=str(uuid.uuid4()),
-                                    role=Role.agent,
-                                    parts=_recovered_chips,
-                                ),
-                                timestamp=datetime.now(timezone.utc).isoformat(),
-                            ),
-                            final=False,
-                        )
-                        task_result_aggregator.process_event(_cr_evt)
-                        await event_queue.enqueue_event(_cr_evt)
-                    except Exception as _cr_stream_err:
-                        logger.log_text("[chip_reprompt] streaming recovered chips failed: " + str(_cr_stream_err))
+                    # v11.63: chips ship in the final artifact ONLY - see the card
+                    # recovery above. The v10.70 note that "chips only in the final
+                    # artifact may not render" predates v0.9; the normal path already
+                    # delivers its suggestions surface through the artifact alone.
                     artifact_media_parts.extend(_recovered_chips)
                     _suggestion_media = list(_recovered_chips)
                     artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
                     logger.log_text("[chip_reprompt] recovered " + str(len(_recovered_chips)) + " suggestion part(s)")
                 else:
                     logger.log_text("[chip_reprompt] re-prompt yielded no usable chips - leaving turn as-is")
+
+        # v11.88 appended an invisible "press landing" surface here, on the
+        # theory that a press targets the previous TURN and so every turn had to
+        # end in a card. The live test refuted both halves: the landing was
+        # emitted and never drawn (a card whose only text is a zero-width space
+        # is not rendered - v10.68), and the target turned out to be the nearest
+        # card-rooted surface ABOVE the pressed one, same turn included. Nothing
+        # is appended here any more; the fix lives where the buttons are built.
+        # See the PRESS-SCROLL LANDING block near _card_wrap_chip_surface.
 
         # Inline overrun conversion (v10.79), exit B: the deadline watchdog may
         # have fired DURING a salvage phase above. If it converted, it already
@@ -5186,14 +5409,14 @@ class TokenExtractionMiddleware(BaseHTTPMiddleware):
         auth_header = request.headers.get("authorization", "")
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
-            logger.log_text(f"MIDDLEWARE: ✅ Token from Authorization header (prefix={token[:25]}..., len={len(token)})")
+            logger.log_text(f"MIDDLEWARE: ✅ Token from Authorization header (fp={_tok_fp(token)}, len={len(token)})")
         
         # Strategy 2: x-authorization header (fallback)
         if not token:
             x_auth = request.headers.get("x-authorization", "")
             if x_auth.startswith("Bearer "):
                 token = x_auth[7:]
-                logger.log_text(f"MIDDLEWARE: ✅ Token from x-authorization header (prefix={token[:25]}..., len={len(token)})")
+                logger.log_text(f"MIDDLEWARE: ✅ Token from x-authorization header (fp={_tok_fp(token)}, len={len(token)})")
         
         # Strategy 3: Parse JSON body for call_context.state.headers.authorization
         if not token and request.url.path.startswith("/a2a/"):
@@ -5215,13 +5438,13 @@ class TokenExtractionMiddleware(BaseHTTPMiddleware):
                             # Check for auth_id key directly
                             if auth_id and auth_id in state:
                                 token = state[auth_id]
-                                logger.log_text(f"MIDDLEWARE: ✅ Token from body context.state['{auth_id}'] (prefix={str(token)[:25]}..., len={len(str(token))})")
+                                logger.log_text(f"MIDDLEWARE: ✅ Token from body context.state['{auth_id}'] (fp={_tok_fp(str(token))}, len={len(str(token))})")
                             # Check for headers.authorization in state
                             elif 'headers' in state and isinstance(state['headers'], dict):
                                 h_auth = state['headers'].get('authorization', '')
                                 if h_auth.startswith("Bearer "):
                                     token = h_auth[7:]
-                                    logger.log_text(f"MIDDLEWARE: ✅ Token from body state.headers.authorization (prefix={token[:25]}..., len={len(token)})")
+                                    logger.log_text(f"MIDDLEWARE: ✅ Token from body state.headers.authorization (fp={_tok_fp(token)}, len={len(token)})")
             except Exception as e:
                 logger.log_text(f"MIDDLEWARE: ⚠️ Body parse error: {type(e).__name__}: {e}")
         
@@ -5813,7 +6036,11 @@ async def execute_task(request: Request):
                     "completed_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
                 })
                 await _send_push_notification(_fs, _demo_id, _task_id, "failed", str(_e)[:200])
-                return {"status": "failed", "error": str(_e)[:200]}
+                # The detail is already in the log line above and in the ticket's
+                # log_tail, which is what the viewer and get_autonomous_task_status
+                # read. The HTTP body goes back over a public Cloud Run URL and the
+                # caller here is the task trigger, which only needs the status.
+                return {"status": "failed", "error": "task execution failed"}
 
 
 async def _send_push_notification(_fs, _demo_id, _task_id, _status, _message):

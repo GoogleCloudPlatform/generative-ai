@@ -27,8 +27,7 @@
             "kpiRow",
             "divider2",
             "openDialogBtn",
-            "profileDialog",
-            "actionRow"
+            "profileDialog"
           ],
           "align": "stretch"
         },
@@ -92,7 +91,7 @@
         {
           "id": "kpi2Lbl",
           "component": "MaterialText",
-          "text": "Lifetime Donations",
+          "text": "Lifetime Value",
           "usageHint": "caption"
         },
         {
@@ -113,7 +112,7 @@
         {
           "id": "kpi3Lbl",
           "component": "MaterialText",
-          "text": "Attendance",
+          "text": "Engagements",
           "usageHint": "caption"
         },
         {
@@ -147,33 +146,47 @@
         {
           "id": "detailInfo",
           "component": "MaterialText",
-          "text": "🏢 Mitsubishi UFJ Bank CFO — 🎓 Class of 2000, Economics — 📧 k.takahashi@example.com",
+          "text": "🏢 Example Corporation CFO — 🏷️ Mid-Market segment, customer since 2000 — 📧 k.takahashi@example.com",
           "usageHint": "body"
         },
         {
           "id": "detailHistory",
           "component": "MaterialText",
-          "text": "💰 Donation History: 2021: [CURRENCY]10,000 — 2022: [CURRENCY]15,000 — 2023: [CURRENCY]25,000 — Total: [CURRENCY]50,000",
+          "text": "💰 Value History: 2021: [CURRENCY]10,000 — 2022: [CURRENCY]15,000 — 2023: [CURRENCY]25,000 — Total: [CURRENCY]50,000",
           "usageHint": "body"
         },
         {
           "id": "detailEvents",
           "component": "MaterialText",
-          "text": "📅 Event Attendance: 75% (3/4) — ✅ Career Seminar, Alumni Meetup, Lecture — ❌ Spring Gala 2024",
+          "text": "📅 Engagement: 75% (3/4) — ✅ Quarterly Review, User Group Meetup, Product Webinar — ❌ Q2 Executive Briefing",
           "usageHint": "body"
-        },
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
         {
-          "id": "actionRow",
+          "id": "root",
           "component": "MaterialRow",
           "children": [
             "btnApproach",
             "btnEdit"
           ],
-          "justify": "end",
+          "justify": "start",
           "align": "center",
           "style": {
-            "gap": "8px",
-            "marginTop": "12px"
+            "gap": "8px"
           }
         },
         {
@@ -196,7 +209,7 @@
           "label": "✏️ Edit Record",
           "action": {
             "event": {
-              "name": "edit_alumni_record",
+              "name": "edit_contact_record",
               "context": {
                 "prompt": "I want to edit Takahashi's record"
               }

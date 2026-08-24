@@ -22,8 +22,10 @@ limitations under the License.
   <title>ADK Agent Demo Generator</title>
   <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN used for portability in GAS environment -->
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Version-pinned, so the bytes are immutable and can carry an integrity hash. The two
+       CDNs above serve floating URLs, where a hash would break the page on any upstream release. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -1427,7 +1429,7 @@ limitations under the License.
             <!-- Fade Slides Container -->
             <div class="relative flex-1 h-[28px] text-xs text-gray-200 self-center flex items-center">
               <div class="banner-slide absolute inset-0 transition-all duration-500 ease-in-out opacity-100 flex items-center">
-                <span>⚡ <strong>Default Model Updated:</strong> The default agent model has been upgraded to <strong>Gemini 3.5 Flash</strong>, delivering blazing fast speed and advanced reasoning capabilities out of the box!</span>
+                <span>⚡ <strong>Default Model Updated:</strong> The default agent model has been upgraded to <strong>Gemini 3.7 Flash</strong>, delivering blazing fast speed and advanced reasoning capabilities out of the box!</span>
               </div>
               <div class="banner-slide absolute inset-0 transition-all duration-500 ease-in-out opacity-0 pointer-events-none flex items-center">
                 <span>🧪 <strong>Agent Sandbox (Code Execution):</strong> Next '26 — Secure Python sandbox for advanced analysis, NLP & data science. <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview" target="_blank" class="text-sky-400 underline cursor-pointer hover:text-sky-300 focus:outline-none">Learn more</a></span>
@@ -2162,7 +2164,7 @@ limitations under the License.
                       <div class="w-8 h-4 bg-gray-700 rounded-full peer peer-checked:bg-sky-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
                     </div>
                   </label>
-                  <p class="text-[10px] text-gray-500 leading-snug flex-1">Let the agent operate a real Chromium browser (<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/computer-use" target="_blank" rel="noopener" class="text-sky-400 hover:underline">Gemini 3.5 Flash Computer Use</a>) to run no-API websites. Watchable via a live-view link + in-chat screenshots.</p>
+                  <p class="text-[10px] text-gray-500 leading-snug flex-1">Let the agent operate a real Chromium browser (<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/computer-use" target="_blank" rel="noopener" class="text-sky-400 hover:underline">Gemini 3.7 Flash Computer Use</a>) to run no-API websites. Watchable via a live-view link + in-chat screenshots.</p>
                 </div>
               </div>
             </div>
@@ -2796,7 +2798,7 @@ limitations under the License.
     const CURRENT_USER_EMAIL = '<?= typeof userEmail !== "undefined" ? userEmail : "" ?>';
     
     function formatModelName(modelId) {
-      if (!modelId) return 'Gemini 3.5 Flash';
+      if (!modelId) return 'Gemini 3.7 Flash';
       return modelId
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -2856,7 +2858,9 @@ limitations under the License.
 
       if (tab === 'preview') {
         // Render Markdown preview
-        preview.innerHTML = simpleMarkdownToHtml(textarea.value || '<span class="text-gray-500 italic">No content to preview.</span>');
+        // The empty-state markup is a literal, so it bypasses the renderer now that the
+        // renderer escapes its input. The wrapper matches what the renderer would have emitted.
+        preview.innerHTML = simpleMarkdownToHtml(textarea.value) || '<p class="text-xs text-gray-400 leading-relaxed mb-2"><span class="text-gray-500 italic">No content to preview.</span></p>';
         textarea.classList.add('hidden');
         preview.classList.remove('hidden');
         tabEdit.className = 'px-3 py-1 text-[9px] font-bold rounded-md transition-all text-gray-500 hover:text-gray-300';
@@ -2869,35 +2873,36 @@ limitations under the License.
       }
     }
 
+    // The result goes straight into innerHTML, and the input is a business goal the
+    // user typed or one the catalog replayed, so every span of text has to be escaped
+    // before the markup is built around it. Bold is applied after escaping, which is
+    // why the ** markers still work: esc() leaves asterisks alone.
     function simpleMarkdownToHtml(md) {
       if (!md || !md.trim()) return '';
-      const lines = md.split('\n');
-      let html = '';
-      let inList = false;
+      var lines = md.split('\n');
+      var html = '';
+      var inList = false;
 
-      lines.forEach(line => {
-        const trimmed = line.trim();
+      lines.forEach(function (line) {
+        var trimmed = line.trim();
 
         // Headings
-        if (trimmed.startsWith('# ')) {
+        if (trimmed.indexOf('# ') === 0) {
           if (inList) { html += '</ul>'; inList = false; }
-          html += `<h2 class="text-lg font-bold text-white mt-4 mb-2 pb-1 border-b border-violet-500/20">${trimmed.substring(2)}</h2>`;
-        } else if (trimmed.startsWith('## ')) {
+          html += '<h2 class="text-lg font-bold text-white mt-4 mb-2 pb-1 border-b border-violet-500/20">' + esc(trimmed.substring(2)) + '</h2>';
+        } else if (trimmed.indexOf('## ') === 0) {
           if (inList) { html += '</ul>'; inList = false; }
-          html += `<h3 class="text-sm font-bold text-violet-300 mt-4 mb-2 flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-violet-400 rounded-full"></span>${trimmed.substring(3)}</h3>`;
-        } else if (trimmed.startsWith('- ')) {
+          html += '<h3 class="text-sm font-bold text-violet-300 mt-4 mb-2 flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-violet-400 rounded-full"></span>' + esc(trimmed.substring(3)) + '</h3>';
+        } else if (trimmed.indexOf('- ') === 0) {
           if (!inList) { html += '<ul class="space-y-1.5 mb-3">'; inList = true; }
-          let content = trimmed.substring(2);
-          // Bold
-          content = content.replace(/\*\*(.+?)\*\*/g, '<strong class="text-emerald-300">$1</strong>');
-          html += `<li class="flex items-start gap-2 text-xs text-gray-300"><span class="text-violet-400 mt-0.5 flex-shrink-0">•</span><span>${content}</span></li>`;
+          var item = esc(trimmed.substring(2)).replace(/\*\*(.+?)\*\*/g, '<strong class="text-emerald-300">$1</strong>');
+          html += '<li class="flex items-start gap-2 text-xs text-gray-300"><span class="text-violet-400 mt-0.5 flex-shrink-0">&bull;</span><span>' + item + '</span></li>';
         } else if (trimmed === '') {
           if (inList) { html += '</ul>'; inList = false; }
         } else {
           if (inList) { html += '</ul>'; inList = false; }
-          let content = trimmed;
-          content = content.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
-          html += `<p class="text-xs text-gray-400 leading-relaxed mb-2">${content}</p>`;
+          var para = esc(trimmed).replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
+          html += '<p class="text-xs text-gray-400 leading-relaxed mb-2">' + para + '</p>';
         }
       });
 
@@ -3579,7 +3584,7 @@ limitations under the License.
     // Premium Synthesis and Bundling Carousel and Timer Logic
     const SYNTHESIS_TIPS = [
       {
-        heading: "⚡ with Gemini 3.5 Flash",
+        heading: "⚡ with Gemini 3.7 Flash",
         body: "Using Google's latest model to synthesize domain models, SQL queries, and reasoning paths in seconds."
       },
       {
@@ -5483,7 +5488,9 @@ limitations under the License.
         
         if (geLink) {
           const baseUrl = 'https://console.cloud.google.com/gemini-enterprise/apps';
-          geLink.href = val ? `${baseUrl}?project=${val}` : baseUrl;
+          // Encoded: the project id comes from a free-text field, and an unencoded
+          // value could otherwise add query parameters or a fragment to the console URL.
+          geLink.href = val ? `${baseUrl}?project=${encodeURIComponent(val)}` : baseUrl;
         }
       }
     }
