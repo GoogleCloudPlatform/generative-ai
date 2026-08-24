@@ -98,7 +98,7 @@ def run_bash(script: str) -> subprocess.CompletedProcess:
 # --- 1. the authorization read-back gate -------------------------------------
 GATE_PRELUDE = """
 TOKEN=stub-token
-# Shouty on purpose: curl is stubbed, so the value is never used, and a
+# Upper case on purpose: curl is stubbed, so the value is never used, and a
 # lowercase project-id-shaped literal reads as a real project to a secret
 # scanner.
 PROJECT_ID=STUB_PROJECT_ID
