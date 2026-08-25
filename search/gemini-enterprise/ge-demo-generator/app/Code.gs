@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.91-public',
+  APP_VERSION: 'v11.93-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2605,6 +2605,21 @@ function generateSetupScript(params) {
     firestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
     logging: 'google-cloud-logging>=3.0.0,<4.0.0',
 
+    // (v11.93) google-api-core is a TRANSITIVE dependency of every Google Cloud
+    // client here, declared directly only to hold this cap. 2.35.0 (2026-08-24)
+    // added urllib.parse.quote(val, safe="/") to
+    // path_template._expand_variable_match as path-traversal hardening, and that
+    // encodes the parentheses in Firestore's default database id: every call
+    // becomes
+    //   InvalidArgument: 400 Invalid database id %28default%29
+    // which takes down session persistence, the idempotency claim, task storage
+    // and the autonomous worker in one go. Bisected 2026-08-25 against a live
+    // project - firestore 2.28.1 and 2.29.0 both fail on api-core 2.35.0 and
+    // both pass on 2.34.0, so the cap belongs here and NOT on the firestore
+    // line. Independently hit by a demo author the same day. Lift the cap once
+    // a release above 2.35.0 restores the unencoded id.
+    apiCore: 'google-api-core>=2.20.0,<2.35.0',
+
     // Utilities
     dotenv: 'python-dotenv>=1.0.0,<2.0.0',
     dbDtypes: 'db-dtypes>=1.0.0,<2.0.0',
@@ -2620,6 +2635,8 @@ function generateSetupScript(params) {
     viewerFunctionsFramework: 'functions-framework>=3.5.0,<4.0.0',
     viewerFlask: 'flask>=3.0.3,<4.0.0',
     viewerFirestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
+    // The viewer reads the same Firestore collections, so it needs the same cap.
+    viewerApiCore: 'google-api-core>=2.20.0,<2.35.0',
 
     // Computer Use (browser agent) -- only added when enableComputerUse is set.
     // playwright pin matches the official reference impl
@@ -2667,6 +2684,7 @@ function generateSetupScript(params) {
   const CONSTRAINT_KEYS = [
     'adk', 'mcp', 'genai', 'a2a', 'aiplatform', 'storage', 'scheduler',
     'tasks', 'pubsub', 'firestore', 'logging', 'dotenv', 'dbDtypes', 'otel',
+    'apiCore',
     'playwright', 'genaiComputerUse', 'cuOtelGcpLogging', 'cuOtelGcpResourceDetector',
   ];
   const constraintLines = [];
@@ -2826,7 +2844,7 @@ if __name__ == '__main__':
     init_data()
 __PY_EOF__\n`;
 
-    firestoreCommands += `uv run --no-project --with "${PINNED_DEPS.firestore}" python setup_fs.py\n`;
+    firestoreCommands += `uv run --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python setup_fs.py\n`;
     firestoreCommands += `rm setup_fs.py\n\n`;
 
     firestoreCommands += `echo "🌐 Deploying Real-time Data Viewer Web App (Cloud Run Functions)..."\n`;
@@ -4009,7 +4027,7 @@ ${ enableManagedAgent ? `
     echo ""
     echo "🔥 Deleting Firestore Collection: ${fsCollection}..."
     if command -v uv >/dev/null 2>&1; then
-      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" python3 -c "from google.cloud import firestore; db=firestore.Client(); [d.reference.delete() for d in db.collection('${fsCollection}').stream()]" 2>/dev/null && echo "   ✅ Firestore documents in collection deleted." || echo "   ⚠️  Could not clear Firestore collection automatically."
+      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python3 -c "from google.cloud import firestore; db=firestore.Client(); [d.reference.delete() for d in db.collection('${fsCollection}').stream()]" 2>/dev/null && echo "   ✅ Firestore documents in collection deleted." || echo "   ⚠️  Could not clear Firestore collection automatically."
     fi
 
     echo ""
@@ -4177,7 +4195,7 @@ ${ enableManagedAgent ? `
 
     echo ""
     echo "📁 Deleting Firestore task collections..."
-    GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" python3 -c "
+    GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python3 -c "
 from google.cloud import firestore
 db = firestore.Client()
 for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '${dirName}_task_push_configs', '${dirName}_adk_sessions']:
@@ -4957,6 +4975,7 @@ ${PINNED_DEPS.pubsub}
 ${PINNED_DEPS.firestore}
 ${PINNED_DEPS.logging}
 ${PINNED_DEPS.otel}
+${PINNED_DEPS.apiCore}
 ${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}\n${PINNED_DEPS.cuOtelGcpLogging}\n${PINNED_DEPS.cuOtelGcpResourceDetector}` : '' }
 __REQ_EOF__
 

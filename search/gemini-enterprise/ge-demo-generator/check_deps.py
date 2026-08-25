@@ -45,11 +45,11 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 CODE_GS = HERE / "app" / "Code.gs"
-# The agent template ships a static pyproject.toml that repeats four of the
+# The agent template ships a static pyproject.toml that repeats five of the
 # PINNED_DEPS requirements; a cap only protects the build if both carry it.
 PYPROJECT = HERE / "agent_template" / "pyproject.toml"
 # PINNED_DEPS key -> the requirement pyproject.toml must repeat verbatim.
-PYPROJECT_KEYS = ("adk", "mcp", "genai", "storage")
+PYPROJECT_KEYS = ("adk", "mcp", "genai", "storage", "apiCore")
 
 # PINNED_DEPS keys that are not pip requirements.
 NON_PIP_KEYS = {"pythonImage", "uvImage", "uvVersion", "supergateway"}
@@ -61,7 +61,8 @@ COMPUTER_USE_KEYS = {
     "cuOtelGcpResourceDetector",
 }
 # Keys that go into the separate viewer_app/requirements.txt, not the agent's.
-VIEWER_KEYS = {"viewerFunctionsFramework", "viewerFlask", "viewerFirestore"}
+VIEWER_KEYS = {"viewerFunctionsFramework", "viewerFlask", "viewerFirestore",
+               "viewerApiCore"}
 
 REQ_SPEC = re.compile(
     r"^(?P<name>[A-Za-z0-9._-]+)"

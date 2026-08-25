@@ -507,6 +507,8 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
 - `python3 check_deps.py` — dependency cap audit (see section 8).
 - `python3 test_press_retire.py` — the press-retire helper deletes a surface the
   user can see, so its guards are covered off-line (see section 2.6).
+- `python3 test_surface_registry_persist.py` — simulates an instance recycle
+  and checks the surfaceId anchors survive it (see section 10.3).
 - `python3 test_register_fallback.py` — slices the authorization read-back gate
   and `register_ge_agent_with_fallback` out of `app/Code.gs` and runs them under
   `bash -e` against a stubbed `curl` and a stubbed `register_agent.py`. The only
@@ -557,9 +559,25 @@ Two things to know before editing a requirement:
   cap contains `a2a-sdk` without holding ADK back. Only a build that passes
   justifies a bound.
 
-`agent_template/pyproject.toml` repeats four of these requirements verbatim and
+- **A transitive dependency can need a direct entry of its own.**
+  `google-api-core` is pulled in by every Google Cloud client here and nothing
+  declared it, so 2.35.0 (2026-08-24) reached the image unopposed: it added
+  `urllib.parse.quote(val, safe="/")` to
+  `path_template._expand_variable_match`, which percent-encodes the parentheses
+  in Firestore's default database id, and every call in a freshly built demo
+  returned `InvalidArgument: 400 Invalid database id %28default%29` —
+  session persistence, the idempotency claim, task storage and the autonomous
+  worker at once. It is listed in `PINNED_DEPS` purely to hold `<2.35.0`.
+  Bisect before choosing where the cap goes: `google-cloud-firestore` 2.28.1
+  and 2.29.0 both fail on api-core 2.35.0 and both pass on 2.34.0, so capping
+  the Firestore line would have pinned the wrong package and still broken.
+
+`agent_template/pyproject.toml` repeats five of these requirements verbatim and
 is copied into the build context, so it must carry the same caps.
-`check_deps.py` fails if it drifts.
+`check_deps.py` fails if it drifts. The same goes for
+`agent_template/viewer_app/requirements.txt`, which is a static file the script
+copies as-is: the viewer reads the same Firestore collections and needs the
+same cap.
 
 A cap in `requirements.txt` only binds the install *we* issue. When a demo
 imports a custom MCP server, the Dockerfile clones that repo and runs its own
@@ -931,9 +949,10 @@ cannot interleave a half-written history, and it runs even when the turn failed
 
 Deliberate limits, do not "fix" these without thinking:
 
-- **Only the conversation is persisted.** `_session_last_artifact` and
-  `builtins._ws_session_tokens` are process-local by design: the token is
-  re-sent on every request, and losing the regenerate cache costs one replay.
+- **The conversation and the surfaceId anchors are persisted; nothing else
+  is.** `_session_last_artifact` and `builtins._ws_session_tokens` stay
+  process-local by design: the token is re-sent on every request, and losing
+  the regenerate cache costs one replay.
 - **The OAuth token is stripped** from the persisted state
   (`_session_persistable_state` skips the `GEMINI_AUTHORIZATION_ID` key). It is
   short-lived and re-supplied per request; it has no business in Firestore.
@@ -942,6 +961,21 @@ Deliberate limits, do not "fix" these without thinking:
   `Event.model_validate` is not worth the crash.
 - **Firestore caps a document at 1 MiB.** The flush halves the event list until
   the gzipped blob fits under 800 KB, and skips the write if it still does not.
+- **The surfaceId anchors ride in the same document** (v11.92, field
+  `surface_registry`). The cross-turn rescope guard in section 2.5 lived in
+  process memory while the cards it tracks live in the Gemini Enterprise
+  client, which outlives the instance: after a scale-to-zero the next turn
+  re-emitted a `surfaceId` the client had already bound to an older message,
+  that older card was patched instead, and the new turn rendered text only.
+  Three details are load-bearing. The anchors are stored as JSON **text**, not
+  a map — a `surfaceId` is model-authored and Firestore rejects a field name
+  matching `__.*__`, and that 400 would fail the whole flush and take the event
+  history with it. The restore runs **before** the ADK-version gate, because
+  the cards on screen do not care which ADK wrote the blob. And it **mutates**
+  the registry dict rather than rebinding it, because `_process_request` armed
+  the guard with that object before the restore ran. The oversized-blob skip
+  path still writes the anchors with `merge=True`; they are a few hundred bytes
+  and have nothing to do with why the history did not fit.
 
 ### 10.4 Why `--max-instances 1`
 
