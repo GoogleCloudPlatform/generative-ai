@@ -1038,8 +1038,8 @@ Then ask for a demo in your own words — "build me a Gemini Enterprise demo for
 `skills/ge-demo-generator/templates/` is a separate copy of the runtime files from
 `agent_template/`, and the two are allowed to differ: `agent_template/` is what the web app's
 setup script fetches at run time, while the skill's copy is what the skill scaffolds and
-carries features the web app does not have (the demo's Drive documents can be pulled into the
-end user's own Drive, for one). Change one and you have not changed the other.
+carries features the web app does not have (it generates external sample documents and can
+index them with a DataStore connector, for one). Change one and you have not changed the other.
 
 ---
 
