@@ -24,7 +24,7 @@
 
 
 # =============================================================================
-# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.10.0)
+# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.11.0)
 # Automatically audits 8 infrastructure layers and heals discrepancies in real time:
 #   1. BigQuery Dataset & Tables (Row counts, _id column for DataStores, schema metadata)
 #   2. Firestore Collection & Seeding (Task queue documents >= 3)
@@ -609,11 +609,11 @@ else:
     else:
         record_check("External Files", "Sample Documents", "WARN", "external_files/ empty", "No external sample files generated")
 
-# The end user gets these documents into their OWN Drive by asking the agent to
-# import them, and that tool reads the BUCKET - a Cloud Run container has no copy
-# of this deploy directory. So an unstaged bucket is not a cosmetic gap: the
-# import answers not_found and the demo looks broken. Staged in both modes since
-# v2.9.0; before that the copy only ran for rag demos.
+# The bucket is the only copy of these documents that outlives this machine: the
+# completion banner links to it, and in rag mode it is what the datastore indexes.
+# So an unstaged bucket is not a cosmetic gap - the links 404 and, for a rag demo,
+# the agent finds nothing to cite. Staged in both modes since v2.9.0; before that
+# the copy only ran for rag demos.
 if ext_files and GCS_BUCKET_NAME:
     staged = subprocess.run(["gcloud", "storage", "ls", f"gs://{GCS_BUCKET_NAME}/"],
                             capture_output=True, text=True)
@@ -630,14 +630,14 @@ if ext_files and GCS_BUCKET_NAME:
         if cp.returncode == 0:
             record_check("External Files", "GCS Staging", "HEALED",
                          f"Staged {len(ext_files)} file(s) to gs://{GCS_BUCKET_NAME}/",
-                         "The in-chat Drive import can read them again")
+                         "The banner's Cloud Storage links resolve again")
         else:
             record_check("External Files", "GCS Staging", "WARN",
                          f"Could not stage to gs://{GCS_BUCKET_NAME}/", cp.stderr.strip()[:120])
 
-# ...and the container has to know the bucket's name. Without it the import tool
-# answers "not configured" however well the bucket is stocked.
-if WORKSPACE_ON and GCS_BUCKET_NAME:
+# ...and the deployed service should still carry the bucket's name, so that a
+# teardown or a later re-run can find the documents from the service alone.
+if GCS_BUCKET_NAME:
     try:
         _envs = cr_info.get("spec", {}).get("template", {}).get("spec", {}).get(
             "containers", [{}])[0].get("env", [])
@@ -650,15 +650,15 @@ if WORKSPACE_ON and GCS_BUCKET_NAME:
                               f"--update-env-vars=GCS_BUCKET_NAME={GCS_BUCKET_NAME}"],
                              capture_output=True, text=True)
         if upd.returncode == 0:
-            record_check("External Files", "Drive Import Wiring", "HEALED",
+            record_check("External Files", "Bucket Name Wiring", "HEALED",
                          "Added GCS_BUCKET_NAME to the Cloud Run service",
-                         "import_demo_files_to_my_drive can now find the documents")
+                         "The service now records where the documents are staged")
         else:
-            record_check("External Files", "Drive Import Wiring", "WARN",
+            record_check("External Files", "Bucket Name Wiring", "WARN",
                          "GCS_BUCKET_NAME missing from the Cloud Run service",
                          upd.stderr.strip()[:120])
     elif _envs is not None:
-        record_check("External Files", "Drive Import Wiring", "PASS", "None",
+        record_check("External Files", "Bucket Name Wiring", "PASS", "None",
                      "Cloud Run carries GCS_BUCKET_NAME")
 
 # -----------------------------------------------------------------------------

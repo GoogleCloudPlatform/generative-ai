@@ -5,11 +5,11 @@ The GE Demo Generator synthesizes realistic external sample data files (PDF Repo
 Where those files end up is the part that surprises people, so it is stated up front:
 they are always written locally and staged to `gs://$GCS_BUCKET_NAME/`; the deploy-time
 `gdrive` upload puts them in the **operator's** Drive and shares that folder with the
-deploy target as Writer (§5); and when there is no such folder, the target gets its own
-copy at conversation time through `import_demo_files_to_my_drive`, which runs with that
-user's OAuth token — by itself on the user's first message, and on request afterwards
-(§5.3). A deployment cannot write into someone else's Drive on its own; sharing is how
-the deploy-time folder reaches the target.
+deploy target as Writer (§5). That upload is the **only** path into a Drive. When it does
+not run — no CLI, no CLI identity, or `SKIP_HOST_DRIVE_UPLOAD=1` — there is no Drive copy
+of these documents at all, and the deploy completion banner says so with the reason (§5.4).
+The deployed agent cannot make one: a deployment cannot write into someone else's Drive on
+its own, and sharing is how the deploy-time folder reaches the target.
 
 ---
 
@@ -79,14 +79,13 @@ When `enableWorkspaceMcp: true` is configured (step 1 applies to `enableWorkspac
 3. The agent can directly search the user's Drive folder for these files:
    - "Search Google Drive for the latest supplier audit report"
    - "Read the reconciliation ledger from Google Sheets and compare with operational tables"
-4. Those two prompts only find something the user's Drive can see. The deploy-time upload
-   covers that by sharing its folder with the deploy target (§5), which makes the files
-   searchable for that account. When there was no deploy-time upload at all, the agent
-   imports the files on the user's first message all by itself
-   (`import_demo_files_to_my_drive`, §5.3), so the ledger is a real Google Sheet by the
-   time the Sheets prompt runs. The user can also ask — "import the demo's sample
-   documents into my Google Drive" — and that works in either case, which is how a
-   participant who is not the deploy target gets a copy of their own.
+4. Those two prompts only find something the user's Drive can see, so they depend on the
+   deploy-time upload having run and its share having landed on the account driving the
+   demo (§5). When it did not, those two prompts come back empty and nothing recovers
+   later: check the completion banner before promising a Drive step, and give the
+   audience the Cloud Storage links instead. The agent is told the same thing, so it
+   answers "the documents are in cloud storage" rather than offering an import it cannot
+   perform.
 
 ---
 
@@ -126,56 +125,34 @@ through a share.
 
 3. **Opt-out**: `SKIP_HOST_DRIVE_UPLOAD=1` restores the old behaviour — skip the upload
    whenever the CLI identity is not the deploy target. Use it when the operator's Drive
-   must not hold the assets at all; the agent-side import (§5.3) then covers Drive.
+   must not hold the assets at all, and accept that the demo then has no Drive copy: this
+   is a trade, not a fallback.
 
-4. **When the upload is skipped**, nothing is lost: the files are in `./external_files`
-   and in `gs://$GCS_BUCKET_NAME/`, which `setup_and_deploy.sh` now stages in **every**
-   mode (before v2.9.0 the copy sat inside the rag branch, so an MCP-mode demo had no
-   bucket at all). `setup_and_deploy.sh` reads `upload_skipped_reason` from
-   `external_files/drive_upload_summary.json` and prints the reason plus both paths in
-   the final banner.
+4. **When the upload is skipped, the documents are intact but there is no Drive folder.**
+   They are in `./external_files` and in `gs://$GCS_BUCKET_NAME/`, which
+   `setup_and_deploy.sh` stages in **every** mode (before v2.9.0 the copy sat inside the
+   rag branch, so an MCP-mode demo had no bucket at all). `setup_and_deploy.sh` reads
+   `upload_skipped_reason` from `external_files/drive_upload_summary.json` and prints it,
+   under a `📁 External Sample Files - NOT in Google Drive` heading, with what it costs (a
+   Drive or Sheets step in the demo script finds nothing) and how to fix it (sign the
+   `gdrive` CLI in and re-run, or upload `./external_files/` by hand and share it).
 
-   **The files still get into the target's own Drive at conversation time, and the user
-   does not have to ask.** With `enableWorkspaceAuth` (or full MCP),
-   `import_demo_files_to_my_drive` lists `gs://$GCS_BUCKET_NAME/`, creates a folder
-   `GE Demo Sample Files - <DEMO_ID>` and uploads each document with the **signed-in
-   user's** OAuth token, so that user OWNS the result — no "Shared with me", no
-   cross-tenant surprise. The `.xlsx` is import-converted to a Google Sheet, the PDF and
-   the scans keep their format.
+   **This banner is the whole recovery story, by design.** v2.10.0 tried to close the gap
+   from the other end: the agent copied the documents into the signed-in user's Drive with
+   their OAuth token, unprompted, on the first turn of every conversation, behind a
+   Firestore claim, a worker thread and a wait budget. v2.11.0 deleted all of it — the
+   tool, the automatic run, the claim, `AUTO_IMPORT_DEMO_FILES` and `DRIVE_FOLDER_URL`.
+   Three reasons, in order of weight:
 
-   **Automatic import (v2.10.0).** Nobody opening a demo for the first time knows the
-   sentence "import the demo's sample documents into my Google Drive" exists, so the same
-   import also runs on its own. `root_agent`'s before-agent callback calls
-   `tools.maybe_auto_import_demo_files()` on the first turn of a conversation; the work
-   happens on a worker thread and the turn waits `AUTO_IMPORT_WAIT_S` (default 8s) for it,
-   so the links normally arrive in the very first reply. When the upload takes longer the
-   worker parks the announcement and the next turn delivers it. Either way it is announced
-   through `{_bg_task_results}` — the same channel background tasks use — with an
-   instruction to reproduce the links and say it once, in the user's language.
-
-   | Question | Answer |
+   | Why it went | Detail |
    | --- | --- |
-   | How is a second copy avoided? | A Firestore marker `<DEMO_ID>_drive_imports/<email>`. It is keyed on the **Drive account the token belongs to** (from `tokeninfo`), never on the ADK `user_id`, which GE mints per session — that key would hand the same person a new folder in every conversation. The marker also survives an instance restart, so two Cloud Run instances cannot both import. |
-   | What if the user deletes the folder? | The recorded folder id is checked with a `files.get` before its links are handed out again; a trashed or missing folder re-imports. A network error during that check counts as "still there", not as deletion. |
-   | What about two instances at once? | The claim is written with Firestore `create()`, which refuses a document that already exists, so the loser backs off with `in_progress` instead of importing a second folder. |
-   | What if a claim crashes mid-upload? | The `running` marker is taken over after 10 minutes. A failed import deletes its own claim. |
-   | Can the user still ask? | Yes, and it is the same code path. The tool returns the recorded folder (`already_imported`) instead of a second copy, or `in_progress` while the automatic import is still uploading. |
-   | What if the deploy already uploaded to Drive? | Then the unprompted run stands down. `setup_and_deploy.sh` passes the shared folder as `DRIVE_FOLDER_URL`, and its presence suppresses the automatic import — a second copy of documents the user can already open is noise. Asking still imports a personal copy, and the answer names the shared folder too (`shared_folder_from_deploy`). |
-   | How is it switched off? | `AUTO_IMPORT_DEMO_FILES=0` on the Cloud Run service. The tool stays; only the unprompted run stops. |
+   | It uploaded the wrong things | The uploader took every object at the root of `gs://$GCS_BUCKET_NAME/`. In rag mode that root is also the datastore's corpus, so on a real demo it was 13 objects / 103 MB of the customer's own manuals, not the 4 generated samples — into an end user's personal Drive, without anyone asking for it. |
+   | The machinery outweighed the feature | Idempotency across instances and conversations needed a Firestore claim keyed on the token's email, a takeover timeout, a trashed-folder re-check and a parked announcement channel; roughly 390 lines to deliver something the deploy already does in one `gdrive` call. |
+   | It paid for itself on every turn | The before-agent callback ran on all turns, and the first one blocked up to `AUTO_IMPORT_WAIT_S` (8s) waiting for the copy — a budget sized for 4 small files. |
 
-   Constraints, all structural:
-
-   | Constraint | Why |
-   | --- | --- |
-   | Live user turn only | The OAuth token is captured per request and has no refresh path; `user_id == "background-worker"` is refused outright, in the tool and in the automatic path. |
-   | Needs `enableWorkspaceAuth` or `enableWorkspaceMcp` | Without the GE authorization no user token ever arrives; the tool answers `disabled` and the automatic import returns nothing. |
-   | `GCS_BUCKET_NAME` must reach Cloud Run | It is in `CR_ENV_VARS`; without it the tool answers `error` / not configured and the automatic import does not start. |
-   | Announcement is in-process | The parked announcement lives in the instance that ran the import. If that instance is recycled before the next turn, the files are still in Drive but nobody says so — the user gets the links by asking. |
-
-   `auth_required` means the user has not consented yet (or the token expired): the fix
-   is for the user to re-authorize the agent in Gemini Enterprise, not to re-deploy. The
-   automatic import treats a missing token the same way, silently: it does not consume
-   the one-shot trigger, so the turn after consent tries again.
+   The agent's system instruction now states the same thing the banner does: the documents
+   live in cloud storage, the deploy shares the Drive folder, and if a Drive search comes
+   back empty it must say so rather than offer a copy it cannot make.
 
 5. **Reporting & Access Instructions.** Every path to the files ends in a link the
    reader can click; a bare `gs://` URI or a folder name is not a link.

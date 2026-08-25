@@ -1398,11 +1398,6 @@ _all_tools.append(tools.register_scheduled_autonomous_task)
 # Drive handoff needs BOTH the user's Workspace OAuth (drive.file) and the
 # Managed Agent deliverables in GCS.
 _all_tools.append(tools.save_deliverables_to_drive)
-# Imports the demo's OWN sample documents (audit PDF, external ledger, scans)
-# into the signed-in user's Drive. Needs the Workspace OAuth only - it is the
-# way those files reach the deploy target's Drive at all, because the deploy-time
-# gdrive CLI can only create files in the Drive of whoever ran the setup script.
-_all_tools.append(tools.import_demo_files_to_my_drive)
 
 
 # --- Agent Sandbox Code Executor (always enabled) ---
@@ -1428,20 +1423,10 @@ _WORKER_ABANDON_AFTER_S = float(os.environ.get("WORKER_ABANDON_AFTER_S", "1800")
 def _inject_completed_tasks(callback_context):
     """Checks Firestore for completed tasks not yet reported and injects results."""
     import builtins, logging as _logging
-    # Same channel, different sender (v2.10.0): the demo's own sample documents
-    # are imported into the signed-in user's Drive on the first turn, without
-    # the user having to know the request exists, and the links are announced
-    # here. Returns "" on every later turn, and whenever the import is off, has
-    # already run for this user, or has no user token to run with.
-    try:
-        _drive_note = tools.maybe_auto_import_demo_files(callback_context)
-    except Exception as _di_err:
-        _logging.warning("auto Drive import skipped: " + str(_di_err)[:200])
-        _drive_note = ""
     _fs = getattr(builtins, '_firestore_client', None)
     _demo_id = os.environ.get("DEMO_ID", "")
     if not _fs or not _demo_id:
-        callback_context.state["_bg_task_results"] = _drive_note
+        callback_context.state["_bg_task_results"] = ""
         return None
     # Stuck-run sweep, BEFORE the completed-tasks query so anything finalized
     # here is announced in this same turn.
@@ -1585,9 +1570,6 @@ def _inject_completed_tasks(callback_context):
     except Exception as _e:
         _logging.error("Failed to inject task results: " + str(_e))
         callback_context.state["_bg_task_results"] = ""
-    if _drive_note:
-        _prev = callback_context.state.get("_bg_task_results", "") or ""
-        callback_context.state["_bg_task_results"] = (_prev + chr(10) + _drive_note).strip()
     return None
 
 # =============================================================================
@@ -2863,20 +2845,14 @@ GOOGLE WORKSPACE HANDOFF (Workspace access is enabled):
    (setup tutorial step 4) and Chat posting starts working - then relay
    the prepared message text from the report. NEVER attribute the failure
    to vague "security restrictions" or tenant policy.
-3. THIS DEMO'S SAMPLE DOCUMENTS INTO DRIVE: the external source documents of
-   this demo (audit report PDF, external ledger spreadsheet, scanned
-   handwritten orders) live in cloud storage, NOT in the user's Drive - the
-   deployment cannot put files in someone else's Drive.
-   import_demo_files_to_my_drive copies them into the user's OWN Drive as one
-   folder, converting the spreadsheet into Google Sheets. This normally runs by
-   itself at the start of the conversation, so the files are usually there
-   already. Call the tool when the user asks for the demo's source documents in
-   their Drive, or when they ask for a Drive / Sheets action on those documents
-   and searching their Drive finds nothing. It is safe to call at any time: it
-   returns the existing folder rather than importing a second copy, and answers
-   in_progress while the automatic import is still uploading - in that case say
-   so and offer to show the links in a moment. Present the folder link first,
-   then the files.
+3. THIS DEMO'S SAMPLE DOCUMENTS: the external source documents of this demo
+   (audit report PDF, external ledger spreadsheet, scanned handwritten orders)
+   live in cloud storage. The deploy also puts them in a Google Drive folder and
+   shares it with the demo's audience, so a Drive or Sheets step over them
+   normally finds them. When a Drive search comes back empty, say that the
+   documents are in cloud storage and that the Drive folder is shared by the
+   person who deployed this demo - do NOT offer to copy them into the user's
+   Drive, the agent has no way to do that.
 
 INTERACTIVE DASHBOARD REQUESTS (ALWAYS DELEGATE — regardless of the two conditions
 above): When the user asks for an INTERACTIVE dashboard — signalled by the word

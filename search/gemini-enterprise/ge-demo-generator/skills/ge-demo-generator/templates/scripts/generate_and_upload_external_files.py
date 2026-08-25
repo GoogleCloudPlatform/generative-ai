@@ -416,8 +416,9 @@ def upload_to_google_drive(company_name: str, suffix: str, files_to_upload: list
     # outcome was no Drive folder at all.
     #
     # SKIP_HOST_DRIVE_UPLOAD=1 restores the strict behaviour for a target whose
-    # tenant must not see operator-owned files; the documents then reach that
-    # user's own Drive through the agent instead (import_demo_files_to_my_drive).
+    # tenant must not see operator-owned files; the documents then live only in
+    # ./external_files/ and the bucket, and the deploy banner says so - there is
+    # no agent-side path that puts them in a Drive.
     # ALLOW_HOST_DRIVE_UPLOAD is now the default and kept only so old runbooks
     # and .env files do not break.
     skip_host_drive = os.environ.get("SKIP_HOST_DRIVE_UPLOAD", "").strip().lower() in ("1", "true", "yes")

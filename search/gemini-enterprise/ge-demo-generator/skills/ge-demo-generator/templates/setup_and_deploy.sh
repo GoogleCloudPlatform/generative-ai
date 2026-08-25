@@ -982,22 +982,13 @@ CR_ENV_VARS="${CR_ENV_VARS},AGENT_ENGINE_NAME=${AGENT_ENGINE_NAME}"
 CR_ENV_VARS="${CR_ENV_VARS},DATA_VIEWER_URL=${VIEWER_URL}"
 CR_ENV_VARS="${CR_ENV_VARS},GEMINI_AUTHORIZATION_ID=${AUTH_ID}"
 CR_ENV_VARS="${CR_ENV_VARS},DASHBOARDS_BUCKET=${DASH_BUCKET}"
-# The demo's external sample documents are staged in this bucket in EVERY mode,
-# and import_demo_files_to_my_drive reads it to copy them into the signed-in
-# user's own Drive. Without the name that tool has nothing to list and answers
-# "not configured" - which is how those documents reach a user's Drive whenever
-# the deploy-time gdrive upload did not happen or could not be shared with them.
+# The demo's external sample documents are staged in this bucket in EVERY mode
+# (in rag mode it is also what the GCS datastore indexes, which is how the agent
+# reads them - through search_datastore, not out of anybody's Drive). No runtime
+# tool reads the NAME since v2.11.0 dropped the in-chat Drive import, but
+# verify_and_heal.py reads it back off the service to confirm the staging, and a
+# self-describing deployed footprint costs nothing.
 CR_ENV_VARS="${CR_ENV_VARS},GCS_BUCKET_NAME=${GCS_BUCKET_NAME}"
-# When the deploy-time upload DID land, the agent gets the folder link: it can
-# point the user at the documents they already have, and the unprompted import
-# stands down instead of dropping a second copy in their My Drive.
-DEPLOYED_DRIVE_FOLDER_URL=""
-if [ -f external_files/drive_upload_summary.json ]; then
-  DEPLOYED_DRIVE_FOLDER_URL=$(jq -r '.folder_url // empty' external_files/drive_upload_summary.json 2>/dev/null || echo "")
-fi
-if [ -n "$DEPLOYED_DRIVE_FOLDER_URL" ]; then
-  CR_ENV_VARS="${CR_ENV_VARS},DRIVE_FOLDER_URL=${DEPLOYED_DRIVE_FOLDER_URL}"
-fi
 # publish_dashboard signs URLs by impersonating the runtime identity; without the
 # address it cannot name the principal to sign as and returns unsigned links.
 CR_ENV_VARS="${CR_ENV_VARS},RUNTIME_SA_EMAIL=${COMPUTE_SA}"
@@ -1415,12 +1406,12 @@ wait $PID_DRIVE 2>/dev/null || true
 
 # Job 3.2b: Stage the external sample files, provision DataStores (Optional)
 (
-  # The staging is NOT rag-only. In mcp mode nothing indexes these documents,
-  # but import_demo_files_to_my_drive still reads this bucket to copy them into
-  # the signed-in user's own Drive - and until v2.9.0 the copy sat inside the
-  # rag branch, so every mcp-mode demo left that tool pointing at a bucket that
-  # was never even created. cleanup.sh deletes the bucket by name in both modes,
-  # so creating it here leaks nothing.
+  # The staging is NOT rag-only. In mcp mode nothing indexes these documents, but
+  # the bucket is still where the demo's sample documents live: the completion
+  # banner links to them there, and it is the only copy that survives this
+  # machine. Until v2.9.0 the staging sat inside the rag branch, so every mcp-mode
+  # demo pointed at a bucket that was never even created. cleanup.sh deletes the
+  # bucket by name in both modes, so creating it here leaks nothing.
   if [ -n "${GCS_BUCKET_NAME:-}" ]; then
     gcloud storage buckets create "gs://${GCS_BUCKET_NAME}" --project="$PROJECT_ID" --location="$REGION" --uniform-bucket-level-access 2>/dev/null || true
     if [ -d "./external_files" ]; then
@@ -1789,8 +1780,11 @@ if [ ! -z "$DRIVE_FOLDER_URL" ]; then
   if [ ! -z "$DRIVE_SHARE_ERROR" ]; then
     echo "❗ SHARING FAILED     : ${GCP_ACCOUNT} cannot open the folder yet."
     echo "   Reason: ${DRIVE_SHARE_ERROR}"
-    echo "   Share it by hand from the Drive UI as [${DRIVE_OWNER_ACCOUNT}] - or, with"
-    echo "   Workspace OAuth on, ask the agent to import the documents into that Drive."
+    echo "   ACTION REQUIRED - the agent cannot fix this for you. Signed in as"
+    echo "   [${DRIVE_OWNER_ACCOUNT}], either share the folder from the Drive UI or run:"
+    echo "     gdrive mutate share --email ${GCP_ACCOUNT} --role writer --notify=false <FOLDER_ID>"
+    echo "   Until then, use the Cloud Storage links below - they work for anyone with"
+    echo "   storage.objects.get on the project."
   elif [ "${DRIVE_OWNER_ACCOUNT}" != "${GCP_ACCOUNT}" ]; then
     echo "⚠️ ACCESS INSTRUCTION:"
     echo "   [${DRIVE_OWNER_ACCOUNT}] OWNS this folder and [${GCP_ACCOUNT}] has Writer access,"
@@ -1803,24 +1797,16 @@ if [ ! -z "$DRIVE_FOLDER_URL" ]; then
   fi
 elif [ ! -z "$DRIVE_SKIP_REASON" ]; then
   echo ""
-  echo "📁 External Sample Files (local - no Google Drive upload)"
+  echo "📁 External Sample Files - NOT in Google Drive"
   echo "--------------------------------------------------------------------------------"
-  echo "📂 Location: ./external_files/"
   echo "ℹ️ Drive upload skipped: ${DRIVE_SKIP_REASON}."
-  if [ "$ENABLE_WORKSPACE_MCP" = "1" ] || [ "$ENABLE_WORKSPACE_AUTH" = "1" ]; then
-    echo "✅ They still reach a Drive by themselves: on your first message to the agent"
-    echo "   in Gemini Enterprise it copies them from the bucket with YOUR OAuth token,"
-    echo "   so you own the result (the ledger arrives as a Google Sheet), and it replies"
-    echo "   with the folder link. Once per account - a second conversation gets the same"
-    echo "   folder, not a second copy. You can also just ask for them:"
-    echo "   \"import the demo's sample documents into my Google Drive\"."
-    echo "   Set AUTO_IMPORT_DEMO_FILES=0 on the Cloud Run service to require the ask."
-  else
-    echo "   Sign the gdrive CLI in and re-run to get a Drive folder, or open the files"
-    echo "   from Cloud Storage with the links below."
-    echo "   With Workspace OAuth enabled the agent could import them into your own Drive"
-    echo "   on request instead - that option needs enableWorkspaceAuth (or the full MCP)."
-  fi
+  echo "   The documents are still complete: in Cloud Storage (links below) and on this"
+  echo "   machine under ./external_files/. Only the Drive copy is missing, so a Drive or"
+  echo "   Sheets step in the demo script will find nothing. The agent cannot create that"
+  echo "   copy for you - it is a deploy-time step."
+  echo "   To get one, sign the gdrive CLI in as the account that should own the folder"
+  echo "   (check with: gdrive readonly quota --json) and re-run this script, or upload"
+  echo "   ./external_files/ to a Drive folder by hand and share it with your audience."
 fi
 if [ ! -z "$GCS_CONSOLE_URL" ]; then
   echo ""

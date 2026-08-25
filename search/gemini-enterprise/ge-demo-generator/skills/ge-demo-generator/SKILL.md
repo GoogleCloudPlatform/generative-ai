@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images) and upload them to Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, Google Drive file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.10.0
+  version: 2.11.0
 ---
 
-# GE Demo Generator Skill (v2.10.0)
+# GE Demo Generator Skill (v2.11.0)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.7 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, direct **Google Drive external sample files storage**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
 
@@ -211,11 +211,10 @@ Close the section with where the files will actually live, in one line, because 
 part users assume wrongly: they are staged to `gs://<project>-<domain>-<suffix>-docs/` in
 every mode; at deploy time the `gdrive` CLI uploads them into the Drive of whoever is
 running this skill and shares that folder with `${GCP_ACCOUNT}` as Writer; and when the
-CLI is not available at all, the deployed agent imports them into the user's own Drive by
-itself, on their first message, and answers with the folder link
-(`import_demo_files_to_my_drive`, once per account). That fallback needs
-`enableWorkspaceAuth` — if the user wants the documents in Drive, has no `gdrive` CLI, and
-that flag is still `false`, say so here, while it can still be switched on.
+CLI is not available or not signed in, there is no Drive copy at all — the deploy banner
+says so, and the documents are reachable only from Cloud Storage and `./external_files/`.
+The deployed agent has no way to put them in anyone's Drive. If the user wants them in
+Drive and has no working `gdrive` CLI, say so here, while it can still be sorted out.
 
 ### § Brief section 4 — 🤖 Agent Models & Runtime
 
@@ -370,14 +369,13 @@ arrive here without that, go back and present it.
        policy), the summary carries `share_error` and the banner says `❗ SHARING FAILED`
        — pass that on with the manual share command rather than handing over a link the
        target cannot open.
-     - When there is no authenticated `gdrive` CLI the upload is skipped, which is not a
-       failure: `setup_and_deploy.sh` stages every file to `gs://$GCS_BUCKET_NAME/` in
-       **both** data-exploration modes, and with `enableWorkspaceAuth` (or the full MCP)
-       the deployed agent imports them into the *end user's own* Drive by itself, on that
-       user's first message, and replies with the links — `import_demo_files_to_my_drive`,
-       using that user's OAuth token, ledger converted to a Google Sheet, once per
-       account. Tell the user this instead of reporting a missing folder;
-       see `references/external_files_and_drive.md` §5.
+     - When there is no authenticated `gdrive` CLI the upload is skipped and the summary
+       carries `skip_reason`. The documents are not lost — `setup_and_deploy.sh` stages
+       every file to `gs://$GCS_BUCKET_NAME/` in **both** data-exploration modes — but
+       there will be no Drive folder, and nothing downstream creates one: report the
+       skip and its reason on the completion screen, point at the Cloud Storage links,
+       and say what to do to get a folder (sign the `gdrive` CLI in and re-run, or upload
+       `./external_files/` by hand). See `references/external_files_and_drive.md` §5.
 
 4. **Provision BigQuery Dataset & Tables (Step 1/6)** (Idempotent + Knowledge Catalog Metadata):
    ```bash
@@ -720,13 +718,15 @@ Upon deployment completion, ALWAYS output the structured results containing dire
   filenames, never a bare `gs://` URI on its own; `gs://` is not clickable.
 - 📂 Also on this machine: `./external_files/`
 
-📁 **When the Drive upload was skipped** (no authenticated `gdrive` CLI):
-- ✅ **They land in your own Drive by themselves**: send the agent your first message and
-  it imports them with **your** OAuth token, so you own the folder and the ledger arrives
-  as a Google Sheet; the reply carries the links. Once per account, and you can also ask
-  for them explicitly: *"import the demo's sample documents into my Google Drive"*. Needs
-  `enableWorkspaceAuth`; if the demo was deployed without it, say that plainly rather
-  than promising the import.
+📁 **When the Drive upload was skipped** (no authenticated `gdrive` CLI) — say it plainly,
+this is the only notice the user gets:
+- ℹ️ **There is no Drive copy of these documents.** Print `skip_reason` verbatim. The
+  documents themselves are complete, in Cloud Storage and `./external_files/`; only the
+  Drive folder is missing, so a Drive or Sheets step in the demo script will find nothing.
+- 🛠️ **To get one**: sign the `gdrive` CLI in as the account that should own the folder
+  (`gdrive readonly quota --json` shows who it is now) and re-run, or upload
+  `./external_files/` to a Drive folder by hand and share it with the audience. Never
+  suggest asking the agent to do it — it cannot.
 
 📊 **Firestore Data Viewer Dashboard:** 👉 ${VIEWER_URL}
 🔎 **BigQuery Console:** 👉 https://console.cloud.google.com/bigquery?referrer=search&project=${PROJECT_ID}&ws=!1m4!1m3!3m2!1s${PROJECT_ID}!2s${DATASET_ID}
