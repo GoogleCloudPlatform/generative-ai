@@ -13,6 +13,7 @@ google-cloud-pubsub>=2.0.0,<3.0.0
 google-cloud-firestore>=2.16.0,<3.0.0
 google-cloud-logging>=3.0.0,<4.0.0
 opentelemetry-api>=1.20.0,<2.0.0
+google-api-core>=2.20.0,<2.35.0
 
 # --- Computer Use / browser automation only (enableComputerUse) ---
 # Uncomment all four together when the demo enables Computer Use, and uncomment the

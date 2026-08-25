@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images) and upload them to Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, Google Drive file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.11.0
+  version: 2.11.2
 ---
 
-# GE Demo Generator Skill (v2.11.0)
+# GE Demo Generator Skill (v2.11.2)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.7 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, direct **Google Drive external sample files storage**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
 

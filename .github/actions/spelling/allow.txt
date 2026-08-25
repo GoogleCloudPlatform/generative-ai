@@ -1671,6 +1671,7 @@ resampled
 resamples
 rescope
 Rescope
+rescoped
 rescoper
 resil
 Resona

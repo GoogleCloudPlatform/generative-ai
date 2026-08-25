@@ -525,6 +525,64 @@ def _get_surface_registry(_sid):
                 _session_surface_registry.pop(_old, None)
     return _reg
 
+# v11.92: the registry above is process memory, but the anchors it tracks live
+# in the GE client, which outlives the process. A scale-to-zero (or a deploy, or
+# an instance recycle) therefore used to reset it while the conversation kept
+# every card on screen: the next turn re-emitted a surfaceId GE had already
+# anchored to an OLD message, GE patched that card instead of rendering a new
+# one, and the turn showed text only - the #14/#15 failure, reintroduced by
+# amnesia. Confirmed 2026-08-25 on a live demo: two analysis-plan cards were
+# rescoped correctly, the instance shut down idle at 04:57, and the third one
+# (05:29) emitted the bare ids again with no [surface_rescope] line and never
+# rendered - the user saw the lead-in text and a turn that appeared to stop.
+# Session events are already mirrored to Firestore for exactly this reason, so
+# the anchors ride along in the same document.
+
+def _snapshot_surface_registry(_sid):
+    """The session's surfaceId anchors as JSON TEXT (newest 50).
+
+    Text rather than a Firestore map because the keys are model-authored
+    surfaceIds: Firestore rejects a field name matching __.*__ ("field name is
+    reserved", probed live 2026-08-25 - 'a.b' and 'has/slash' are accepted,
+    '__evil__' is a 400), and that 400 would fail the WHOLE session flush and
+    take the event history down with it, which is the cold-start amnesia this
+    is here to prevent. A string also keeps unbounded invented keys out of the
+    index.
+    """
+    _out = {}
+    for _k, _v in list((_session_surface_registry.get(_sid) or {}).items())[-50:]:
+        if isinstance(_v, dict) and _v.get('current'):
+            _out[str(_k)] = {'current': str(_v.get('current')),
+                             'owner': str(_v.get('owner') or '')}
+    try:
+        return json.dumps(_out, ensure_ascii=False)
+    except Exception:
+        return ''
+
+def _load_surface_registry(_sid, _stored):
+    """Re-seed the in-memory registry from a persisted snapshot."""
+    if isinstance(_stored, str):
+        try:
+            _stored = json.loads(_stored or '{}')
+        except Exception:
+            return
+    if not isinstance(_stored, dict) or not _stored:
+        return
+    # Mutated in place: _process_request armed the guard with THIS dict object
+    # before the restore runs, so rebinding it here would be invisible.
+    _reg = _get_surface_registry(_sid)
+    _n = 0
+    for _k, _v in _stored.items():
+        # Anything this process already owns is newer than the blob.
+        if _k in _reg or not isinstance(_v, dict) or not _v.get('current'):
+            continue
+        _reg[str(_k)] = {'current': str(_v.get('current')),
+                         'owner': str(_v.get('owner') or '')}
+        _n += 1
+    if _n:
+        logger.log_text('[surface_rescope] restored ' + str(_n)
+                        + ' surface id(s) after a cold start')
+
 def _a2ui_components(_v):
     _c = _v.get('components')
     return _c if isinstance(_c, list) else []
@@ -2297,6 +2355,10 @@ async def _persist_session(_session, _session_id, _user_id):
         if len(_blob) > _SESSION_BLOB_MAX_BYTES:
             logger.log_text("[session_persist] " + str(_session_id) + ": blob still "
                             + str(len(_blob)) + " bytes after trimming - skipping flush")
+            # The surfaceId anchors are a few hundred bytes and have nothing to
+            # do with why the history did not fit; dropping them too would cost
+            # an unrendered card on the next cold start (v11.92).
+            _ref.set({"surface_registry": _snapshot_surface_registry(_session_id)}, merge=True)
             return
         _ref.set({
             "session_id": str(_session_id),
@@ -2305,6 +2367,7 @@ async def _persist_session(_session, _session_id, _user_id):
             "adk_version": _ADK_VERSION,
             "event_count": len(_payload["events"]),
             "updated_at": datetime.now(timezone.utc).isoformat(),
+            "surface_registry": _snapshot_surface_registry(_session_id),
             "blob": _blob,
         })
     except Exception as _pe:
@@ -2322,6 +2385,15 @@ async def _restore_session(_session_id, _user_id, _initial_state):
         if not _snap.exists:
             return None
         _doc = _snap.to_dict() or {}
+        # Ahead of the version gate on purpose (v11.92): the cards GE has on
+        # screen are unaffected by which ADK wrote the blob, so their surfaceId
+        # anchors stay valid even on the paths that discard the event history.
+        # Own try: a card that renders in the wrong place is a far smaller loss
+        # than the event history this function exists to bring back.
+        try:
+            _load_surface_registry(_session_id, _doc.get("surface_registry"))
+        except Exception as _sre:
+            logger.log_text("[surface_rescope] anchor restore skipped: " + str(_sre)[:200])
         _stored_version = _doc.get("adk_version", "")
         if _stored_version != _ADK_VERSION:
             logger.log_text("[session_persist] " + str(_session_id) + ": discarding blob written by adk "

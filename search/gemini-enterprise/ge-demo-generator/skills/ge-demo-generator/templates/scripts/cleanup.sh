@@ -380,7 +380,8 @@ if [ -n "$FIRESTORE_COLLECTION" ] || [ -n "$DEMO_ID" ]; then
     # `|| true` turned that into a silent no-op under a "completed successfully"
     # banner. setup_and_deploy.sh already installs uv, so borrow its runner.
     if command -v uv >/dev/null 2>&1; then
-      FS_PY=(uv run --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0" python3)
+      FS_PY=(uv run --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0"
+        --with "google-api-core>=2.20.0,<2.35.0" python3)
     else
       FS_PY=(python3)
       echo "   ⚠️  uv not found - falling back to the system python3; if google-cloud-firestore is not installed there, clear the collections by hand."

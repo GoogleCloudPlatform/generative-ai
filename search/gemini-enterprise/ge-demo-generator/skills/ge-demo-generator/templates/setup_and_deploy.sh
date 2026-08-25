@@ -899,6 +899,7 @@ PID_DRIVE=$!
     # Report what happened. The seed silently failing is exactly the case that
     # has to be visible: every Firestore-backed feature of the demo depends on it.
     if _FS_SEED_OUT=$(uv run --with "google-cloud-firestore>=2.16.0,<3.0.0" \
+      --with "google-api-core>=2.20.0,<2.35.0" \
       python3 scripts/setup_fs.py \
       --project "$PROJECT_ID" \
       --collection "$FIRESTORE_COLLECTION" 2>&1); then
