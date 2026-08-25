@@ -1,3 +1,4 @@
 functions-framework>=3.5.0
 flask>=3.0.3
 google-cloud-firestore>=2.16.0
+google-api-core>=2.20.0,<2.35.0

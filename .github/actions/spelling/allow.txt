@@ -1611,6 +1611,7 @@ Reranking
 reranks
 rescope
 Rescope
+rescoped
 rescoper
 resil
 Resona
