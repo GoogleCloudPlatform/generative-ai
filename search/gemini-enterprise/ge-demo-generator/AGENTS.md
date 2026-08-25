@@ -1371,3 +1371,73 @@ navigation chip bar must be a `MaterialRow` of `MaterialButton`s;
 `MaterialChips` stays correct for *bound selection* inside a form, where the
 value flows through the data model rather than the action. No schema can express
 this, so `validate_examples.py` checks it directly.
+
+---
+
+## 14. `skills/` — the same generator as an Agent Skill
+
+`skills/ge-demo-generator/` packages the whole generator as an Agent Skill so a
+coding agent can build and deploy a demo directly, without the Apps Script web
+app. It is a third front end over the same Google Cloud footprint, not a wrapper
+around `app/Code.gs`:
+
+```
+skills/ge-demo-generator/
+  ├─ SKILL.md      the lifecycle the agent follows, phase by phase
+  ├─ references/   the material it reads on demand (data modelling, IAM and
+  │                deployment, MCP and A2UI catalogs, Drive files, prompts)
+  └─ templates/    the files it scaffolds into the demo project, including
+                   scripts/verify_and_heal.py, the post-deploy checks it runs
+```
+
+### 14.1 `skills/…/templates/` is a fork of `agent_template/`, deliberately
+
+Both trees hold the same runtime files, and they are **allowed to diverge**:
+`agent_template/` is what the generated setup script fetches at run time
+(section 4), while the skill's copy is what the skill writes to disk itself. The
+skill's copy carries behaviour the web app does not have, so a change to one is
+not a change to the other. When you edit a runtime file, decide which front end
+you are fixing, and port it across only if the fix applies to both.
+
+Do not "de-duplicate" the two by symlinking or by pointing the skill at
+`agent_template/`: it would silently downgrade the skill to the web app's
+feature set, and the drift is not visible in a diff of file names.
+
+### 14.2 Conventions this sample adds to the skill
+
+The skill is developed against a live Google Cloud project and lands here with
+three transforms applied. Reapply all three when you update it:
+
+1. **Lint suppression.** Every `.py` file under `templates/` is a runtime
+   template, not sample code that the repository's linters should police, so
+   each one carries the same eight-line block the rest of this sample uses
+   (`# Deployed as a runtime template …` plus the `flake8`, `pylint`, `mypy`
+   and `ruff` opt-outs) directly under the license header. Each `Dockerfile`
+   under `templates/` carries `# hadolint ignore=` lines for the same reason,
+   every one of them with a comment saying why the rule does not apply.
+2. **Product naming**, matching `.github/actions/spelling/line_forbidden.patterns`:
+   the platform is written "Vertex AI Agent Platform" and never shortened, Agent
+   Engine is written bare with no platform prefix, "GCP" is written "Google
+   Cloud" in prose (the `GCP_ACCOUNT` variable keeps its name), and the SDK is
+   "Gen AI", two words.
+3. **Shell cleanliness.** `templates/setup_and_deploy.sh` and
+   `templates/scripts/cleanup.sh` are checked by the repository's super-linter,
+   so both must be `shellcheck`-clean and `shfmt`-clean at the two-space indent
+   the root `.editorconfig` sets. That indent rule applies to the whole file,
+   including the Python heredocs inside it — a continuation line aligned under
+   an opening parenthesis usually lands on an odd column, so break after the
+   parenthesis and indent by four instead. Verify all three before pushing:
+
+   ```bash
+   shellcheck -e SC1091 -e SC2086 skills/ge-demo-generator/templates/setup_and_deploy.sh
+   shfmt -d -i 2 skills/ge-demo-generator/templates/scripts/cleanup.sh
+   editorconfig-checker skills/ge-demo-generator/templates/setup_and_deploy.sh
+   ```
+
+### 14.3 Version bumps
+
+A behaviour change to the skill bumps its version in three places, which are
+checked against each other by eye and drift easily: the `version:` field in
+`SKILL.md`'s front matter, the version in `SKILL.md`'s title line, and the
+banner string in `templates/scripts/verify_and_heal.py`. The skill's version is
+independent of `APP_VERSION` in `app/Code.gs`.

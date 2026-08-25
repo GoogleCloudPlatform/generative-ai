@@ -1,0 +1,117 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "image-report",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "image-report",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "mainCol"
+          ]
+        },
+        {
+          "id": "mainCol",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "chartImage",
+            "insight"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📊 Value Trend Analysis Report",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "chartImage",
+          "component": "MaterialImage",
+          "url": "https://example.com/chart.png",
+          "alt": "2020-2024 Value Trends by Segment",
+          "fit": "contain",
+          "roundedCorners": true
+        },
+        {
+          "id": "insight",
+          "component": "MaterialText",
+          "text": "💡 Enterprise value up +23% YoY. SMB down -8%. Engagement strategy review recommended.",
+          "usageHint": "body",
+          "style": {
+            "marginTop": "12px"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "suggestions",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "suggestions",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialRow",
+          "children": [
+            "btnDetail",
+            "btnExport"
+          ],
+          "justify": "start",
+          "align": "center",
+          "style": {
+            "gap": "8px"
+          }
+        },
+        {
+          "id": "btnDetail",
+          "component": "MaterialButton",
+          "label": "📉 Root Cause",
+          "action": {
+            "event": {
+              "name": "deep_dive_segment",
+              "context": {
+                "prompt": "Analyze the root cause of declining value in the SMB segment"
+              }
+            }
+          },
+          "variant": "raised"
+        },
+        {
+          "id": "btnExport",
+          "component": "MaterialButton",
+          "label": "📄 Export Report",
+          "action": {
+            "event": {
+              "name": "export_report_pdf",
+              "context": {
+                "prompt": "Summarize this analysis report in PDF format"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

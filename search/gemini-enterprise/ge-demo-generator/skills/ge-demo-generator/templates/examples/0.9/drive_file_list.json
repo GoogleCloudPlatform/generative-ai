@@ -1,0 +1,88 @@
+[
+  {
+    "version": "v0.9",
+    "createSurface": {
+      "surfaceId": "drive-files",
+      "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateDataModel": {
+      "surfaceId": "drive-files",
+      "path": "/files",
+      "value": [
+        {
+          "name": "Weekly Inventory Report",
+          "type": "Document",
+          "modified": "2024-09-15"
+        },
+        {
+          "name": "Q3 Sales Data",
+          "type": "Spreadsheet",
+          "modified": "2024-09-10"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9",
+    "updateComponents": {
+      "surfaceId": "drive-files",
+      "components": [
+        {
+          "id": "root",
+          "component": "MaterialCard",
+          "children": [
+            "col"
+          ]
+        },
+        {
+          "id": "col",
+          "component": "MaterialColumn",
+          "children": [
+            "title",
+            "divider1",
+            "table"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "MaterialText",
+          "text": "📁 Drive Files",
+          "usageHint": "h2"
+        },
+        {
+          "id": "divider1",
+          "component": "MaterialDivider"
+        },
+        {
+          "id": "table",
+          "component": "MaterialTable",
+          "caption": "Recent Drive files",
+          "columns": [
+            {
+              "header": "Name",
+              "field": "name"
+            },
+            {
+              "header": "Type",
+              "field": "type"
+            },
+            {
+              "header": "Modified",
+              "field": "modified"
+            }
+          ],
+          "rows": {
+            "path": "/files"
+          },
+          "style": {
+            "marginTop": "8px"
+          }
+        }
+      ]
+    }
+  }
+]

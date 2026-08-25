@@ -121,6 +121,8 @@ auc
 aujourd'hui
 authtoken
 autocal
+autodetect
+autodetected
 autoflake
 autogen
 automerge
@@ -152,6 +154,7 @@ baristas
 barmode
 barpolar
 BARSAC
+basename
 baxis
 bayes
 bbc
@@ -195,7 +198,9 @@ bluesky
 bml
 bname
 bnb
+bom
 booktitle
+bools
 boop
 Borregas
 Borussia
@@ -208,12 +213,14 @@ bpa
 bpd
 bpm
 Bqbl
+bqdescription
 bqdf
 bqds
 bqml
 brandable
 breakroom
 briest
+brl
 Broadoak
 Brusdar
 Brynner
@@ -299,6 +306,7 @@ clsx
 cmap
 cmn
 cnf
+cny
 COCOAPODS
 codebase
 codebases
@@ -321,6 +329,9 @@ colorway
 colurna
 colvis
 colwidth
+Copyable
+counterparties
+counterparty
 Cómo
 Condesa
 Connectez
@@ -397,6 +408,7 @@ DCR
 ddata
 ddbb
 ddl
+declaratively
 decord
 dedup
 Dedup
@@ -407,6 +419,8 @@ defn
 deliv
 Demis
 Demme
+demoable
+demoed
 demouser
 denorm
 dente
@@ -418,8 +432,10 @@ deskmates
 devkey
 Dexin
 dflags
+dflt
 dfs
 DHH
+diffable
 diffed
 diffs
 digikey
@@ -427,6 +443,7 @@ diltiazem
 dino
 dioicus
 direnv
+dirnames
 distichum
 Disturbia
 diy
@@ -443,6 +460,7 @@ docai
 DOCDB
 docstore
 docstores
+docstring
 doi
 DOIs
 Donen
@@ -459,6 +477,7 @@ draig
 Dreesen
 drilldown
 drinkware
+droid
 dropbtn
 dropdown
 dropna
@@ -492,6 +511,7 @@ edata
 EDB
 edgecolor
 edgelist
+editorconfig
 edoc
 edtech
 edu
@@ -533,6 +553,7 @@ enqueuer
 ENU
 Envane
 envrc
+envs
 envsubst
 Enzo
 epath
@@ -567,6 +588,8 @@ evse
 evt
 Exfil
 expl
+expr
+extfiles
 faa
 facecolor
 Fairall
@@ -584,6 +607,7 @@ fea
 fect
 Feitian
 fewshot
+fffbeb
 ffi
 ffprobe
 FHIR
@@ -621,14 +645,18 @@ FMWK
 Folmer
 fontane
 fontdict
+foo
 footwell
 forbes
 forno
 fos
+fpath
 FPDF
 FREDDIE
 freedraw
 freopen
+freq
+fresp
 Friedkin
 Frodo
 fromarray
@@ -680,6 +708,7 @@ gdk
 gdkx
 GDM
 gdp
+gdrive
 geboten
 gecos
 gedemo
@@ -694,6 +723,7 @@ GEOGPOINT
 Geralt
 GError
 getconn
+getcwd
 getdata
 getexif
 getparent
@@ -705,6 +735,7 @@ gfile
 GFile
 Gfm
 gguf
+ghcr
 giallo
 Giallo
 Giancarlo
@@ -829,6 +860,7 @@ HMO
 hnsw
 Hogwarts
 Homesley
+honoured
 Hoodi
 Horamavu
 Hossein
@@ -896,6 +928,7 @@ inpaint
 inpainted
 inr
 INR
+ints
 IOMGR
 ionate
 Iosif
@@ -909,8 +942,10 @@ ipynb
 ipywebrtc
 IRAs
 isa
+isdigit
 isdir
 isess
+isfile
 itable
 itables
 itb
@@ -951,6 +986,7 @@ Jibo
 Jincheng
 Jincheol
 jit
+jittering
 jiwer
 Joji
 Jolyon
@@ -959,6 +995,7 @@ JPY
 jsemer
 jsonable
 jsonify
+jsonl
 jsonlines
 jsonpath
 jsonplus
@@ -1015,6 +1052,7 @@ kpi
 kpis
 KPIs
 Kraizt
+krw
 KSA
 kubectl
 Kubeflow
@@ -1058,7 +1096,9 @@ linecolor
 linestyle
 linkedin
 linted
+linters
 linting
+listdir
 litellm
 livekit
 LIVEKIT
@@ -1083,6 +1123,7 @@ LOOKBACK
 lookml
 Lopyrev
 loras
+lossless
 Lottry
 louvain
 lparam
@@ -1116,6 +1157,7 @@ magika
 Mahindra
 mahut
 mai
+makedirs
 Makemake
 makeover
 malware
@@ -1272,6 +1314,7 @@ NDEBUG
 ndocs
 nec
 neering
+neighbouring
 neil
 Nemar
 nemri
@@ -1316,6 +1359,8 @@ NOMINATIM
 NOMINMAX
 nonroot
 norigin
+normalise
+northwind
 notetaker
 novnc
 noxfile
@@ -1369,16 +1414,19 @@ onsen
 ood
 OOD
 OOM
+OOMs
 Oort
 OOTB
 openai
 openat
 openfda
 openssl
+opentype
 Oppo
 opsz
 oraw
 Orbelians
+ord
 Orus
 osm
 oss
@@ -1394,6 +1442,8 @@ padus
 Pageable
 pagedown
 pagemap
+pagesize
+pagesizes
 pageup
 Pakeman
 paleo
@@ -1449,9 +1499,11 @@ Pharma
 phellos
 Photoshop
 Pichai
+pids
 pidx
 pietra
 pii
+pil
 pilates
 Pilates
 pincodes
@@ -1462,6 +1514,7 @@ pixmap
 pjson
 pkce
 pkl
+pks
 playlists
 PLLu
 pllum
@@ -1496,6 +1549,7 @@ Pranav
 praw
 prcntg
 PRD
+prereleases
 Pré
 PREBROWSE
 preds
@@ -1575,6 +1629,7 @@ Raikkonen
 Rajpurkar
 Ramblas
 ramen
+randint
 Ranurte
 rapideval
 raquin
@@ -1588,6 +1643,7 @@ rbf
 rbm
 rdoc
 RDONLY
+reallocations
 recontext
 Recontext
 recrawl
@@ -1595,9 +1651,11 @@ reddit
 redef
 redmine
 Redmine
+regexes
 reidx
 remai
 rembg
+remediate
 reoffice
 rephraser
 REPOURL
@@ -1609,8 +1667,11 @@ reranker
 reranking
 Reranking
 reranks
+resampled
+resamples
 rescope
 Rescope
+rescoped
 rescoper
 resil
 Resona
@@ -1631,6 +1692,7 @@ rlog
 rmcp
 RMSE
 rmsg
+rnd
 RNN
 RNNs
 ROAS
@@ -1657,6 +1719,7 @@ RTN
 rubra
 rubrum
 Ruchika
+runbooks
 runjdwp
 RUnlock
 RUNPATH
@@ -1675,6 +1738,7 @@ Satoru
 Sauron
 saveddir
 Sca
+scaffolded
 scann
 scattergl
 Schlenoff
@@ -1692,6 +1756,7 @@ SDKROOT
 sdt
 seabut
 sealife
+searchable
 seatback
 Segfault
 SEK
@@ -1725,7 +1790,9 @@ Shawshank
 Shazeer
 SHEBA
 shedd
+shellcheck
 Shenzhou
+shfmt
 Shibuya
 Shinjuku
 Shklovsky
@@ -1800,6 +1867,7 @@ SSRF
 sss
 SSZ
 Statcast
+staticmethod
 stdcall
 stext
 stitle
@@ -1812,6 +1880,7 @@ Strappy
 strdupv
 streamlit
 strfreev
+strptime
 stt
 stuffie
 subclip
@@ -1820,6 +1889,9 @@ submodule
 subprocess
 subschema
 subschemas
+subshell
+subshells
+substr
 subviews
 subword
 sudo
@@ -1840,6 +1912,7 @@ SWP
 sxs
 sylvatica
 SYMED
+symlinking
 syscalls
 Syscalls
 SYSINSTR
@@ -1861,13 +1934,16 @@ Taskfile
 tastetest
 tavily
 tbadge
+tbd
 Tbk
 Tbl
+tbl
 tbtn
 TBY
 tcard
 tcd
 TCEHY
+teardowns
 telework
 tema
 tempfile
@@ -1881,6 +1957,7 @@ termcolor
 terraform
 Testables
 Tetsuo
+TEXTCOLOR
 texting
 textno
 tfhub
@@ -1946,8 +2023,10 @@ trimpath
 tritan
 TRK
 trl
+truetype
 truncatum
 Trung
+truthy
 TSA
 tscore
 tseslint
@@ -1957,7 +2036,9 @@ tsne
 TSNE
 tsutatsu
 tsv
+ttc
 ttext
+ttf
 ttfb
 TTFB
 ttft
@@ -1969,6 +2050,7 @@ Tunables
 tures
 Tuteja
 tval
+twd
 twiml
 typehints
 ubuntu
@@ -1984,7 +2066,12 @@ ulaw
 ulmoides
 ultrawide
 unadvertised
+uncomment
+uncommented
+uncommenting
 und
+undescribed
+undeterminable
 undst
 unigram
 Unimicron
@@ -1992,16 +2079,24 @@ Uniquify
 unlabel
 unmarshal
 unparseable
+unpersisted
 UNPIVOT
 unquote
+unregister
+unregistration
 unrtf
+unscoped
 unserialisable
 unsloth
 Unsloth
+unstaged
+unsubstituted
 unterminated
+upd
 upsamples
 upsell
 Upserting
+upto
 urandom
 Urs
 Usain
@@ -2126,6 +2221,7 @@ WIF
 wiffle
 wikipedia
 wil
+wildcard
 windspeed
 winres
 wip
@@ -2142,6 +2238,8 @@ workarounds
 worklets
 wparam
 WRatio
+writerow
+writerows
 wscat
 wscore
 wscores
@@ -2205,6 +2303,7 @@ zakarid
 Zakarids
 zaxis
 Zemeckis
+zfill
 zfq
 Zhaohua
 Zhenguo
@@ -2212,6 +2311,7 @@ Zhengying
 Zijin
 zimie
 Zinnemann
+zipcode
 Zizu
 zmin
 zola

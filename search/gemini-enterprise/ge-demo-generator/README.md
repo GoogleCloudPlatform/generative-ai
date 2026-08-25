@@ -50,6 +50,7 @@ The **Gemini Enterprise Demo Generator** is a low-code web application built on 
 - [12. Cleanup](#12-cleanup)
 - [13. Guided Walkthrough & Tutorial](#13-guided-walkthrough--tutorial)
 - [14. System Architecture](#14-system-architecture)
+- [15. Agent Skill (Deploy from a Coding Agent)](#15-agent-skill-deploy-from-a-coding-agent)
 
 ---
 
@@ -327,6 +328,11 @@ ge-demo-generator/
 ├── deploy.sh                # Clasp deployment orchestrator script
 ├── validate_examples.py     # Validates agent_template JSON + Python files
 ├── check_deps.py            # Audits the PINNED_DEPS major caps (AGENTS.md 8)
+├── skills/                  # (Section 15) The same generator as an Agent
+│   └── ge-demo-generator/   #  Skill, for a coding agent instead of the
+│       ├── SKILL.md         #  web app: the lifecycle it follows,
+│       ├── references/      #  the reference material it reads, and
+│       └── templates/       #  its own copy of the files it scaffolds
 ├── ge-demo-generator-lite/  # (Subproject) Gemini Enterprise Demo Generator
 │                            #  Lite — Workspace demo-data generator for
 │                            #  Gemini Enterprise editions without
@@ -977,6 +983,63 @@ After running the setup script, the following directory structure is created:
 - **ReflectAndRetryToolPlugin**: Automatically retries failed tool calls with error reflection, improving robustness against transient MCP failures.
 - **Tool Name Deduplication**: `get_custom_mcp_toolsets` uses `tool_name_prefix` to prevent "Duplicate function declaration" errors when multiple MCP servers expose identical tool names.
 - **Retry Options**: Both models are configured with `HttpRetryOptions` (8 attempts, exponential backoff 2s–60s) specifically targeting HTTP 429 (Resource Exhausted) errors.
+
+---
+
+## 15. Agent Skill (Deploy from a Coding Agent)
+
+`skills/ge-demo-generator/` is the same generator packaged as an **Agent Skill** — a
+`SKILL.md` plus its reference material and file templates — for people who would rather
+drive the whole thing from a coding agent than from the web app.
+
+The two front ends build the same demo and differ in who does the work:
+
+| | Web app (sections 1-14) | Agent Skill (this section) |
+|---|---|---|
+| You need | An Apps Script deployment | A coding agent that reads `SKILL.md`, plus `gcloud`, `python3` and [`uv`](https://docs.astral.sh/uv/) |
+| Research | The wizard asks, Gemini researches the domain | The agent researches the domain and confirms the requirements in conversation |
+| Sample data | Synthesized by the generator | Synthesized by the agent, per the data model you approve |
+| Deployment | You run the generated setup script in Cloud Shell | The agent runs it and reads the output back |
+| Failures | You read the log | The agent verifies eight layers after the deploy and repairs what it can |
+
+### Installing it
+
+Copy the skill directory to wherever your agent looks for skills, or point the agent at it
+in a checkout of this repository:
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/generative-ai.git
+cd generative-ai
+git sparse-checkout set search/gemini-enterprise/ge-demo-generator/skills
+```
+
+Then ask for a demo in your own words — "build me a Gemini Enterprise demo for example.com"
+— or invoke it by name if your agent supports slash commands (`/ge-demo-generator`).
+
+### What it does
+
+1. **Researches the customer** from a domain or a business goal, in the language that domain
+   implies, and offers the automatable workflows it finds.
+2. **Confirms the requirements, then shows a Demo Architecture & Data Model Plan** — a Mermaid
+   ER diagram, the Drive file lineage, the target project — and waits for your approval.
+   Nothing is created before that gate.
+3. **Generates the sample data and the external documents** (PDF, Excel, scanned images) and
+   uploads them to Google Drive.
+4. **Scaffolds the ADK multi-agent project** from `templates/`, filling in only the
+   business-context placeholders.
+5. **Provisions in dependency order** — BigQuery and Firestore, the Agent Engine Sandbox, the
+   Data Viewer, the agent on Cloud Run, the background task subscription.
+6. **Registers the agent with Gemini Enterprise**, with Workspace authorization when asked for.
+7. **Verifies the deployment across eight layers and repairs what it can** before reporting.
+8. **Hands back the links and seven demo prompts**, localized, and a one-command teardown.
+
+### Its templates are its own
+
+`skills/ge-demo-generator/templates/` is a separate copy of the runtime files from
+`agent_template/`, and the two are allowed to differ: `agent_template/` is what the web app's
+setup script fetches at run time, while the skill's copy is what the skill scaffolds and
+carries features the web app does not have (it generates external sample documents and can
+index them with a DataStore connector, for one). Change one and you have not changed the other.
 
 ---
 
