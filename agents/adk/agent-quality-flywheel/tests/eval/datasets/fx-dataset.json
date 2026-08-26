@@ -1,0 +1,46 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "usd_to_eur",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Convert 100 USD to EUR."}]
+      }
+    },
+    {
+      "eval_case_id": "usd_to_jpy",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "How much is 50 US dollars in Japanese yen?"}]
+      }
+    },
+    {
+      "eval_case_id": "gbp_to_usd",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "I have 200 GBP. What is that in USD?"}]
+      }
+    },
+    {
+      "eval_case_id": "usd_to_inr",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Convert 10 USD into INR please."}]
+      }
+    },
+    {
+      "eval_case_id": "eur_to_usd",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "What is 75 euros worth in US dollars?"}]
+      }
+    },
+    {
+      "eval_case_id": "jpy_to_usd",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Convert 100000 JPY to USD."}]
+      }
+    }
+  ]
+}
