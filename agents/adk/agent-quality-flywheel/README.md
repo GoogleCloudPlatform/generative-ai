@@ -11,7 +11,7 @@ The seeded bug: the baseline instruction never asks the agent to end its answer 
 ## Prerequisites
 
 - A Google Cloud project with Vertex AI and the Agent Platform evaluation service enabled.
-- Access to `gemini-3.7-flash` on Vertex AI in your project and region.
+- Access to `gemini-3.7-flash` in your Google Cloud project and region.
 - Application default credentials: `gcloud auth application-default login`.
 - [`uv`](https://docs.astral.sh/uv/) and [`agents-cli`](https://adk.dev/get-started/agents-cli/): `uv tool install google-agents-cli`.
 
