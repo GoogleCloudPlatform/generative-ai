@@ -25,17 +25,30 @@
 
 """
 Generates external demo files (PDF Audit Report, Excel Spreadsheet Ledger, Simulated Scanned Images)
-and uploads them directly to Google Drive, ensuring full writer/reader permissions are granted
-to the deployer account (the active gcloud account, or GCP_ACCOUNT / DRIVE_SHARE_ACCOUNT).
+and uploads them to the Google Drive of the deploy target - the active gcloud account.
+
+The upload talks to the Drive v3 REST API with the access token `gcloud` already
+holds, so there is no CLI to install and no second identity: the folder is owned
+by the same account that owns the demo, which removes the cross-domain share that
+used to fail more often than it worked. The one prerequisite is the Drive scope,
+which a plain `gcloud auth login` does not grant - see get_drive_identity().
 """
 
 import os
-import re
 import sys
 import json
+import mimetypes
 import subprocess
 import argparse
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
+
+DRIVE_API = "https://www.googleapis.com/drive/v3"
+DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3"
+FOLDER_MIME = "application/vnd.google-apps.folder"
+REAUTH_HINT = "gcloud auth login --enable-gdrive-access"
 
 def run_cmd(cmd, check=False):
     """Run a shell command and return stdout."""
@@ -349,44 +362,159 @@ def get_active_account() -> str:
     return os.environ.get("GCP_ACCOUNT") or os.environ.get("USER") or "current user"
 
 
-_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+def drive_access_token() -> str:
+    """The gcloud access token, or '' when gcloud cannot mint one."""
+    out, code = run_cmd("gcloud auth print-access-token")
+    return out.strip() if code == 0 else ""
 
 
-def get_gdrive_identity(gdrive_bin: str) -> str:
-    """The account the gdrive CLI is authenticated as, or '' when unknown.
+def drive_request(token: str, method: str, url: str, body=None, content_type="", raw=b""):
+    """One Drive v3 call. Returns (parsed_json_or_{}, status, error_text).
 
-    Worth two attempts: an identity that cannot be read at all means the CLI is
-    not signed in and the upload is skipped, and a Drive folder that never
-    appears is a worse outcome than the parse being a little loose. The value is
-    also what the banner reports as the folder's OWNER, which is the account the
-    operator has to be signed in as to open the links.
-    `--json` is the contract; the plain output is read for an email address
-    only when the JSON shape is not what this expects.
+    Errors are values, not exceptions: every caller has something useful to do
+    with a failure - name it in the skip reason, record it as share_error, or
+    carry on without a link - and none of them should take the document
+    generation down with them.
     """
-    out, code = run_cmd(f"{gdrive_bin} readonly quota --json")
-    if code == 0 and out:
+    data = raw if raw else (json.dumps(body).encode("utf-8") if body is not None else None)
+    req = urllib.request.Request(url, data=data, method=method)
+    req.add_header("Authorization", f"Bearer {token}")
+    if data is not None:
+        req.add_header("Content-Type", content_type or "application/json; charset=UTF-8")
+    try:
+        with urllib.request.urlopen(req, timeout=120) as res:
+            payload = res.read().decode("utf-8", "replace")
+            return (json.loads(payload) if payload.strip() else {}), res.status, ""
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")
         try:
-            email = json.loads(out).get("user", {}).get("emailAddress", "")
-            if email:
-                return email.strip()
+            message = json.loads(detail).get("error", {}).get("message", "")
         except Exception:
-            pass
-        found = _EMAIL_RE.search(out)
-        if found:
-            return found.group(0)
-    out, code = run_cmd(f"{gdrive_bin} readonly quota")
-    if code == 0 and out:
-        found = _EMAIL_RE.search(out)
-        if found:
-            return found.group(0)
-    return ""
+            message = ""
+        return {}, e.code, (message or detail.strip().splitlines()[0] if detail.strip() else str(e))[:300]
+    except Exception as e:  # DNS, proxy, timeout
+        return {}, 0, str(e)[:300]
+
+
+def get_drive_identity(token: str):
+    """(email, skip_reason) for the Drive the token can write into.
+
+    `about.get` is the whole pre-flight: it answers who the token is AND whether
+    it carries the Drive scope, which is the failure everyone hits. A plain
+    `gcloud auth login` grants cloud-platform and nothing else, so Drive returns
+    403 ACCESS_TOKEN_SCOPE_INSUFFICIENT and the fix is a re-login with
+    --enable-gdrive-access. Saying that here is the difference between a demo
+    that is one command from having its documents in Drive and one whose
+    operator concludes the feature is broken.
+    """
+    if not token:
+        return "", ("no gcloud access token is available on this machine "
+                    f"(run: {REAUTH_HINT})")
+    info, status, err = drive_request(token, "GET", f"{DRIVE_API}/about?fields=user")
+    if status == 200:
+        email = (info.get("user") or {}).get("emailAddress", "").strip()
+        if email:
+            return email, ""
+        return "", "the Drive API returned no user for these credentials"
+    if status == 403 and "scope" in (err or "").lower():
+        return "", ("the gcloud credentials have no Google Drive scope - "
+                    f"run `{REAUTH_HINT}` and re-run this script")
+    if status in (401, 403):
+        return "", f"Google Drive refused these credentials ({status}: {err})"
+    return "", f"the Drive API could not be reached ({status or 'no response'}: {err})"
+
+
+def drive_escape_query(value: str) -> str:
+    """Escape a literal for a Drive `q` string.
+
+    Company names with an apostrophe would otherwise terminate the quoted term
+    early, and the query stops meaning what it says.
+    """
+    return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
+def drive_find_folder(token: str, name: str) -> str:
+    """The id of a non-trashed folder this account OWNS with this exact name, or ''.
+
+    `'me' in owners` matters: without it a folder someone else happened to share
+    under the same name wins the search, and the upload then writes the demo
+    documents into a stranger's Drive.
+    """
+    q = (f"name = '{drive_escape_query(name)}' and mimeType = '{FOLDER_MIME}' "
+         "and trashed = false and 'me' in owners")
+    url = f"{DRIVE_API}/files?" + urllib.parse.urlencode(
+        {"q": q, "fields": "files(id)", "pageSize": "1"})
+    info, status, _ = drive_request(token, "GET", url)
+    files = info.get("files") or []
+    return files[0].get("id", "") if status == 200 and files else ""
+
+
+def drive_find_child(token: str, name: str, parent_id: str) -> str:
+    """The id of a non-trashed file already called `name` inside `parent_id`, or ''.
+
+    The folder is found by name, so a second deploy of the same suffix - a heal,
+    a retry, a re-run after editing the content - lands in the folder that is
+    already there. Without this lookup it would collect a second copy of all
+    four documents every time. Replacing the file instead also keeps its id, so
+    a link already pasted into a demo script still resolves.
+    """
+    if not parent_id:
+        return ""
+    q = (f"name = '{drive_escape_query(name)}' and '{parent_id}' in parents "
+         "and trashed = false")
+    url = f"{DRIVE_API}/files?" + urllib.parse.urlencode(
+        {"q": q, "fields": "files(id)", "pageSize": "1"})
+    info, status, _ = drive_request(token, "GET", url)
+    files = info.get("files") or []
+    return files[0].get("id", "") if status == 200 and files else ""
+
+
+def drive_upload_file(token: str, path: str, parent_id: str):
+    """Upload one file into parent_id with a multipart/related request.
+
+    Returns (file_id, error). The error travels back because a folder full of
+    nothing is the one outcome that must not be reported as success, and only
+    the caller can see that every file failed the same way.
+
+    A file of the same name already in the folder is replaced rather than
+    duplicated - see drive_find_child(). `parents` is only writable on create,
+    so the update sends the name alone.
+
+    The four sample documents are a few hundred KB in total, so a single
+    multipart request is the right shape - a resumable session would be three
+    round trips per file to protect against an interruption that costs one
+    second to retry.
+    """
+    name = os.path.basename(path)
+    existing_id = drive_find_child(token, name, parent_id)
+    metadata = {"name": name}
+    if parent_id and not existing_id:
+        metadata["parents"] = [parent_id]
+    mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
+    boundary = "ge-demo-external-files-boundary"
+    with open(path, "rb") as fh:
+        content = fh.read()
+    body = b"".join([
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n".encode("utf-8"),
+        json.dumps(metadata).encode("utf-8"),
+        f"\r\n--{boundary}\r\nContent-Type: {mime}\r\n\r\n".encode("utf-8"),
+        content,
+        f"\r\n--{boundary}--\r\n".encode("utf-8"),
+    ])
+    if existing_id:
+        method, url = "PATCH", f"{DRIVE_UPLOAD_API}/files/{existing_id}?uploadType=multipart&fields=id"
+    else:
+        method, url = "POST", f"{DRIVE_UPLOAD_API}/files?uploadType=multipart&fields=id"
+    info, status, err = drive_request(
+        token, method, url,
+        content_type=f"multipart/related; boundary={boundary}", raw=body)
+    if status == 200 and info.get("id"):
+        return info["id"], ""
+    print(f"    ⚠️ Upload failed ({status}): {err}", file=sys.stderr)
+    return "", f"{status}: {err}"
 
 def upload_to_google_drive(company_name: str, suffix: str, files_to_upload: list) -> dict:
-    """Creates a Google Drive folder and uploads all external demo files, granting access to the target account."""
-    gdrive_bin = "/google/bin/releases/gemini-agents-gdrive/gdrive"
-    if not os.path.exists(gdrive_bin):
-        gdrive_bin = "gdrive"
-
+    """Creates a Google Drive folder and uploads all external demo files into the deploy target's Drive."""
     target_account = get_active_account()
     folder_name = f"GE Demo - {company_name} ({suffix})"
     
@@ -400,99 +528,77 @@ def upload_to_google_drive(company_name: str, suffix: str, files_to_upload: list
     shared_permissions = []
     share_error = ""
 
-    # Check if gdrive CLI is operational and check its authenticated identity
-    check_out, check_code = run_cmd(f"{gdrive_bin} --version")
-    gdrive_account = get_gdrive_identity(gdrive_bin) if check_code == 0 else ""
+    # The upload runs as the deploy target itself.
+    #
+    # `gcloud` is already authenticated as the account that owns the demo, so
+    # the folder is OWNED by that account and there is nothing to share with it.
+    # Until v2.13.0 this used a separate CLI authenticated as the operator, which
+    # meant every cross-account demo depended on a Drive share landing - and a
+    # google.com -> customer-domain share is frequently refused by policy, so the
+    # target got a link that 404s. Owning the folder outright removes that whole
+    # class of failure along with the "Shared with me" caveats.
+    #
+    # SKIP_DRIVE_UPLOAD=1 stays out of Drive entirely; the documents then live in
+    # ./external_files/ and the bucket, and the deploy banner says so.
+    skip_drive = os.environ.get("SKIP_DRIVE_UPLOAD", "").strip().lower() in ("1", "true", "yes")
+    token = "" if skip_drive else drive_access_token()
+    drive_account, identity_error = ("", "SKIP_DRIVE_UPLOAD is set") if skip_drive \
+        else get_drive_identity(token)
 
-    # Upload whenever the CLI can, and SHARE with the deploy target.
-    #
-    # Whatever the gdrive CLI creates is OWNED by the account the CLI is
-    # authenticated as - the operator running this skill - so when the operator
-    # and the deploy target are different accounts the target gets the folder
-    # under "Shared with me" rather than owning it. That is the accepted
-    # trade-off: a folder the target can open on the day of the demo beats a
-    # bucket nobody looks in. v2.9.0 tried the strict version of this rule
-    # (upload only when the two identities are provably the same) and the usual
-    # outcome was no Drive folder at all.
-    #
-    # SKIP_HOST_DRIVE_UPLOAD=1 restores the strict behaviour for a target whose
-    # tenant must not see operator-owned files; the documents then live only in
-    # ./external_files/ and the bucket, and the deploy banner says so - there is
-    # no agent-side path that puts them in a Drive.
-    # ALLOW_HOST_DRIVE_UPLOAD is now the default and kept only so old runbooks
-    # and .env files do not break.
-    skip_host_drive = os.environ.get("SKIP_HOST_DRIVE_UPLOAD", "").strip().lower() in ("1", "true", "yes")
-    should_use_gdrive = False
-    skip_reason = ""
-    if check_code != 0:
-        skip_reason = "the gdrive CLI is not available in this environment"
-    elif not gdrive_account:
-        skip_reason = ("the gdrive CLI is not authenticated, so there is no Drive to upload into")
-    elif skip_host_drive and gdrive_account.lower() != (target_account or "").lower():
-        skip_reason = (f"SKIP_HOST_DRIVE_UPLOAD is set and the gdrive CLI is authenticated as "
-                       f"{gdrive_account}, not as the deploy target {target_account}")
-    else:
-        should_use_gdrive = True
-        if target_account and gdrive_account.lower() != target_account.lower():
-            print(f"ℹ️ Uploading as [{gdrive_account}] and sharing with the deploy target.")
-            print(f"  {target_account} gets Writer access and finds the folder under 'Shared with me'.")
+    should_upload = bool(drive_account)
+    skip_reason = "" if should_upload else identity_error
 
     if skip_reason:
         print(f"ℹ️ Skipping the Google Drive upload: {skip_reason}.")
         print("  Demo files are kept in ./external_files/ and staged to GCS instead.")
-        print("  The deployed agent can still import them into the end user's own Drive on request.")
+        print("  Nothing after this step can create a Drive copy - it is a deploy-time step.")
 
-    if should_use_gdrive:
-        mkdir_out, code = run_cmd(f"{gdrive_bin} mutate mkdir '{folder_name}' --json")
-        if code == 0 and mkdir_out:
-            try:
-                folder_info = json.loads(mkdir_out)
-                folder_id = folder_info.get("id", "")
-            except Exception:
-                pass
-
-        if not folder_id:
-            search_out, _ = run_cmd(f"{gdrive_bin} readonly search --name-exact '{folder_name}' --json")
-            try:
-                search_info = json.loads(search_out)
-                if isinstance(search_info, list) and len(search_info) > 0:
-                    folder_id = search_info[0].get("id", "")
-            except Exception:
-                pass
+    if should_upload:
+        # Idempotent by name: a re-run of the deploy reuses the folder it made
+        # the first time rather than leaving the operator with three of them.
+        folder_id = drive_find_folder(token, folder_name)
+        if folder_id:
+            print(f"  ♻️ Reusing the existing Drive folder '{folder_name}'.")
+        else:
+            info, status, err = drive_request(
+                token, "POST", f"{DRIVE_API}/files?fields=id",
+                body={"name": folder_name, "mimeType": FOLDER_MIME})
+            folder_id = info.get("id", "")
+            if not folder_id:
+                skip_reason = f"the Drive folder could not be created ({status}: {err})"
+                should_upload = False
+                print(f"  ⚠️ {skip_reason}")
 
         if folder_id:
             folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
-            print(f"  ✅ Folder Created: {folder_url}")
+            print(f"  ✅ Folder ready: {folder_url}")
 
-            # Explicitly grant writer permissions to the target deployer account
-            if target_account and "@" in target_account:
-                print(f"  🔑 Granting Writer permissions to target account '{target_account}'...")
-                share_out, share_code = run_cmd(f"{gdrive_bin} mutate share '{folder_id}' --email '{target_account}' --role writer --notify=false --json")
-                if share_code == 0:
-                    shared_permissions.append(f"{target_account} (Writer/Editor)")
-                    print(f"  ✅ Permission granted: {target_account} (Writer/Editor)")
-                else:
-                    # Usually a cross-domain sharing policy. The folder exists
-                    # and the operator owns it; the target simply cannot open it
-                    # yet, and the banner has to say so rather than print a link
-                    # that 404s for the person the demo is for.
-                    share_error = (share_out or "unknown error").strip().splitlines()[-1][:300]
-                    print(f"  ⚠️ Could not grant email share: {share_out}")
-
-            # Also enable link sharing as reader for frictionless demo access
-            link_share_out, link_share_code = run_cmd(f"{gdrive_bin} mutate share '{folder_id}' --type anyone --role reader --json")
-            if link_share_code == 0:
+            # Link sharing is a convenience for the demo audience, not a
+            # requirement: the owner can always open it. Organizations routinely
+            # forbid "anyone with the link", so a refusal is recorded and the
+            # run continues - it is not the failed share of the old design,
+            # where the target could not open its own demo documents.
+            _, status, err = drive_request(
+                token, "POST",
+                f"{DRIVE_API}/files/{folder_id}/permissions?sendNotificationEmail=false",
+                body={"type": "anyone", "role": "reader"})
+            if status == 200:
                 shared_permissions.append("Anyone with link (Reader)")
                 print("  ✅ Link sharing enabled: Anyone with link (Reader)")
+            else:
+                share_error = f"{status}: {err}"
+                print(f"  ℹ️ Link sharing not enabled ({share_error}). "
+                      f"{drive_account} can still open the folder.")
 
-    # owner_account is the account that actually OWNS the Drive resources, which
-    # is the gdrive CLI's identity and not necessarily the deploy target. The
-    # deploy banner prints this as "Drive Owner Account" and tells the operator
-    # which Google account to be signed in as, so naming the target here sent
-    # people to an account that only had the folder shared with it - or, when
-    # nothing was uploaded at all, to a folder that does not exist.
+    # owner_account is the account that actually OWNS the Drive resources. The
+    # deploy banner prints it as "Drive Owner Account" and tells the operator
+    # which Google account to be signed in as, so it must stay empty when
+    # nothing was uploaded - otherwise the banner sends people to a folder that
+    # does not exist. Since v2.13.0 the owner is the token's own identity, which
+    # is normally the deploy target; they can still differ if `gcloud config
+    # get-value account` is not the account that minted the token.
     results = {
-        "owner_account": (gdrive_account or target_account) if should_use_gdrive else "",
+        "owner_account": drive_account if folder_url else "",
         "target_account": target_account,
         "upload_skipped_reason": skip_reason,
         "shared_permissions": shared_permissions,
@@ -503,29 +609,25 @@ def upload_to_google_drive(company_name: str, suffix: str, files_to_upload: list
         "uploaded_files": []
     }
 
+    uploaded = 0
+    upload_error = ""
     for file_path in files_to_upload:
         if not os.path.exists(file_path):
             continue
         fname = os.path.basename(file_path)
         file_id = ""
         file_url = ""
-        
-        if folder_id and should_use_gdrive:
+
+        if folder_id and should_upload:
             print(f"  📤 Uploading '{fname}' to Google Drive...")
-            parent_arg = f"--parent '{folder_id}'" if folder_id else ""
-            upload_cmd = f"{gdrive_bin} mutate upload '{file_path}' {parent_arg} --json"
-            out, code = run_cmd(upload_cmd)
-            
-            if code == 0 and out:
-                try:
-                    res_obj = json.loads(out)
-                    file_id = res_obj.get("id", "")
-                except Exception:
-                    pass
+            file_id, upload_err = drive_upload_file(token, file_path, folder_id)
             if file_id:
+                uploaded += 1
                 file_url = f"https://drive.google.com/file/d/{file_id}/view"
                 print(f"    ✅ Link: {file_url}")
-        
+            else:
+                upload_error = upload_error or upload_err
+
         results["uploaded_files"].append({
             "fileName": fname,
             "fileId": file_id,
@@ -533,20 +635,33 @@ def upload_to_google_drive(company_name: str, suffix: str, files_to_upload: list
             "localPath": os.path.abspath(file_path)
         })
 
+    # An empty folder is not a Drive copy. The folder create and the uploads are
+    # separate permissions - a service-account token, for instance, may create
+    # folders all day and have no storage quota to put anything in them - so
+    # reporting the folder URL after every upload failed hands the demo a link
+    # to nothing. Report it as no Drive copy, with the upload's own error, and
+    # keep folder_id so cleanup.sh still trashes the empty folder.
+    if should_upload and folder_id and uploaded == 0:
+        skip_reason = f"the Drive folder was created but every upload failed ({upload_error})"
+        results["upload_skipped_reason"] = skip_reason
+        results["folder_url"] = ""
+        results["owner_account"] = ""
+        folder_url = ""
+        print(f"  ⚠️ {skip_reason}")
+
     print("\n" + "-" * 80)
     print(f"👤 Target Account     : {target_account}")
     print(f"📂 Folder Link        : {folder_url or 'Stored Locally in ./external_files/'}")
     print(f"🔑 Permissions Granted: {', '.join(shared_permissions) if shared_permissions else 'Local file store'}")
     if folder_url:
         print(f"👑 Drive Owner        : {results['owner_account']}")
-        print(f"⚠️ ACCESS INSTRUCTION : Switch browser to Google Account [{target_account}] before opening links.")
-        if results["owner_account"].lower() != target_account.lower():
-            print("                        The folder is SHARED with that account, not owned by it -")
-            print(f"                        it appears under 'Shared with me' for {target_account}.")
+        print(f"⚠️ ACCESS INSTRUCTION : Switch browser to Google Account [{results['owner_account']}] before opening links.")
+        if results["owner_account"].lower() != (target_account or "").lower():
+            print(f"                        Note: the deploy target is {target_account}, a different account.")
+            print(f"                        Share the folder with it from the Drive UI as {results['owner_account']}.")
         if share_error:
-            print(f"❗ SHARE FAILED       : {target_account} cannot open the folder yet ({share_error}).")
-            print(f"                        Share it by hand from the Drive UI as {results['owner_account']},")
-            print("                        or have the agent import the documents into that user's own Drive.")
+            print(f"ℹ️ LINK SHARING OFF   : 'anyone with the link' was refused ({share_error}).")
+            print("                        The owner can open the folder; share it explicitly for others.")
     print("-" * 80 + "\n")
 
     return results

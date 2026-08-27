@@ -514,6 +514,10 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
   `bash -e` against a stubbed `curl` and a stubbed `register_agent.py`. The only
   way to exercise a path whose real trigger is a broken Discovery Engine
   authorization (see section 6).
+- `python3 test_external_files_wiring.py` — the skill's sample documents have
+  exactly one route into a Drive and one banner that reports it; the gate slices
+  the upload job out of `skills/…/setup_and_deploy.sh` and runs it under a
+  stubbed `gcloud` in both data-exploration modes (see section 14.4).
 - `python3 canary.py --out /tmp/canary --run-venv` — resolve today's
   requirements and actually run the imports (see section 8.4);
   `docker build /tmp/canary` for the full image.
@@ -1475,3 +1479,48 @@ checked against each other by eye and drift easily: the `version:` field in
 `SKILL.md`'s front matter, the version in `SKILL.md`'s title line, and the
 banner string in `templates/scripts/verify_and_heal.py`. The skill's version is
 independent of `APP_VERSION` in `app/Code.gs`.
+
+### 14.4 The Drive copy belongs to the account running the deploy (v2.13.0)
+
+The skill generates four documents the web app does not — a PDF audit report, an
+Excel ledger and two simulated scans — and puts them somewhere a demo can open
+them. They always go to `gs://$GCS_BUCKET_NAME/`, in every data-exploration mode.
+The Drive copy is the part with a history worth knowing.
+
+Until v2.11.x the upload ran through a CLI authenticated as whoever was operating
+the tool, so the folder belonged to that operator and the deploy target reached it
+through a share. Sharing across an organization boundary is frequently refused by
+policy, which handed the demo a link that 404s. Since v2.13.0
+`templates/scripts/generate_and_upload_external_files.py` calls the Drive v3 REST
+API directly with the access token `gcloud` already holds: `about.get` to identify
+the Drive and prove the scope, `files.list` + `files.create` for the folder, one
+`multipart/related` upload per document, `permissions.create` for link sharing.
+There is no CLI to install and no second identity — the folder is owned by the
+same account that owns the demo.
+
+Four properties are worth preserving if you touch this file:
+
+- **The Drive scope is the one real prerequisite.** A plain `gcloud auth login`
+  grants `cloud-platform` and nothing else, so Drive answers 403
+  `ACCESS_TOKEN_SCOPE_INSUFFICIENT`. The script does not treat that as a broken
+  feature: it skips the upload and names the fix, `gcloud auth login
+  --enable-gdrive-access`, in the summary and in the completion banner.
+- **A folder with nothing in it is not a Drive copy.** Creating a folder and
+  writing into it are separate permissions, so every upload can fail under a
+  folder that was created fine. Reporting the folder URL then hands the demo a
+  link to nothing, so a zero-upload guard reports no Drive copy instead, with the
+  upload's own error, while keeping `folder_id` so cleanup still tears the empty
+  folder down.
+- **Re-running the deploy must not duplicate anything.** The folder is looked up
+  by name (with `'me' in owners`, or a same-named folder somebody shared with you
+  wins and the documents land in a stranger's Drive), and each document is looked
+  up inside it and replaced with `PATCH upload/drive/v3/files/<id>` when it is
+  already there. Two consecutive runs leave four files with the same ids, so a
+  link already pasted into a demo script survives the re-deploy.
+- **Cleanup trashes, it does not delete.** `templates/scripts/cleanup.sh` sends
+  `PATCH {"trashed": true}`, because this is a folder in a person's own Drive and
+  the reversible operation is the correct one there.
+
+Link sharing (`anyone`, `reader`) is best-effort: plenty of organizations forbid
+it, so the refusal is recorded as `share_error` and the banner notes it rather
+than failing the deploy. The owner can always open the folder.

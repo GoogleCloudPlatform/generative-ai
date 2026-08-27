@@ -1,14 +1,14 @@
 ---
 name: ge-demo-generator
-description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images) and upload them to Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, Google Drive file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
+description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.11.2
+  version: 2.13.0
 ---
 
-# GE Demo Generator Skill (v2.11.2)
+# GE Demo Generator Skill (v2.13.0)
 
-Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.7 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, direct **Google Drive external sample files storage**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
+Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.7 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
 
 ---
 
@@ -65,7 +65,7 @@ Phase 6: Gemini Enterprise App Discovery, Workspace Authorization & Registration
    ↓
 Phase 7: Comprehensive Results Output:
    ├── 💬 Direct Gemini Enterprise Console Chat Link
-   ├── 📁 Google Drive External Sample Files & Folder Links
+   ├── 📁 External Sample Files: Cloud Storage links, plus Drive links when the upload ran
    ├── 📊 Firestore Data Viewer Dashboard Link
    ├── 🔎 BigQuery Console Link
    └── 🎯 7 Structured Demo Prompts Playbook (Localized to Target Language)
@@ -126,11 +126,11 @@ with a stated default so the user can answer "all defaults" in three words:
    counterpart. If the user declines, rotate personas freely instead.
 2. **Scope of the narrative** — which single process instance the demo follows, if Phase 1
    left more than one plausible reading of the chosen scenario.
-3. **Advanced settings** — the options from the table in brief section 6 that this demo is a
-   plausible candidate for, with their defaults. Do not read out all eight; name the two or
-   three that matter here (Workspace OAuth when the scenario touches Gmail/Drive/Calendar,
-   `rag` when it turns on documents rather than numbers, `dataScale` when the narrative claims
-   enterprise volume) and say the rest keep their defaults.
+3. **Advanced settings** — ask about the two or three the demo is a plausible candidate for
+   (Workspace OAuth when the scenario touches Gmail/Drive/Calendar, `rag` when it turns on
+   documents rather than numbers, `dataScale` when the narrative claims enterprise volume),
+   and say the rest keep their defaults. Keep the *question* short — brief section 6 lists
+   every option with its resolved value, so nothing is hidden by asking about a few.
 4. **Target environment** — only if what `gcloud` reports (read it now, see below) is not
    obviously the project the user means.
 
@@ -145,7 +145,20 @@ GCP_ACCOUNT=$(gcloud config get-value account 2>/dev/null || echo "Unknown")
 PROJECT_ID=$(gcloud config get-value project)
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
 REGION=${CLOUD_RUN_REGION:-"asia-northeast1"}
+# Whether the sample documents can reach a Google Drive at all - sections 3 and 5
+# depend on it. The deploy uploads them with this same token, so this one call
+# answers the question exactly as the deploy will.
+DRIVE_OK=$(curl -s -o /dev/null -w '%{http_code}' \
+  -H "Authorization: Bearer $(gcloud auth print-access-token 2>/dev/null)" \
+  'https://www.googleapis.com/drive/v3/about?fields=user')
 ```
+
+`DRIVE_OK` is `200` when the Drive copy will happen, and the owner is `${GCP_ACCOUNT}` — the
+same account, because the upload uses this token. Anything else (usually `403`, a token
+carrying no Drive scope, which is what a plain `gcloud auth login` gives you) means **this
+demo will have no Google Drive copy of the sample documents at all**. That is a fact the
+brief has to state, not discover at deploy time — see brief sections 3 and 5. It is also one
+command to fix, so say it now: `gcloud auth login --enable-gdrive-access`, then re-read.
 
 ### Step 2.2 — Present the Demo Architecture & Data Model Plan
 
@@ -191,7 +204,11 @@ self-contained when it is pasted into a chat with a colleague:
   an audit seed visible only when the departments' views are joined. Details and the
   single-department escape hatch: `references/data_generation.md` §1.3.
 
-### § Brief section 3 — 📁 Google Drive External Files & Cross-Source Lineage
+### § Brief section 3 — 📁 External Sample Files & Cross-Source Lineage
+
+Title this section after where the files will actually be, not after where people assume they
+go. Cloud Storage is the only guaranteed destination (below), so a heading that says "Google
+Drive" is wrong in every run whose token lacks the Drive scope — and it was, in most of them.
 
 A table with one row per external file — type, filename, and what binds it to BigQuery:
 
@@ -208,13 +225,19 @@ document *and* querying a table, and that only works if the keys line up (70%+ F
 5-15% audit variance). See `references/external_files_and_drive.md`.
 
 Close the section with where the files will actually live, in one line, because it is the
-part users assume wrongly: they are staged to `gs://<project>-<domain>-<suffix>-docs/` in
-every mode; at deploy time the `gdrive` CLI uploads them into the Drive of whoever is
-running this skill and shares that folder with `${GCP_ACCOUNT}` as Writer; and when the
-CLI is not available or not signed in, there is no Drive copy at all — the deploy banner
-says so, and the documents are reachable only from Cloud Storage and `./external_files/`.
-The deployed agent has no way to put them in anyone's Drive. If the user wants them in
-Drive and has no working `gdrive` CLI, say so here, while it can still be sorted out.
+part users assume wrongly. Write the line that matches the `DRIVE_OK` read above:
+
+| `DRIVE_OK` | The line to write |
+| --- | --- |
+| `200` | Staged to `gs://<project>-<domain>-<suffix>-docs/` **and** uploaded at deploy time to the Google Drive of `${GCP_ACCOUNT}`, which owns the folder. |
+| anything else | Staged to `gs://<project>-<domain>-<suffix>-docs/`. **No Google Drive copy** — this machine's `gcloud` credentials carry no Drive scope, so a Drive or Sheets step in the demo script would find nothing. |
+
+The Cloud Storage staging happens in **both** `mcp` and `rag` mode; the deploy-time upload is
+the *only* path into any Drive. The deployed agent has no way to put them in anyone's Drive —
+v2.11.0 removed the in-conversation import, deliberately. If the user wants them in Drive and
+`DRIVE_OK` is not `200`, say so here, while it can still be sorted out
+(`gcloud auth login --enable-gdrive-access` and re-run, or upload `./external_files/` by hand
+afterwards).
 
 ### § Brief section 4 — 🤖 Agent Models & Runtime
 
@@ -234,19 +257,26 @@ Show what the commands above returned, verbatim, in a fenced block:
 👤 Active User Account : ${GCP_ACCOUNT}
 🏢 Target Project      : ${PROJECT_ID} (${PROJECT_NUMBER})
 🌐 Target Region       : ${REGION}
-📁 Google Drive Storage: Google Drive of ${GCP_ACCOUNT}
+🗂️ Sample File Storage : gs://${PROJECT_ID}-<domain>-<suffix>-docs/
+📁 Google Drive Copy   : <the DRIVE_OK line, below>
 ```
 
 This is the section users most often stop on, because the answer is frequently "wrong
 project". Do not paraphrase the values and do not print a project the user named unless
-`gcloud` agrees — the deploy will use what `gcloud` says, not what the brief claims. The Drive
-line is only true when the `gdrive` CLI is authenticated as the same account. When the CLI is
-signed in as someone else, that account owns the folder and `${GCP_ACCOUNT}` gets it as a
-share, so write `📁 Google Drive Storage: Google Drive of <gdrive account>, shared with
-${GCP_ACCOUNT}`; when there is no CLI at all, write `📁 Google Drive Storage: staged in GCS;
-imported into the Drive of ${GCP_ACCOUNT} on the first message to the agent`. See
-`references/external_files_and_drive.md` §5. Never print a Drive destination the deploy
-cannot reach.
+`gcloud` agrees — the deploy will use what `gcloud` says, not what the brief claims.
+
+Both storage lines are mandatory, and neither is optional wording: the Cloud Storage bucket is
+created in every mode, and the Drive line is the one users read as a promise. Write it from
+`DRIVE_OK`, never from intent:
+
+| `DRIVE_OK` | `📁 Google Drive Copy` |
+| --- | --- |
+| `200` | `Google Drive of ${GCP_ACCOUNT}` |
+| anything else | `none - these credentials have no Drive scope (fix: gcloud auth login --enable-gdrive-access)` |
+
+Never print a Drive destination the deploy cannot reach, and never describe the copy as
+something the agent will do later — nothing after the deploy writes to a Drive. See
+`references/external_files_and_drive.md` §5.
 
 ### § Brief section 6 — 🎛️ Advanced Settings & Integrations
 
@@ -256,16 +286,24 @@ cannot reach.
    real switch in the deployed container, so an option discussed here but not written to
    `.env` is a feature the demo will not have.
 
-   | Option | Default | What it buys, and what it costs |
-   |---|---|---|
-   | 🤖 `enableManagedAgent` | **`true`** | Agent Engine Sandbox code execution, asynchronous background delegation (`delegate_autonomous_task`), scheduled tasks and Drive deliverable exports. The delegation prompts in the demo playbook exercise this, which is why it is the one default-on capability. Adds ~8-10 min of provisioning, overlapped with the rest of the deploy. |
-   | 🔎 `dataExplorationMode` | **`mcp`** | How the agent reads the demo's data. **`mcp`** (default) provisions no search index: the data-asset catalog is already in the agent's system instruction, so a figure question is *one* `execute_sql` call — the four-to-five round trips people blame on "no index" came from the metadata expedition in front of the query, and the mcp routing block overrides exactly that. **`rag`** additionally builds a Discovery Engine index over the BigQuery dataset and the staged files and makes it the read path: lookups and document questions return in one sub-second `search_datastore` call, while computed figures, joins and every write stay on MCP because the index lags the tables. Pick `rag` when the demo turns on documents rather than on numbers, and note it also attaches data stores to the (often shared) Gemini Enterprise app — see `references/datastore_connectors.md`. |
-   | 🔑 `enableWorkspaceAuth` | `false` | User-OAuth passthrough — the agent acts as the signed-in user for the Drive handoff and Workspace token plumbing. Commonly wanted, since Workspace is usually available in the target environment, but **not** default-on: some organizations refuse to authorize an OAuth client they have not vetted, and there sign-in fails for every demo user. Confirm the target org permits it before enabling. |
-   | 🔑 `enableWorkspaceMcp` | `false` | **Advanced, rarely used.** Adds the Gmail / Drive / Calendar / Docs / Chat MCP toolsets on top of the auth passthrough. The Workspace MCP servers are Developer Preview and the project must be allowlisted first — enable it without that and every Workspace call 403s. Kept separate from `enableWorkspaceAuth` for exactly this reason. |
-   | 🖥️ `enableComputerUse` | `false` | Headless browser automation (Playwright). Also requires uncommenting the Playwright block in **both** `requirements.txt` and the `Dockerfile`; the deploy pre-flights this and refuses a half-configured build. |
-   | 📦 `customMcpRepos` | empty | Third-party MCP servers. Both GitHub sidecars and remote managed servers (Slack included — it is one entry in this list, not a flag of its own) go here. |
-   | 🌐 `publicDatasetId` | unset | Ground the demo in a real BigQuery public dataset (e.g. NOAA Weather, Google Trends) alongside the synthetic data. |
-   | 📈 `dataScale` | unset (hero rows only) | Row count to grow the fact tables to before loading — thousands to tens of thousands. You still write only the 50-200 hero rows the demo script names; `scripts/amplify_data.py` expands the tables around them deterministically, keeping the hero rows verbatim and foreign keys intact. Ask for it when the narrative claims enterprise volume or the demo opens with an aggregate — a `COUNT(*)` of 63 undercuts both. Costs ~10-30s of setup and a longer Discovery Engine ingest. |
+   **List all eight, every time**, in this order, with the value this deploy will use in the
+   second column — `✅ true` / `❌ false` / the literal value / `— (unset)`. An option the
+   brief leaves out is an option the user cannot ask for: they do not know it exists, and by
+   the time the deploy banner mentions it the 15-30 minutes are already spent. The gate is the
+   last cheap moment to turn one on, so the gate has to show the whole board. Keep the third
+   column as written here — it is what makes a `false` decidable rather than merely visible —
+   and reword only where this demo's scenario changes what an option would buy.
+
+   | Option | This demo | Default | What it buys, and what it costs |
+   |---|---|---|---|
+   | 🤖 `enableManagedAgent` | `<value>` | **`true`** | Agent Engine Sandbox code execution, asynchronous background delegation (`delegate_autonomous_task`), scheduled tasks and Drive deliverable exports. The delegation prompts in the demo playbook exercise this, which is why it is the one default-on capability. Adds ~8-10 min of provisioning, overlapped with the rest of the deploy. |
+   | 🔎 `dataExplorationMode` | `<value>` | **`mcp`** | How the agent reads the demo's data. **`mcp`** (default) provisions no search index: the data-asset catalog is already in the agent's system instruction, so a figure question is *one* `execute_sql` call — the four-to-five round trips people blame on "no index" came from the metadata expedition in front of the query, and the mcp routing block overrides exactly that. **`rag`** additionally builds a Discovery Engine index over the BigQuery dataset and the staged files and makes it the read path: lookups and document questions return in one sub-second `search_datastore` call, while computed figures, joins and every write stay on MCP because the index lags the tables. Pick `rag` when the demo turns on documents rather than on numbers, and note it also attaches data stores to the (often shared) Gemini Enterprise app — see `references/datastore_connectors.md`. |
+   | 🔑 `enableWorkspaceAuth` | `<value>` | `false` | User-OAuth passthrough — the agent acts as the signed-in user for the Drive handoff and Workspace token plumbing. Commonly wanted, since Workspace is usually available in the target environment, but **not** default-on: some organizations refuse to authorize an OAuth client they have not vetted, and there sign-in fails for every demo user. Confirm the target org permits it before enabling. |
+   | 🔑 `enableWorkspaceMcp` | `<value>` | `false` | **Advanced, rarely used.** Adds the Gmail / Drive / Calendar / Docs / Chat MCP toolsets on top of the auth passthrough. The Workspace MCP servers are Developer Preview and the project must be allowlisted first — enable it without that and every Workspace call 403s. Kept separate from `enableWorkspaceAuth` for exactly this reason. |
+   | 🖥️ `enableComputerUse` | `<value>` | `false` | Headless browser automation (Playwright). Also requires uncommenting the Playwright block in **both** `requirements.txt` and the `Dockerfile`; the deploy pre-flights this and refuses a half-configured build. |
+   | 📦 `customMcpRepos` | `<value>` | empty | Third-party MCP servers. Both GitHub sidecars and remote managed servers (Slack included — it is one entry in this list, not a flag of its own) go here. |
+   | 🌐 `publicDatasetId` | `<value>` | unset | Ground the demo in a real BigQuery public dataset (e.g. NOAA Weather, Google Trends) alongside the synthetic data. |
+   | 📈 `dataScale` | `<value>` | unset (hero rows only) | Row count to grow the fact tables to before loading — thousands to tens of thousands. You still write only the 50-200 hero rows the demo script names; `scripts/amplify_data.py` expands the tables around them deterministically, keeping the hero rows verbatim and foreign keys intact. Ask for it when the narrative claims enterprise volume or the demo opens with an aggregate — a `COUNT(*)` of 63 undercuts both. Costs ~10-30s of setup and a longer Discovery Engine ingest. |
 
 Only list the options that are on, plus the two or three the demo is a plausible candidate
 for. A user reading eight defaults they did not ask about is a user who skims the whole brief.
@@ -358,24 +396,25 @@ arrive here without that, go back and present it.
        `style` wording for the scanned forms), written in the demo's own language and
        domain. Without it the script emits generic placeholder documents - it holds no
        built-in industry content by design.
-     - Creates dedicated Drive folder: `GE Demo - <Company Name> (<Suffix>)`.
+     - Creates dedicated Drive folder: `GE Demo - <Company Name> (<Suffix>)`, reusing one
+       of that name if a previous run already made it.
      - Uploads `.pdf`, `.xlsx`, and `.jpg` files.
      - Saves links to `external_files/drive_upload_summary.json` and creates `.url.json` artifacts.
-     - **The folder lands in the Drive of whoever the `gdrive` CLI is signed in as** — a
-       CLI owns what it creates — **and the deploy target is added as Writer** with
-       `mutate share --email <target> --role writer --notify=false`, so it shows up under
-       that account's "Shared with me". Report the owner, the share recipient, and the
-       folder URL; when the share itself failed (cross-domain sharing is often blocked by
-       policy), the summary carries `share_error` and the banner says `❗ SHARING FAILED`
-       — pass that on with the manual share command rather than handing over a link the
-       target cannot open.
-     - When there is no authenticated `gdrive` CLI the upload is skipped and the summary
-       carries `skip_reason`. The documents are not lost — `setup_and_deploy.sh` stages
+     - **The folder is owned by `${GCP_ACCOUNT}`** — the upload is a Drive v3 REST call
+       carrying this machine's own `gcloud` access token, so the account deploying the
+       demo owns what it creates and nothing has to be shared with it. Report that owner
+       and the folder URL. The script also asks for "anyone with the link (Reader)" as a
+       convenience; plenty of organizations refuse it, in which case the summary carries
+       `share_error` and the banner notes `ℹ️ LINK SHARING OFF` — the owner can still open
+       everything, so this is a footnote, not a failure.
+     - When the token has no Drive scope the upload is skipped and the summary carries
+       `upload_skipped_reason`. The documents are not lost — `setup_and_deploy.sh` stages
        every file to `gs://$GCS_BUCKET_NAME/` in **both** data-exploration modes — but
        there will be no Drive folder, and nothing downstream creates one: report the
        skip and its reason on the completion screen, point at the Cloud Storage links,
-       and say what to do to get a folder (sign the `gdrive` CLI in and re-run, or upload
-       `./external_files/` by hand). See `references/external_files_and_drive.md` §5.
+       and give the fix, which is one command — `gcloud auth login --enable-gdrive-access`
+       and re-run, or upload `./external_files/` by hand. See
+       `references/external_files_and_drive.md` §5.
 
 4. **Provision BigQuery Dataset & Tables (Step 1/6)** (Idempotent + Knowledge Catalog Metadata):
    ```bash
@@ -700,16 +739,17 @@ Upon deployment completion, ALWAYS output the structured results containing dire
 *(Or fallback console if no app registered: `https://console.cloud.google.com/gemini-enterprise/overview?&project=${PROJECT_ID}`)*
 
 📁 **Google Drive External Sample Files** (when the deploy-time upload ran):
-- 👑 **Folder Owner**: `${DRIVE_OWNER_ACCOUNT}` (the account the `gdrive` CLI is signed in as)
-- 🔑 **Shared With**: `${GCP_ACCOUNT}` as Writer — look under "Shared with me"
+- 👑 **Folder Owner**: `${DRIVE_OWNER_ACCOUNT}` (the account that ran the deploy — switch
+  the browser to it before opening these links)
+- 🔑 **Link Sharing**: "Anyone with link (Reader)" when the organization allows it
 - 📂 **Open the Folder**: https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}
 - 📄 Audit Report (PDF, Japanese CJK Font): ${PDF_URL}
 - 📊 Supplier Ledger (Excel): ${XLSX_URL}
 - 🖼️ Simulated Document 1 (JPG): ${IMG1_URL}
 - 🖼️ Simulated Document 2 (JPG, Discrepancy Embedded): ${IMG2_URL}
-- ❗ If `drive_upload_summary.json` carries `share_error`, print that instead of implying
-  access works, and give the manual fix:
-  `gdrive mutate share <FOLDER_ID> --email ${GCP_ACCOUNT} --role writer --notify=false`.
+- ℹ️ If `drive_upload_summary.json` carries `share_error`, link sharing was refused: say
+  the owner can open the folder but the audience needs an explicit share from the Drive
+  UI, and offer the Cloud Storage links below in the meantime.
 
 📦 **External Sample Files in Cloud Storage** (always — the staging copy is unconditional):
 - 🗂️ **Browse the bucket**: https://console.cloud.google.com/storage/browser/${GCS_BUCKET_NAME}?project=${PROJECT_ID}
@@ -718,15 +758,15 @@ Upon deployment completion, ALWAYS output the structured results containing dire
   filenames, never a bare `gs://` URI on its own; `gs://` is not clickable.
 - 📂 Also on this machine: `./external_files/`
 
-📁 **When the Drive upload was skipped** (no authenticated `gdrive` CLI) — say it plainly,
-this is the only notice the user gets:
-- ℹ️ **There is no Drive copy of these documents.** Print `skip_reason` verbatim. The
-  documents themselves are complete, in Cloud Storage and `./external_files/`; only the
+📁 **When the Drive upload was skipped** (the credentials carry no Drive scope) — say it
+plainly, this is the only notice the user gets:
+- ℹ️ **There is no Drive copy of these documents.** Print `upload_skipped_reason` verbatim.
+  The documents themselves are complete, in Cloud Storage and `./external_files/`; only the
   Drive folder is missing, so a Drive or Sheets step in the demo script will find nothing.
-- 🛠️ **To get one**: sign the `gdrive` CLI in as the account that should own the folder
-  (`gdrive readonly quota --json` shows who it is now) and re-run, or upload
-  `./external_files/` to a Drive folder by hand and share it with the audience. Never
-  suggest asking the agent to do it — it cannot.
+- 🛠️ **To get one**: run `gcloud auth login --enable-gdrive-access` and re-run this script
+  (a plain `gcloud auth login` grants no Drive scope, which is why this is the usual
+  cause), or upload `./external_files/` to a Drive folder by hand and share it with the
+  audience. Never suggest asking the agent to do it — it cannot.
 
 📊 **Firestore Data Viewer Dashboard:** 👉 ${VIEWER_URL}
 🔎 **BigQuery Console:** 👉 https://console.cloud.google.com/bigquery?referrer=search&project=${PROJECT_ID}&ws=!1m4!1m3!3m2!1s${PROJECT_ID}!2s${DATASET_ID}
@@ -766,7 +806,7 @@ The template below is the base progression, before those overrides:
 #### 3. [Role Title] Cross-Source Anomaly & Risk Detection [WOW MOMENT]
 - **Tags**: `[Cross-Source WOW]` `[Drive File Binding]`
 - **Prompt Text**: (Strategic inquiry about untracked discrepancies across recent deliveries/records)
-- **Expected Outcome**: Autonomously cross-references Google Drive PDF/Excel against BigQuery tables, isolates the 5-15% discrepancy, and renders discrepancy cards and infographics.
+- **Expected Outcome**: Autonomously cross-references the external PDF/Excel against BigQuery tables, isolates the 5-15% discrepancy, and renders discrepancy cards and infographics.
 - **Watch Point**: (e.g. nobody told it to open the external report - it decided to)
 
 #### 4. [Role Title] Multi-Step Dependent Immediate Workflow [WOW MOMENT]
