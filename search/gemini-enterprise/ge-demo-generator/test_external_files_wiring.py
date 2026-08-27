@@ -26,7 +26,7 @@ happened.
 So this gate holds four facts, in three files:
 
   1. the documents are staged to gs://$GCS_BUCKET_NAME/ in EVERY mode - until
-     v2.9.0 the copy sat inside the `RAG_MODE` branch, so an mcp-mode demo had
+     v2.9.0 the copy sat inside the `RAG_MODE` branch, so a demo in mcp mode had
      no bucket at all, and that bucket is now the only copy that outlives the
      operator's machine;
   2. the upload runs against the REST API with a gcloud token and no external
@@ -214,7 +214,7 @@ def main():
             name not in tools_src and name not in agent_src and name not in setup_src,
             "no %s" % name)
     # DRIVE_FOLDER_URL survives as a shell variable - the banner parses the
-    # summary into it - but it must not reach the container any more.
+    # summary into it - but it must not reach the container anymore.
     failures += check(",DRIVE_FOLDER_URL=" not in setup_src
                       and "DRIVE_FOLDER_URL" not in tools_src
                       and "DRIVE_FOLDER_URL" not in agent_src,
