@@ -1,0 +1,5 @@
+aiplatform
+fx
+gbp
+jpy
+ootb

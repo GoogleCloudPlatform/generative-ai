@@ -1,0 +1,56 @@
+# Custom-metric config: promote the "tool-usage footer" concern to its own
+# metric (the Quality-Flywheel move). Two views of the same behavior:
+#   1) tools_footer_present      -> LLM-as-judge categorical rubric (Vertex)
+#   2) tools_footer_present_code -> deterministic regex check (local, $0)
+metrics_to_run:
+  - tools_footer_present
+  - tools_footer_present_code
+
+custom_metrics:
+  # (1) LLM-as-judge categorical rubric metric.
+  # NOTE: an explicit `judge_model: gemini-2.5-flash` is REJECTED by the
+  # Vertex eval service with "Invalid autorater model resource name". Omit
+  # judge_model to use the service default autorater (works).
+  - name: tools_footer_present
+    judge_model_sampling_count: 1
+    prompt_template: |
+      You are grading whether an assistant's final response ends with a
+      TOOL-USAGE FOOTER. A valid footer is a line that explicitly lists the
+      tool(s) the assistant used, for example: "Tools used: get_exchange_rate".
+
+      A conversational sentence that merely mentions a tool does NOT count;
+      the response must contain an explicit "Tools used:" style footer line.
+
+      User prompt: {prompt}
+      Assistant final response: {response}
+      Full trajectory (for context): {agent_data}
+
+      Return JSON only:
+      {"score": <1 if a "Tools used:" footer line is present, else 0>, "explanation": "<one short sentence>"}
+
+  # (2) Deterministic code metric (runs in-process, no model call).
+  - name: tools_footer_present_code
+    custom_function: |
+      import re
+
+      def _collect_text(obj, out):
+          if isinstance(obj, dict):
+              t = obj.get("text")
+              if isinstance(t, str):
+                  out.append(t)
+              for v in obj.values():
+                  _collect_text(v, out)
+          elif isinstance(obj, list):
+              for v in obj:
+                  _collect_text(v, out)
+
+      def evaluate(instance):
+          parts = []
+          _collect_text(instance.get("agent_data") or {}, parts)
+          _collect_text(instance.get("response") or {}, parts)
+          text = "\n".join(parts)
+          present = bool(re.search(r"tools?\s+used\s*:", text, re.IGNORECASE))
+          return {
+              "score": 1.0 if present else 0.0,
+              "explanation": "footer present" if present else "no 'Tools used:' footer",
+          }

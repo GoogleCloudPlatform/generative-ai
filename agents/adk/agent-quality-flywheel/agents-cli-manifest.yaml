@@ -1,0 +1,12 @@
+name: "agent-quality-flywheel"
+acli_version: "1.4.1"
+agent_directory: "app"
+region: "us-central1"
+base_template: "adk"
+language: "python"
+create_params:
+  deployment_target: "agent_runtime"
+  session_type: "none"
+  cicd_runner: "skip"
+  is_a2a: false
+  agent_gateway: false
