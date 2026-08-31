@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Google%20Cloud-Gemini%20Enterprise%20Agent%20Platform-4285F4.svg)](https://cloud.google.com)
-[![ADK](https://img.shields.io/badge/Framework-Google%20ADK-purple.svg)](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/agents/adk/zero-trust-agents-2)
+[![ADK](https://img.shields.io/badge/Framework-Google%20ADK-purple.svg)](https://adk.dev/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://python.org)
 
 An open-source companion demo and architectural blueprint demonstrating how to secure autonomous AI agents at **runtime** using **Model Armor**, **Semantic Governance Policies (SGP)**, **Agent Anomaly Detection (AAD)**, and **Closed-Loop Remediation** on the Gemini Enterprise Agent Platform.
@@ -162,8 +162,4 @@ To transition from the local simulation to enterprise production on Google Cloud
 
 ---
 
-## Authors & Contributors
 
-* **Shubham Saboo** — Developer Relations, Google Cloud
-* **Eric Dong** — AI Security & Platform Engineering
-* Product Input: **Nils Swart** & **Bob Zhang**
