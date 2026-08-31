@@ -215,8 +215,51 @@ if enable_bq and bq_dataset:
 
     created_datastores.append(ds_id)
 
+# 3. Provision Firestore Semi-Structured DataStore on discoveryengine.googleapis.com (when ENABLE_DATASTORE_FS is enabled)
+enable_fs = (os.environ.get("ENABLE_DATASTORE_FS", "").lower() in ("true", "1", "yes")) or (len(sys.argv) > 11 and sys.argv[11].lower() == "true")
+fs_collection = sys.argv[9] if (len(sys.argv) > 9 and sys.argv[9] and sys.argv[9].lower() not in ("true", "false")) else os.environ.get("FIRESTORE_COLLECTION", "")
 
-# 3. Attach created DataStores to Gemini Enterprise Engine (App) via PATCH dataStoreIds
+if enable_fs and fs_collection:
+    ds_id = f"ds-{service_name}-fs"
+    print(f"🔥 Provisioning Firestore DataStore: {ds_id} from collection {fs_collection}...")
+    code, resp = api_call("GET", f"{base_url}/dataStores/{ds_id}")
+    if code != 200:
+        ds_payload = {
+            "displayName": f"Demo Firestore Tasks ({service_name})",
+            "industryVertical": "GENERIC",
+            "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
+            "contentConfig": "NO_CONTENT"
+        }
+        create_code, create_resp = api_call("POST", f"{base_url}/dataStores?dataStoreId={ds_id}", ds_payload)
+        if create_code not in (200, 201):
+            print(f"⚠️ Failed to create Firestore DataStore ({create_code}): {create_resp.get('error', '')}")
+        else:
+            print(f"✅ Firestore DataStore created: {ds_id}")
+    else:
+        print(f"ℹ️ Firestore DataStore {ds_id} already exists.")
+
+    staging_bucket = gcs_bucket or os.environ.get("GCS_BUCKET_NAME", f"{project_id}-{service_name}-docs")
+    import_payload = {
+        "firestoreSource": {
+            "projectId": project_id,
+            "databaseId": "(default)",
+            "collectionId": fs_collection,
+            "gcsStagingDir": f"gs://{staging_bucket}/firestore_staging"
+        },
+        "reconciliationMode": "INCREMENTAL"
+    }
+    imp_code, imp_resp = api_call("POST", f"{base_url}/dataStores/{ds_id}/branches/0/documents:import", import_payload)
+    if imp_code in (200, 201, 202):
+        print(f"  ✅ Started ingestion for Firestore collection: {fs_collection}")
+        op_name = imp_resp.get("name", "")
+        if op_name:
+            wait_for_op(op_name, max_wait_sec=30)
+    else:
+        print(f"  ⚠️ Firestore collection {fs_collection} import returned code {imp_code}: {imp_resp.get('error', '')}")
+
+    created_datastores.append(ds_id)
+
+# 4. Attach created DataStores to Gemini Enterprise Engine (App) via PATCH dataStoreIds
 if app_id and created_datastores:
     print(f"🔗 Attaching DataStores to Gemini Enterprise Engine: {app_id}...")
     eng_code, eng_resp = api_call("GET", f"{base_url}/engines/{app_id}")

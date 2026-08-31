@@ -120,11 +120,43 @@ The supported way to put the demo's documents in front of the audience stays: st
 GCS and index them with §2.1, and let the deploy-time Drive upload provide the human-facing
 Drive copy (`references/external_files_and_drive.md` §5).
 
-### 2.4 Firestore DataStore — not provisioned here
-- **Source**: Firestore Collection JSONL exports or real-time sync.
-- **Content Type**: Operational task records, incident logs, workflow state.
-- The demo reaches Firestore through the MCP toolset in both modes, never through an index —
-  task state changes while the demo runs and an index would serve stale rows.
+### 2.4 Firestore DataStore — Technical Evaluation & Hybrid Integration Pattern
+
+#### 1. API Capability & Mechanics
+Discovery Engine natively supports **Firestore** as a data source via `FirestoreSource` inside `ImportDocumentsRequest` (`google.cloud.discoveryengine.v1alpha / v1`):
+
+```json
+{
+  "firestoreSource": {
+    "projectId": "${PROJECT_ID}",
+    "databaseId": "(default)",
+    "collectionId": "${FIRESTORE_COLLECTION}",
+    "gcsStagingDir": "gs://${GCS_BUCKET_NAME}/firestore_staging"
+  },
+  "reconciliationMode": "INCREMENTAL"
+}
+```
+
+- **DataStore Configuration**: Created with `solutionTypes: ["SOLUTION_TYPE_SEARCH"]` and `contentConfig: "NO_CONTENT"` (structured data store, since Firestore documents are JSON key-value records).
+- **Ingestion Pipeline**: Discovery Engine orchestrates a Firestore collection export to the intermediate Cloud Storage directory specified in `gcsStagingDir`, then ingests and indexes the resulting records.
+- **IAM Prerequisite**: The Cloud Datastore/Firestore service agent (`service-${PROJECT_NUMBER}@gcp-sa-firestore.iam.gserviceaccount.com`) must have `roles/storage.objectAdmin` on the staging Cloud Storage bucket.
+
+#### 2. Architectural Comparison: DataStore (RAG) vs. Firestore MCP
+
+| Dimension | Firestore DataStore (Discovery Engine) | Firestore MCP Toolset (`fast_api_app.py`) |
+| :--- | :--- | :--- |
+| **Data Freshness** | Asynchronous batch snapshot (1–3 min export/import LRO) | **Instant, sub-100ms real-time reads & writes** |
+| **Primary Strength** | Semantic search across historical incident notes, resolution logs, ticket archives | **Live state management, transactional writes, task status transitions** |
+| **Human-in-the-Loop** | Cannot reflect real-time approval state changes immediately | **Updates task to `IN_PROGRESS` upon user clicking A2UI ActionCard** |
+| **Real-Time Viewer Sync** | N/A (Index lags real-time changes) | **Instantly streams updates to the Operations Viewer via Firestore live listeners** |
+
+#### 3. Recommended Hybrid Pattern
+- **Do NOT replace Firestore MCP with a DataStore**: The core demo magic depends on the agent creating and mutating tasks that the user approves via A2UI cards and that the Real-Time Operations Viewer dashboard displays live.
+- **Tri-Source RAG (GCS + BigQuery + Firestore)**:
+  - When `ENABLE_DATASTORE_FS=1` is enabled alongside `DATA_EXPLORATION_MODE=rag`, `scripts/setup_datastores.py` provisions `ds-${SERVICE_NAME}-fs` to index historical incident tickets and past resolution logs.
+  - The routing rule in `agent.py` assigns:
+    - **Historical ticket / SOP search** ("Have we faced a stock-out like this before and how was it solved?") → `search_datastore`
+    - **Current operational task query / mutation / approval** ("What tasks are pending right now?", "Approve transfer") → Firestore MCP (`query_tasks`, `update_task_status`, `advance_workflow`).
 
 ---
 

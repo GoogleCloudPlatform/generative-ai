@@ -662,7 +662,7 @@ PID_CATALOG=$!
   echo "  🧪 [Parallel] Provisioning Agent Engine Sandbox..."
   SANDBOX_TMPDIR=$(mktemp -d)
   pushd "$SANDBOX_TMPDIR" >/dev/null 2>&1
-  uv run --with "google-cloud-aiplatform[agent_engines]" python3 - <<'__SANDBOX_PROV_EOF__' 2>/dev/null || true
+  GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "google-cloud-aiplatform[agent_engines]>=1.112.0,<2.0.0" python3 - <<'__SANDBOX_PROV_EOF__' 2>/dev/null || true
 import os, sys, vertexai
 from vertexai import types
 
@@ -813,7 +813,11 @@ PID_BQ=$!
     EXT_SPEC_ARG=""
     [ -f data/external_files_spec.json ] && EXT_SPEC_ARG="--spec-file ./data/external_files_spec.json"
     EXT_LOG=$(mktemp /tmp/ge-extfiles-XXXXXX.log)
-    uv run --with "openpyxl,reportlab,pillow" python3 scripts/generate_and_upload_external_files.py \
+    uv run --no-project \
+      --with "openpyxl>=3.1.0,<4.0.0" \
+      --with "reportlab>=4.0.0,<6.0.0" \
+      --with "pillow>=10.0.0,<13.0.0" \
+      python3 scripts/generate_and_upload_external_files.py \
       --domain "$DOMAIN_SLUG" \
       --company "$COMPANY_NAME" \
       --suffix "$SUFFIX" \
@@ -898,7 +902,7 @@ PID_DRIVE=$!
   if [ -f scripts/setup_fs.py ]; then
     # Report what happened. The seed silently failing is exactly the case that
     # has to be visible: every Firestore-backed feature of the demo depends on it.
-    if _FS_SEED_OUT=$(uv run --with "google-cloud-firestore>=2.16.0,<3.0.0" \
+    if _FS_SEED_OUT=$(uv run --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0" \
       --with "google-api-core>=2.20.0,<2.35.0" \
       python3 scripts/setup_fs.py \
       --project "$PROJECT_ID" \
@@ -1508,6 +1512,18 @@ __AUTH_BODY_EOF__
 fi
 
 # Job 3.3: Register Agent to Gemini Enterprise & Resolve Direct URL
+
+# The name and description the agent is registered under, derived from the
+# domain when .env does not say (matching what the Web UI generates). These are
+# computed OUT here rather than beside the registration call below, because the
+# call runs in a `( ... )` subshell and the final summary reads them from the
+# parent: assigning them inside meant the summary always printed the fallback
+# and never the name the agent was actually registered with.
+_DEFAULT_DISPLAY_NAME="${COMPANY_NAME:-Demo} ${AGENT_ROLE:-Operations Specialist}"
+_DEFAULT_DESC="${COMPANY_NAME:-Demo Enterprise} AI agent orchestrating operations, supply chain, and intelligent analytics."
+ACTUAL_DISPLAY_NAME="${DEMO_DISPLAY_NAME:-$_DEFAULT_DISPLAY_NAME}"
+ACTUAL_DESCRIPTION="${DEMO_DESCRIPTION:-$_DEFAULT_DESC}"
+
 (
   if [ -f scripts/register_agent.py ] && [ ! -z "$SELECTED_APP_ID" ]; then
     echo "  🚀 Registering Agent to Gemini Enterprise (A2UI v0.9)..."
@@ -1523,8 +1539,8 @@ fi
         "$TOKEN" \
         "$SERVICE_NAME" \
         "$AGENT_URL" \
-        "${DEMO_DISPLAY_NAME:-Demo Agent}" \
-        "${DEMO_DESCRIPTION:-Operational AI Agent}" \
+        "$ACTUAL_DISPLAY_NAME" \
+        "$ACTUAL_DESCRIPTION" \
         "$1" 2>&1
     }
     REG_OUT=$(register_agent_once "$AUTH_ARG" || true)
@@ -1613,6 +1629,7 @@ if [ "$RAG_MODE" = "1" ] && [ -n "$SELECTED_APP_ID" ]; then
   DS_SCOPE=""
   [ -n "${GCS_BUCKET_NAME:-}" ] && DS_SCOPE="ds-${SERVICE_NAME}-gcs"
   [ -n "${DATASET_ID:-}" ] && DS_SCOPE="${DS_SCOPE:+$DS_SCOPE,}ds-${SERVICE_NAME}-bq"
+  [ "${ENABLE_DATASTORE_FS:-0}" = "1" ] && [ -n "${FIRESTORE_COLLECTION:-}" ] && DS_SCOPE="${DS_SCOPE:+$DS_SCOPE,}ds-${SERVICE_NAME}-fs"
   if [ -n "$DS_SCOPE" ]; then
     POST_ENV="${POST_ENV:+$POST_ENV;}DATASTORE_SCOPE_IDS=${DS_SCOPE}"
   fi
@@ -1751,11 +1768,11 @@ echo "🤖 Service Account     : ${PROJECT_NUMBER}-compute@developer.gserviceacc
 echo ""
 echo "🌟 Agent Profile"
 echo "--------------------------------------------------------------------------------"
-echo "🤖 Agent Name:        ${DEMO_DISPLAY_NAME:-Demo Agent} ($SERVICE_NAME)"
+echo "🤖 Agent Name:        ${ACTUAL_DISPLAY_NAME:-${DEMO_DISPLAY_NAME:-Demo Agent}} ($SERVICE_NAME)"
 if [ ! -z "$AGENT_ID" ]; then
   echo "🆔 Agent ID:          ${AGENT_ID}"
 fi
-echo "📝 Description:       ${DEMO_DESCRIPTION:-Operational AI Agent}"
+echo "📝 Description:       ${ACTUAL_DESCRIPTION:-${DEMO_DESCRIPTION:-Operational AI Agent}}"
 echo "🧠 Reasoning Model:   gemini-3.7-flash"
 echo "🎨 Image Gen Model:   gemini-3.1-flash-image"
 echo ""

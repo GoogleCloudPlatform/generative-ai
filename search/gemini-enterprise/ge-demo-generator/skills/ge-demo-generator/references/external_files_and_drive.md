@@ -42,7 +42,11 @@ During Phase 3, the generator executes:
 
 ```bash
 # 1. Generate PDF and Excel files locally
-uv run --with "openpyxl,reportlab,pillow" python3 scripts/generate_and_upload_external_files.py \
+uv run --no-project \
+  --with "openpyxl>=3.1.0,<4.0.0" \
+  --with "reportlab>=4.0.0,<6.0.0" \
+  --with "pillow>=10.0.0,<13.0.0" \
+  python3 scripts/generate_and_upload_external_files.py \
   --domain "$DOMAIN" \
   --company "$COMPANY_NAME" \
   --suffix "$SUFFIX" \
