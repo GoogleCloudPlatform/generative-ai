@@ -4522,3 +4522,170 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
             if _errors:
                 _out["problems"] = _errors
             return _out
+
+
+# DataStore ids that DATASTORE_SCOPE_IDS names but the engine does not actually
+# carry. The engine rejects the WHOLE search with a 400 if the scope mentions one
+# of these, so the first such rejection records the offender here and every later
+# call skips it. Populated at most once per process.
+_DATASTORE_SCOPE_DROPPED = set()
+
+
+def search_datastore(
+    query: str,
+    datastore_id: str = "",
+    filter_expr: str = "",
+    page_size: int = 5,
+    tool_context: ToolContext = None
+) -> dict:
+    """FAST PATH. One sub-second call against a single Discovery Engine index built over
+    BOTH the enterprise documents (PDF, Excel, Word, scanned images, manuals, reports) AND
+    the transaction tables. Prefer this over the catalog-then-SQL route, which costs four
+    to five model round trips before the user sees anything.
+
+    USE WHEN: looking something up by name, id or keyword; "what do we have on X" / "tell me
+    about X"; finding the manual, spec or report that covers Y; profiling ONE named record
+    (a store, a customer, a campaign, a part) from its own stored fields; the opening
+    exploratory question of a conversation - anything a person would answer by searching
+    rather than by calculating.
+
+    DO NOT USE WHEN: the answer is DERIVED - an aggregate over many rows (sum, count,
+    average, ranking, trend, share, variance), a join across tables, or anything you have to
+    compute. Use execute_sql for those. Also use execute_sql for any record created or
+    changed during this conversation: this index LAGS the tables. It cannot write anything.
+
+    Args:
+        query: Natural language query (e.g. "trunk route detour procedure", "Q3 audit discrepancies").
+        datastore_id: Optional specific DataStore ID to search. If omitted, searches this
+            demo's own DataStores on the Gemini Enterprise engine.
+        filter_expr: Optional filter expression (e.g., 'category: ANY("audit", "finance")').
+        page_size: Maximum number of search results to return (default: 5).
+
+    Returns:
+        dict containing search results, extractive answers, snippet text, and document reference links.
+    """
+    import os, re, json, urllib.request, urllib.error
+    import google.auth
+    from google.auth.transport.requests import Request
+
+    _project_id = os.environ.get("PROJECT_ID") or os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+    _location = os.environ.get("DATASTORE_LOCATION", "global")
+    _target_ds = datastore_id or os.environ.get("DEFAULT_DATASTORE_ID", "")
+
+    if not _project_id:
+        return {"status": "error", "message": "PROJECT_ID environment variable not set."}
+
+    _ep = "discoveryengine.googleapis.com" if _location == "global" else f"{_location}-discoveryengine.googleapis.com"
+    _collection = f"projects/{_project_id}/locations/{_location}/collections/default_collection"
+
+    # DATASTORE_SCOPE_IDS confines the engine-wide search to the DataStores this
+    # deployment created. A Gemini Enterprise app is routinely shared by several
+    # demos, and unscoped the engine ranks by relevance across ALL of them - a
+    # generic query like "gold tier customers" then answers out of a NEIGHBOURING
+    # demo's customer table, which reads as this demo returning wrong data. Left
+    # unset the behaviour is the old engine-wide search, so an app whose extra
+    # DataStores are deliberate keeps working.
+    _scope_ids = []
+    if _target_ds:
+        _search_url = f"https://{_ep}/v1alpha/{_collection}/dataStores/{_target_ds}/servingConfigs/default_search:search"
+    else:
+        _app_id = os.environ.get("GEMINI_ENTERPRISE_APP_ID", "")
+        if _app_id:
+            _search_url = f"https://{_ep}/v1alpha/{_collection}/engines/{_app_id}/servingConfigs/default_search:search"
+            _scope_ids = [
+                _s.strip() for _s in os.environ.get("DATASTORE_SCOPE_IDS", "").split(",")
+                if _s.strip() and _s.strip() not in _DATASTORE_SCOPE_DROPPED
+            ]
+        else:
+            return {"status": "error", "message": "No datastore_id provided and neither DEFAULT_DATASTORE_ID nor GEMINI_ENTERPRISE_APP_ID is configured."}
+
+    try:
+        _creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        _creds.refresh(Request())
+        _token = _creds.token
+    except Exception as _auth_err:
+        return {"status": "error", "message": f"Failed to acquire Google Cloud auth token: {str(_auth_err)}"}
+
+    _payload = {
+        "query": query,
+        "pageSize": max(1, min(page_size, 10)),
+        "contentSearchSpec": {
+            "snippetSpec": {"returnSnippet": True},
+            "summarySpec": {"summaryResultCount": 3, "includeCitations": True},
+            "extractiveContentSpec": {"maxExtractiveAnswerCount": 1, "maxExtractiveSegmentCount": 2}
+        }
+    }
+    if filter_expr:
+        _payload["filter"] = filter_expr
+    if _scope_ids:
+        _payload["dataStoreSpecs"] = [{"dataStore": f"{_collection}/dataStores/{_i}"} for _i in _scope_ids]
+
+    def _post(_body):
+        _req = urllib.request.Request(
+            _search_url,
+            data=json.dumps(_body).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {_token}",
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(_req, timeout=30) as _resp:
+            return json.loads(_resp.read().decode("utf-8"))
+
+    try:
+        try:
+            _resp_data = _post(_payload)
+        except urllib.error.HTTPError as _scope_err:
+            # A DataStore named in the scope that is not attached to the engine
+            # fails the entire request. Remember which ones, so this costs one
+            # extra round trip once rather than on every search, and retry with
+            # what is left - unscoped if nothing is.
+            if _scope_err.code != 400 or not _scope_ids:
+                raise
+            _body_txt = _scope_err.read().decode("utf-8", errors="replace")
+            if "data_store_specs" not in _body_txt:
+                raise
+            _bad = set(re.findall(r"dataStores/([A-Za-z0-9_-]+)", _body_txt))
+            if not _bad:
+                raise
+            _DATASTORE_SCOPE_DROPPED.update(_bad)
+            _scope_ids = [_i for _i in _scope_ids if _i not in _bad]
+            if _scope_ids:
+                _payload["dataStoreSpecs"] = [{"dataStore": f"{_collection}/dataStores/{_i}"} for _i in _scope_ids]
+            else:
+                _payload.pop("dataStoreSpecs", None)
+            _resp_data = _post(_payload)
+
+        _results = []
+        for item in _resp_data.get("results", []):
+            _doc = item.get("document", {})
+            _struct_data = _doc.get("structData", {})
+            _derived = _doc.get("derivedStructData", {})
+            _snippets = [s.get("snippet", "") for s in _derived.get("snippets", []) if s.get("snippet")]
+            _extractive_answers = [a.get("content", "") for a in _derived.get("extractive_answers", []) if a.get("content")]
+            _extractive_segments = [s.get("content", "") for s in _derived.get("extractive_segments", []) if s.get("content")]
+            _title = _derived.get("title", "") or _struct_data.get("title", "") or _doc.get("name", "").split("/")[-1]
+            _link = _derived.get("link", "") or _struct_data.get("link", "") or _doc.get("name", "")
+            _results.append({
+                "title": _title,
+                "link": _link,
+                "snippets": _snippets,
+                "extractive_answers": _extractive_answers,
+                "extractive_segments": _extractive_segments,
+                "data": _struct_data
+            })
+        _summary = _resp_data.get("summary", {}).get("summaryText", "")
+        return {
+            "status": "success",
+            "query": query,
+            "total_size": _resp_data.get("totalSize", len(_results)),
+            "summary": _summary,
+            "results": _results
+        }
+    except urllib.error.HTTPError as _http_err:
+        _err_body = _http_err.read().decode("utf-8", errors="replace")
+        return {"status": "error", "code": _http_err.code, "message": f"Discovery Engine Search API error: {_err_body[:300]}"}
+    except Exception as _e:
+        return {"status": "error", "message": f"Search failed: {str(_e)}"}
+

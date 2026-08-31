@@ -756,6 +756,24 @@ instruction = (
 # so is what makes the difference. Two contradictory rules in a 100k-token prompt
 # do not resolve in favour of the later one, they resolve at random, so there is
 # deliberately no competing METADATA-FIRST rule anywhere above this block.
+#
+# RAG mode additionally needs the wiring to actually exist. The mode says what
+# was asked for; DEFAULT_DATASTORE_ID / GEMINI_ENTERPRISE_APP_ID say what the
+# deploy managed to wire. Pointing the model at an unbacked search_datastore
+# trades a slow answer for a failed one, so an un-wired rag deployment
+# degrades to the mcp block rather than to nothing.
+_DATA_EXPLORATION_MODE = os.environ.get("DATA_EXPLORATION_MODE", "").strip().lower()
+if not _DATA_EXPLORATION_MODE:
+    # Older deployments carry the boolean instead.
+    _DATA_EXPLORATION_MODE = (
+        "rag" if os.environ.get("ENABLE_DATASTORE_CONNECTORS", "").lower()
+        in ("true", "1", "yes") else "mcp"
+    )
+_RAG_WIRED = bool(
+    os.environ.get("DEFAULT_DATASTORE_ID", "").strip()
+    or os.environ.get("GEMINI_ENTERPRISE_APP_ID", "").strip()
+)
+
 _ONE_QUERY_RULE = (
     "ONE QUERY, NOT SEVERAL (MANDATORY). Before calling `execute_sql`, work out every "
     "figure the answer needs and fetch them ALL in a single statement - conditional "
@@ -784,33 +802,94 @@ _NO_NARRATION_RULE = (
     "a business question, not for a query plan.\n"
 )
 
-instruction += (
-    "\n\n--- DATA EXPLORATION: ANSWER IN ONE CALL (MANDATORY) ---\n"
-    "Three paths, listed in ascending cost. Pick the cheapest one that can actually "
-    "answer the question asked, and never walk further down the list for practice.\n\n"
-    "PATH 0 - ANSWER FROM THIS PROMPT. Zero calls, instant. The data-asset catalog above "
-    "already names every table, every column and its business meaning. Any question about "
-    "WHAT DATA EXISTS or what you are able to analyse is answered from it directly.\n"
-    "PATH 1 - SQL: `execute_sql`. One call. The catalog above IS your schema, so a figure "
-    "question needs no metadata expedition first - write the query and run it.\n"
-    "PATH 2 - CATALOG: `search_entries` / `lookup_entry` / `lookup_context`, then SQL. Two "
-    "extra round trips before the user sees anything.\n\n"
-    "ROUTING:\n"
-    "- \"What data do you have\", \"what can you analyse\" -> PATH 0. Zero tool calls.\n"
-    "- EVERYTHING that touches actual records - a lookup by name or id, a profile, an "
-    "aggregate, a comparison, a ranking, a trend, a filter over a date or numeric range, "
-    "a join, or any write -> PATH 1, directly. Do not stop at PATH 2 on the way.\n"
-    "- PATH 2 ONLY when the question is about the metadata itself, when a column you need "
-    "is not described above, or when `execute_sql` failed and you need the real schema to "
-    "fix it.\n\n"
-    + _ONE_QUERY_RULE + _PARALLEL_CALLS_RULE +
-    "ANSWER THE QUESTION THAT WAS ASKED. \"Tell me about X\" asks who or what X is - ONE "
-    "query for that record's own row, NOT a full analytical work-up. Offer the sales "
-    "trend, the customer mix and the ranking as follow-up buttons; run them when the user "
-    "presses one.\n\n"
-    + _NO_NARRATION_RULE +
-    "--- END DATA EXPLORATION ---\n"
-)
+if _DATA_EXPLORATION_MODE == "rag" and _RAG_WIRED:
+    instruction += (
+        "\n\n--- RAG-PREFERRED DATA EXPLORATION: SEARCH READS, COMPUTE WITH SQL (MANDATORY) ---\n"
+        "Reads go to the search index first. SQL is for the two things the index cannot "
+        "do - compute a figure, and change a record. Four paths, listed in ascending cost. "
+        "Pick the cheapest one that can actually answer the question asked, and never walk "
+        "further down the list for practice.\n\n"
+        "PATH 0 - ANSWER FROM THIS PROMPT. Zero calls, instant. The data-asset catalog above "
+        "already names every table, every column and its business meaning. Any question about "
+        "WHAT DATA EXISTS or what you are able to analyse is answered from it directly.\n"
+        "PATH 1 - SEARCH (the default for reads): `search_datastore`. One call, typically "
+        "under a second. It searches a single index built over BOTH the structured tables and "
+        "the documents, reports and spreadsheets staged for this demo. For a document it "
+        "returns snippets with citations; for a table row it returns THAT ROW'S OWN STORED "
+        "FIELDS - the record's identifiers, attributes, targets, dates and amounts, ready to "
+        "quote.\n"
+        "PATH 2 - SQL: `execute_sql`. One call. The catalog above IS your schema, so a figure "
+        "question needs no metadata expedition first - write the query and run it.\n"
+        "PATH 3 - CATALOG: `search_entries` / `lookup_entry` / `lookup_context`, then SQL. Two "
+        "extra round trips before the user sees anything.\n\n"
+        "ROUTING:\n"
+        "- \"What data do you have\", \"what can you analyse\" -> PATH 0. Zero tool calls.\n"
+        "- EVERY read that is not a computation -> PATH 1. Lookups by name, id or keyword; "
+        "\"what do we have on X\"; \"find the manual/report/spec covering Y\"; the opening "
+        "exploratory question of a conversation; anything a person would answer by searching "
+        "rather than by calculating.\n"
+        "- NAMED-ENTITY FIRST TOUCH (the bullet most often broken). The user names ONE thing - "
+        "a store, a tenant, a customer, a campaign, a part, a document - and asks an open "
+        "question about it: \"tell me about X\", \"what do we know about X\", \"give me X's "
+        "profile\", \"what can you tell me on X\". That is PATH 1: exactly ONE "
+        "`search_datastore` call, then answer from what comes back. Opening such a turn with "
+        "`execute_sql` is a DEFECT, and it is still a defect when the profile you had in mind "
+        "contains numbers - the record's own stored fields come back in that one call. "
+        "Answer the question that was actually asked: \"tell me about X\" asks who or what X "
+        "is, NOT for a full analytical work-up. Offer the sales trend, the customer mix and "
+        "the ranking as follow-up buttons; run them when the user presses one.\n"
+        "- ANY figure the user will read as a number - an aggregate, a comparison, a variance, "
+        "a ranking, a trend, a filter over a date or numeric range, a join, or any write -> "
+        "PATH 2, directly. Do not stop at PATH 3 on the way.\n"
+        "- PATH 3 ONLY when the question is about the metadata itself, when a column you need "
+        "is not described above, or when `execute_sql` failed and you need the real schema to "
+        "fix it.\n"
+        "- Escalate from PATH 1 the moment the snippets do not actually answer the question. "
+        "Escalating costs one extra call; guessing from a snippet costs the demo.\n\n"
+        + _ONE_QUERY_RULE + _PARALLEL_CALLS_RULE +
+        "TWO HARD RULES:\n"
+        "1. WRITES NEVER USE PATH 1. Every INSERT / UPDATE / DELETE / MERGE and every "
+        "Firestore write goes through the MCP toolsets. `search_datastore` is read-only.\n"
+        "2. DERIVED NUMBERS COME FROM SQL. Anything you COMPUTE - a sum, count, average, "
+        "share, ranking, trend, variance, or any figure spanning more than one record - MUST "
+        "come from `execute_sql` or the Firestore tools, never from a search result. So must "
+        "any record created or changed during this conversation: the index lags the tables, so "
+        "a row written a minute ago may not be indexed yet. A SINGLE named record's own stored "
+        "fields, returned by PATH 1, are the source of record and you may quote them as they "
+        "stand - that is what PATH 1 is for. Use PATH 1 to find WHAT to compute on; use SQL to "
+        "compute it.\n\n"
+        "If `search_datastore` errors or returns nothing, fall back to SQL and answer the "
+        "question. " + _NO_NARRATION_RULE +
+        "--- END RAG-PREFERRED DATA EXPLORATION ---\n"
+    )
+else:
+    instruction += (
+        "\n\n--- DATA EXPLORATION: ANSWER IN ONE CALL (MANDATORY) ---\n"
+        "Three paths, listed in ascending cost. Pick the cheapest one that can actually "
+        "answer the question asked, and never walk further down the list for practice.\n\n"
+        "PATH 0 - ANSWER FROM THIS PROMPT. Zero calls, instant. The data-asset catalog above "
+        "already names every table, every column and its business meaning. Any question about "
+        "WHAT DATA EXISTS or what you are able to analyse is answered from it directly.\n"
+        "PATH 1 - SQL: `execute_sql`. One call. The catalog above IS your schema, so a figure "
+        "question needs no metadata expedition first - write the query and run it.\n"
+        "PATH 2 - CATALOG: `search_entries` / `lookup_entry` / `lookup_context`, then SQL. Two "
+        "extra round trips before the user sees anything.\n\n"
+        "ROUTING:\n"
+        "- \"What data do you have\", \"what can you analyse\" -> PATH 0. Zero tool calls.\n"
+        "- EVERYTHING that touches actual records - a lookup by name or id, a profile, an "
+        "aggregate, a comparison, a ranking, a trend, a filter over a date or numeric range, "
+        "a join, or any write -> PATH 1, directly. Do not stop at PATH 2 on the way.\n"
+        "- PATH 2 ONLY when the question is about the metadata itself, when a column you need "
+        "is not described above, or when `execute_sql` failed and you need the real schema to "
+        "fix it.\n\n"
+        + _ONE_QUERY_RULE + _PARALLEL_CALLS_RULE +
+        "ANSWER THE QUESTION THAT WAS ASKED. \"Tell me about X\" asks who or what X is - ONE "
+        "query for that record's own row, NOT a full analytical work-up. Offer the sales "
+        "trend, the customer mix and the ranking as follow-up buttons; run them when the user "
+        "presses one.\n\n"
+        + _NO_NARRATION_RULE +
+        "--- END DATA EXPLORATION ---\n"
+    )
 
 # --- Conditional Data Viewer integration ---
 _viewer_url = os.environ.get("DATA_VIEWER_URL", "")
@@ -1256,6 +1335,11 @@ _all_tools = [t for t in _all_tools if t is not None]
 _all_tools.append(tools.write_operational_alert)
 _all_tools.append(tools.save_document_to_db)
 _all_tools.append(tools.publish_dashboard)
+# Only offered in rag mode, and only once the index is actually wired. A tool the
+# model can see is a tool it will eventually try, and in mcp mode every such call
+# is a wasted round trip that ends in an error.
+if _DATA_EXPLORATION_MODE == "rag" and _RAG_WIRED:
+    _all_tools.append(tools.search_datastore)
 
 # --- Background task management tools ---
 _all_tools.append(tools.background_task_tool)
