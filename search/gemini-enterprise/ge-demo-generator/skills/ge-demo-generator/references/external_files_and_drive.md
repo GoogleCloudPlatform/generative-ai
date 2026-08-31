@@ -108,10 +108,11 @@ the owner.
    A plain `gcloud auth login` grants `cloud-platform` and nothing else, so Drive answers
    `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`. `generate_and_upload_external_files.py` probes
    `GET drive/v3/about?fields=user` first, which resolves the identity and the scope in
-   one call, and turns that 403 into the fix:
+   one call, and turns that 403 into the fix. Use `--no-launch-browser` because agentic
+   IDE terminals and remote development machines have no local browser to hand off to:
 
-   ```
-   gcloud auth login --enable-gdrive-access
+   ```bash
+   gcloud auth login --enable-gdrive-access --no-launch-browser
    ```
 
    | Situation | Behaviour |
@@ -158,7 +159,7 @@ the owner.
    `upload_skipped_reason` from `external_files/drive_upload_summary.json` and prints it,
    under a `📁 External Sample Files - NOT in Google Drive` heading, with what it costs (a
    Drive or Sheets step in the demo script finds nothing) and how to fix it
-   (`gcloud auth login --enable-gdrive-access` and re-run, or upload `./external_files/`
+   (`gcloud auth login --enable-gdrive-access --no-launch-browser` and re-run, or upload `./external_files/`
    by hand and share it).
 
    **This banner is the whole recovery story, by design.** v2.10.0 tried to close the gap

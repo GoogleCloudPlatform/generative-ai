@@ -48,7 +48,7 @@ from pathlib import Path
 DRIVE_API = "https://www.googleapis.com/drive/v3"
 DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3"
 FOLDER_MIME = "application/vnd.google-apps.folder"
-REAUTH_HINT = "gcloud auth login --enable-gdrive-access"
+REAUTH_HINT = "gcloud auth login --enable-gdrive-access --no-launch-browser"
 
 def run_cmd(cmd, check=False):
     """Run a shell command and return stdout."""
@@ -403,7 +403,7 @@ def get_drive_identity(token: str):
     it carries the Drive scope, which is the failure everyone hits. A plain
     `gcloud auth login` grants cloud-platform and nothing else, so Drive returns
     403 ACCESS_TOKEN_SCOPE_INSUFFICIENT and the fix is a re-login with
-    --enable-gdrive-access. Saying that here is the difference between a demo
+    --enable-gdrive-access --no-launch-browser. Saying that here is the difference between a demo
     that is one command from having its documents in Drive and one whose
     operator concludes the feature is broken.
     """

@@ -65,7 +65,7 @@ GEN = os.path.join(REPO, "skills/ge-demo-generator/templates/scripts/"
 # The one command that turns a scope-less token into a working Drive upload.
 # Both the script and the deploy banner have to print it verbatim, because
 # "authorize Drive" sends people to the Cloud console, where it is not.
-REAUTH_HINT = "gcloud auth login --enable-gdrive-access"
+REAUTH_HINT = "gcloud auth login --enable-gdrive-access --no-launch-browser"
 
 # Every name the deleted feature was made of. None of them may come back.
 RETIRED = [

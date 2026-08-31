@@ -158,7 +158,7 @@ same account, because the upload uses this token. Anything else (usually `403`, 
 carrying no Drive scope, which is what a plain `gcloud auth login` gives you) means **this
 demo will have no Google Drive copy of the sample documents at all**. That is a fact the
 brief has to state, not discover at deploy time — see brief sections 3 and 5. It is also one
-command to fix, so say it now: `gcloud auth login --enable-gdrive-access`, then re-read.
+command to fix, so say it now: `gcloud auth login --enable-gdrive-access --no-launch-browser` (using `--no-launch-browser` since an agentic IDE terminal usually has no local browser), then re-read.
 
 ### Step 2.2 — Present the Demo Architecture & Data Model Plan
 
@@ -236,7 +236,7 @@ The Cloud Storage staging happens in **both** `mcp` and `rag` mode; the deploy-t
 the *only* path into any Drive. The deployed agent has no way to put them in anyone's Drive —
 v2.11.0 removed the in-conversation import, deliberately. If the user wants them in Drive and
 `DRIVE_OK` is not `200`, say so here, while it can still be sorted out
-(`gcloud auth login --enable-gdrive-access` and re-run, or upload `./external_files/` by hand
+(`gcloud auth login --enable-gdrive-access --no-launch-browser` and re-run, or upload `./external_files/` by hand
 afterwards).
 
 ### § Brief section 4 — 🤖 Agent Models & Runtime
@@ -272,7 +272,7 @@ created in every mode, and the Drive line is the one users read as a promise. Wr
 | `DRIVE_OK` | `📁 Google Drive Copy` |
 | --- | --- |
 | `200` | `Google Drive of ${GCP_ACCOUNT}` |
-| anything else | `none - these credentials have no Drive scope (fix: gcloud auth login --enable-gdrive-access)` |
+| anything else | `none - these credentials have no Drive scope (fix: gcloud auth login --enable-gdrive-access --no-launch-browser)` |
 
 Never print a Drive destination the deploy cannot reach, and never describe the copy as
 something the agent will do later — nothing after the deploy writes to a Drive. See
@@ -412,7 +412,7 @@ arrive here without that, go back and present it.
        every file to `gs://$GCS_BUCKET_NAME/` in **both** data-exploration modes — but
        there will be no Drive folder, and nothing downstream creates one: report the
        skip and its reason on the completion screen, point at the Cloud Storage links,
-       and give the fix, which is one command — `gcloud auth login --enable-gdrive-access`
+       and give the fix, which is one command — `gcloud auth login --enable-gdrive-access --no-launch-browser`
        and re-run, or upload `./external_files/` by hand. See
        `references/external_files_and_drive.md` §5.
 
@@ -763,9 +763,9 @@ plainly, this is the only notice the user gets:
 - ℹ️ **There is no Drive copy of these documents.** Print `upload_skipped_reason` verbatim.
   The documents themselves are complete, in Cloud Storage and `./external_files/`; only the
   Drive folder is missing, so a Drive or Sheets step in the demo script will find nothing.
-- 🛠️ **To get one**: run `gcloud auth login --enable-gdrive-access` and re-run this script
+- 🛠️ **To get one**: run `gcloud auth login --enable-gdrive-access --no-launch-browser` and re-run this script
   (a plain `gcloud auth login` grants no Drive scope, which is why this is the usual
-  cause), or upload `./external_files/` to a Drive folder by hand and share it with the
+  cause; `--no-launch-browser` prints the OAuth consent URL to copy into any browser when the terminal environment lacks a browser), or upload `./external_files/` to a Drive folder by hand and share it with the
   audience. Never suggest asking the agent to do it — it cannot.
 
 📊 **Firestore Data Viewer Dashboard:** 👉 ${VIEWER_URL}

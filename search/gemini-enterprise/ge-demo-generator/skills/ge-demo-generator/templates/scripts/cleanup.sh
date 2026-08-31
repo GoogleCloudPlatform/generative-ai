@@ -475,7 +475,7 @@ fi
 # nothing and is one click to undo if the folder turned out to hold something
 # the operator added by hand. Skipped silently when the deploy never made one,
 # or when these credentials have no Drive scope - a teardown is the wrong moment
-# to send someone through `gcloud auth login --enable-gdrive-access`.
+# to send someone through `gcloud auth login --enable-gdrive-access --no-launch-browser`.
 if [ -n "$TOKEN" ] && [ -f external_files/drive_upload_summary.json ]; then
   (
     DRIVE_FOLDER_ID=$(python3 -c \

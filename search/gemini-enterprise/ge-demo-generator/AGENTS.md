@@ -1504,7 +1504,11 @@ Four properties are worth preserving if you touch this file:
   grants `cloud-platform` and nothing else, so Drive answers 403
   `ACCESS_TOKEN_SCOPE_INSUFFICIENT`. The script does not treat that as a broken
   feature: it skips the upload and names the fix, `gcloud auth login
-  --enable-gdrive-access`, in the summary and in the completion banner.
+  --enable-gdrive-access --no-launch-browser`, in the summary and in the
+  completion banner. The `--no-launch-browser` half is not decoration: this
+  script runs from an agentic IDE terminal or a remote development machine,
+  neither of which has a local browser for gcloud to hand the consent flow to,
+  so without it the re-login stalls where nobody can see it.
 - **A folder with nothing in it is not a Drive copy.** Creating a folder and
   writing into it are separate permissions, so every upload can fail under a
   folder that was created fine. Reporting the folder URL then hands the demo a

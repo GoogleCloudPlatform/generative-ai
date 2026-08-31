@@ -1799,7 +1799,7 @@ elif [ ! -z "$DRIVE_SKIP_REASON" ]; then
   echo "   copy for you - it is a deploy-time step."
   echo "   Almost always the fix is one command - a plain 'gcloud auth login' grants no"
   echo "   Drive scope, so run:"
-  echo "     gcloud auth login --enable-gdrive-access"
+  echo "     gcloud auth login --enable-gdrive-access --no-launch-browser"
   echo "   and re-run this script. Otherwise upload ./external_files/ to a Drive folder"
   echo "   by hand and share it with your audience."
 fi
