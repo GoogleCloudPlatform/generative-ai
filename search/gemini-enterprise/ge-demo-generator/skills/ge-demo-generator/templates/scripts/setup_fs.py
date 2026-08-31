@@ -64,7 +64,19 @@ from google.cloud import firestore
 
 
 def seed_firestore(project_id, collection_name, docs):
-    db = firestore.Client(project=project_id) if project_id else firestore.Client()
+    db = None
+    try:
+        import subprocess
+        from google.oauth2.credentials import Credentials
+        token = subprocess.check_output(["gcloud", "auth", "print-access-token"], stderr=subprocess.DEVNULL).decode().strip()
+        if token:
+            creds = Credentials(token=token)
+            db = firestore.Client(project=project_id, credentials=creds)
+    except Exception as exc:
+        print("   ⚠️  Could not use gcloud token for Firestore (%s); trying default credentials..." % exc)
+
+    if db is None:
+        db = firestore.Client(project=project_id) if project_id else firestore.Client()
 
     print("🔥 Seeding %d records into Firestore collection '%s'..."
           % (len(docs), collection_name))

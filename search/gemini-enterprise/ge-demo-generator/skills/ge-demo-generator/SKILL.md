@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.13.0
+  version: 2.14.4
 ---
 
-# GE Demo Generator Skill (v2.13.0)
+# GE Demo Generator Skill (v2.14.4)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.7 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
 
@@ -239,15 +239,14 @@ v2.11.0 removed the in-conversation import, deliberately. If the user wants them
 (`gcloud auth login --enable-gdrive-access --no-launch-browser` and re-run, or upload `./external_files/` by hand
 afterwards).
 
-### § Brief section 4 — 🤖 Agent Models & Runtime
+### § Brief section 4 — 🤖 Agent Profile & Runtime
 
-- **Reasoning / orchestration**: **`gemini-3.7-flash`** for all agent instances (Root
-  Coordinator, Deep Analysis Sub-Agent, Background Worker).
-- **Image generation**: **`gemini-3.1-flash-image`** (with localized prompt reinforcement and
-  GCS artifact persistence).
+- **Agent Name (`DEMO_DISPLAY_NAME`)**: Concise 2–4 word domain role (e.g. `TWG Tea Retail Operations Director`, `Mercari Trust & Safety Specialist`). Registered in Gemini Enterprise as `${DEMO_DISPLAY_NAME} (${SERVICE_NAME})`, matching the Web UI (GAS) version.
+- **Description (`DEMO_DESCRIPTION`)**: Concrete, professional 1–2 sentence mission summary specifying the business domain, core datasets, and operational goals (e.g. `Orchestrates boutique inventory balancing, central commissary replenishment, and plantation harvest orders across Singapore.`). Matches `oneSentenceSummary` in the Web UI (GAS).
+- **Reasoning / orchestration**: **`gemini-3.7-flash`** for all agent instances (Root Coordinator, Deep Analysis Sub-Agent, Background Worker).
+- **Image generation**: **`gemini-3.1-flash-image`** (with localized prompt reinforcement and GCS artifact persistence).
 - **Code execution**: Agent Engine Sandbox (`us-central1` — fixed, not `$REGION`).
-- **UI**: Gemini Enterprise A2UI v0.9 composite catalog (name the components this demo will
-  actually lean on — `MaterialTable`, `VegaChart`, `MaterialCard`).
+- **UI**: Gemini Enterprise A2UI v0.9 composite catalog (name the components this demo will actually lean on — `MaterialTable`, `VegaChart`, `MaterialCard`).
 
 ### § Brief section 5 — ⚙️ Deployment Target Environment
 
@@ -286,7 +285,7 @@ something the agent will do later — nothing after the deploy writes to a Drive
    real switch in the deployed container, so an option discussed here but not written to
    `.env` is a feature the demo will not have.
 
-   **List all eight, every time**, in this order, with the value this deploy will use in the
+   **List all nine, every time**, in this order, with the value this deploy will use in the
    second column — `✅ true` / `❌ false` / the literal value / `— (unset)`. An option the
    brief leaves out is an option the user cannot ask for: they do not know it exists, and by
    the time the deploy banner mentions it the 15-30 minutes are already spent. The gate is the
@@ -298,6 +297,7 @@ something the agent will do later — nothing after the deploy writes to a Drive
    |---|---|---|---|
    | 🤖 `enableManagedAgent` | `<value>` | **`true`** | Agent Engine Sandbox code execution, asynchronous background delegation (`delegate_autonomous_task`), scheduled tasks and Drive deliverable exports. The delegation prompts in the demo playbook exercise this, which is why it is the one default-on capability. Adds ~8-10 min of provisioning, overlapped with the rest of the deploy. |
    | 🔎 `dataExplorationMode` | `<value>` | **`mcp`** | How the agent reads the demo's data. **`mcp`** (default) provisions no search index: the data-asset catalog is already in the agent's system instruction, so a figure question is *one* `execute_sql` call — the four-to-five round trips people blame on "no index" came from the metadata expedition in front of the query, and the mcp routing block overrides exactly that. **`rag`** additionally builds a Discovery Engine index over the BigQuery dataset and the staged files and makes it the read path: lookups and document questions return in one sub-second `search_datastore` call, while computed figures, joins and every write stay on MCP because the index lags the tables. Pick `rag` when the demo turns on documents rather than on numbers, and note it also attaches data stores to the (often shared) Gemini Enterprise app — see `references/datastore_connectors.md`. |
+   | 📁 `enableDatastoreFs` | `<value>` | `false` | When `dataExplorationMode=rag`, provisions a semi-structured Discovery Engine DataStore (`ds-${SERVICE_NAME}-fs`) from `FIRESTORE_COLLECTION` via `FirestoreSource` (GCS export staging). Enables semantic search over historical incident tickets, resolved remediation logs, and SOP archives. Note: live task mutations, approvals, and Operations Viewer synchronization continue to use Firestore MCP for sub-100ms real-time state tracking. |
    | 🔑 `enableWorkspaceAuth` | `<value>` | `false` | User-OAuth passthrough — the agent acts as the signed-in user for the Drive handoff and Workspace token plumbing. Commonly wanted, since Workspace is usually available in the target environment, but **not** default-on: some organizations refuse to authorize an OAuth client they have not vetted, and there sign-in fails for every demo user. Confirm the target org permits it before enabling. |
    | 🔑 `enableWorkspaceMcp` | `<value>` | `false` | **Advanced, rarely used.** Adds the Gmail / Drive / Calendar / Docs / Chat MCP toolsets on top of the auth passthrough. The Workspace MCP servers are Developer Preview and the project must be allowlisted first — enable it without that and every Workspace call 403s. Kept separate from `enableWorkspaceAuth` for exactly this reason. |
    | 🖥️ `enableComputerUse` | `<value>` | `false` | Headless browser automation (Playwright). Also requires uncommenting the Playwright block in **both** `requirements.txt` and the `Dockerfile`; the deploy pre-flights this and refuses a half-configured build. |
@@ -337,13 +337,19 @@ user actually said yes to.
 **Entry condition: the Phase 2 brief was presented in full and the user approved it.** If you
 arrive here without that, go back and present it.
 
-1. **Derive the demo's identifiers** (the account, project, number and region were already read
-   and shown in brief section 5 — re-read them here only if the shell state was lost):
+1. **Derive the demo's identifiers, concrete name, and description**:
    ```bash
    SUFFIX=$(date +%s | tail -c 5)
+   DEMO_ID="${DOMAIN_SLUG}-${SUFFIX}"
+   SERVICE_NAME="ge-demo-${DOMAIN_SLUG}-${SUFFIX}"
    DATASET_ID="demo_${DOMAIN_SLUG}_${SUFFIX}"
    FIRESTORE_COLLECTION="demo-${DOMAIN_SLUG}-${SUFFIX}-tasks"
+
+   # Set concrete, domain-specific display name & description (matching Web UI / GAS version)
+   DEMO_DISPLAY_NAME="${COMPANY_NAME} ${AGENT_ROLE:-Operations Specialist}"
+   DEMO_DESCRIPTION="Orchestrates ${SCENARIO_SUMMARY:-operations and intelligent data analytics} across ${COMPANY_NAME}."
    ```
+   *Always write `DEMO_DISPLAY_NAME` and `DEMO_DESCRIPTION` into `.env` so `setup_and_deploy.sh` and `register_agent.py` register the agent with concrete domain details.*
 
 2. **Generate Real-World Synthetic Data & Display Previews**:
    - Generate CSV files with realistic addresses, valid foreign keys across tables, and varied statuses in `data/<table_name>.csv`.
@@ -385,7 +391,11 @@ arrive here without that, go back and present it.
      3. **Simulated Operational Document Images** (`handwritten_order_1.jpg`, `handwritten_order_2.jpg`): Realistic scanned forms generated via `gemini-3.1-flash-image` with localized text.
    - **Upload to Google Drive**:
      ```bash
-     uv run --with "openpyxl,reportlab,pillow" python3 scripts/generate_and_upload_external_files.py \
+     uv run --no-project \
+       --with "openpyxl>=3.1.0,<4.0.0" \
+       --with "reportlab>=4.0.0,<6.0.0" \
+       --with "pillow>=10.0.0,<13.0.0" \
+       python3 scripts/generate_and_upload_external_files.py \
        --domain "$DOMAIN_SLUG" \
        --company "$COMPANY_NAME" \
        --suffix "$SUFFIX" \
@@ -436,7 +446,9 @@ arrive here without that, go back and present it.
      to `data/firestore_seed.json` as a list of `{"id": ..., "data": {...}}` objects, in the
      demo's own language and domain, then upload them:
      ```bash
-     uv run --with "google-cloud-firestore" python3 scripts/setup_fs.py \
+     uv run --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0" \
+       --with "google-api-core>=2.20.0,<2.35.0" \
+       python3 scripts/setup_fs.py \
        --collection "$FIRESTORE_COLLECTION" \
        --docs ./data/firestore_seed.json
      ```
