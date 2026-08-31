@@ -192,6 +192,8 @@ bitcoin
 Bitcoin
 bjerr
 bjson
+bkey
+blindspot
 blogs
 BLR
 bluesky
@@ -831,6 +833,8 @@ HDFC
 hdfs
 HDFS
 hdlr
+hdmi
+HDMI
 hdone
 hdr
 hdrs
@@ -1497,6 +1501,7 @@ Phanfone
 pharma
 Pharma
 phellos
+phishing
 Photoshop
 Pichai
 pids
@@ -1729,6 +1734,8 @@ RVL
 RVR
 RYDE
 saaagesh
+saas
+Saboo
 Sahel
 sampwidth
 SAOT
@@ -1741,6 +1748,7 @@ Sca
 scaffolded
 scann
 scattergl
+scc
 Schlenoff
 Schulen
 scidocs
@@ -1779,6 +1787,7 @@ setlocal
 sfn
 sft
 sfx
+sgp
 Sha'carri
 shalas
 Shankman
@@ -1834,6 +1843,9 @@ SMCC
 Smol
 smolagent
 SMSN
+smurf
+smurfing
+Smurfing
 SNB
 SNE
 snowboard

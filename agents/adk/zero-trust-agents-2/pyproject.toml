@@ -1,0 +1,22 @@
+[project]
+name = "zero-trust-agents-2"
+version = "2.0.0"
+description = "Runtime governance blueprint for autonomous AI agents on Gemini Enterprise Agent Platform: Model Armor, Semantic Governance Policies (SGP), and Agent Anomaly Detection (AAD)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+
+# Zero external dependencies for standard local simulation mode
+dependencies = []
+
+[project.optional-dependencies]
+# Install these for production mode on Google Cloud / Gemini Enterprise Agent Platform
+production = [
+    "google-adk>=1.0.0",
+    "google-genai>=1.0.0",
+    "google-cloud-modelarmor>=0.1.0",
+    "google-cloud-kms>=2.0.0",
+    "google-cloud-dlp>=3.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+]
