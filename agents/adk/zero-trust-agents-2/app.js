@@ -175,10 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const PII_MASKS = [
-        { type: 'CREDIT_CARD', regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g },
-        { type: 'AUTH_TOKEN', regex: /\b(?:sec|tok)_[a-zA-Z0-9]{20,64}\b/g },
-        { type: 'SSN', regex: /\b\d{3}-\d{2}-\d{4}\b/g },
-        { type: 'EMPLOYEE_ID', regex: /\bEMP-[A-Z0-9]{6,10}\b/g }
+        { type: 'CREDIT_CARD', regex: new RegExp('\\b(?:\\d{4}[-\\s]?){3}\\d{4}\\b', 'g') },
+        { type: 'AUTH_TOKEN', regex: new RegExp('\\b(?:sec|tok)_[a-zA-Z0-9]{20,64}\\b', 'g') },
+        { type: 'SSN', regex: new RegExp('\\b\\d{3}-\\d{2}-\\d{4}\\b', 'g') },
+        { type: 'EMPLOYEE_ID', regex: new RegExp('\\bEMP-[A-Z0-9]{6,10}\\b', 'g') }
     ];
 
     DOM.btnArmorTplJailbreak.addEventListener('click', () => {

@@ -32,7 +32,7 @@ import time
 import re
 from typing import Dict, Any, List, Optional
 
-# Try loading official Gemini / GenAI SDK if present for live LLM Judge
+# Try loading official Gemini / Gen AI SDK if present for live LLM Judge
 try:
     from google import genai
     HAS_GENAI_SDK = True
