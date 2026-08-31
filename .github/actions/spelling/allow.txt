@@ -44,6 +44,7 @@ aio
 aip
 AIP
 AIphone
+aiplatform
 airbnb
 airlume
 aistudio
@@ -682,6 +683,7 @@ functiona
 Fushimi
 futur
 fval
+fx
 Gabeira
 Gacrux
 gaeta
@@ -694,6 +696,7 @@ gauff
 Gaussians
 gbif
 gboolean
+gbp
 GBP
 gbq
 gca
@@ -996,6 +999,7 @@ jiwer
 Joji
 Jolyon
 Jostar
+jpy
 JPY
 jsemer
 jsonable
@@ -1421,6 +1425,7 @@ OOD
 OOM
 OOMs
 Oort
+ootb
 OOTB
 openai
 openat
