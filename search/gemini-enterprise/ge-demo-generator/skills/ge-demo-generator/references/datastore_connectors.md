@@ -84,8 +84,8 @@ made to work here even by hand. Do not offer either in a brief.
 ### 2.3 Google Drive DataStore — **NOT USABLE BY THIS GENERATOR**
 
 It creates cleanly, and it still cannot serve a demo built by this skill. The four reasons
-below were established against the live API in `ryotat-argolis-demo` on 2026-08-27 (the probe
-data store was deleted afterwards), not inferred from the documentation:
+below were established against the live API on 2026-08-27 (the probe data store was
+deleted afterwards), not inferred from the documentation:
 
 ```jsonc
 // POST .../locations/global/collections/default_collection/dataStores?dataStoreId=...
