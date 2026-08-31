@@ -819,11 +819,11 @@ PID_BQ=$!
       --suffix "$SUFFIX" \
       $EXT_SPEC_ARG \
       --outdir "./external_files" >"$EXT_LOG" 2>&1 || true
-    # The folder is owned by whoever the gdrive CLI is signed in as - a CLI owns
-    # whatever it creates - and the deploy target is added as Writer. When the
-    # CLI is absent or unauthenticated the upload is skipped entirely, which is
-    # not an error, but announcing "uploaded to Google Drive" either way sent
-    # operators looking for a folder that was never created.
+    # The upload runs against Drive v3 with this machine's gcloud token, so the
+    # folder is owned by the account deploying the demo. It is skipped when that
+    # token has no Drive scope, which is not an error, but announcing "uploaded
+    # to Google Drive" either way sent operators looking for a folder that was
+    # never created.
     if grep -q '"folder_url": "http' external_files/drive_upload_summary.json 2>/dev/null; then
       echo "  ✅ External sample files generated and uploaded to Google Drive."
     else
@@ -1778,23 +1778,15 @@ if [ ! -z "$DRIVE_FOLDER_URL" ]; then
     echo "📄 Uploaded Files:"
     echo "$DRIVE_FILES_SUMMARY"
   fi
+  echo "⚠️ ACCESS INSTRUCTION:"
+  echo "   Make sure your browser is currently switched to Google Account [${DRIVE_OWNER_ACCOUNT}]"
+  echo "   when opening the Google Drive folder/file links above to avoid permission (403/404) errors."
   if [ ! -z "$DRIVE_SHARE_ERROR" ]; then
-    echo "❗ SHARING FAILED     : ${GCP_ACCOUNT} cannot open the folder yet."
-    echo "   Reason: ${DRIVE_SHARE_ERROR}"
-    echo "   ACTION REQUIRED - the agent cannot fix this for you. Signed in as"
-    echo "   [${DRIVE_OWNER_ACCOUNT}], either share the folder from the Drive UI or run:"
-    echo "     gdrive mutate share --email ${GCP_ACCOUNT} --role writer --notify=false <FOLDER_ID>"
-    echo "   Until then, use the Cloud Storage links below - they work for anyone with"
+    echo "ℹ️ LINK SHARING OFF   : 'anyone with the link' was refused (${DRIVE_SHARE_ERROR})."
+    echo "   [${DRIVE_OWNER_ACCOUNT}] owns the folder and can open it; that is usually a"
+    echo "   Workspace policy, so share it with your audience explicitly from the Drive UI,"
+    echo "   or use the Cloud Storage links below - they work for anyone with"
     echo "   storage.objects.get on the project."
-  elif [ "${DRIVE_OWNER_ACCOUNT}" != "${GCP_ACCOUNT}" ]; then
-    echo "⚠️ ACCESS INSTRUCTION:"
-    echo "   [${DRIVE_OWNER_ACCOUNT}] OWNS this folder and [${GCP_ACCOUNT}] has Writer access,"
-    echo "   so it appears under 'Shared with me' for the deploy account. Open the links"
-    echo "   as either of those two accounts; any other account gets 403/404."
-  else
-    echo "⚠️ ACCESS INSTRUCTION:"
-    echo "   Make sure your browser is currently switched to Google Account [${DRIVE_OWNER_ACCOUNT}]"
-    echo "   when opening the Google Drive folder/file links above to avoid permission (403/404) errors."
   fi
 elif [ ! -z "$DRIVE_SKIP_REASON" ]; then
   echo ""
@@ -1805,9 +1797,11 @@ elif [ ! -z "$DRIVE_SKIP_REASON" ]; then
   echo "   machine under ./external_files/. Only the Drive copy is missing, so a Drive or"
   echo "   Sheets step in the demo script will find nothing. The agent cannot create that"
   echo "   copy for you - it is a deploy-time step."
-  echo "   To get one, sign the gdrive CLI in as the account that should own the folder"
-  echo "   (check with: gdrive readonly quota --json) and re-run this script, or upload"
-  echo "   ./external_files/ to a Drive folder by hand and share it with your audience."
+  echo "   Almost always the fix is one command - a plain 'gcloud auth login' grants no"
+  echo "   Drive scope, so run:"
+  echo "     gcloud auth login --enable-gdrive-access --no-launch-browser"
+  echo "   and re-run this script. Otherwise upload ./external_files/ to a Drive folder"
+  echo "   by hand and share it with your audience."
 fi
 if [ ! -z "$GCS_CONSOLE_URL" ]; then
   echo ""

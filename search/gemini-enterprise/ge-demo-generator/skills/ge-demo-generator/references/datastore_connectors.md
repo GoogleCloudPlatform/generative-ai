@@ -62,7 +62,12 @@ Enterprise app therefore degrades to the mcp block rather than to nothing.
 
 ---
 
-## 2. Supported DataStore Connector Types
+## 2. DataStore Connector Types
+
+`scripts/setup_datastores.py` provisions **two**, and only two: GCS (§2.1) and BigQuery (§2.2).
+Discovery Engine has more connector types, and §2.3-§2.4 describe the two people ask for by
+name — but nothing in this skill creates them, and §2.3 explains why the Drive one cannot be
+made to work here even by hand. Do not offer either in a brief.
 
 ### 2.1 Google Cloud Storage (GCS) DataStore
 - **Source**: `gs://${GCS_BUCKET_NAME}/*`
@@ -76,14 +81,50 @@ Enterprise app therefore degrades to the mcp block rather than to nothing.
 - **Indexing Options**: Searchable text fields + filterable metadata fields (dates, categories, status).
 - **Use Case**: Natural language exploration across large transaction logs, CRM records, inventory catalogs without manual SQL authoring.
 
-### 2.3 Google Drive DataStore
-- **Source**: Google Workspace Drive Folders / Shared Drives
-- **Content Type**: Google Docs, Sheets, Slides, Drive PDFs.
-- **Use Case**: Cross-referencing enterprise Drive documents directly within Gemini Enterprise.
+### 2.3 Google Drive DataStore — **NOT USABLE BY THIS GENERATOR**
 
-### 2.4 Firestore DataStore
+It creates cleanly, and it still cannot serve a demo built by this skill. The four reasons
+below were established against the live API on 2026-08-27 (the probe data store was
+deleted afterwards), not inferred from the documentation:
+
+```jsonc
+// POST .../locations/global/collections/default_collection/dataStores?dataStoreId=...
+{"displayName": "...", "industryVertical": "GENERIC", "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
+ "contentConfig": "GOOGLE_WORKSPACE", "aclEnabled": true, "workspaceConfig": {"type": "GOOGLE_DRIVE"}}
+```
+
+1. **The agent can never read it.** Searching it with the Cloud Run runtime service account
+   returns `403 PERMISSION_DENIED: Search using service account credentials is not supported
+   for workspace datastores.` `search_datastore` runs as that service account, so the tool
+   would fail on every call. This one is decisive on its own — the data store is reachable
+   from the Gemini Enterprise UI, where the caller is the signed-in user, but not from the
+   agent this generator deploys.
+2. **It cannot be scoped to the demo's files.** There is no folder, shared-drive or query
+   parameter: `workspaceConfig.dasherCustomerId` is filled in by the server from the
+   project's own Workspace customer (`C0177...` in the probe) and the whole domain's Drive is
+   the corpus. The probe returned unrelated documents from four weeks earlier on its first
+   query, with no import call and no ingest wait. A demo would be searching the operator's
+   real Drive, which is a data-exposure problem before it is a relevance problem.
+3. **ACL is mandatory and pins the identity provider.** Omitting `aclEnabled` is rejected —
+   a data store with WORKSPACE content config is not allowed to set
+   `dataStore.aclEnabled` to false — and the created resource comes back with
+   `idpConfig.idpType: GSUITE`. Results are then
+   filtered by the querying user's Drive permissions — the demo audience sees a different
+   corpus than the presenter.
+4. **`global` only, in practice.** The same create in `asia-northeast1` fails with
+   `FAILED_PRECONDITION: IdP must be selected before creating a Data Store with
+   "dataStore.enableAcl" set to true`, i.e. it additionally needs a per-location IdP
+   configured in the project first.
+
+The supported way to put the demo's documents in front of the audience stays: stage them in
+GCS and index them with §2.1, and let the deploy-time Drive upload provide the human-facing
+Drive copy (`references/external_files_and_drive.md` §5).
+
+### 2.4 Firestore DataStore — not provisioned here
 - **Source**: Firestore Collection JSONL exports or real-time sync.
 - **Content Type**: Operational task records, incident logs, workflow state.
+- The demo reaches Firestore through the MCP toolset in both modes, never through an index —
+  task state changes while the demo runs and an index would serve stale rows.
 
 ---
 

@@ -313,7 +313,7 @@ before the first deploy.
 | `WORKER_QUEUE` | `${SERVICE_NAME}-worker` | setup | Cloud Tasks queue for background runs. |
 | `WORKER_QUEUE_LOCATION` | `us-central1` | setup | Pinned independently of `REGION` so a demo in a region without Cloud Tasks still gets durable background work. |
 | `MIN_INSTANCES` | `0` | setup | Set to `1` before a live presentation to avoid the ~20s cold start on the first message. |
-| `GCS_BUCKET_NAME` | `${PROJECT_ID}-${DOMAIN_SLUG}-${SUFFIX}-docs` | both | Created and populated with `external_files/` in `rag` mode; deleted recursively by cleanup. Defaulted rather than left unset so the unstructured half of the index exists without extra configuration when `rag` is chosen. |
+| `GCS_BUCKET_NAME` | `${PROJECT_ID}-${DOMAIN_SLUG}-${SUFFIX}-docs` | both | Created and populated with `external_files/` in **both** modes (Job 3.2b, outside the `RAG_MODE` branch) — in `mcp` mode nothing indexes those documents, but the bucket is still the only copy that outlives the machine running the skill, and the completion banner links to it. In `rag` mode it is additionally the unstructured half of the index. Deleted recursively by cleanup in both modes. |
 | `DATA_SCALE` | unset | setup | Row count to amplify the fact tables to before `bq load`, via `scripts/amplify_data.py` in Job 1.4. Unset loads the CSVs exactly as generated. `data/data_scale_spec.json`, when present, gives per-table targets and overrides this number. The step is deterministic and idempotent — the hero rows are stashed as `data/<table>.hero.csv` on the first run and every later run amplifies from the stash, never from already-amplified output — so it is safe whether or not the data phase already ran it. |
 
 #### Feature flags

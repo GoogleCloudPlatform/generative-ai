@@ -796,6 +796,7 @@ GSM
 gsod
 gspread
 gstatic
+GSUITE
 gsutil
 gtk
 guanciale
@@ -1649,6 +1650,7 @@ rbm
 rdoc
 RDONLY
 reallocations
+REAUTH
 recontext
 Recontext
 recrawl

@@ -1024,7 +1024,10 @@ Then ask for a demo in your own words — "build me a Gemini Enterprise demo for
    ER diagram, the Drive file lineage, the target project — and waits for your approval.
    Nothing is created before that gate.
 3. **Generates the sample data and the external documents** (PDF, Excel, scanned images) and
-   uploads them to Google Drive.
+   uploads them to the Google Drive of the account running the deploy, over the Drive v3 REST
+   API with the token `gcloud` already holds. Sign in with `gcloud auth login
+   --enable-gdrive-access` first — a plain login carries no Drive scope, and without it the
+   documents still reach Cloud Storage but there is no Drive copy.
 4. **Scaffolds the ADK multi-agent project** from `templates/`, filling in only the
    business-context placeholders.
 5. **Provisions in dependency order** — BigQuery and Firestore, the Agent Engine Sandbox, the

@@ -464,6 +464,39 @@ if [ -n "$DASH_BUCKET" ]; then
   PIDS+=($!)
 fi
 
+# 8c. Trash the Google Drive folder of external sample files (Parallel)
+# The deploy uploads the four generated documents into the deploying account's
+# own Drive and records the folder id in external_files/drive_upload_summary.json;
+# without this the folders pile up in that Drive, one per demo, long after the
+# project side is gone.
+#
+# Trashed, not deleted: this is a folder in a person's Drive, not a billed cloud
+# resource. `files.delete` is permanent and unrecoverable, while trash costs
+# nothing and is one click to undo if the folder turned out to hold something
+# the operator added by hand. Skipped silently when the deploy never made one,
+# or when these credentials have no Drive scope - a teardown is the wrong moment
+# to send someone through `gcloud auth login --enable-gdrive-access --no-launch-browser`.
+if [ -n "$TOKEN" ] && [ -f external_files/drive_upload_summary.json ]; then
+  (
+    DRIVE_FOLDER_ID=$(python3 -c \
+      'import json,sys; print(json.load(open("external_files/drive_upload_summary.json")).get("folder_id",""))' \
+      2>/dev/null || echo "")
+    if [ -n "$DRIVE_FOLDER_ID" ]; then
+      echo "📁 [Parallel] Trashing the Drive folder of sample files: ${DRIVE_FOLDER_ID}..."
+      DRIVE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+        -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" \
+        -d '{"trashed": true}' \
+        "https://www.googleapis.com/drive/v3/files/${DRIVE_FOLDER_ID}" 2>/dev/null || true)
+      if [ "$DRIVE_CODE" = "200" ]; then
+        echo "   ✅ Drive folder moved to Trash (recoverable there for 30 days)."
+      else
+        echo "   ⚠️  Drive folder not trashed (HTTP ${DRIVE_CODE}) - remove it by hand if it is still there."
+      fi
+    fi
+  ) &
+  PIDS+=($!)
+fi
+
 # 9. Delete Cloud Scheduler jobs & the Cloud Tasks worker queue (Parallel)
 # Scheduler jobs are created by the agent at runtime, one per scheduled task
 # ("<DEMO_ID>-sched-<task_id>"), so there is no fixed list to delete - they have
