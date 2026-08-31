@@ -508,7 +508,7 @@ limitations under the License.
                             }
                         }
                         displayVal = String(displayVal);
-                        fieldsHtml += `<div class="field"><span class="field-k">${key}</span><span class="field-v" title="${displayVal.replace(/"/g, '&quot;')}">${displayVal}</span></div>`;
+                        fieldsHtml += `<div class="field"><span class="field-k">${escDetailText(key)}</span><span class="field-v" title="${escDetailText(displayVal)}">${escDetailText(displayVal)}</span></div>`;
                         fieldCount++;
                     }
                     if (!card) {
@@ -524,20 +524,20 @@ limitations under the License.
                     card.className = `card s-${bClass}`;
                     card.setAttribute('data-id', doc.id);
                     card.innerHTML = `
-                        <div class="card-top" onclick="openRecordDetail('${doc.id}')">
-                            <div class="card-id"><i data-lucide="hash"></i>${doc.id}</div>
-                            <span class="badge ${bClass}">${statusStr}</span>
+                        <div class="card-top" onclick="openRecordDetail('${escIdArg(doc.id)}')">
+                            <div class="card-id"><i data-lucide="hash"></i>${escDetailText(doc.id)}</div>
+                            <span class="badge ${escDetailText(bClass)}">${escDetailText(statusStr)}</span>
                         </div>
-                        <div onclick="openRecordDetail('${doc.id}')">${fieldsHtml}</div>
-                        <div class="card-expand" onclick="openRecordDetail('${doc.id}')"><i data-lucide="chevrons-up-down"></i> View all ${fieldCount} fields</div>
+                        <div onclick="openRecordDetail('${escIdArg(doc.id)}')">${fieldsHtml}</div>
+                        <div class="card-expand" onclick="openRecordDetail('${escIdArg(doc.id)}')"><i data-lucide="chevrons-up-down"></i> View all ${fieldCount} fields</div>
                         <div class="card-actions">
-                            <select aria-label="Change status for ${doc.id}" onchange="event.stopPropagation(); updateStatus('${doc.id}', this.value)">
+                            <select aria-label="Change status for ${escDetailText(doc.id)}" onchange="event.stopPropagation(); updateStatus('${escIdArg(doc.id)}', this.value)">
                                 <option value="Pending" ${statusKey==='PENDING'?'selected':''}>Pending</option>
                                 <option value="Resolved" ${statusKey==='RESOLVED'?'selected':''}>Resolved</option>
                                 <option value="Flagged" ${statusKey==='FLAGGED'?'selected':''}>Flagged</option>
                                 ${customStatusOpt}
                             </select>
-                            <button class="btn-del" onclick="event.stopPropagation(); deleteRecord('${doc.id}')" aria-label="Delete record ${doc.id}"><i data-lucide="trash-2"></i></button>
+                            <button class="btn-del" onclick="event.stopPropagation(); deleteRecord('${escIdArg(doc.id)}')" aria-label="Delete record ${escDetailText(doc.id)}"><i data-lucide="trash-2"></i></button>
                         </div>
                     `;
                 });
@@ -569,23 +569,23 @@ limitations under the License.
 
                     let colMeta = '<div class="card-col-meta">';
                     colMeta += '  <div class="card-top" style="margin-bottom:6px;justify-content:flex-start;gap:8px;align-items:center;">';
-                    colMeta += '    <div class="card-id" style="font-size:13px;font-weight:700;color:var(--text-1);"><i data-lucide="hash" style="width:12px;height:12px;"></i>' + docId + '</div>';
-                    colMeta += '    <span class="badge ' + bClass + '" style="font-size:9px;padding:2px 6px;">' + statusStr + '</span>';
+                    colMeta += '    <div class="card-id" style="font-size:13px;font-weight:700;color:var(--text-1);"><i data-lucide="hash" style="width:12px;height:12px;"></i>' + escDetailText(docId) + '</div>';
+                    colMeta += '    <span class="badge ' + escDetailText(bClass) + '" style="font-size:9px;padding:2px 6px;">' + escDetailText(statusStr) + '</span>';
                     colMeta += '  </div>';
                     colMeta += '  <div style="font-size:11px;color:var(--text-3);display:flex;flex-direction:column;gap:2px;">';
-                    colMeta += '    <span>👤 ' + assignedTo + '</span>';
-                    if (curDept) colMeta += '    <span style="display:inline-block;font-weight:700;color:var(--primary);background:var(--primary-light);border:1px solid #C7D2FE;border-radius:6px;padding:1px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;" title="Process stage: current department' + (nextDept ? ' and next department' : '') + '">🏬 ' + curDept + (nextDept ? ' ➜ ' + nextDept : '') + '</span>';
-                    if (customerName) colMeta += '    <span style="font-weight:600;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="' + customerName.replace(/"/g, '&quot;') + '">🏢 ' + customerName + '</span>';
+                    colMeta += '    <span>👤 ' + escDetailText(assignedTo) + '</span>';
+                    if (curDept) colMeta += '    <span style="display:inline-block;font-weight:700;color:var(--primary);background:var(--primary-light);border:1px solid #C7D2FE;border-radius:6px;padding:1px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;" title="Process stage: current department' + (nextDept ? ' and next department' : '') + '">🏬 ' + escDetailText(curDept) + (nextDept ? ' ➜ ' + escDetailText(nextDept) : '') + '</span>';
+                    if (customerName) colMeta += '    <span style="font-weight:600;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="' + escDetailText(customerName) + '">🏢 ' + escDetailText(customerName) + '</span>';
                     colMeta += '  </div>';
                     colMeta += '</div>';
 
                     let colMain = '<div class="card-col-main">';
                     if (productName) {
                         let qtyText = qty ? ' (' + qty + ' units)' : '';
-                        colMain += '  <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:4px;">📦 ' + productName + qtyText + '</div>';
+                        colMain += '  <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:4px;">📦 ' + escDetailText(productName) + escDetailText(qtyText) + '</div>';
                     }
                     if (notes) {
-                        colMain += '  <div style="font-size:12.5px;color:var(--text-2);line-height:1.5;background:var(--bg-2);padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary-light);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;" title="' + notes.replace(/"/g, '&quot;') + '">📝 ' + notes + '</div>';
+                        colMain += '  <div style="font-size:12.5px;color:var(--text-2);line-height:1.5;background:var(--bg-2);padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary-light);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;" title="' + escDetailText(notes) + '">📝 ' + escDetailText(notes) + '</div>';
                     } else {
                         var previewSkip = { status: 1, assigned_to: 1, assignedto: 1, customer_name: 1, customername: 1, product_name: 1, productname: 1, requested_qty: 1, requestedqty: 1, qty: 1, quantity: 1, notes: 1, message: 1, workflow_state: 1, updated_at: 1, current_department: 1, currentdepartment: 1, next_department: 1, nextdepartment: 1, history: 1 };
                         var previewParts = [];
@@ -607,7 +607,7 @@ limitations under the License.
 
                     let colActions = '<div class="card-col-actions">';
                     if (wfStateStr) {
-                        colActions += '  <div style="font-size:10px;font-weight:600;color:var(--text-3);background:var(--bg-2);padding:3px 8px;border-radius:20px;border:1px solid var(--border);display:inline-flex;align-items:center;gap:4px;"><i data-lucide="git-pull-request" style="width:10px;height:10px;color:var(--primary);"></i> ' + wfStateStr + '</div>';
+                        colActions += '  <div style="font-size:10px;font-weight:600;color:var(--text-3);background:var(--bg-2);padding:3px 8px;border-radius:20px;border:1px solid var(--border);display:inline-flex;align-items:center;gap:4px;"><i data-lucide="git-pull-request" style="width:10px;height:10px;color:var(--primary);"></i> ' + escDetailText(wfStateStr) + '</div>';
                     }
                     colActions += '  <div style="display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-end;">';
                     
@@ -699,24 +699,24 @@ limitations under the License.
             const typeIcon = t.task_type === 'scheduled' ? 'calendar-clock' : 'zap';
             const typeLabel = t.task_type === 'scheduled' ? 'SCHEDULED' : 'IMMEDIATE';
             let meta = '';
-            if (t.schedule_cron) meta += `<span><i data-lucide="clock"></i>${t.schedule_cron}</span>`;
+            if (t.schedule_cron) meta += `<span><i data-lucide="clock"></i>${escDetailText(t.schedule_cron)}</span>`;
             if (t.started_at) meta += `<span><i data-lucide="play"></i>${new Date(t.started_at).toLocaleString()}</span>`;
             if (t.completed_at) meta += `<span><i data-lucide="check-circle"></i>${new Date(t.completed_at).toLocaleString()}</span>`;
             let progress = '';
-            if (t.status === 'working') progress = `<div class="tprogress"><div class="tprogress-bar" style="width:${t.progress_pct}%"></div></div>`;
+            if (t.status === 'working') progress = `<div class="tprogress"><div class="tprogress-bar" style="width:${Number(t.progress_pct) || 0}%"></div></div>`;
             let result = '';
-            if (t.result_summary) result = `<div class="tcard-result" onclick="openTaskDetail('${t.task_id}')">${t.result_summary.substring(0, 200)}</div>`;
+            if (t.result_summary) result = `<div class="tcard-result" onclick="openTaskDetail('${escIdArg(t.task_id)}')">${escDetailText(t.result_summary.substring(0, 200))}</div>`;
             let actions = '';
             if (t.status === 'working' || t.status === 'submitted') {
-                actions += `<button class="tbtn" onclick="cancelTask('${t.task_id}')"><i data-lucide="x-circle"></i> Cancel</button>`;
+                actions += `<button class="tbtn" onclick="cancelTask('${escIdArg(t.task_id)}')"><i data-lucide="x-circle"></i> Cancel</button>`;
             }
-            actions += `<button class="tbtn" onclick="openTaskDetail('${t.task_id}')"><i data-lucide="eye"></i> Detail</button>`;
-            actions += `<button class="tbtn danger" onclick="deleteTask('${t.task_id}')"><i data-lucide="trash-2"></i></button>`;
+            actions += `<button class="tbtn" onclick="openTaskDetail('${escIdArg(t.task_id)}')"><i data-lucide="eye"></i> Detail</button>`;
+            actions += `<button class="tbtn danger" onclick="deleteTask('${escIdArg(t.task_id)}')"><i data-lucide="trash-2"></i></button>`;
             return `<div class="tcard-hdr">
-                <div class="tcard-name"><i data-lucide="${typeIcon}"></i>${t.task_name || t.task_id}</div>
-                <span class="tbadge ${t.status}">${t.status}</span>
+                <div class="tcard-name"><i data-lucide="${typeIcon}"></i>${escDetailText(t.task_name || t.task_id)}</div>
+                <span class="tbadge ${escDetailText(t.status)}">${escDetailText(t.status)}</span>
             </div>
-            <div class="tcard-desc">${t.task_description || ''}</div>
+            <div class="tcard-desc">${escDetailText(t.task_description || '')}</div>
             ${progress}
             <div class="tcard-meta">${meta}<span class="tcard-type">${typeLabel}</span></div>
             ${result}
@@ -897,9 +897,9 @@ limitations under the License.
             try {
                 const res = await fetch('/api/tasks/' + id);
                 const t = await res.json();
-                document.getElementById('modal-title').innerHTML = '<i data-lucide="file-text"></i> ' + (t.task_name || t.task_id);
-                let metaHtml = `<span class="tbadge ${t.status}">${t.status}</span>`;
-                if (t.schedule_cron) metaHtml += `<span><i data-lucide="clock"></i> ${t.schedule_cron}</span>`;
+                document.getElementById('modal-title').innerHTML = '<i data-lucide="file-text"></i> ' + escDetailText(t.task_name || t.task_id);
+                let metaHtml = `<span class="tbadge ${escDetailText(t.status)}">${escDetailText(t.status)}</span>`;
+                if (t.schedule_cron) metaHtml += `<span><i data-lucide="clock"></i> ${escDetailText(t.schedule_cron)}</span>`;
                 if (t.started_at) metaHtml += `<span>Started: ${new Date(t.started_at).toLocaleString()}</span>`;
                 if (t.completed_at) metaHtml += `<span>Completed: ${new Date(t.completed_at).toLocaleString()}</span>`;
                 document.getElementById('modal-meta').innerHTML = metaHtml;
@@ -915,6 +915,15 @@ limitations under the License.
 
         function escDetailText(s) {
             return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function escIdArg(s) {
+            // The value lands inside a single-quoted JS string in an inline
+            // handler. HTML entity escaping does not help there: the parser
+            // decodes entities before the JS is parsed, so a &#39; would still
+            // close the string. Record and task ids are opaque identifiers, so
+            // keeping only identifier characters is safe and lossless for
+            // anything the generator emits.
+            return String(s).replace(/[^A-Za-z0-9_.:@ +-]/g, '');
         }
         function prettyFieldKey(k) {
             return String(k).replace(/_/g, ' ').replace(/([a-z0-9])([A-Z])/g, '$1 $2').split(' ').map(function(w) { return w ? w.charAt(0).toUpperCase() + w.slice(1) : w; }).join(' ');
@@ -968,14 +977,14 @@ limitations under the License.
             const modal = document.getElementById('record-modal');
             modal.classList.add('open');
             document.getElementById('rec-modal-body').innerHTML = '<div style="color:var(--text-3)">Loading...</div>';
-            document.getElementById('rec-modal-title').innerHTML = '<i data-lucide="database"></i> ' + docId;
+            document.getElementById('rec-modal-title').innerHTML = '<i data-lucide="database"></i> ' + escDetailText(docId);
             document.getElementById('rec-modal-meta').innerHTML = '';
             try {
                 const card = document.querySelector('[data-id="' + docId + '"]');
                 if (!card) return;
                 const badge = card.querySelector('.badge');
                 if (badge) {
-                    document.getElementById('rec-modal-meta').innerHTML = '<span class="' + badge.className + '">' + badge.textContent + '</span>';
+                    document.getElementById('rec-modal-meta').innerHTML = '<span class="' + escDetailText(badge.className) + '">' + escDetailText(badge.textContent) + '</span>';
                 }
                 fetch('/api/data').then(r => r.json()).then(data => {
                     const doc = data.find(d => d.id === docId);
@@ -1023,7 +1032,7 @@ limitations under the License.
                     document.getElementById('rec-modal-body').innerHTML = html || '<div style="color:var(--text-3)">No fields.</div>';
                     lucide.createIcons();
                 });
-            } catch (e) { document.getElementById('rec-modal-body').innerHTML = '<div style="color:var(--danger)">Error: ' + e.message + '</div>'; }
+            } catch (e) { document.getElementById('rec-modal-body').innerHTML = '<div style="color:var(--danger)">Error: ' + escDetailText(e && e.message) + '</div>'; }
         }
 
         function closeModal() { document.getElementById('task-modal').classList.remove('open'); document.getElementById('record-modal').classList.remove('open'); }
