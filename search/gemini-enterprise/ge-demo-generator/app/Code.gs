@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.93-public',
+  APP_VERSION: 'v11.95-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2704,13 +2704,6 @@ function generateSetupScript(params) {
   const constraintsTxt = constraintLines.map(line => line.text).join('\n');
 
 
-  const escapedInstruction = systemInstruction
-    .replace(/\\/g, '\\\\\\\\')
-    .replace(/'/g, "'\\''")
-    .replace(/\{/g, '{{')
-    .replace(/\}/g, '}}')
-    .replace(/\n/g, '\\n');
-
   // == Managed Autonomous Agent (Antigravity) generation-time assets ==
   // Craft skills come from this repo's demo-skills/ dir (main branch, fetched
   // at generation time; fail-soft) and are emitted as quoted heredocs. The
@@ -3000,8 +2993,14 @@ Requirements:
     firestoreCommands += `fi\n\n`;
   }
 
-  // Robustly escape instruction for an unquoted bash heredoc
-  const rawInstruction = systemInstruction.replace(/[\\$`]/g, match => '\\' + match);
+  // The instruction is emitted into a QUOTED heredoc (__GE_INSTRUCTION_EOF__),
+  // which suppresses parameter expansion, command substitution and backslash
+  // processing alike, so it must NOT be escaped. Escaping it is not undone by
+  // the shell: the added backslashes land in generated_instruction.md, which
+  // agent.py reads verbatim, so the model is told "\$5,000" and "C:\\path"
+  // instead of what the plan actually said. The comment this replaces named an
+  // unquoted heredoc; the heredoc has been quoted for as long as it existed.
+  const rawInstruction = systemInstruction;
 
   // Per-demo MCP server config consumed by the static agent_template runtime
   // (tools.get_custom_mcp_toolsets / get_slack_mcp_toolset and the numbered

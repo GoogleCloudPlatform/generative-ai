@@ -83,6 +83,11 @@ Dockerfile assembly, deployment). Inside those JS template literals:
   newline disappears from the output). Use it only intentionally.
 - Quoted heredocs (`cat <<'X'`) pass content through verbatim; unquoted
   heredocs (`cat <<X`) expand `$VAR` at run time.
+- Because a quoted heredoc is verbatim, content bound for one must **not** be
+  pre-escaped. The shell does not strip the backslashes back off; they land in
+  the written file. The system instruction was escaped this way for a quoted
+  heredoc until v11.95-public, so every `$`, backtick and backslash reached the
+  model with a stray backslash in front of it. Escape for the heredoc you have.
 
 ### 2.3 ADK instruction template engine hazard (applies to agent.py)
 
