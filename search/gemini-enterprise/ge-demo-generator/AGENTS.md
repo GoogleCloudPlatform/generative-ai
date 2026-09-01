@@ -590,16 +590,22 @@ same cap.
 
 A cap in `requirements.txt` only binds the install *we* issue. When a demo
 imports a custom MCP server, the Dockerfile clones that repo and runs its own
-`uv pip install` into the same site-packages — with bounds we did not write. So
-the script also emits a `constraints.txt` (upper bounds only, derived from the
-same `PINNED_DEPS`) and passes `-c /app/constraints.txt` to both branches of
-that install. Upper bounds only is deliberate: a floor in a constraints file
-can force an *upgrade* inside a resolution we are not steering, including into
-a pre-release; a cap can only ever prevent one. Constraint files may not carry
-extras or direct references, so `[a2a]` / `[agent_engines]` are stripped and
-the a2ui git pin is excluded. Duplicate names are a hard error for pip, which
-is why dropping the floors usefully collapses the two `google-genai` entries
-into one line.
+`uv pip install` — with bounds we did not write. v11.40 answered that by
+emitting a `constraints.txt` (upper bounds only, derived from the same
+`PINNED_DEPS`) and passing `-c /app/constraints.txt` to both branches of that
+install, so the caps applied image-wide.
+
+It worked, and it was the wrong shape: it made the **agent's** requirement
+decide what a **sidecar** may depend on. A server that legitimately needs
+`mcp>=2` became uninstallable because `google-adk` pins `mcp<2`, and that cap
+cannot move — adk imports `mcp.shared.session`, which 2.x deleted.
+
+v12.3 removes the file and the sharing that created it. Each cloned server now
+installs into its own virtualenv rather than the site-packages the agent
+imports from, so a third-party install cannot reach the agent's environment at
+all — a boundary rather than a bound, and the sidecar may hold mcp 2.x while
+the agent holds 1.24. Section 8.5 has the mechanics. Reinstating a shared
+install would need `constraints.txt` back with it.
 
 ### 8.2 The build fails on a broken import, not the container
 
@@ -649,9 +655,9 @@ by running the imports. Until this script existed, the first execution of any
 new resolution was a customer-facing demo build.
 
 `canary.py` reconstructs the build context out of the repo — the requirements
-for a variant, `constraints.txt`, the `__DEP_SMOKE_EOF__` heredoc verbatim, and
-a module holding every import statement in `agent_template/adk_agent/` — into a
-directory that can be run in a venv or built with Docker:
+for a variant, the `__DEP_SMOKE_EOF__` heredoc verbatim, and a module holding
+every import statement in `agent_template/adk_agent/` — into a directory that
+can be run in a venv or built with Docker:
 
 ```bash
 python3 canary.py --out /tmp/canary --run-venv     # fast path, no Docker
@@ -695,21 +701,69 @@ clones the repo and installs it. Each branch of that install used to end in
    `pyproject.toml` or `setup.py`.
 
 Adding `-c /app/constraints.txt` (section 8.1) made (2) *more* likely, not
-less: a cloned server demanding `mcp>=2` now fails resolution, and that
-failure — the one the constraints file exists to produce — was the one being
+less: a cloned server demanding `mcp>=2` then failed resolution, and that
+failure — the one the constraints file existed to produce — was the one being
 swallowed. A guard whose alarm is wired to `/dev/null` is worse than no guard.
+(That constraints file is gone as of v12.3; the swallowing is what this section
+is about, and it would be just as invisible without it.)
 
-The install is now built from three pieces, chosen by position:
+The install is built from these pieces, chosen by position:
 
 | Piece | Where | On failure |
 |-------|-------|------------|
-| `pipStrict` | primary, Python repos | fails → hands over to the Node fallback; no Python manifest at all also counts as failure, so the fallback is reachable |
+| `mkVenv` | first, every repo | fails → fails the build. `uv venv --system-site-packages`, section 8.1 |
+| `pipStrict` | primary, Python repos | fails → hands over to the next position; no Python manifest at all also counts as failure, so the fallback is reachable |
+| `pipFloor` | middle, Python repos | fails → hands over to the Node fallback |
 | `npmCmd` | primary on Node repos, last resort on Python repos | fails → fails the build |
 | `pipBonus` | trailing extra on Node repos, for hybrid servers | prints `WARNING:`, build continues |
 
 `npm run build` is skipped when `npm pkg get scripts.build` returns `{}`, and
 fatal when the repo declares one and it fails — a half-built TypeScript server
 is precisely the image that starts and then cannot answer a tool call.
+
+#### The per-sidecar virtualenv (v12.3)
+
+`mkVenv` creates `/app/custom_mcp_<n>/.venv` and every piece after it installs
+through that interpreter, so a cloned repo's resolution cannot reach the
+agent's `site-packages`. Two details make the boundary safe to cross in the one
+direction that matters. The venv is created `--system-site-packages`, because
+cloned repos are often sloppy about declaring what they import (`mcp`
+especially) and those servers work today only because the agent's copy is
+visible; the venv's own `site-packages` still comes first, so anything the
+server *does* declare shadows ours for that sidecar. And `start_mcp.sh` puts
+`.venv/bin` first on each sidecar's `PATH` inside a subshell — `PATH`, not an
+absolute interpreter, because `entrypoint` is an arbitrary shell command
+(`python -m x`, a console script, `uv run ...`); a subshell so sidecar *n+1*
+does not inherit *n*'s. `VIRTUAL_ENV` is set alongside it so a `uv run`
+entrypoint reuses the environment the build populated.
+
+`pipFloor` is for a server that declares a Python floor above the image's
+interpreter — `yahoo-finance-mcp` says `>=3.14.6` while the image is
+`python:3.11.x`. uv refuses the resolution outright and the build stops, even
+when the server is pure Python. That one sidecar's virtualenv is rebuilt on a
+uv-managed CPython of the declared minor and installed normally; the agent
+keeps the image's interpreter. The floor is read out of `pyproject.toml`
+(PEP 621 `requires-python`, or poetry's `python` entry) and acted on **only
+when it is above this interpreter**, compared on the full version rather than
+the minor, so a satisfiable floor does not rebuild the venv for nothing while a
+same-minor patch floor (3.11.13 on a 3.11.12 image) still does.
+
+Two things this position gets wrong if you write it from first principles, both
+found by building it:
+
+- **`uv venv` refuses to overwrite.** "A virtual environment already exists" —
+  and `mkVenv` has always just made one. Without `--clear` the retry cannot run
+  at all, and the build ends on the Node fallback's error instead of the real
+  one.
+- **uv cannot always supply the declared floor.** It ships a fixed list of
+  managed interpreters; uv 0.11.17's newest 3.14 is 3.14.5, and
+  `yahoo-finance-mcp` wants 3.14.6. So after the venv is on the right *minor*, a
+  failed install retries once with `--python-version "$FLOOR"`. That is a
+  patch-level override and safe because wheel tags do not change within a minor
+  (everything is `cp314`), so no `--no-deps` and no second pass are needed.
+  Measured end to end — the sidecar comes up on CPython 3.14.5 with **mcp
+  2.1.1** and answers `tools/list` through supergateway, while the same image's
+  agent holds mcp 1.29.1 and google-adk 2.8.0.
 
 This is deliberately breaking: builds that used to go green now stop. Every one
 of them was producing an image with its MCP dependencies missing. If you touch

@@ -11,7 +11,6 @@ customer-facing demo build.
 It writes a directory that mirrors what the setup script emits:
 
     requirements.txt          from PINNED_DEPS in app/Code.gs, per variant
-    constraints.txt           caps only, mirroring the Code.gs generator
     dep_smoke_test.py         the __DEP_SMOKE_EOF__ heredoc, verbatim
     adk_agent/app/imports.py  every import statement in the agent template,
                               try/except context preserved
@@ -46,15 +45,6 @@ from check_deps import (
 HERE = Path(__file__).parent
 CODE_GS = HERE / "app" / "Code.gs"
 AGENT_SRC = HERE / "agent_template" / "adk_agent"
-
-# Mirrors CONSTRAINT_KEYS in app/Code.gs. Kept in the same order so the emitted
-# constraints.txt is byte-comparable with the generated one.
-CONSTRAINT_KEYS = [
-    "adk", "mcp", "genai", "a2a", "aiplatform", "storage", "scheduler",
-    "tasks", "pubsub", "firestore", "logging", "dotenv", "dbDtypes", "otel",
-    "playwright", "genaiComputerUse", "cuOtelGcpLogging",
-    "cuOtelGcpResourceDetector",
-]
 
 # The A2UI v0.9 wiring the generated agent depends on. A plain module import
 # cannot see a dropped symbol, and these four are exactly what agent.py and
@@ -145,26 +135,6 @@ def requirements_for(values, variant):
     return [table[k] for k in order]
 
 
-def constraints_for(table):
-    """Caps only, deduplicated by name -- mirrors the Code.gs generator."""
-    lines, seen = [], set()
-    for key in CONSTRAINT_KEYS:
-        spec = table.get(key)
-        if not spec or " @ " in spec:
-            continue
-        match = re.match(r"^([A-Za-z0-9._-]+)(?:\[[^\]]*\])?(.*)$", spec)
-        if not match:
-            continue
-        name, rest = match.group(1), match.group(2) or ""
-        bounds = [p.strip() for p in rest.split(",")
-                  if p.strip().startswith("<") or p.strip().startswith("==")]
-        if not bounds or name in seen:
-            continue
-        seen.add(name)
-        lines.append(name + ",".join(bounds))
-    return lines
-
-
 def write_context(out, variant):
     text = CODE_GS.read_text(encoding="utf-8")
     lines = text.split("\n")
@@ -177,8 +147,6 @@ def write_context(out, variant):
 
     (out / "requirements.txt").write_text(
         "\n".join(requirements_for(pairs, variant)) + "\n", encoding="utf-8")
-    (out / "constraints.txt").write_text(
-        "\n".join(constraints_for(table)) + "\n", encoding="utf-8")
     (out / "dep_smoke_test.py").write_text(
         "\n".join(heredoc("__DEP_SMOKE_EOF__", lines)) + "\n", encoding="utf-8")
 
@@ -194,14 +162,8 @@ def write_context(out, variant):
         "COPY --from=" + table["uvImage"] + " /uv /uvx /bin/\n"
         "RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*\n"
         "WORKDIR /app\n"
-        "COPY requirements.txt constraints.txt ./\n"
+        "COPY requirements.txt ./\n"
         "RUN uv pip install --system -r requirements.txt\n"
-        # constraints.txt guards the cloned-MCP installs and nothing else
-        # exercises it. A duplicate package name or a stray extra makes the
-        # file a hard error, which would surface only on a customer's build
-        # of a demo that happens to clone an MCP server.
-        "RUN uv pip install --system --dry-run -c constraints.txt "
-        '"mcp>=1.24.0" > /dev/null && echo "constraints.txt OK"\n'
         "COPY . .\n"
         'RUN uv pip freeze | grep -iE "^(google-adk|a2ui|mcp|google-genai|a2a-sdk)"'
         " | tee /app/.dep-versions\n"
