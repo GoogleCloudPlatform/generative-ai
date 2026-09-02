@@ -1,6 +1,6 @@
 # Generative AI on Google Cloud
 
-> The latest Gemini models are available! Try out [Gemini 3.87 Flash](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_3_8_flash.ipynb).
+> The latest Gemini models are available! Try out [Gemini 3.8 Flash](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_3_8_flash.ipynb).
 >
 > **[Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform)**, the latest evolution of Vertex AI, has been released!
 >
