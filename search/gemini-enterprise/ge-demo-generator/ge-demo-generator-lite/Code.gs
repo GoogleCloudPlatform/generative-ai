@@ -35,7 +35,7 @@ const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 const CONFIG = {
   PROJECT_ID: SCRIPT_PROPS.getProperty('PROJECT_ID'),
   LOCATION: SCRIPT_PROPS.getProperty('LOCATION') || 'global',
-  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.7-flash',
+  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.8-flash',
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
   APP_VERSION: 'v1.9-public',
@@ -68,7 +68,7 @@ function doGet(e) {
   template.appVersion = CONFIG.APP_VERSION;
   template.projectId = CONFIG.PROJECT_ID;
   template.userEmail = Session.getActiveUser().getEmail();
-  template.generatorModel = CONFIG.MODEL || 'gemini-3.7-flash';
+  template.generatorModel = CONFIG.MODEL || 'gemini-3.8-flash';
 
   let webAppUrl = '';
   try {
@@ -115,7 +115,7 @@ function initializeProject(projectId) {
   const newProps = {
     PROJECT_ID: projectId,
     LOCATION: currentProps.LOCATION || 'global',
-    MODEL: currentProps.MODEL || 'gemini-3.7-flash'
+    MODEL: currentProps.MODEL || 'gemini-3.8-flash'
   };
 
   scriptProps.setProperties(newProps);

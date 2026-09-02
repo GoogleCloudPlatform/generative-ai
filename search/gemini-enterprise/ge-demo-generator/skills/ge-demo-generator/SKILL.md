@@ -3,12 +3,12 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.14.4
+  version: 2.14.5
 ---
 
-# GE Demo Generator Skill (v2.14.4)
+# GE Demo Generator Skill (v2.14.5)
 
-Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.7 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
+Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.8 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
 
 ---
 
@@ -243,7 +243,7 @@ afterwards).
 
 - **Agent Name (`DEMO_DISPLAY_NAME`)**: Concise 2–4 word domain role (e.g. `TWG Tea Retail Operations Director`, `Mercari Trust & Safety Specialist`). Registered in Gemini Enterprise as `${DEMO_DISPLAY_NAME} (${SERVICE_NAME})`, matching the Web UI (GAS) version.
 - **Description (`DEMO_DESCRIPTION`)**: Concrete, professional 1–2 sentence mission summary specifying the business domain, core datasets, and operational goals (e.g. `Orchestrates boutique inventory balancing, central commissary replenishment, and plantation harvest orders across Singapore.`). Matches `oneSentenceSummary` in the Web UI (GAS).
-- **Reasoning / orchestration**: **`gemini-3.7-flash`** for all agent instances (Root Coordinator, Deep Analysis Sub-Agent, Background Worker).
+- **Reasoning / orchestration**: **`gemini-3.8-flash`** for all agent instances (Root Coordinator, Deep Analysis Sub-Agent, Background Worker).
 - **Image generation**: **`gemini-3.1-flash-image`** (with localized prompt reinforcement and GCS artifact persistence).
 - **Code execution**: Agent Engine Sandbox (`us-central1` — fixed, not `$REGION`).
 - **UI**: Gemini Enterprise A2UI v0.9 composite catalog (name the components this demo will actually lean on — `MaterialTable`, `VegaChart`, `MaterialCard`).
@@ -472,7 +472,7 @@ ge-demo-<domain>-<suffix>/
 │   ├── __init__.py            # empty; makes adk_agent importable as a package
 │   └── app/
 │       ├── __init__.py
-│       ├── agent.py           # Triple-Agent (gemini-3.7-flash) + Code Executor + A2UI System Prompts
+│       ├── agent.py           # Triple-Agent (gemini-3.8-flash) + Code Executor + A2UI System Prompts
 │       ├── tools.py           # MCP Toolsets + gemini-3.1-flash-image generate_image tool
 │       ├── part_converters.py # A2A <-> Gen AI DataPart Converters
 │       ├── fast_api_app.py    # A2A Server + A2UI StreamParser + Token Middleware + /execute_task
