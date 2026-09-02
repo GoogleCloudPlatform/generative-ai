@@ -24,7 +24,7 @@
 
 
 # =============================================================================
-# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.14.4)
+# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.14.5)
 # Automatically audits 8 infrastructure layers and heals discrepancies in real time:
 #   1. BigQuery Dataset & Tables (Row counts, _id column for DataStores, schema metadata)
 #   2. Firestore Collection & Seeding (Task queue documents >= 3)

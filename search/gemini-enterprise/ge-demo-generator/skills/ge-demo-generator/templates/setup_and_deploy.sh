@@ -1011,8 +1011,8 @@ CR_ENV_VARS="${CR_ENV_VARS},ENABLE_MANAGED_AGENT=${ENABLE_MANAGED_AGENT}"
 # Picks agent.py's data-exploration routing block, and gates whether
 # search_datastore is registered at all.
 CR_ENV_VARS="${CR_ENV_VARS},DATA_EXPLORATION_MODE=${DATA_EXPLORATION_MODE}"
-CR_ENV_VARS="${CR_ENV_VARS},AGENT_MODEL=${AGENT_MODEL:-gemini-3.7-flash}"
-CR_ENV_VARS="${CR_ENV_VARS},AGENT_MODEL_LITE=${AGENT_MODEL_LITE:-gemini-3.7-flash}"
+CR_ENV_VARS="${CR_ENV_VARS},AGENT_MODEL=${AGENT_MODEL:-gemini-3.8-flash}"
+CR_ENV_VARS="${CR_ENV_VARS},AGENT_MODEL_LITE=${AGENT_MODEL_LITE:-gemini-3.8-flash}"
 if [ "$ENABLE_MANAGED_AGENT" = "1" ]; then
   # MANAGED_AGENT_ID is the whole switch on the tool side: the delegation tools
   # check it before the flag and report "unavailable" when it is blank, so an
@@ -1773,7 +1773,7 @@ if [ ! -z "$AGENT_ID" ]; then
   echo "🆔 Agent ID:          ${AGENT_ID}"
 fi
 echo "📝 Description:       ${ACTUAL_DESCRIPTION:-${DEMO_DESCRIPTION:-Operational AI Agent}}"
-echo "🧠 Reasoning Model:   gemini-3.7-flash"
+echo "🧠 Reasoning Model:   gemini-3.8-flash"
 echo "🎨 Image Gen Model:   gemini-3.1-flash-image"
 echo ""
 echo "🗄️ Data Resources"

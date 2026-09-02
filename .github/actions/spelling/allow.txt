@@ -79,6 +79,7 @@ apikeys
 apixaban
 apk
 approv
+appsscript
 appuser
 appyaml
 apredict
@@ -148,6 +149,7 @@ Ayyappa
 backstory
 backticks
 bagchi
+Bahasa
 Bakkali
 bargap
 barista
@@ -251,6 +253,7 @@ Camry
 cands
 Canlaws
 Caprese
+CAPTCH
 carbonara
 Carcante
 cardio
@@ -279,6 +282,7 @@ cer
 cfbundle
 cfo
 chatbots
+chatmcp
 CHECKOV
 CHENNAI
 chipset
@@ -333,6 +337,7 @@ colorway
 colurna
 colvis
 colwidth
+contextvar
 Cómo
 Condesa
 Connectez
@@ -420,6 +425,7 @@ deepeval
 DeepEval
 deepseek
 defn
+DELET
 deliv
 Demis
 Demme
@@ -429,6 +435,8 @@ demouser
 denorm
 dente
 Depatmint
+derailed
+derails
 Derpanis
 DERs
 descgen
@@ -438,6 +446,7 @@ Dexin
 dflags
 dflt
 dfs
+Dgektczl
 DHH
 diffable
 diffed
@@ -481,6 +490,7 @@ draig
 Dreesen
 drilldown
 drinkware
+drivemcp
 droid
 dropbtn
 dropdown
@@ -596,6 +606,8 @@ expr
 extfiles
 faa
 facecolor
+Failsafe
+failsafe
 Fairall
 faiss
 FAISS
@@ -646,6 +658,7 @@ FLX
 fmeasure
 fmeta
 FMWK
+Foauth
 Folmer
 fontane
 fontdict
@@ -685,6 +698,7 @@ Fushimi
 futur
 fval
 fx
+FYWWN
 Gabeira
 Gacrux
 gaeta
@@ -757,6 +771,7 @@ gke
 GKE
 Gleyber
 glowin
+gmailmcp
 gmaps
 Gmb
 GmbH
@@ -1043,6 +1058,7 @@ keypair
 Keypair
 KFBI
 kfp
+Kfuy
 Khanh
 khz
 kickstart
@@ -1054,6 +1070,7 @@ KMEANS
 knative
 KNN
 kok
+kokkai
 Kongre
 konnte
 kotlin
@@ -1180,6 +1197,7 @@ Manh
 manquez
 Manyata
 mapbox
+mapstools
 marp
 Masaru
 maskmode
@@ -1325,6 +1343,7 @@ ndd
 NDEBUG
 ndocs
 nec
+Nederlands
 neering
 neighbouring
 neil
@@ -1503,6 +1522,7 @@ pfas
 pgadmin
 PGHOST
 pgid
+Pgnpk
 PGPORT
 PGUSER
 pgvector
@@ -1556,6 +1576,7 @@ Popken
 popleft
 Porat
 PORTFILE
+Portugu
 postictal
 powerups
 PPO
@@ -1613,6 +1634,7 @@ Qantas
 qas
 QEDC
 qjson
+QKYV
 QLo
 qlog
 qlogger
@@ -1621,6 +1643,7 @@ QPM
 qqq
 qrel
 qrels
+Qsxq
 quadrotor
 qubit
 qubits
@@ -1781,6 +1804,7 @@ seatback
 Segfault
 SEK
 Selam
+SELEC
 selectbox
 selfie
 selftext
@@ -1968,6 +1992,7 @@ tcard
 tcd
 TCEHY
 teardowns
+telematics
 telework
 tema
 tempfile
@@ -2095,6 +2120,7 @@ uncomment
 uncommented
 uncommenting
 und
+undary
 undescribed
 undeterminable
 undst
@@ -2329,6 +2355,7 @@ Yuzuru
 zakarid
 Zakarids
 zaxis
+ZBOA
 Zemeckis
 zfill
 zfq
@@ -2347,4 +2374,5 @@ Zoomably
 Zosyn
 Zscaler
 Zuv
+Zvrm
 ZWSP

@@ -1,22 +1,22 @@
 # Multi-Agent Architecture & Routing Reference
 
-The synthesized demo agent employs a **Triple-Agent Architecture** built on the Google Agent Development Kit (ADK) and **Gemini 3.7 Flash**:
+The synthesized demo agent employs a **Triple-Agent Architecture** built on the Google Agent Development Kit (ADK) and **Gemini 3.8 Flash**:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  root_agent (Coordinator + A2UI Builder)                     │
-│  Model: gemini-3.7-flash (AGENT_MODEL_LITE)                  │
+│  Model: gemini-3.8-flash (AGENT_MODEL_LITE)                  │
 │  Role: Main conversation, greetings, simple queries,         │
 │        building A2UI cards, routing to sub-agents.           │
 │                                                              │
 │  Sub-Agents:                                                 │
 │  ├── deep_analysis_agent (Inline Analytical Sub-Agent)       │
-│  │   Model: gemini-3.7-flash (AGENT_MODEL)                   │
+│  │   Model: gemini-3.8-flash (AGENT_MODEL)                   │
 │  │   Role: Complex inline multi-step analytical reasoning.   │
 │  │   Transfer: Returns control to root_agent on completion.  │
 │  │                                                           │
 │  └── background_agent (Standalone Async Worker)              │
-│      Model: gemini-3.7-flash (AGENT_MODEL)                   │
+│      Model: gemini-3.8-flash (AGENT_MODEL)                   │
 │      Role: Deep batch operations & long-running pipelines.   │
 │      Trigger: Invoked via /execute_task endpoint.            │
 └──────────────────────────────────────────────────────────────┘
@@ -69,7 +69,7 @@ The worker is prohibited from shallow hand-waving. It MUST:
 ## 3. ADK Configuration Best Practices
 
 1. **Model Selection**:
-   - Standard: `gemini-3.7-flash` (Highest quality, native reasoning, sub-second latency across all agent tiers).
+   - Standard: `gemini-3.8-flash` (Highest quality, native reasoning, sub-second latency across all agent tiers).
 
 2. **Placeholder Escaping Rule**:
    - In agent instructions (`base_instruction`), NEVER use `{variable_name}` or `{{variable_name}}`. ADK's `inject_session_state` regex matches all `{...}` and will crash with `KeyError`.

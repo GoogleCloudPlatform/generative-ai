@@ -21,7 +21,7 @@
  *
  * ── What Gets Generated ──────────────────────────────────────────────
  *   • Synthetic business data (BigQuery tables + optional Firestore docs)
- *   • Dual-model ADK agent (Gemini 3.7 Flash root + deep analysis sub-agent)
+ *   • Dual-model ADK agent (Gemini 3.8 Flash root + deep analysis sub-agent)
  *   • MCP toolsets — BigQuery, Maps, Firestore, Google Workspace (Gmail,
  *     Drive, Calendar, Chat, People), plus arbitrary GitHub MCP servers
  *   • A2A (Agent-to-Agent) server with A2UI interactive components
@@ -97,11 +97,11 @@ const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 const CONFIG = {
   PROJECT_ID: SCRIPT_PROPS.getProperty('PROJECT_ID'),
   LOCATION: SCRIPT_PROPS.getProperty('LOCATION') || 'global',
-  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.7-flash',
+  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.8-flash',
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v12.3-public',
+  APP_VERSION: 'v12.4-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -176,7 +176,7 @@ function doGet() {
 
   template.projectId = CONFIG.PROJECT_ID;
   template.userEmail = Session.getActiveUser().getEmail();
-  template.generatorModel = CONFIG.MODEL || 'gemini-3.7-flash';
+  template.generatorModel = CONFIG.MODEL || 'gemini-3.8-flash';
   
   return template.evaluate()
     .setTitle('Gemini Enterprise Demo Generator')
@@ -358,7 +358,7 @@ function initializeProject(projectId, logSheetUrl) {
   const newProps = {
     PROJECT_ID: projectId, 
     LOCATION: currentProps.LOCATION || 'global',
-    MODEL: currentProps.MODEL || 'gemini-3.7-flash',
+    MODEL: currentProps.MODEL || 'gemini-3.8-flash',
     LOG_SHEET_URL: logSheetUrl || currentProps.LOG_SHEET_URL || ''
   };
   
@@ -847,7 +847,7 @@ function planAndGenerateData(userGoal, options) {
   }
   if (options.enableComputerUse) {
     prompt += `\n- **🖥️ COMPUTER USE (BROWSER AGENT) AVAILABLE**:
-    - The agent can operate a real headless web browser (Gemini 3.7 Flash Computer Use) to navigate, click, type, fill forms and extract data from sites that have NO API: competitor public pages, supplier/partner portals, government/regulatory sites, public data sources, and internal web apps. Browser runs happen as autonomous background tasks and the user can watch the live session.
+    - The agent can operate a real headless web browser (Gemini 3.8 Flash Computer Use) to navigate, click, type, fill forms and extract data from sites that have NO API: competitor public pages, supplier/partner portals, government/regulatory sites, public data sources, and internal web apps. Browser runs happen as autonomous background tasks and the user can watch the live session.
     - You MUST leverage this capability when generating the 'businessInstruction' and 'demoGuide' (prompts).
     - In 'businessInstruction', mention that the agent can autonomously browse external websites via a browser-automation background task to gather or act on data that has no API.
     - You MUST design at least TWO prompts (out of the 7 required) in the 'demoGuide' that explicitly ask the agent to browse an external website or portal to accomplish the goal.
@@ -3727,9 +3727,9 @@ show_usage() {
   echo ""
   echo "Options:"
   echo "  --model-analysis-agent, -m <MODEL>  Set the deep analysis agent model"
-  echo "                                      (default: gemini-3.7-flash)"
+  echo "                                      (default: gemini-3.8-flash)"
   echo "  --model-root-agent <MODEL>          Set the root orchestration agent model"
-  echo "                                      (default: gemini-3.7-flash)"
+  echo "                                      (default: gemini-3.8-flash)"
   echo "  --cleanup, -c                       Delete all provisioned demo resources"
   echo "  --yes, -y                           Skip confirmation prompts (non-interactive use)"
   echo "  --help, -h                          Show this help message and exit"
@@ -3745,8 +3745,8 @@ show_usage() {
 
 
 # --- Argument Parsing ---
-AGENT_MODEL="gemini-3.7-flash"
-AGENT_MODEL_LITE="gemini-3.7-flash"
+AGENT_MODEL="gemini-3.8-flash"
+AGENT_MODEL_LITE="gemini-3.8-flash"
 ROOT_MODEL_CLI_OVERRIDE=false
 CLEANUP_MODE=false
 AUTO_CONFIRM=false
@@ -4263,14 +4263,14 @@ while true; do
     # --- Model Selection Flow ---
     echo ""
     echo "🧠 Configure Chat & Orchestration Model (root_agent):"
-    echo "   - root_agent (Chat/UI): Uses 'gemini-3.7-flash' by default."
-    echo "   - deep_analysis_agent (Reasoning): Uses 'gemini-3.7-flash'."
+    echo "   - root_agent (Chat/UI): Uses 'gemini-3.8-flash' by default."
+    echo "   - deep_analysis_agent (Reasoning): Uses 'gemini-3.8-flash'."
     echo ""
     echo "   You can choose 'gemini-3.5-flash-lite' for the root_agent."
     echo "   While it yields simpler and more concise responses, it provides"
     echo "   much faster and snappier interactions for routine chat."
     echo "   For complex tasks requiring deep analysis, the root_agent can"
-    echo "   still delegate the work to the deep_analysis_agent (3.7-flash)."
+    echo "   still delegate the work to the deep_analysis_agent (3.8-flash)."
     echo ""
     read -p "▶ Use lightweight gemini-3.5-flash-lite for root_agent? (Y/n): " CHOOSE_LITE
     CHOOSE_LITE=\$(echo "\$CHOOSE_LITE" | tr -d '\\r\\n\\t ')
@@ -4284,8 +4284,8 @@ while true; do
       AGENT_MODEL_LITE="gemini-3.5-flash-lite"
       echo "   ✅ Configured root_agent to use: gemini-3.5-flash-lite"
     else
-      AGENT_MODEL_LITE="gemini-3.7-flash"
-      echo "   ℹ️  Keeping default root_agent: gemini-3.7-flash"
+      AGENT_MODEL_LITE="gemini-3.8-flash"
+      echo "   ℹ️  Keeping default root_agent: gemini-3.8-flash"
     fi
     echo ""
     # Directly proceed to deployment steps after configuration is complete

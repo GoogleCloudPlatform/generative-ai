@@ -1237,7 +1237,7 @@ async def publish_dashboard(html: str, title: str, tool_context: ToolContext) ->
 if os.environ.get("ENABLE_COMPUTER_USE") == "1":
 
     # =====================================================================
-    # Computer Use (browser agent) -- Gemini 3.7 Flash built-in computer_use
+    # Computer Use (browser agent) -- Gemini 3.8 Flash built-in computer_use
     # tool driven over a self-hosted headless Chromium (Playwright). Adapted
     # from the official reference impl (github.com/google-gemini/
     # computer-use-preview, Apache-2.0): same generate_content loop, action
@@ -1570,11 +1570,11 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             return {"status": "error", "detail": "Playwright is not installed in this environment: " + str(_imp)}
 
         client = genai_client.Client(vertexai=True, location=location, project=project)
-        # gemini-3.7-flash supports the Computer Use tool (3.6-flash did not,
+        # gemini-3.8-flash supports the Computer Use tool (3.6-flash did not,
         # which is why this used to be pinned to 3.5-flash). Kept on its own
         # COMPUTER_USE_MODEL override rather than AGENT_MODEL, since a custom
         # --model-analysis-agent may point at a model without Computer Use.
-        model = os.environ.get("COMPUTER_USE_MODEL", "gemini-3.7-flash")
+        model = os.environ.get("COMPUTER_USE_MODEL", "gemini-3.8-flash")
         cfg = types.GenerateContentConfig(
             temperature=1.0, top_p=0.95, top_k=40, max_output_tokens=8192,
             tools=[types.Tool(computer_use=types.ComputerUse(environment=types.Environment.ENVIRONMENT_BROWSER))],
