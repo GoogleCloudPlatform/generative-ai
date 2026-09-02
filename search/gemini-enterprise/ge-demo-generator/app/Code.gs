@@ -3890,9 +3890,9 @@ fi
     echo "  • Maps API Key Secret: ${dirName}-maps-key"
     echo "  • Agent Engine (Sandbox): ${dirName}-sandbox"
 ${ enableManagedAgent ? `    echo "  • Managed Agent (Antigravity): ${managedAgentId} (location: global; its sandbox environments expire automatically after 7 idle days)"
-` : ''}    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET (+ signBlob self-binding)"
+` : ''}    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET"
     echo "  • Pub/Sub Topics: ${dirName}-sched-tasks, ${dirName}-task-results"
-    echo "  • Pub/Sub Subscriptions: ${dirName}-sched-tasks-push, ${dirName}-task-results-push"
+    echo "  • Pub/Sub Subscriptions: ${dirName}-sched-tasks-push"
     echo "  • Cloud Scheduler Jobs: ${dirName}-sched-* (if any)"
     echo "  • Firestore Task Collections: ${dirName}_task_definitions, ${dirName}_task_executions"
     echo "  • Local Directory: ~/${dirName}"
@@ -3969,19 +3969,22 @@ ${ enableManagedAgent ? `
       echo "   ⚠️  Live Viewer Function not found or already deleted."
     fi
 
-    # --- Dashboards bucket + signBlob self-binding ---
+    # --- Dashboards bucket ---
+    # The signBlob (token-creator) self-binding granted at setup is deliberately
+    # NOT removed here. COMPUTE_SA is the project's DEFAULT compute service
+    # account, so every demo in the project shares one binding: the grant is
+    # idempotent, but a removal is not scoped to this demo. Cleaning up the
+    # first demo in a shared project used to strip the binding out from under
+    # every other one, breaking their dashboards' V4 signed URLs with a 403 that
+    # only surfaces when someone opens a link. A service account holding
+    # token-creator on itself grants no access to anything else, so leaving it
+    # costs nothing.
     echo "🪣 Deleting dashboards bucket: \$DASH_BUCKET ..."
     if gcloud storage buckets describe "gs://\$DASH_BUCKET" >/dev/null 2>&1; then
       gcloud storage rm --recursive "gs://\$DASH_BUCKET" --quiet 2>/dev/null && echo "   ✅ Dashboards bucket and objects deleted." || echo "   ⚠️  Failed to delete dashboards bucket."
     else
       echo "   ⚠️  Dashboards bucket not found or already deleted."
     fi
-
-    echo "🔐 Removing signBlob (token-creator) self-binding on the runtime SA..."
-    gcloud iam service-accounts remove-iam-policy-binding "\$COMPUTE_SA" \
-      --member="serviceAccount:\$COMPUTE_SA" \
-      --role="roles/iam.serviceAccountTokenCreator" \
-      --project="$PROJECT_ID" --quiet >/dev/null 2>&1 && echo "   ✅ signBlob self-binding removed." || echo "   ⚠️  Self-binding not present or removal failed."
 
 
 
@@ -4119,7 +4122,11 @@ ${ enableManagedAgent ? `
 
     echo ""
     echo "📨 Deleting Pub/Sub topics and subscriptions..."
-    for SUB in "${dirName}-sched-tasks-push" "${dirName}-task-results-push"; do
+    # Only the scheduler topic gets a push subscription. The result topic is for
+    # downstream consumers and is deliberately left unsubscribed (see the note
+    # where the subscriptions are created), so listing it here only ever printed
+    # a "not found" warning that could never mean anything.
+    for SUB in "${dirName}-sched-tasks-push"; do
       gcloud pubsub subscriptions delete "$SUB" --project="$PROJECT_ID" --quiet 2>/dev/null \\
         && echo "   ✅ Subscription deleted: $SUB" \\
         || echo "   ⚠️  Subscription not found: $SUB"
@@ -4223,6 +4230,14 @@ while true; do
   echo "🧪 Code Sandbox:   ✅ Enabled (Agent Runtime)"
   ${ enableComputerUse ? `echo "🖥️ Computer Use:   ✅ Enabled (Browser Agent)"\n` : ''}${ enableManagedAgent ? `echo "🤖 Managed Agent:  ✅ Enabled (Antigravity autonomous sandbox - provisioned in parallel with setup)"\n` : ''}${ enableWorkspaceMcp ? `echo "🔌 Google Workspace MCP: Enabled"\n` : ''}${ (enableWorkspaceAuth && !enableWorkspaceMcp) ? `echo "🔐 Workspace Auth: ✅ Enabled (user OAuth, no MCP servers)"\n` : ''}${mcpBanner}echo "========================================================="
   
+  # --yes is advertised as "skip confirmation prompts (non-interactive use)", so
+  # it has to skip this one too. Without the break, "read" gets EOF, returns
+  # non-zero and set -e kills the run before a single resource is created.
+  if [ "\$AUTO_CONFIRM" = "true" ]; then
+    echo "Proceeding with this project (--yes)."
+    break
+  fi
+
   echo "Choose an option:"
   echo "  [Y] Yes, proceed with this project (Default)"
   echo "  [N] No, cancel deployment"
@@ -4558,8 +4573,11 @@ PYEOF
     echo "   If you haven't, please create one here first:"
     echo "   https://console.cloud.google.com/gemini-enterprise/products?project=$PROJECT_ID"
     echo ""
-    read -p "Have you confirmed the instance exists? (y/n) " -n 1 -r
-    echo
+    REPLY=""
+    if [ -t 0 ]; then
+      read -p "Have you confirmed the instance exists? (y/n) " -n 1 -r
+      echo
+    fi
     if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
         echo "Exiting. Please create the instance and run the script again."
         exit 1
@@ -5194,7 +5212,12 @@ __DOCKER_MCP_CLONE_${idx}_EOF__
     // A declared build script that fails is fatal: a half-built TypeScript
     // server is exactly the image that starts and then cannot serve a tool
     // call. A repo that declares no build script is skipped, not failed.
-    const npmCmd = `(npm install && { if [ "$(npm pkg get scripts.build)" = "{}" ]; then echo "MCP install: no build script declared, skipping" >&2; else npm run build; fi; })`;
+    //
+    // Guarded on package.json. As the trailing position after a failed Python
+    // install, running npm install in a Python repository printed a wall of
+    // ENOENT lines and the build ended on those, burying the resolution error
+    // that was the actual cause.
+    const npmCmd = `(if [ -f package.json ]; then npm install && { if [ "$(npm pkg get scripts.build)" = "{}" ]; then echo "MCP install: no build script declared, skipping" >&2; else npm run build; fi; }; else echo "MCP install: no package.json either, so this is not a Node.js server. The Python failure above is the real cause." >&2; false; fi)`;
     const ign = mcp.npm_ignore_scripts ? 'ENV NPM_CONFIG_IGNORE_SCRIPTS=true\n' : '';
     if (isNodejs) {
       // Primary: Node.js install, fatal on failure. Then a best-effort Python
@@ -6195,6 +6218,13 @@ EOF
     if [ "$APP_COUNT" = "0" ]; then
       echo "⚠️ No Gemini Enterprise apps found in 'global', 'us', or 'eu'. You might need to create one first."
       echo "After creating an app, you can register the agent manually or re-run the script."
+    elif [ ! -t 0 ]; then
+      # Which app to register into is a choice, not a confirmation, so --yes
+      # cannot answer it and guessing would register the agent into somebody
+      # else's app. Leave the deployment in place and say what a human has to do.
+      echo "⚠️  Found \$APP_COUNT Gemini Enterprise apps and there is no terminal to choose from."
+      echo "    The Cloud Run deployment itself is COMPLETE; only the registration was skipped."
+      echo "    To register manually: Gemini Enterprise > Agents > Add, URL: \$SERVICE_URL/a2a/app"
     else
       echo "💡 Found \$APP_COUNT Gemini Enterprise apps across regions:"
       for i in "\${!APP_DISPLAY_NAMES[@]}"; do
