@@ -286,6 +286,7 @@ chipsets
 Chiyoda
 chk
 Chocolat
+Choreo
 chromadb
 Chrono
 Chunyuan
@@ -1100,6 +1101,7 @@ lexer
 lexers
 liberties
 lic
+likelier
 linalg
 linecolor
 linestyle
@@ -1161,6 +1163,7 @@ Maarten
 maas
 macd
 MACD
+Magick
 magicoder
 magika
 Mahindra
@@ -1369,6 +1372,7 @@ NOMINMAX
 nonroot
 norigin
 normalise
+Norsk
 northwind
 notetaker
 novnc
@@ -1744,6 +1748,7 @@ saaagesh
 saas
 Saboo
 Sahel
+sakura
 sampwidth
 SAOT
 sargentii
@@ -2251,6 +2256,7 @@ wlog
 wlogger
 Wnd
 WNDCLASS
+woken
 womens
 Womens
 wook
@@ -2263,6 +2269,7 @@ writerows
 wscat
 wscore
 wscores
+wsmcp
 wst
 wstoken
 wstring

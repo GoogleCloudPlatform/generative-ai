@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.95-public',
+  APP_VERSION: 'v12.3-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2659,49 +2659,14 @@ function generateSetupScript(params) {
     cuOtelGcpResourceDetector: 'opentelemetry-resourcedetector-gcp>=1.12.0a0,<2.0.0',
   };
 
-  // == constraints.txt (v11.40) ==
-  // Caps in requirements.txt only bind the install WE issue. Cloned custom MCP
-  // server repos run their own `uv pip install` inside the same image (see the
-  // __DOCKER_MCP_INSTALL_*__ layers), and an `mcp>=2` pinned in someone else's
-  // requirements.txt would upgrade straight past our cap and reintroduce the
-  // exact ModuleNotFoundError the cap exists to prevent -- in a layer we do not
-  // control and did not write. Passing -c makes the caps apply image-wide.
-  //
-  // UPPER BOUNDS ONLY. A floor in a constraints file can force an upgrade --
-  // including into a pre-release, the trap the cuOtelGcp* comment above
-  // describes -- inside a resolution we are not steering. A cap can only ever
-  // prevent one, so the file is purely protective and cannot make a
-  // third-party install fail in a way our own build would not. Dropping the
-  // floors also collapses the two
-  // google-genai entries (>=1.27.0 and the computer-use >=2.7.0) to one line;
-  // duplicate names in a constraints file are a hard error for pip.
-  //
-  // Constraint files may not carry extras or direct references, so the a2ui git
-  // pin is excluded and `[a2a]` / `[agent_engines]` are stripped. A constraint
-  // on a package that is never installed is a no-op, so listing the
-  // computer-use entries unconditionally is safe and keeps the file identical
-  // across feature-flag combinations.
-  const CONSTRAINT_KEYS = [
-    'adk', 'mcp', 'genai', 'a2a', 'aiplatform', 'storage', 'scheduler',
-    'tasks', 'pubsub', 'firestore', 'logging', 'dotenv', 'dbDtypes', 'otel',
-    'apiCore',
-    'playwright', 'genaiComputerUse', 'cuOtelGcpLogging', 'cuOtelGcpResourceDetector',
-  ];
-  const constraintLines = [];
-  CONSTRAINT_KEYS.forEach(key => {
-    const spec = PINNED_DEPS[key];
-    if (!spec || spec.indexOf(' @ ') !== -1) return;
-    const parsed = spec.match(/^([A-Za-z0-9._-]+)(?:\[[^\]]*\])?(.*)$/);
-    if (!parsed) return;
-    const name = parsed[1];
-    const bounds = (parsed[2] || '').split(',')
-      .map(part => part.trim())
-      .filter(part => part.charAt(0) === '<' || part.substring(0, 2) === '==');
-    if (!bounds.length) return;
-    if (constraintLines.some(line => line.name === name)) return;
-    constraintLines.push({ name: name, text: name + bounds.join(',') });
-  });
-  const constraintsTxt = constraintLines.map(line => line.text).join('\n');
+  // constraints.txt (v11.40, removed v12.3). It existed because cloned MCP
+  // server repos ran their own `uv pip install` into the same site-packages the
+  // agent imports from, so our caps had to bind an install we did not write.
+  // Each sidecar now installs into its own virtualenv (see the
+  // __DOCKER_MCP_INSTALL_*__ layers), which is a boundary rather than a bound:
+  // a third-party install cannot reach the agent's environment at all, and a
+  // sidecar that legitimately needs a version we cap may have it. Reinstating a
+  // shared install would need this file back with it.
 
 
   // == Managed Autonomous Agent (Antigravity) generation-time assets ==
@@ -3925,9 +3890,9 @@ fi
     echo "  • Maps API Key Secret: ${dirName}-maps-key"
     echo "  • Agent Engine (Sandbox): ${dirName}-sandbox"
 ${ enableManagedAgent ? `    echo "  • Managed Agent (Antigravity): ${managedAgentId} (location: global; its sandbox environments expire automatically after 7 idle days)"
-` : ''}    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET (+ signBlob self-binding)"
+` : ''}    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET"
     echo "  • Pub/Sub Topics: ${dirName}-sched-tasks, ${dirName}-task-results"
-    echo "  • Pub/Sub Subscriptions: ${dirName}-sched-tasks-push, ${dirName}-task-results-push"
+    echo "  • Pub/Sub Subscriptions: ${dirName}-sched-tasks-push"
     echo "  • Cloud Scheduler Jobs: ${dirName}-sched-* (if any)"
     echo "  • Firestore Task Collections: ${dirName}_task_definitions, ${dirName}_task_executions"
     echo "  • Local Directory: ~/${dirName}"
@@ -4004,19 +3969,22 @@ ${ enableManagedAgent ? `
       echo "   ⚠️  Live Viewer Function not found or already deleted."
     fi
 
-    # --- Dashboards bucket + signBlob self-binding ---
+    # --- Dashboards bucket ---
+    # The signBlob (token-creator) self-binding granted at setup is deliberately
+    # NOT removed here. COMPUTE_SA is the project's DEFAULT compute service
+    # account, so every demo in the project shares one binding: the grant is
+    # idempotent, but a removal is not scoped to this demo. Cleaning up the
+    # first demo in a shared project used to strip the binding out from under
+    # every other one, breaking their dashboards' V4 signed URLs with a 403 that
+    # only surfaces when someone opens a link. A service account holding
+    # token-creator on itself grants no access to anything else, so leaving it
+    # costs nothing.
     echo "🪣 Deleting dashboards bucket: \$DASH_BUCKET ..."
     if gcloud storage buckets describe "gs://\$DASH_BUCKET" >/dev/null 2>&1; then
       gcloud storage rm --recursive "gs://\$DASH_BUCKET" --quiet 2>/dev/null && echo "   ✅ Dashboards bucket and objects deleted." || echo "   ⚠️  Failed to delete dashboards bucket."
     else
       echo "   ⚠️  Dashboards bucket not found or already deleted."
     fi
-
-    echo "🔐 Removing signBlob (token-creator) self-binding on the runtime SA..."
-    gcloud iam service-accounts remove-iam-policy-binding "\$COMPUTE_SA" \
-      --member="serviceAccount:\$COMPUTE_SA" \
-      --role="roles/iam.serviceAccountTokenCreator" \
-      --project="$PROJECT_ID" --quiet >/dev/null 2>&1 && echo "   ✅ signBlob self-binding removed." || echo "   ⚠️  Self-binding not present or removal failed."
 
 
 
@@ -4154,7 +4122,11 @@ ${ enableManagedAgent ? `
 
     echo ""
     echo "📨 Deleting Pub/Sub topics and subscriptions..."
-    for SUB in "${dirName}-sched-tasks-push" "${dirName}-task-results-push"; do
+    # Only the scheduler topic gets a push subscription. The result topic is for
+    # downstream consumers and is deliberately left unsubscribed (see the note
+    # where the subscriptions are created), so listing it here only ever printed
+    # a "not found" warning that could never mean anything.
+    for SUB in "${dirName}-sched-tasks-push"; do
       gcloud pubsub subscriptions delete "$SUB" --project="$PROJECT_ID" --quiet 2>/dev/null \\
         && echo "   ✅ Subscription deleted: $SUB" \\
         || echo "   ⚠️  Subscription not found: $SUB"
@@ -4258,6 +4230,14 @@ while true; do
   echo "🧪 Code Sandbox:   ✅ Enabled (Agent Runtime)"
   ${ enableComputerUse ? `echo "🖥️ Computer Use:   ✅ Enabled (Browser Agent)"\n` : ''}${ enableManagedAgent ? `echo "🤖 Managed Agent:  ✅ Enabled (Antigravity autonomous sandbox - provisioned in parallel with setup)"\n` : ''}${ enableWorkspaceMcp ? `echo "🔌 Google Workspace MCP: Enabled"\n` : ''}${ (enableWorkspaceAuth && !enableWorkspaceMcp) ? `echo "🔐 Workspace Auth: ✅ Enabled (user OAuth, no MCP servers)"\n` : ''}${mcpBanner}echo "========================================================="
   
+  # --yes is advertised as "skip confirmation prompts (non-interactive use)", so
+  # it has to skip this one too. Without the break, "read" gets EOF, returns
+  # non-zero and set -e kills the run before a single resource is created.
+  if [ "\$AUTO_CONFIRM" = "true" ]; then
+    echo "Proceeding with this project (--yes)."
+    break
+  fi
+
   echo "Choose an option:"
   echo "  [Y] Yes, proceed with this project (Default)"
   echo "  [N] No, cancel deployment"
@@ -4593,8 +4573,11 @@ PYEOF
     echo "   If you haven't, please create one here first:"
     echo "   https://console.cloud.google.com/gemini-enterprise/products?project=$PROJECT_ID"
     echo ""
-    read -p "Have you confirmed the instance exists? (y/n) " -n 1 -r
-    echo
+    REPLY=""
+    if [ -t 0 ]; then
+      read -p "Have you confirmed the instance exists? (y/n) " -n 1 -r
+      echo
+    fi
     if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
         echo "Exiting. Please create the instance and run the script again."
         exit 1
@@ -4978,12 +4961,6 @@ ${PINNED_DEPS.apiCore}
 ${ enableComputerUse ? `${PINNED_DEPS.playwright}\n${PINNED_DEPS.genaiComputerUse}\n${PINNED_DEPS.cuOtelGcpLogging}\n${PINNED_DEPS.cuOtelGcpResourceDetector}` : '' }
 __REQ_EOF__
 
-# Generate constraints.txt -- applied to third-party installs inside the image
-# (cloned MCP server repos) so their own requirements cannot break our caps.
-cat <<'__CONSTRAINTS_EOF__' > constraints.txt
-${constraintsTxt}
-__CONSTRAINTS_EOF__
-
 # Generate pyproject.toml required for adk project type
 cp "$GE_TPL/pyproject.toml" pyproject.toml
 
@@ -4999,7 +4976,7 @@ FROM ${PINNED_DEPS.pythonImage}
 COPY --from=${PINNED_DEPS.uvImage} /uv /uvx /bin/
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY requirements.txt constraints.txt pyproject.toml ./
+COPY requirements.txt pyproject.toml ./
 RUN uv pip install --system -r requirements.txt
 __DOCKER_EOF__
 
@@ -5143,40 +5120,115 @@ RUN git clone ${mcp.github_url} ${mcpDir}
 __DOCKER_MCP_CLONE_${idx}_EOF__
 `;
     let installStep;
-    // -c /app/constraints.txt (v11.40): this installs a repo we did not write,
-    // with dependency bounds we did not choose, into the same site-packages the
-    // agent imports from. Without the constraints file an `mcp>=2` pinned in
-    // that repo upgrades past our cap and the container dies at import.
+    // v12.3: each cloned server is installed into ITS OWN virtualenv, not into
+    // the site-packages the agent imports from. Until now they shared one
+    // environment, and every consequence of that sharing was a problem we then
+    // had to work around:
+    //
+    //   * the agent's caps had to bind someone else's install (-c
+    //     /app/constraints.txt, v11.40), because a vendored mcp>=2 landing in
+    //     shared site-packages kills the agent at import;
+    //   * and that cap then made servers that legitimately need mcp>=2
+    //     uninstallable. google-adk pins mcp<2 and imports modules 2.x deleted,
+    //     so the cap cannot move -- but nothing about the AGENT's requirement
+    //     should decide what a sidecar may depend on.
+    //
+    // The processes were always separate; only the environment was shared. Once
+    // it is not, the sidecar may hold mcp 2.x while the agent holds 1.24, and
+    // the constraints file has nothing left to protect: an install that cannot
+    // reach the agent's site-packages cannot break the agent.
+    //
+    // --system-site-packages keeps this strictly additive. Cloned repos are
+    // frequently sloppy about declaring what they import (mcp especially), and
+    // those servers work today only because the agent's copy happens to be
+    // visible. The venv's own site-packages still comes first, so anything the
+    // server does declare shadows ours for that sidecar.
     //
     // v11.43: every branch below used to end in `2>/dev/null || true`. Three
     // consequences, all of which shipped: a failed install produced a green
     // image whose sidecar then died at runtime with its dependencies missing;
     // the stderr naming the cause was discarded; and because `( ... || true )`
     // always exits 0, the `|| npm` fallback in the Python path was unreachable
-    // code. Adding the constraints file made the first one likelier, not less
-    // -- a cloned server that demands mcp>=2 now fails resolution, which is
-    // precisely the failure that was being swallowed. Each position below
-    // either fails the build or prints a warning; nothing is silent.
-    const pipInstall = `uv pip install --system -c /app/constraints.txt`;
+    // code. Each position below either fails the build or prints a warning;
+    // nothing is silent.
+    //
+    // Plain strings rather than template literals throughout: every backtick
+    // added to this file is one more place a generated shell line can turn into
+    // a command substitution.
+    const venvDir = mcpDir + '/.venv';
+    const mkVenv = 'uv venv --system-site-packages ' + venvDir;
+    const pipInstall = 'uv pip install --python ' + venvDir + '/bin/python';
     // Primary position. No Python manifest at all is a failure here too, so
     // that the Node fallback actually gets its turn.
     const pipStrict = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then ${pipInstall} .; elif [ -f requirements.txt ]; then ${pipInstall} -r requirements.txt; else echo "MCP install: no pyproject.toml, setup.py or requirements.txt" >&2; false; fi)`;
     // Trailing position on a Node repo: a bonus attempt for hybrid servers, so
     // a failure stays non-fatal -- but it is announced rather than hidden.
     const pipBonus = `(if [ -f pyproject.toml ] || [ -f setup.py ]; then ${pipInstall} . || echo "WARNING: optional Python install failed, see above" >&2; elif [ -f requirements.txt ]; then ${pipInstall} -r requirements.txt || echo "WARNING: optional Python install failed, see above" >&2; fi)`;
+    // Middle position. A cloned server that declares a Python floor above this
+    // image's interpreter fails resolution outright -- uv reports "the current
+    // Python version does not satisfy Python>=X" and the build stops, even when
+    // the server is pure Python and would have run fine. Measured against
+    // yahoo-finance-mcp, which declares >=3.14.6 while the image is
+    // ${PINNED_DEPS.pythonImage}.
+    //
+    // v12.3 gives the sidecar the interpreter it asked for: uv downloads a
+    // managed CPython of that minor and rebuilds this one virtualenv on it. The
+    // agent keeps the image's interpreter, so nothing about the demo's own
+    // runtime moves. This replaces the v12.1 workaround, which overrode the
+    // floor for resolution only (--python-version) and therefore had to pass
+    // --no-deps to stop uv selecting every DEPENDENCY's wheel under the
+    // overridden tags too, then reinstall those dependencies from the server's
+    // own metadata in a second pass. That got the build green while leaving the
+    // server on an interpreter it had declared too old -- newer syntax then
+    // failed at import instead. A real interpreter needs none of it: the
+    // ordinary install resolves against the right tags in one pass.
+    //
+    // The reader emits the declared floor only when it is ABOVE this
+    // interpreter, so a satisfiable floor does not rebuild the venv for
+    // nothing. Both metadata dialects, because poetry states the same
+    // requirement in its own table. The comparison is on the full version, not
+    // the minor: a floor of 3.11.13 on a 3.11.12 image is unsatisfiable too,
+    // and uv's newest 3.11 will clear it.
+    //
+    // --clear on the rebuild is not optional. uv REFUSES to create a virtualenv
+    // over an existing one ("A virtual environment already exists"), and the
+    // one made a few clauses earlier is always there -- measured, this is what
+    // the first draft of this position did, and the retry never ran.
+    //
+    // The trailing --python-version is a patch-level override and nothing more.
+    // uv ships a fixed list of managed interpreters, so a floor newer than the
+    // newest patch it knows cannot be installed at all: yahoo-finance-mcp
+    // declares >=3.14.6 while uv ${PINNED_DEPS.uvImage} tops out at 3.14.5.
+    // Refusing there would fail the build over a patch. Overriding it is safe
+    // in a way v12.1's override was not, and the difference is the wheel tags:
+    // within one minor they are identical (cp314), so every dependency wheel
+    // selected under the override is importable by the interpreter actually
+    // running -- which is why this needs no --no-deps and no second pass to
+    // reinstall the dependencies. v12.1 overrode across THREE minors, where
+    // that does not hold. The venv has already been rebuilt on the right minor
+    // by the time this runs; on its own it would be the v12.1 bug again.
+    const readFloor = "python -c 'import tomllib,re,sys;d=tomllib.load(open(\"pyproject.toml\",\"rb\"));p=d.get(\"project\") or {};q=d.get(\"tool\",{}).get(\"poetry\",{}).get(\"dependencies\",{});r=p.get(\"requires-python\") or q.get(\"python\") or \"\";m=re.search(\"([0-9]+)[.]([0-9]+)(?:[.]([0-9]+))?\",r);v=tuple(int(g) for g in m.groups() if g) if m else ();print(\".\".join(str(n) for n in v) if v > sys.version_info[:len(v)] else \"\")'";
+    const pipFloor = '(if [ -f pyproject.toml ]; then FLOOR=$(' + readFloor + '); if [ -n "$FLOOR" ]; then MINOR=$(echo "$FLOOR" | cut -d. -f1,2); echo "MCP install: WARNING - this server declares Python >=$FLOOR, above ' + PINNED_DEPS.pythonImage + '. Rebuilding this sidecar virtualenv on a managed Python $MINOR; the agent keeps the image interpreter." >&2; uv venv --clear --python "$MINOR" ' + venvDir + ' && ( ' + pipInstall + ' . || { echo "MCP install: WARNING - no managed interpreter reaches $FLOOR; resolving as if it did. Wheel tags do not change within a minor, so the dependencies remain importable." >&2; ' + pipInstall + ' --python-version "$FLOOR" .; } ); else false; fi; else false; fi)';
     // A declared build script that fails is fatal: a half-built TypeScript
     // server is exactly the image that starts and then cannot serve a tool
     // call. A repo that declares no build script is skipped, not failed.
-    const npmCmd = `(npm install && { if [ "$(npm pkg get scripts.build)" = "{}" ]; then echo "MCP install: no build script declared, skipping" >&2; else npm run build; fi; })`;
+    //
+    // Guarded on package.json. As the trailing position after a failed Python
+    // install, running npm install in a Python repository printed a wall of
+    // ENOENT lines and the build ended on those, burying the resolution error
+    // that was the actual cause.
+    const npmCmd = `(if [ -f package.json ]; then npm install && { if [ "$(npm pkg get scripts.build)" = "{}" ]; then echo "MCP install: no build script declared, skipping" >&2; else npm run build; fi; }; else echo "MCP install: no package.json either, so this is not a Node.js server. The Python failure above is the real cause." >&2; false; fi)`;
     const ign = mcp.npm_ignore_scripts ? 'ENV NPM_CONFIG_IGNORE_SCRIPTS=true\n' : '';
     if (isNodejs) {
       // Primary: Node.js install, fatal on failure. Then a best-effort Python
-      // install for servers that ship both.
-      installStep = `${ign}RUN cd ${mcpDir} && ${npmCmd} && ${pipBonus}`;
+      // install for servers that ship both. The venv is created either way --
+      // an empty one costs a symlink, and the launcher below does not have to
+      // know which languages this server turned out to use.
+      installStep = `${ign}RUN cd ${mcpDir} && ${mkVenv} && ${npmCmd} && ${pipBonus}`;
     } else {
       // Primary: Python install. Fallback: Node.js install if pip fails. If
       // both fail the build stops here rather than at the customer's demo.
-      installStep = `RUN cd ${mcpDir} && ( ${pipStrict} || ${npmCmd} )`;
+      installStep = `RUN cd ${mcpDir} && ${mkVenv} && ( ${pipStrict} || ${pipFloor} || ${npmCmd} )`;
     }
     dockerSteps += `
 cat <<'__DOCKER_MCP_INSTALL_${idx}_EOF__' >> Dockerfile
@@ -5202,6 +5254,7 @@ __DOCKER_MCP_INSTALL_${idx}_EOF__
     const ep = mcp.entrypoint || '';
     const isFastMcp = ep.includes(':') && !ep.includes(' ');
     const mcpDir = `/app/custom_mcp_${idx}`;
+    const venvDir = mcpDir + '/.venv';
     const port = 9090 + idx;
     let stdioCmd;
     if (isFastMcp) {
@@ -5231,7 +5284,15 @@ __DOCKER_COPY_RUN_PY_${idx}_EOF__
 `;
       stdioCmd = `python _run.py`;
     } else { stdioCmd = ep; }
-    startScript += `cd ${mcpDir} && supergateway --stdio "${stdioCmd}" --outputTransport streamableHttp --port ${port} --sessionStateless &\n`;
+    // v12.3: the sidecar runs with its own virtualenv first on PATH, which is
+    // what makes the per-server environment reach the process rather than just
+    // the build. PATH rather than an absolute interpreter because `entrypoint`
+    // is an arbitrary shell command the model wrote from the server's README --
+    // it may be `python -m x`, a console script the install just created, or
+    // `uv run ...`, and all three resolve through PATH. VIRTUAL_ENV is for the
+    // last of those: uv reuses an active environment instead of building a new
+    // one behind our back. A subshell, so sidecar N+1 does not inherit N's PATH.
+    startScript += `( cd ${mcpDir} && PATH=${venvDir}/bin:$PATH VIRTUAL_ENV=${venvDir} exec supergateway --stdio "${stdioCmd}" --outputTransport streamableHttp --port ${port} --sessionStateless ) &\n`;
     startScript += `PID_${idx}=$!\n`;
   });
 
@@ -6157,6 +6218,13 @@ EOF
     if [ "$APP_COUNT" = "0" ]; then
       echo "⚠️ No Gemini Enterprise apps found in 'global', 'us', or 'eu'. You might need to create one first."
       echo "After creating an app, you can register the agent manually or re-run the script."
+    elif [ ! -t 0 ]; then
+      # Which app to register into is a choice, not a confirmation, so --yes
+      # cannot answer it and guessing would register the agent into somebody
+      # else's app. Leave the deployment in place and say what a human has to do.
+      echo "⚠️  Found \$APP_COUNT Gemini Enterprise apps and there is no terminal to choose from."
+      echo "    The Cloud Run deployment itself is COMPLETE; only the registration was skipped."
+      echo "    To register manually: Gemini Enterprise > Agents > Add, URL: \$SERVICE_URL/a2a/app"
     else
       echo "💡 Found \$APP_COUNT Gemini Enterprise apps across regions:"
       for i in "\${!APP_DISPLAY_NAMES[@]}"; do
