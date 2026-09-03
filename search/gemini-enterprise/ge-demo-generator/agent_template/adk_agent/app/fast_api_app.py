@@ -69,7 +69,7 @@ from google.adk.apps.app import App, EventsCompactionConfig
 from google.adk.plugins import ReflectAndRetryToolPlugin, LoggingPlugin
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-from google.cloud import logging as google_cloud_logging
+import threading
 from google.genai import types as genai_types
 from a2a import types as a2a_types
 from a2ui.schema.constants import VERSION_0_9
@@ -1320,8 +1320,54 @@ class Feedback(BaseModel):
     user_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
 _, project_id = google.auth.default()
-logging_client = google_cloud_logging.Client()
-logger = logging_client.logger(__name__)
+
+# =============================================================================
+# Lever D: Lazy Google Cloud Logger Proxy with Fallback Adapter
+# =============================================================================
+class _PyLoggerAdapter:
+    """Adapter bridging Google Cloud Logging log_text and log_struct to standard logging."""
+    def __init__(self, py_logger: logging.Logger):
+        self._py_logger = py_logger
+
+    def log_text(self, text: str, *args, **kwargs):
+        self._py_logger.info(text)
+
+    def log_struct(self, info: dict, *args, **kwargs):
+        self._py_logger.info(str(info))
+
+    def __getattr__(self, name):
+        return getattr(self._py_logger, name)
+
+
+class _LazyCloudLogger:
+    def __init__(self, name: str):
+        self._name = name
+        self._logger = None
+        self._lock = threading.Lock()
+        self._py_logger = logging.getLogger(name)
+
+    def _get_logger(self):
+        if self._logger is None:
+            with self._lock:
+                if self._logger is None:
+                    try:
+                        import google.cloud.logging as gcl
+                        self._logger = gcl.Client().logger(self._name)
+                    except Exception as e:
+                        self._py_logger.warning("Falling back to standard logger adapter: " + str(e))
+                        self._logger = _PyLoggerAdapter(self._py_logger)
+        return self._logger
+
+    def log_text(self, text: str, *args, **kwargs):
+        self._get_logger().log_text(text, *args, **kwargs)
+
+    def log_struct(self, info: dict, *args, **kwargs):
+        self._get_logger().log_struct(info, *args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self._get_logger(), name)
+
+logger = _LazyCloudLogger(__name__)
 
 # =============================================================================
 # PRE-FLIGHT GATE (v10.93): deterministic server-side Analysis Plan card.
@@ -1595,6 +1641,72 @@ def _is_preflight_confirmed_press(run_args):
         return False
     return False
 
+# =============================================================================
+# Lever A: Heuristic Trivial Query Classifier Bypass
+# =============================================================================
+_TRIVIAL_GREETING_RE = re.compile(
+    r'^(?:hi|hello|hey|greetings|good\s+(?:morning|afternoon|evening)|howdy|sup|yo|'
+    r'こんにちは|こんばんは|はじめまして|どうも|'
+    r'お疲れ様(?:です|でした)?|おつかれさま(?:です|でした)?|'
+    r'おはよう(?:ございます)?|'
+    r'よろしく(?:お(?:願い|ねがい)(?:します|いたします))?|'
+    r'(?:いつも)?(?:大変)?お世話になっております)[!?.~ \s\u3000\u3001\u3002\uff01\uff1f]*$',
+    re.IGNORECASE,
+)
+_TRIVIAL_ACK_RE = re.compile(
+    r'^(?:ok|okay|yes|no|yep|nope|thanks|thank\s+you|thx|cool|got\s+it|understood|sure|fine|'
+    r'はい|いいえ|了解|承知|ありがとう)[!?.~ \s\u3000\u3001\u3002\uff01\uff1f]*$',
+    re.IGNORECASE,
+)
+_TRIVIAL_META_RE = re.compile(
+    r'^(?:help|who\s+are\s+you|what\s+can\s+you\s+do|ヘルプ|使い方|あなた|誰)[!?.~ \s\u3000\u3001\u3002\uff01\uff1f]*$',
+    re.IGNORECASE,
+)
+# Strict negative keywords: if ANY analytical trigger is present, NEVER bypass
+_ANALYTICAL_KEYWORDS_EN = re.compile(
+    r'\b(?:analyze|analysis|breakdown|compare|comparison|correlate|correlation|forecast|predict|'
+    r'prediction|trend|trends|deep\s+dive|investigate|audit|simulate|churn|segment|segmentation|'
+    r'cohort|pipeline|benchmark|dataset|metrics|revenue|sales|profit|margin|roi|inventory|'
+    r'anomaly|anomalies|detect|detection)\b',
+    re.IGNORECASE,
+)
+_ANALYTICAL_KEYWORDS_JA = re.compile(
+    r'(?:分析|集計|予測|調査|比較|レポート|推移|可視化|トレンド|深掘り|シミュレーション|'
+    r'セグメント|コホート|離脱|監査|売上|顧客|利益|在庫|粗利|異常|検知)'
+)
+
+def _is_trivial_preflight_bypass(text: str, run_args: dict | None = None) -> bool:
+    """Evaluates whether a message is trivial and safe to bypass the preflight classifier."""
+    if not text:
+        return True
+    s = text.strip()
+    
+    # Fail-Safe Gate 1: Analytical intent present -> bypass forbidden
+    if _ANALYTICAL_KEYWORDS_EN.search(s) or _ANALYTICAL_KEYWORDS_JA.search(s):
+        return False
+        
+    # Gate 2: Explicit greetings, acknowledgments, or basic conversational turns
+    if _TRIVIAL_GREETING_RE.match(s) or _TRIVIAL_ACK_RE.match(s) or _TRIVIAL_META_RE.match(s):
+        return True
+        
+    # Gate 4: Non-analytical A2UI action button clicks (navigation, tabs, pagination, modal close)
+    if run_args:
+        try:
+            nm = run_args.get("new_message")
+            for p in (getattr(nm, "parts", None) or []):
+                t = getattr(p, "text", None)
+                if t and "userAction" in t and not getattr(p, "is_user_text", False):
+                    ua = json.loads(t).get("userAction", {}) or {}
+                    action_name = str(ua.get("name", "")).lower()
+                    _STANDARD_NAV_ACTIONS = {"next_page", "prev_page", "close_dialog", "switch_tab", "close_modal"}
+                    _NAV_PREFIXES = ("nav_", "tab_", "page_", "dismiss_", "select_")
+                    if action_name in _STANDARD_NAV_ACTIONS or any(action_name.startswith(pfx) for pfx in _NAV_PREFIXES):
+                        return True
+        except Exception:
+            pass
+            
+    return False
+
 async def _classify_for_preflight(text, prev_user_text=""):
     # v11.6: prev_user_text is a short sample of the last HUMAN-TYPED message,
     # passed as a language reference so fixed-English chip prompts do not
@@ -1617,7 +1729,11 @@ async def _classify_for_preflight(text, prev_user_text=""):
                 _client.models.generate_content,
                 model=_model,
                 contents=[genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=_prompt)])],
-                config=genai_types.GenerateContentConfig(response_mime_type="application/json", temperature=0),
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0,
+                    thinking_config=genai_types.ThinkingConfig(thinking_level="LOW"),
+                ),
             ),
             timeout=12,
         )
@@ -1676,7 +1792,11 @@ async def _localize_ui_strings(_defaults, _language_sample):
                 _client.models.generate_content,
                 model=_model,
                 contents=[genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=_prompt)])],
-                config=genai_types.GenerateContentConfig(response_mime_type="application/json", temperature=0),
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0,
+                    thinking_config=genai_types.ThinkingConfig(thinking_level="LOW"),
+                ),
             ),
             timeout=8,
         )
@@ -2104,7 +2224,7 @@ def _heal_session_events(session, force_aggressive=False):
     #   - force_aggressive=True (emergency, after a token-overflow ClientError)
     #   - the root model is a lightweight model (flash-lite) — always compact
     #   - the measured context size exceeds the char budget. Heavier models
-    #     (3.8-flash / pro) keep FULL context UNTIL near the limit, so normal
+    #     (3.7-flash / pro) keep FULL context UNTIL near the limit, so normal
     #     large reports are never trimmed — only runaway contexts are.
     # Char-based by design: generated-image bytes are NOT stored in history
     # (generate_image stashes them in session.state), so the real bloat is
@@ -2670,25 +2790,57 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                 _ma_fs = getattr(_ma_note_b, '_firestore_client', None)
                 _ma_demo = os.environ.get('DEMO_ID', '')
                 _ma_nm = run_args.get('new_message')
-                if _ma_fs and _ma_demo and _ma_nm is not None and getattr(_ma_nm, 'parts', None) is not None:
-                    _ma_ndocs = _ma_fs.collection(_ma_demo + '_task_executions').where(
-                        'reported_to_user', '==', False).where(
-                        'status', 'in', ['completed', 'failed']).limit(3).stream()
+
+                # Lever C: Check session state skip condition before touching Firestore
+                _active_tickets = getattr(_ma_note_b, '_active_task_tickets', None)
+                _has_tasks = bool(_active_tickets and _active_tickets.get(session_id))
+                if not _has_tasks:
+                    try:
+                        _sess_check = await runner.session_service.get_session(
+                            app_name=runner.app_name,
+                            user_id=user_id,
+                            session_id=session_id,
+                        )
+                        if _sess_check is not None and hasattr(_sess_check, 'state'):
+                            _has_tasks = _sess_check.state.get('_has_autonomous_tasks', False)
+                    except Exception:
+                        pass
+
+                if _has_tasks and _ma_fs and _ma_demo and _ma_nm is not None and getattr(_ma_nm, 'parts', None) is not None:
+                    def _query_and_ack_tasks_sync(fs_client, demo_id, sess_id):
+                        try:
+                            # Use atomic claim to prevent race condition across concurrent SSE streams
+                            # Only unacknowledged tasks in completed/failed state are claimed
+                            docs = fs_client.collection(demo_id + '_task_executions').where(
+                                'reported_to_user', '==', False).where(
+                                'status', 'in', ['completed', 'failed']).limit(3).stream()
+                            ret = []
+                            for doc in docs:
+                                d = doc.to_dict()
+                                try:
+                                    doc.reference.update({'reported_to_user': True})
+                                    ret.append((doc.id, d))
+                                except Exception:
+                                    continue
+                            
+                            # Multi-task tracking: Check if any tasks remain in flight ('submitted', 'working')
+                            active_query = fs_client.collection(demo_id + '_task_executions').where(
+                                'status', 'in', ['submitted', 'working']).limit(1).stream()
+                            has_remaining_active = any(True for _ in active_query)
+                            return ret, has_remaining_active
+                        except Exception as e:
+                            logger.log_text('[ma_task_query] sync error: ' + str(e)[:200])
+                            return [], True
+
+                    _ma_records, _has_active = await asyncio.to_thread(_query_and_ack_tasks_sync, _ma_fs, _ma_demo, session_id)
                     _ma_notes = []
-                    for _ma_nd in _ma_ndocs:
-                        _ma_ndd = _ma_nd.to_dict()
+                    for _tid, _ma_ndd in _ma_records:
                         _ma_full = _ma_ndd.get('result_summary', '') or ''
                         _ma_note = ('Task ticket ' + _ma_ndd.get('task_id', '') + ' status: ' + _ma_ndd.get('status', '')
                                     + '. Result summary (first 400 chars): ' + _ma_full[:400])
-                        # The 400-char cut can drop the Drive webViewLink the sandbox put
-                        # further down the report, which made the root call the fallback
-                        # Drive tool and then claim no file existed (observed 2026-07-14).
-                        # Surface every Workspace link from the FULL report deterministically.
                         _ma_links = re.findall(r'https://(?:docs|drive|sheets|slides)[.]google[.]com/[A-Za-z0-9./?=&#%_+:~@-]+', _ma_full)
                         if _ma_links:
                             _ma_note = _ma_note + ' Workspace links found in the full report: ' + ' '.join(_ma_links[:5])
-                        # Same salience treatment for GCS deliverable downloads: the signed-URL
-                        # markdown links live at the END of the report, far past the 400-char cut.
                         if 'DELIVERABLE DOWNLOADS' in _ma_full:
                             _ma_dl = [_l for _l in _ma_full.split(chr(10)) if _l.strip().startswith('- [')][:5]
                             if _ma_dl:
@@ -2702,7 +2854,6 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                         'it with deliverables_for_task_id set to this ticket-id so the links attach '
                                         'to this task).')
                         _ma_notes.append(_ma_note)
-                        _ma_nd.reference.update({'reported_to_user': True})
                     if _ma_notes:
                         _ma_note_text = ('SYSTEM NOTE (auto-generated; the user did NOT type this): a background task just finished. '
                                          'BEFORE addressing the user message above, announce this result briefly in the user language, '
@@ -2723,6 +2874,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                                'Save the deliverables of task <ticket-id> to Google Drive.')
                         _ma_nm.parts.append(genai_types.Part(text=_ma_note_text))
                         logger.log_text('[managed_agent] appended completion note for ' + str(len(_ma_notes)) + ' task(s) to the user message')
+
+                    # Multi-Task Safe State Management:
+                    if not _has_active:
+                        if _active_tickets and session_id in _active_tickets:
+                            _active_tickets[session_id].clear()
 
                 if (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1"):
                     # Rotating Workspace-token objects (best-effort, throttled to one
@@ -3143,6 +3299,11 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         pass
 
             _gate_scope = _gate_text.split(":", 1)[1].strip() if _gate_is_inline else _gate_text
+
+            # Lever A: Fast-path bypass for trivial conversational turns and non-analytical UI actions
+            if not _gate_skip and _is_trivial_preflight_bypass(_gate_scope, run_args):
+                _gate_skip = True
+                logger.log_text("[preflight_gate] trivial query bypass: " + _gate_scope[:60])
 
             # v10.97: deterministic short-circuit for an explicit "Run in
             # Background:" press. Register the task HERE (bypassing the agent and
@@ -5429,7 +5590,7 @@ def _build_static_agent_card() -> AgentCard:
     return AgentCard(
         name=adk_app.name,
         description=adk_app.root_agent.description or f"Agent {adk_app.name}",
-        url=f"{os.getenv('APP_URL', 'http://0.0.0.0:8000')}{A2A_RPC_PATH}",
+        url=f"{os.getenv('APP_URL') or os.getenv('SELF_URL') or 'http://0.0.0.0:8000'}{A2A_RPC_PATH}",
         version=os.getenv("AGENT_VERSION", "0.1.0"),
         capabilities=AgentCapabilities(
             streaming=True,
