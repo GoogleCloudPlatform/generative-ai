@@ -1842,6 +1842,10 @@ echo ""
 if [ ! -z "$GE_DIRECT_CHAT_URL" ]; then
   echo "💬 Start Chatting with Your Agent (Direct):"
   echo "   👉 ${GE_DIRECT_CHAT_URL}"
+  echo "   ⚠️  The FIRST message right after a deploy can come back as an error."
+  echo "      Gemini Enterprise takes up to ~90 seconds to start routing to a brand"
+  echo "      new agent, and a cold Cloud Run instance can refuse one request while"
+  echo "      it starts. Both are transient - send the message again."
   echo ""
 fi
 echo "💻 Gemini Enterprise Console (Overview):"
