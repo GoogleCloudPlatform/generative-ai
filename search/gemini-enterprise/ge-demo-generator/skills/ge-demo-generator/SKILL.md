@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.14.5
+  version: 2.15.0
 ---
 
-# GE Demo Generator Skill (v2.14.5)
+# GE Demo Generator Skill (v2.15.0)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.8 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, and **global multilingual localization (i18n/l10n)**.
 
@@ -130,7 +130,12 @@ with a stated default so the user can answer "all defaults" in three words:
    (Workspace OAuth when the scenario touches Gmail/Drive/Calendar, `rag` when it turns on
    documents rather than numbers, `dataScale` when the narrative claims enterprise volume),
    and say the rest keep their defaults. Keep the *question* short — brief section 6 lists
-   every option with its resolved value, so nothing is hidden by asking about a few.
+   every option with its resolved value, so nothing is hidden by asking about a few. Add
+   **a warm Cloud Run instance** (`MIN_INSTANCES=1`) to that question whenever the user has
+   named a date, an audience or a live session: it is the one option that is about the
+   *presentation* rather than the demo, and the only thing that removes the cold start — and
+   the occasional cold-start error — from the first message. Offer it with its price in the
+   same breath (see brief section 6).
 4. **Target environment** — only if what `gcloud` reports (read it now, see below) is not
    obviously the project the user means.
 
@@ -308,6 +313,26 @@ something the agent will do later — nothing after the deploy writes to a Drive
 Only list the options that are on, plus the two or three the demo is a plausible candidate
 for. A user reading eight defaults they did not ask about is a user who skims the whole brief.
 
+**One more switch, and it is deliberately not in that table** — it is not an `.env` key and it
+changes nothing inside the container. Cloud Run scales this demo to zero when nobody is talking
+to it, which is why an idle demo costs nothing, and why the first message after an idle gap
+waits ~20-25s for a cold start and can come back as an error instead: Cloud Run sometimes
+refuses a request outright while the container is still starting. Deploying with
+`MIN_INSTANCES=1` — the environment variable `setup_and_deploy.sh` reads in Step 4/6, exported
+before the deploy runs — keeps one instance always up and removes both.
+
+State it as a line under the table when you offer it, with the price attached rather than in a
+footnote:
+
+> 🔥 **Warm instance** — `MIN_INSTANCES=1` · default `0` (scale-to-zero). No cold start and no
+> cold-start error on the first message. **Cost:** one 8 GiB / 2 vCPU instance is then billed
+> continuously for as long as the demo exists — not just during the presentation.
+
+The honest default is `0`: for a demo deployed now and shown next week, sending the first
+message twice is far cheaper than a week of idle billing. It is also not a decision that has to
+be made now — it is read at deploy time, so re-running the deploy with the variable set (or
+unset) flips an existing demo either way.
+
 ### § The gate — ask once, then stop
 
 Close the message with a single explicit question, in the demo's language, that (a) names what
@@ -316,8 +341,8 @@ Enterprise registration (Phases 3-7) — and (b) leaves the door open for late c
 
 > Shall I proceed with this design and run the synthetic data generation, Google Drive upload,
 > Cloud Run deployment and Gemini Enterprise registration (Phases 3-7) in one pass? Let me know
-> if you want any option enabled (Google Workspace OAuth, RAG mode, data scale, …) or any part
-> of the model changed.
+> if you want any option enabled (Google Workspace OAuth, RAG mode, data scale, a warm Cloud
+> Run instance for a live session, …) or any part of the model changed.
 
 One question, not a second round of Step 2.1: everything else was settled before the brief was
 written, and a gate that re-opens five decisions is a gate nobody clears.
@@ -610,6 +635,7 @@ Follow the optimized dependency sequence with local pre-flight checks and fast b
    # setup_and_deploy.sh assembles this; see references/deployment_and_iam.md for the
    # complete table and for which variables are applied later, in Step 5.
    MIN_INSTANCES="${MIN_INSTANCES:-0}"   # export MIN_INSTANCES=1 to stay warm for a live demo
+                                         # (brief section 6 - it bills while idle, so ask first)
    gcloud run deploy "$SERVICE_NAME" \
      --source . \
      --region "$REGION" \
@@ -745,6 +771,7 @@ Upon deployment completion, ALWAYS output the structured results containing dire
 
 💬 **Start Chatting with Your Agent (Direct Chat Link):**
 👉 https://vertexaisearch.cloud.google.com/home/cid/${CONFIG_ID}/r/agent/${AGENT_ID}/session/-
+⚠️ The FIRST message right after a deploy can come back as an error. Gemini Enterprise takes up to ~90 seconds to start routing to a brand new agent, and a cold Cloud Run instance can refuse one request while it starts. Both are transient — send the message again.
 
 💻 **Gemini Enterprise Console (Overview):**
 👉 https://console.cloud.google.com/gemini-enterprise/locations/${SELECTED_LOC}/engines/${SELECTED_APP_ID}/overview/dashboard?&project=${PROJECT_ID}

@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v12.4-public',
+  APP_VERSION: 'v12.9-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -542,7 +542,13 @@ function generateDemo(userGoal, options = {}) {
     // experience, provisioning is parallelized and fail-soft, and no
     // allowlist is required. The UI toggle allows opting out per demo.
     enableManagedAgent: true,
-    enableWorkspaceAuth: false
+    enableWorkspaceAuth: false,
+    // Cloud Run scale-to-zero is the default and the reason an idle demo costs
+    // nothing; see the deploy block for why max-instances is pinned to 1. The
+    // toggle exists because the trade-off lands on exactly one message - the
+    // first one after an idle gap - and that is often the one an audience
+    // watches. MIN_INSTANCES in the environment still overrides either way.
+    keepWarm: false
   };
   options = { ...defaultOptions, ...options };
   
@@ -632,6 +638,7 @@ function generateDemo(userGoal, options = {}) {
     result.enableComputerUse = options.enableComputerUse || false;
     result.enableManagedAgent = options.enableManagedAgent || false;
     result.enableWorkspaceAuth = options.enableWorkspaceAuth || false;
+    result.keepWarm = options.keepWarm || false;
 
     result.setupScript = generateSetupScript({
       datasetId: datasetId,
@@ -652,6 +659,7 @@ function generateDemo(userGoal, options = {}) {
       enableComputerUse: options.enableComputerUse,
       enableManagedAgent: options.enableManagedAgent,
       enableWorkspaceAuth: options.enableWorkspaceAuth,
+      keepWarm: options.keepWarm,
       metadata: planResult.metadata
     });
     result.steps.push({ step: 4, status: 'completed', message: 'Generation complete' });
@@ -2442,7 +2450,7 @@ function buildDataAssetCatalog_(tables) {
 }
 
 function generateSetupScript(params) {
-  const { datasetId, systemInstruction, businessInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, operatingModel, enableWorkspaceMcp, enableComputerUse, enableManagedAgent, enableWorkspaceAuth, metadata } = params;
+  const { datasetId, systemInstruction, businessInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, operatingModel, enableWorkspaceMcp, enableComputerUse, enableManagedAgent, enableWorkspaceAuth, keepWarm, metadata } = params;
 
   // Derived feature gates (see AGENTS.md section 14):
   // - workspaceAuthEnabled: the GE OAuth authorization (user token) exists.
@@ -4228,7 +4236,7 @@ while true; do
   echo "📂 Demo Asset Directory: ~/${dirName}"
   echo "🧠 Agent Models:   root_agent: \$AGENT_MODEL_LITE / deep_analysis_agent: \$AGENT_MODEL"
   echo "🧪 Code Sandbox:   ✅ Enabled (Agent Runtime)"
-  ${ enableComputerUse ? `echo "🖥️ Computer Use:   ✅ Enabled (Browser Agent)"\n` : ''}${ enableManagedAgent ? `echo "🤖 Managed Agent:  ✅ Enabled (Antigravity autonomous sandbox - provisioned in parallel with setup)"\n` : ''}${ enableWorkspaceMcp ? `echo "🔌 Google Workspace MCP: Enabled"\n` : ''}${ (enableWorkspaceAuth && !enableWorkspaceMcp) ? `echo "🔐 Workspace Auth: ✅ Enabled (user OAuth, no MCP servers)"\n` : ''}${mcpBanner}echo "========================================================="
+  ${ enableComputerUse ? `echo "🖥️ Computer Use:   ✅ Enabled (Browser Agent)"\n` : ''}${ enableManagedAgent ? `echo "🤖 Managed Agent:  ✅ Enabled (Antigravity autonomous sandbox - provisioned in parallel with setup)"\n` : ''}${ enableWorkspaceMcp ? `echo "🔌 Google Workspace MCP: Enabled"\n` : ''}${ (enableWorkspaceAuth && !enableWorkspaceMcp) ? `echo "🔐 Workspace Auth: ✅ Enabled (user OAuth, no MCP servers)"\n` : ''}${ keepWarm ? 'echo "🔥 Warm Instance:  ✅ Enabled (min-instances 1 - no cold start, billed while idle)"\n' : ''}${mcpBanner}echo "========================================================="
   
   # --yes is advertised as "skip confirmation prompts (non-interactive use)", so
   # it has to skip this one too. Without the break, "read" gets EOF, returns
@@ -5498,6 +5506,7 @@ GOOGLE_API_USE_CLIENT_CERTIFICATE=false
 GOOGLE_CLOUD_LOCATION="global"
 DEMO_DATASET="${datasetId}"
 FS_COLLECTION="${fsCollection}"
+FIRESTORE_COLLECTION="${fsCollection}"
 REFERENCE_DATE="${referenceDate}"
 PUBLIC_DATASET_ID="${publicDatasetId || ''}"
 ENABLE_WORKSPACE_MCP=${enableWorkspaceMcp ? '1' : '0'}
@@ -5751,6 +5760,7 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
   ${ (() => {
     let envVars = [
       "GOOGLE_CLOUD_PROJECT=\$PROJECT_ID",
+      "PROJECT_ID=\$PROJECT_ID",
       "GOOGLE_CLOUD_LOCATION=global",
       "GEMINI_AUTHORIZATION_ID=\$AUTH_ID",
       "ADK_ENABLE_MCP_GRACEFUL_ERROR_HANDLING=1",
@@ -5763,6 +5773,7 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
       `BIGQUERY_DATASET=${datasetId}`,
       `DEMO_DATASET=${datasetId}`,
       `FS_COLLECTION=${fsCollection}`,
+      `FIRESTORE_COLLECTION=${fsCollection}`,
       `REFERENCE_DATE=${referenceDate}`,
       `PUBLIC_DATASET_ID=${publicDatasetId || ''}`,
       `ENABLE_WORKSPACE_MCP=${enableWorkspaceMcp ? '1' : '0'}`,
@@ -5872,7 +5883,20 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
     // "Application startup complete" and the turn took 37s end to end against
     // 9-13s warm, i.e. roughly +25s on that first message only. Export
     // MIN_INSTANCES=1 before running the script to keep a warm instance for a
-    // live presentation.
+    // live presentation, or tick "Keep one instance warm" in Advanced Settings
+    // to have that baked in here.
+    //
+    // The toggle raises the baseline rather than rewriting the line below,
+    // because the environment has to keep the last word in BOTH directions: an
+    // operator who exports MIN_INSTANCES=0 on a demo built while the toggle was
+    // on gets scale-to-zero, and one who exports 1 on a demo built while it was
+    // off gets a warm instance. The :- default only fills an unset or empty
+    // value, so the line below leaves whatever this set alone.
+    //
+    // A plain '...' string, not a template literal: this block interpolates
+    // nothing, and in single quotes "$MIN_INSTANCES" is already literal - one
+    // fewer escaping layer than the \$ the line below still needs.
+    deployCmd += keepWarm ? '\n# Advanced Settings asked for a warm instance: no cold start on the first\n# message, at the price of one always-on 8Gi/2vCPU instance for as long as the\n# demo exists. Export MIN_INSTANCES=0 to put this demo back on scale-to-zero.\nif [ -z "$MIN_INSTANCES" ]; then\n  MIN_INSTANCES=1\nfi\n' : '';
     deployCmd += `\n# Scale-to-zero unless the operator asked for a warm instance\nMIN_INSTANCES="\${MIN_INSTANCES:-0}"\n`;
 
     if (optionalSecrets.length > 0) {
@@ -6339,6 +6363,10 @@ ${params.importedMcpList.map((mcp, idx) => {
     if [ ! -z "\$CONFIG_ID" ]; then
       echo "💬 Start Chatting with Your Agent:"
       echo "   👉 https://vertexaisearch.cloud.google.com/home/cid/\$CONFIG_ID/r/agent/\$AGENT_ID/session/-"
+      echo "   ⚠️  The FIRST message right after a deploy can come back as an error."
+      echo "      Gemini Enterprise takes up to ~90 seconds to start routing to a brand"
+      echo "      new agent, and a cold Cloud Run instance can refuse one request while"
+      echo "      it starts. Both are transient - send the message again."
     else
       echo "💬 Start Chatting in Gemini Enterprise:"
       echo "   👉 https://console.cloud.google.com/gemini-enterprise/locations/\$SELECTED_LOC/engines/\$SELECTED_APP_ID/overview/dashboard?project=\$PROJECT_ID"

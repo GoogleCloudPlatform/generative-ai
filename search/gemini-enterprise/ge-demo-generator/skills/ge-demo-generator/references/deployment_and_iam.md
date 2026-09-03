@@ -157,9 +157,13 @@ gcloud run deploy "$SERVICE_NAME" \
 SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region="$REGION" --format="value(status.url)")
 ```
 
-Scale-to-zero is the default: an idle demo should not bill for a warm instance. The cost is a
-~20s cold start on the first message after an idle gap, so export `MIN_INSTANCES=1` before a
-live presentation.
+Scale-to-zero is the default: an idle demo should not bill for a warm instance. The cost lands
+entirely on the first message after an idle gap — a ~20s cold start, and occasionally an error
+instead, because Cloud Run can refuse a request while the container is still starting. Export
+`MIN_INSTANCES=1` before a live presentation to remove both. Offer it with its price: one
+8 GiB / 2 vCPU instance is then billed continuously for as long as the demo exists, not just
+during the presentation, so `0` stays the right default for a demo that is deployed now and
+shown later.
 
 The rest of the shape is not negotiable:
 
@@ -312,7 +316,7 @@ before the first deploy.
 | `DASH_BUCKET` | `${PROJECT_ID}-${DOMAIN_SLUG}-${SUFFIX}-dash` | setup | Deliverables bucket, created unconditionally and passed as `DASHBOARDS_BUCKET`. `publish_dashboard` and the autonomous agent's skill mount both read it. |
 | `WORKER_QUEUE` | `${SERVICE_NAME}-worker` | setup | Cloud Tasks queue for background runs. |
 | `WORKER_QUEUE_LOCATION` | `us-central1` | setup | Pinned independently of `REGION` so a demo in a region without Cloud Tasks still gets durable background work. |
-| `MIN_INSTANCES` | `0` | setup | Set to `1` before a live presentation to avoid the ~20s cold start on the first message. |
+| `MIN_INSTANCES` | `0` | setup | Set to `1` before a live presentation to avoid the ~20s cold start (and the occasional cold-start error) on the first message. Bills one 8 GiB / 2 vCPU instance continuously until the demo is deleted. |
 | `GCS_BUCKET_NAME` | `${PROJECT_ID}-${DOMAIN_SLUG}-${SUFFIX}-docs` | both | Created and populated with `external_files/` in **both** modes (Job 3.2b, outside the `RAG_MODE` branch) — in `mcp` mode nothing indexes those documents, but the bucket is still the only copy that outlives the machine running the skill, and the completion banner links to it. In `rag` mode it is additionally the unstructured half of the index. Deleted recursively by cleanup in both modes. |
 | `DATA_SCALE` | unset | setup | Row count to amplify the fact tables to before `bq load`, via `scripts/amplify_data.py` in Job 1.4. Unset loads the CSVs exactly as generated. `data/data_scale_spec.json`, when present, gives per-table targets and overrides this number. The step is deterministic and idempotent — the hero rows are stashed as `data/<table>.hero.csv` on the first run and every later run amplifies from the stash, never from already-amplified output — so it is safe whether or not the data phase already ran it. |
 
