@@ -1351,8 +1351,8 @@ class _LazyCloudLogger:
             with self._lock:
                 if self._logger is None:
                     try:
-                        import google.cloud.logging as gcl
-                        self._logger = gcl.Client().logger(self._name)
+                        import google.cloud.logging as cloud_logging
+                        self._logger = cloud_logging.Client().logger(self._name)
                     except Exception as e:
                         self._py_logger.warning("Falling back to standard logger adapter: " + str(e))
                         self._logger = _PyLoggerAdapter(self._py_logger)
@@ -1654,7 +1654,7 @@ _TRIVIAL_GREETING_RE = re.compile(
     re.IGNORECASE,
 )
 _TRIVIAL_ACK_RE = re.compile(
-    r'^(?:ok|okay|yes|no|yep|nope|thanks|thank\s+you|thx|cool|got\s+it|understood|sure|fine|'
+    r'^(?:ok|okay|yes|no|yep|nope|thanks|thank\s+you|cool|got\s+it|understood|sure|fine|'
     r'はい|いいえ|了解|承知|ありがとう)[!?.~ \s\u3000\u3001\u3002\uff01\uff1f]*$',
     re.IGNORECASE,
 )

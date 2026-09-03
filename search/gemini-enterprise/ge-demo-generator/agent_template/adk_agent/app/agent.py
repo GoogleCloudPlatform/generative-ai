@@ -3418,7 +3418,7 @@ async def _log_cache_and_model_telemetry(
     }
     print(json.dumps(payload), flush=True)
 
-# 100% static instruction string preserves Vertex AI Context Cache fingerprint across all turns.
+# 100% static instruction string preserves Context Cache fingerprint across all turns.
 _ROOT_INSTRUCTION = _ROOT_INSTRUCTION_TEMPLATE
 
 root_agent = LlmAgent(
