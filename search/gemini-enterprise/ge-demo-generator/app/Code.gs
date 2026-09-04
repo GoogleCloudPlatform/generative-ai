@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v12.9-public',
+  APP_VERSION: 'v12.10-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -5963,9 +5963,7 @@ ${ (params.importedMcpList || []).some(m => m.type === 'remote' && (m.auth_type 
     sleep 5
   done
   echo ""
-  wait $DEPLOY_PID
-  DEPLOY_EXIT=$?
-  if [ $DEPLOY_EXIT -ne 0 ]; then
+  if ! wait "$DEPLOY_PID"; then
     echo "   ❌ Cloud Run deployment failed. Build log:"
     echo "---------------------------------------------------------"
     cat "$DEPLOY_LOG"
