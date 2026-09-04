@@ -337,12 +337,12 @@ colorway
 colurna
 colvis
 colwidth
-contextvar
 Cómo
 Condesa
 Connectez
 CONOUT
 constexpr
+contextvar
 convo
 convos
 cooldown
@@ -606,8 +606,8 @@ expr
 extfiles
 faa
 facecolor
-Failsafe
 failsafe
+Failsafe
 Fairall
 faiss
 FAISS
