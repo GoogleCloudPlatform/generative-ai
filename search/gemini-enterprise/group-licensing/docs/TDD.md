@@ -122,10 +122,10 @@ The utility's logic is divided into two primary reconciliation workflows.
   A billing account may have multiple active subscriptions for the same SKU. At startup, the joiner fetches all `BillingAccountLicenseConfig` records and builds an index keyed by `(SKU, ProjectNumber, Location)`. Each key maps to an ordered slice of `LicenseConfigEntry` values — one per distinct subscription pool — so that all seat capacity is visible and no pool is silently discarded.
 
   If a `batchUpdateUserLicenses` call fails because a pool is exhausted, the job does **not** treat this as a fatal error. Instead it:
-  1. Calls `licenseConfigsUsageStats.list` for the affected project to retrieve the current `usedLicenseCount` for the relevant `licenseConfig`.
-  2. Computes `available = allocatedCount - usedLicenseCount` (the allocated count is from the `licenseConfigDistributions` map fetched at startup).
-  3. Retries the batch trimmed to `available` items, granting as many licenses as possible.
-  4. Carries the remaining (ungranted) users forward to the next subscription pool for the same SKU, if one exists, and repeats steps 1–3.
+  1. Calls `licenseConfigsUsageStats.list` for the affected project to retrieve and log the current `available` seat capacity (for observability).
+  2. Falls back to a **1-by-1 sequential assignment** for the failed batch. This ensures that users who already hold a license (no-ops) do not strand seats by artificially masking capacity.
+  3. Halts the 1-by-1 assignment the moment `batchUpdateUserLicenses` returns `ErrLicensesExhausted` for a single user, confirming the pool is now truly at zero capacity.
+  4. Carries the remaining (ungranted) users forward to the next subscription pool for the same SKU, if one exists, and repeats the batch assignment.
   5. After all pools for a SKU are exhausted, soft-fails any users still unseated: logs a `WARN` entry per exhausted pool and continues to the next batch or project. The job exits `0`.
 
   Each user appears in at most one successful `batchUpdateUserLicenses` call — users do not advance to the next pool if they were already granted a seat. The `licenses_soft_failed` count in the final summary reflects only users who could not be seated across all pools for their SKU.
