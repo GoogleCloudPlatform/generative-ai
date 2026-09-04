@@ -1387,17 +1387,21 @@ _all_tools.append(tools.start_browser_session)
 _all_tools.append(tools.computer_use_browse)
 # Managed Autonomous Agent (Antigravity) delegation. Background workers are
 # blocked by a structural guard in tools.py; deep_analysis_agent is ALLOWED
-# to delegate (v11.2) so a mis-routed web/file/Workspace task has an escape
-# hatch instead of a dead end - the tool always returns within the sync
-# window, so the F1 hang pattern does not apply.
-_all_tools.append(tools.delegate_autonomous_task)
-_all_tools.append(tools.get_autonomous_task_status)
-# Recurring autonomous schedules (v11.33): Cloud Scheduler fires
-# /execute_task, which delegates to the sandbox headlessly.
-_all_tools.append(tools.register_scheduled_autonomous_task)
-# Drive handoff needs BOTH the user's Workspace OAuth (drive.file) and the
-# Managed Agent deliverables in GCS.
-_all_tools.append(tools.save_deliverables_to_drive)
+# Managed Autonomous Agent (Antigravity) delegation & Workspace Drive handoff.
+# Background workers are blocked by a structural guard in tools.py; deep_analysis_agent
+# is ALLOWED to delegate (v11.2) so a mis-routed web/file/Workspace task has an escape
+# hatch instead of a dead end - the tool always returns within the sync window, so the
+# F1 hang pattern does not apply.
+for _tool_name in (
+    "delegate_autonomous_task",
+    "get_autonomous_task_status",
+    "register_scheduled_autonomous_task",
+    "save_deliverables_to_drive",
+):
+    _tool = getattr(tools, _tool_name, None)
+    if _tool is not None:
+        _all_tools.append(_tool)
+
 
 
 # --- Agent Sandbox Code Executor (always enabled) ---
