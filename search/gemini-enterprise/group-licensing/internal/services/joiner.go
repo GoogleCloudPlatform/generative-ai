@@ -289,7 +289,7 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 		return 0, nil, batchErr
 	}
 
-	// License pool exhausted. Look up how many seats are still available.
+	// License pool almost exhausted. Look up how many seats are still available.
 	usageStats, statsErr := s.gemini.FetchLicenseUsageStats(ctx, projectNumber, location)
 	if statsErr != nil {
 		return 0, nil, fmt.Errorf("fetching license usage stats after exhaustion: %w", statsErr)
@@ -301,31 +301,51 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 		available = 0
 	}
 
-	logger.WarnContext(ctx, "license pool exhausted, soft-failing remaining users",
+	logger.WarnContext(ctx, "license pool nearing exhaustion, initiating 1-by-1 fallback",
 		slog.String("project_id", projectID),
 		slog.String("license_config_path", entry.Path),
-		slog.Int64("available", available),
-		slog.Int("soft_failed", len(batch)-int(available)),
+		slog.Int64("reported_available", available),
+		slog.Int("batch_size", len(batch)),
 	)
 
-	if available == 0 {
-		return 0, batch, nil
+	// Retry remaining users 1-by-1 to ensure no-op successes don't strand available seats.
+	// We rely on the strong consistency of the batch update endpoint.
+	var successful int
+	for _, u := range batch {
+		if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, []models.LicenseUpdate{u}); retryErr != nil {
+			if errors.Is(retryErr, models.ErrLicensesExhausted) {
+				logger.DebugContext(ctx, "1-by-1 fallback hit hard limit; pool is completely exhausted",
+					slog.String("project_id", projectID),
+					slog.Int("successful_so_far", successful),
+					slog.String("license_config_path", entry.Path),
+				)
+				// The pool is completely exhausted. The current user and the rest of the batch are soft-failed.
+				break
+			}
+			return successful, nil, retryErr // hard failure on 1-by-1
+		}
+		successful++
 	}
 
-	// Retry with only the available seats. Any error here is a hard failure.
-	trimmed := batch[:available]
-	if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, trimmed); retryErr != nil {
-		return 0, nil, retryErr
+	softFailedCount := len(batch) - successful
+
+	if softFailedCount > 0 {
+		logger.WarnContext(ctx, "1-by-1 fallback complete, soft-failing remaining users",
+			slog.String("project_id", projectID),
+			slog.String("license_config_path", entry.Path),
+			slog.Int("soft_failed", softFailedCount),
+		)
 	}
 
-	// verbose debug logging: Emitted per batch
-	logger.DebugContext(ctx, "batch granted after pool exhaustion",
+	// verbose debug logging: Emitted per batch exhaustion
+	logger.DebugContext(ctx, "batch granted 1-by-1 after pool exhaustion",
 		slog.String("project_id", projectID),
-		slog.Int("count", int(available)),
+		slog.Int("successful_1_by_1_count", successful),
+		slog.Int("soft_failed_count", softFailedCount),
 		slog.String("license_config_path", entry.Path),
 	)
 	
-	return int(available), batch[available:], nil
+	return successful, batch[successful:], nil
 }
 
 // collectGroupMembers pages through all members of groupEmail and updates
