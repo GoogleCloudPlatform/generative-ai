@@ -36,6 +36,31 @@ import json
 from typing import Dict, Any, List, Optional
 
 
+def evaluate_session_anomalies(session_history: list, order_baseline: float) -> list[dict]:
+    """
+    Evaluates session history against behavioral anomaly detectors (local stand-in for AAD).
+    Featured in blog Section 3.
+    """
+    findings = []
+    refunds = [t for t in session_history
+               if (t.get("tool") == "issue_refund" or t.get("tool_called") == "issue_refund" or t.get("action") == "issue_refund")
+               and t.get("status") == "APPROVED"]
+    cumulative = sum(float(t.get("args", {}).get("amount", t.get("tool_args", {}).get("amount", t.get("turn_amount", 0.0)))) for t in refunds)
+
+    # High-frequency identical tool calls
+    if len(refunds) >= 3:
+        findings.append({"detector": "repeated_tool_call", "confidence": 0.95})
+    # Cumulative parameter value exceeds the order baseline
+    if cumulative > order_baseline:
+        findings.append({"detector": "cumulative_limit_exceeded", "confidence": 0.80})
+    # Repeated write mutations against the same order id
+    order_ids = {str(t.get("args", {}).get("order_id", t.get("tool_args", {}).get("order_id", t.get("order_id", "")))) for t in refunds}
+    if len(order_ids) == 1 and len(refunds) >= 2:
+        findings.append({"detector": "single_entity_write_velocity", "confidence": 0.80})
+
+    return findings
+
+
 class AADSession:
     """Represents an active multi-turn agent session under behavioral monitoring."""
 
@@ -142,14 +167,29 @@ class AADSession:
 
         highest_severity = "CRITICAL" if any(f["severity"] == "CRITICAL" for f in self.findings) else "HIGH"
 
-        return {
+        finding = {
+            "vulnerabilityId": f"a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
             "finding_id": f"scc-finding-aad-{self.session_id}",
-            "resource_name": f"//aiplatform.googleapis.com/agents/{self.agent_id}/sessions/{self.session_id}",
+            "findingClass": "THREAT",
+            "findingType": "AGENT_SESSION_ANOMALY",
             "category": "AGENT_BEHAVIORAL_ANOMALY",
             "state": "ACTIVE",
             "severity": highest_severity,
-            "event_time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "source_properties": {
+            "csccResourceName": f"//aiplatform.googleapis.com/projects/agent-security-fleet-prod/locations/us-central1/reasoningEngines/{self.agent_id}",
+            "agent": { "id": self.agent_id, "displayName": "support-refund-agent" },
+            "agentSessions": [ { "sessionId": self.session_id } ],
+            "agentAnomaly": {
+                "detectorReferences": [
+                    {
+                        "detectorId": "tool_misuse",
+                        "displayName": "ASI02: Tool Misuse",
+                        "severity": highest_severity,
+                        "recommendation": "Restrict the tool to a smaller allowlist and add a confirmation step before execution."
+                    }
+                ]
+            },
+            "structuredProperties": {
+                "contextUris": { "relatedFindingUri": { "displayName": "View agents anomaly session details" } },
                 "agent_id": self.agent_id,
                 "order_id": self.order_id,
                 "turns_analyzed": len(self.turns),
@@ -160,10 +200,13 @@ class AADSession:
             "recommendation": {
                 "action": "SYNTHESIZE_SGP_POLICY",
                 "policy_name": "refund-policy-single-order-limit",
-                "suggested_constraint": "Deny any refund approval if the conversation history or ledger already shows an approved refund for the same order ID in this conversation. Cumulative refunds for an order must never exceed the original verified purchase amount.",
+                "suggested_constraint": "Deny any issue_refund call when the conversation history already contains an approved refund for the same order_id in this session. Route the request to a human manager instead.",
                 "enforcement": "BLOCK"
             }
         }
+        # Backwards compatibility helper
+        finding["properties"] = finding["structuredProperties"]
+        return finding
 
 
 class AADTelemetryEngine:

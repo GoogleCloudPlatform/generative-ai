@@ -33,6 +33,35 @@ from aad_engine import AADSession
 ACTIVE_POLICIES_FILE = Path(__file__).parent / "active_policies.json"
 
 
+def remediate(finding: dict, sgp_client) -> None:
+    """
+    Wires a Security Command Center (SCC) finding directly to a new adaptive policy.
+    Featured in blog Section 3.
+    """
+    # Match the findingClass and findingType from the SCC finding payload
+    if finding.get("findingType") != "AGENT_SESSION_ANOMALY":
+        return
+    agent_id = finding.get("agent", {}).get("id", "support-refund-agent")
+    constraint = (
+        "Deny any issue_refund call when the conversation history already "
+        "contains an approved refund for the same order_id in this session. "
+        "Route the request to a human manager instead."
+    )
+    sgp_client.create_policy(
+        name="refund-policy-single-order-limit",
+        target_agent=agent_id,
+        target_tools=["issue_refund"],
+        constraint=constraint,
+        enforcement="BLOCK",
+    )
+    # The new policy is evaluated by Agent Gateway on the next tool call,
+    # with no agent redeploy or restart.
+    if hasattr(sgp_client, "policies"):
+        all_policies = {name: p.to_dict() for name, p in sgp_client.policies.items()}
+        with open(ACTIVE_POLICIES_FILE, "w") as f:
+            json.dump(all_policies, f, indent=2)
+
+
 def synthesize_adaptive_policy(session: AADSession) -> SGPPolicy:
     """
     Synthesizes a targeted conversational policy from an anomalous session finding.
@@ -42,9 +71,9 @@ def synthesize_adaptive_policy(session: AADSession) -> SGPPolicy:
         target_agent=session.agent_id,
         target_tools=["issue_refund"],
         constraints=(
-            "Deny any refund approval if the conversation history or ledger already shows an approved "
-            "refund for the same order ID in this conversation. Any subsequent refund for that same "
-            "order must be denied and routed to a human manager, regardless of the requested amount."
+            "Deny any issue_refund call when the conversation history already "
+            "contains an approved refund for the same order_id in this session. "
+            "Route the request to a human manager instead."
         ),
         enforcement="BLOCK"
     )

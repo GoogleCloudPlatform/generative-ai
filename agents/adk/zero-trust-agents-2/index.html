@@ -502,13 +502,13 @@
                         <div class="form-group">
                             <label><strong>Evaluate Proposed Tool Call:</strong></label>
                             <div class="template-selector mb-2">
-                                <button class="btn btn-secondary btn-sm" id="btn-sgp-tpl-act2">💥 Act 2: $120 Enterprise IDE Software</button>
+                                <button class="btn btn-secondary btn-sm" id="btn-sgp-tpl-act2">💥 Act 2: $120 Workplace User License</button>
                                 <button class="btn btn-secondary btn-sm" id="btn-sgp-tpl-cable">✅ $20 Power Cable (Hardware)</button>
                                 <button class="btn btn-secondary btn-sm" id="btn-sgp-tpl-exceed">💥 $200 Docking Station (> $149 Cap)</button>
                             </div>
                             <div class="input-group-row">
                                 <input type="text" id="sgp-test-tool" class="form-control" value="issue_refund" readonly style="max-width: 140px;" />
-                                <input type="text" id="sgp-test-args" class="form-control" value='{"order_id": "99281", "amount": 120.00, "item": "Enterprise IDE License"}' />
+                                <input type="text" id="sgp-test-args" class="form-control" value='{"order_id": "99281", "amount": 120.00, "item": "Workplace User License"}' />
                             </div>
                         </div>
 
@@ -535,7 +535,7 @@
 
                             <h4>Key Takeaways for Enterprise SecOps:</h4>
                             <ul>
-                                <li><strong>Semantic Understanding</strong>: The LLM judge recognizes "Enterprise IDE License" as digital software without requiring SKUs.</li>
+                                <li><strong>Semantic Understanding</strong>: The LLM judge recognizes "Workplace User License" as digital software without requiring SKUs or explicit keywords like "software".</li>
                                 <li><strong>Fail-Closed Guarantee</strong>: If policy evaluation times out or encounters network latency, the gateway suppresses execution by default.</li>
                                 <li><strong>Explainable Rationales</strong>: The decision payload includes human-readable rationale that can be returned to customers or logged in Chronicle.</li>
                             </ul>
@@ -639,12 +639,13 @@
                         <!-- SCC Finding Card -->
                         <div class="scc-finding-card" id="scc-finding-card">
                             <div class="scc-header">
-                                <span class="scc-badge text-danger">⚠️ HIGH SEVERITY FINDING</span>
-                                <span class="scc-category">AGENT_BEHAVIORAL_ANOMALY</span>
+                                <span class="scc-badge text-danger">⚠️ CRITICAL SEVERITY FINDING</span>
+                                <span class="scc-category">THREAT: AGENT_SESSION_ANOMALY</span>
                             </div>
                             <div class="scc-body">
-                                <strong>Resource:</strong> <code>//aiplatform.googleapis.com/agents/support-refund-agent-04/sessions/sess_demo</code><br>
-                                <strong>Finding:</strong> Multi-turn refund smurfing detected across 8 turns ($160.00 extracted).<br>
+                                <strong>Resource:</strong> <code>//aiplatform.googleapis.com/projects/agent-security-fleet-prod/locations/us-central1/reasoningEngines/support-refund-agent</code><br>
+                                <strong>Agent:</strong> <code>support-refund-agent (ID: 3757043326738497536)</code><br>
+                                <strong>Finding:</strong> ASI02: Tool Misuse / Cumulative extraction ($160.00) on Order #99281.<br>
                                 <strong>Recommended Remediation:</strong> Synthesize conversational policy <code>refund-policy-single-order-limit</code>.
                             </div>
                             

@@ -55,8 +55,8 @@ ORDER_DATABASE = {
         "customer_id": "cust_402",
         "total_amount": 149.00,
         "items": [
-            {"name": "USB-C Pro Docking Station & Cable", "category": "hardware_accessory", "price": 29.00},
-            {"name": "Enterprise IDE Software License (Annual)", "category": "digital_software", "price": 120.00}
+            {"name": "USB-C Pro Docking Station and Cable", "category": "hardware_accessory", "price": 29.00},
+            {"name": "Workplace User License (Annual)", "category": "digital_software", "price": 120.00}
         ]
     }
 }
@@ -290,12 +290,12 @@ class SupportRefundRuntime:
         """Determines tool arguments based on user prompt semantics."""
         prompt_lower = prompt.lower()
         
-        # Software License / IDE
-        if "ide" in prompt_lower or "software" in prompt_lower or "license" in prompt_lower:
+        # Digital Goods / Workplace User License / Software License
+        if "workplace" in prompt_lower or "user license" in prompt_lower or "ide" in prompt_lower or "software" in prompt_lower or "license" in prompt_lower:
             return "issue_refund", {
                 "order_id": "99281",
                 "amount": 120.00,
-                "item": "Enterprise IDE Software License",
+                "item": "Workplace User License",
                 "recipient": "cust_402"
             }
         

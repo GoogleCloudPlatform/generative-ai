@@ -45,9 +45,9 @@ name: refund-policy-category
 target_agent: support-refund-agent-04
 target_tools: ["issue_refund", "calculate_restocking_fee"]
 constraints: |
-  Refunds or fee waivers for opened digital goods, software licenses, or clearance items 
-  exceeding 30 USD must be denied and routed to a human manager. 
-  Refunds for physical hardware or unopened accessories up to 149 USD are allowed.
+  Refunds for opened digital goods, software licenses, or clearance items 
+  over 30 USD must be denied and routed to a human manager. 
+  Refunds for physical hardware accessories up to 149 USD are allowed.
 enforcement: BLOCK
 ```
 
@@ -59,8 +59,8 @@ sgp = SGPGuard()
 
 # Proposed tool execution from agent
 tool_call = "issue_refund"
-tool_args = {"order_id": "99281", "amount": 120.00, "item": "Enterprise IDE License"}
-user_prompt = "I bought an IDE license for $120. Please refund my card."
+tool_args = {"order_id": "99281", "amount": 120.00, "item": "Workplace User License"}
+user_prompt = "I purchased an annual Workplace user license ($120.00) under order #99281. The tool did not fit our workflow, so please issue a full refund to my card."
 
 decision = sgp.evaluate_tool_call(tool_call, tool_args, user_prompt)
 
@@ -110,14 +110,15 @@ anomalies = session.evaluate_anomalies()
 When AAD flags a session, the system automatically synthesizes an adaptive conversational policy and attaches it in real-time with **zero code redeployment and zero downtime**:
 
 ```python
-from remediation_loop import attach_remediation_policy
+from remediation_loop import remediate, attach_remediation_policy
 
-# Synthesize and hot-reload adaptive policy
-event = attach_remediation_policy(sgp, session)
+# Wire an SCC finding directly into a new policy (matching blog Section 3)
+scc_finding = session.get_scc_finding()
+remediate(scc_finding, sgp)
 
 # Live Adaptive Policy:
 #   name: refund-policy-single-order-limit
-#   constraints: "Deny any refund approval if the conversation history already shows an approved refund for the same order ID in this conversation."
+#   constraints: "Deny any issue_refund call when the conversation history already contains an approved refund for the same order_id in this session. Route the request to a human manager instead."
 
 # Now, Turn 9 is evaluated:
 turn9_decision = sgp.evaluate_tool_call(
