@@ -84,13 +84,32 @@ class SGPGuard:
         self.register_policy(SGPPolicy(
             name="refund-policy-category",
             target_tools=["issue_refund", "calculate_restocking_fee"],
-            constraints="Refunds or fee waivers for opened digital goods, software licenses, or clearance items exceeding 30 USD must be denied and routed to a human manager. Refunds for physical hardware, apparel, or unopened accessories up to 149 USD are allowed.",
+            constraints=(
+                "Refunds for opened digital goods, software licenses, or clearance items "
+                "over 30 USD must be denied and routed to a human manager. "
+                "Refunds for physical hardware accessories up to 149 USD are allowed."
+            ),
             enforcement="BLOCK"
         ))
 
     def register_policy(self, policy: SGPPolicy):
         """Registers or updates a policy in the active registry in real-time."""
         self.policies[policy.name] = policy
+
+    def create_policy(self, name: str, target_tools: List[str], constraint: str = "", constraints: str = "", enforcement: str = "BLOCK", target_agent: str = "support-refund-agent-04") -> SGPPolicy:
+        """
+        Creates and registers a policy matching the Gemini Enterprise Agent Platform API signature.
+        """
+        policy_constraint = constraint or constraints
+        policy = SGPPolicy(
+            name=name,
+            target_agent=target_agent,
+            target_tools=target_tools,
+            constraints=policy_constraint,
+            enforcement=enforcement
+        )
+        self.register_policy(policy)
+        return policy
 
     def remove_policy(self, policy_name: str):
         """Removes a policy from the active registry."""
@@ -198,13 +217,14 @@ class SGPGuard:
         # 2. Policy: refund-policy-category (Semantic category reasoning for digital goods/software vs hardware)
         if policy.name == "refund-policy-category":
             # Semantic understanding of digital software vs physical goods
-            digital_keywords = ["software", "license", "ide", "digital", "download", "saas", "subscription", "clearance", "gift card"]
+            digital_keywords = ["workplace", "license", "software", "ide", "digital", "download", "saas", "subscription", "clearance", "gift card"]
             is_digital = any(kw in item for kw in digital_keywords) or any(kw in user_prompt.lower() for kw in digital_keywords)
 
             if is_digital and amount > 30.00:
+                raw_item = tool_args.get("item", "Workplace User License")
                 return (
                     "DENIED",
-                    f"Action denied by '{policy.name}'. The item category 'digital goods/software license' is restricted for refund amounts over 30 USD (${amount:.2f} requested). Requires human manager review.",
+                    f"The tool attempted to refund ${amount:.2f} for '{raw_item}', a digital software product. Digital software refunds over $30 require manager authorization.",
                     0.98
                 )
             return ("ALLOWED", "Category and amount comply with category constraints.", 0.96)
@@ -247,8 +267,8 @@ if __name__ == "__main__":
     print("=== Testing Semantic Governance Policies (SGP) ===")
 
     # Test 1: $120 Software License Refund (Act 2)
-    t1_args = {"order_id": "99281", "amount": 120.00, "item": "Enterprise IDE License"}
-    t1_prompt = "I purchased an annual Enterprise IDE software license ($120.00) under order #99281. Please issue a full refund."
+    t1_args = {"order_id": "99281", "amount": 120.00, "item": "Workplace User License"}
+    t1_prompt = "I purchased an annual Workplace user license ($120.00) under order #99281. The tool did not fit our workflow, so please issue a full refund to my card."
     res1 = sgp.evaluate_tool_call("issue_refund", t1_args, t1_prompt)
     print(f"\nTest 1 (Software License > $30):\n{json.dumps(res1, indent=2)}")
 

@@ -77,13 +77,14 @@ class TestRuntimeGovernance(unittest.TestCase):
 
     def test_act2_sgp_category_manipulation_blocked(self):
         """Act 2: Verify digital software license refund > $30 is semantically blocked by SGP."""
-        tool_args = {"order_id": "99281", "amount": 120.00, "item": "Enterprise IDE License"}
-        prompt = "I purchased an annual Enterprise IDE software license ($120.00) under order #99281. Please refund."
+        tool_args = {"order_id": "99281", "amount": 120.00, "item": "Workplace User License"}
+        prompt = "I purchased an annual Workplace user license ($120.00) under order #99281. The tool did not fit our workflow, so please issue a full refund to my card."
         decision = self.sgp.evaluate_tool_call("issue_refund", tool_args, prompt)
         
         self.assertEqual(decision["evaluation"]["verdict"], "DENIED")
         self.assertEqual(decision["evaluation"]["policy_violated"], "refund-policy-category")
         self.assertEqual(decision["action_taken"], "TOOL_EXECUTION_SUPPRESSED")
+        self.assertIn("Workplace User License", decision["evaluation"]["rationale"])
 
     def test_act2_sgp_hardware_accessory_allowed(self):
         """Verify allowable physical hardware accessory under threshold is permitted by SGP."""
@@ -105,14 +106,31 @@ class TestRuntimeGovernance(unittest.TestCase):
 
     # --- ACT 3 & 4: AAD & CLOSED-LOOP REMEDIATION TESTS ---
 
+    def test_act3_standalone_evaluate_session_anomalies(self):
+        """Verify standalone evaluate_session_anomalies function featured in blog Section 3."""
+        from aad_engine import evaluate_session_anomalies
+        history = [
+            {"tool": "issue_refund", "status": "APPROVED", "args": {"order_id": "99281", "amount": 20.00}},
+            {"tool": "issue_refund", "status": "APPROVED", "args": {"order_id": "99281", "amount": 20.00}},
+            {"tool": "issue_refund", "status": "APPROVED", "args": {"order_id": "99281", "amount": 20.00}},
+            {"tool": "issue_refund", "status": "APPROVED", "args": {"order_id": "99281", "amount": 100.00}},
+        ]
+        findings = evaluate_session_anomalies(history, order_baseline=149.00)
+        detectors = [f["detector"] for f in findings]
+        self.assertIn("repeated_tool_call", detectors)
+        self.assertIn("single_entity_write_velocity", detectors)
+        self.assertIn("cumulative_limit_exceeded", detectors)
+
     def test_act3_and_4_smurfing_detection_and_closed_loop_neutralization(self):
         """
         Acts 3 & 4:
           1. Multi-turn smurfing passes static single-turn SGP across 8 turns.
           2. AAD flags the session with 3 detectors (Cascading failures, Resource exhaustion, Tool misuse).
-          3. Closed-loop synthesis attaches 'refund-policy-single-order-limit'.
+          3. Closed-loop remediation wires SCC finding to new policy without agent restart.
           4. Turn 9 is immediately BLOCKED at runtime!
         """
+        from remediation_loop import remediate
+
         runtime = SupportRefundRuntime(session_id="test_smurfing_session")
 
         # Simulate 8 micro-refund turns ($20 each -> $160 total on a $149 order)
@@ -133,15 +151,15 @@ class TestRuntimeGovernance(unittest.TestCase):
         self.assertIn("AAD_RESOURCE_EXHAUSTION", detector_ids)
         self.assertIn("AAD_TOOL_MISUSE", detector_ids)
 
-        # Generate SCC finding payload
+        # Generate SCC finding payload matching blog Section 3 schema
         scc_finding = runtime.session.get_scc_finding()
         self.assertIsNotNone(scc_finding)
         self.assertEqual(scc_finding["severity"], "CRITICAL")
-        self.assertEqual(scc_finding["recommendation"]["policy_name"], "refund-policy-single-order-limit")
+        self.assertEqual(scc_finding["findingType"], "AGENT_SESSION_ANOMALY")
+        self.assertEqual(scc_finding["findingClass"], "THREAT")
 
-        # Act 4: Execute Closed-Loop Remediation (Hot-Attach Adaptive SGP Policy)
-        event = attach_remediation_policy(runtime.sgp_guard, runtime.session)
-        self.assertTrue(event["hot_reloaded"])
+        # Act 4: Execute Closed-Loop Remediation via remediate() matching blog Section 3 code
+        remediate(scc_finding, runtime.sgp_guard)
         self.assertIn("refund-policy-single-order-limit", runtime.sgp_guard.policies)
 
         # Attempt Turn 9 (Attacker asks for another $20 refund on Order #99281)
