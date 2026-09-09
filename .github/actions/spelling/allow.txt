@@ -204,6 +204,7 @@ bml
 bname
 bnb
 bom
+bookable
 booktitle
 bools
 boop
@@ -247,6 +248,7 @@ Byzance
 cacio
 cais
 CALIPSO
+Camden
 campestre
 CAMQAA
 Camry
@@ -832,6 +834,7 @@ gws
 HACCP
 hacer
 hackathon
+Hackney
 hadolint
 hahaha
 Haichao
@@ -956,6 +959,7 @@ inpaint
 inpainted
 inr
 INR
+insideairbnb
 ints
 IOMGR
 ionate
@@ -974,6 +978,7 @@ isdigit
 isdir
 isess
 isfile
+Islington
 itable
 itables
 itb
@@ -1350,6 +1355,7 @@ ndocs
 nec
 Nederlands
 neering
+neighbourhood
 neighbouring
 neil
 Nemar

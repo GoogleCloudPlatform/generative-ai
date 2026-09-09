@@ -4,17 +4,18 @@ This repository explores various techniques and use-cases for embedding in Machi
 
 ## Notebooks
 
-- [Vertex AI Vector Search Introduction](vector-search-2-intro.ipynb): An introduction to setting up and using Vertex AI Vector Search 2.0.
+- [Agent Platform Vector Search Introduction](vector-search-2-intro.ipynb): An introduction to setting up and using Agent Platform Vector Search 2.0.
+- [Build a Travel Agent with Vector Search 2.0 and ADK](vector-search-2-travel-agent.ipynb): Ingest Airbnb listings into a Vector Search 2.0 Collection, then wrap hybrid search as a tool an ADK agent calls on its own.
 - [Import from BigQuery into Vector Search](bigquery-import.ipynb): Learn how to import vector embedding data from a BigQuery data source into a Vector Search index.
 - [Use Gemini and OSS Text-Embedding Models Against Your BigQuery Data](bigquery_ml_gemini_and_oss_text_embedding.ipynb): Learn how to generate text embeddings using BigQuery in conjunction with both Gemini and OSS text embedding models.
-- [Vertex AI Vector Search Quickstart](vector-search-quickstart.ipynb): A quickstart guide to setting up and using Vertex AI Vector Search.
+- [Agent Platform Vector Search Quickstart](vector-search-quickstart.ipynb): A quickstart guide to setting up and using Agent Platform Vector Search.
 - [Introduction to Text Embeddings and Vector Search](intro-textemb-vectorsearch.ipynb): Provides an introduction to text embeddings and their application in building vector search engines.
 - [Hybrid Search](hybrid-search.ipynb): Demonstrates building a hybrid search system leveraging both keyword-based search and semantic similarity search with embeddings.
 - [Embedding Similarity Visualization](embedding-similarity-visualization.ipynb): Visualizes similarity relationships between embeddings using dimensionality reduction techniques like PCA and t-SNE.
 - [Introduction to Multimodal Embeddings](intro_multimodal_embeddings.ipynb): Introduces the concept of multimodal embeddings, which combine information from different modalities like text and images.
 - [Introduction to Embeddings Tuning](intro_embeddings_tuning.ipynb): Explores techniques for fine-tuning pre-trained embedding models to specific domains and tasks.
 - [Task-specific Embeddings](task-type-embedding.ipynb): Explores techniques for creating embeddings specialized for different tasks.
-- [Large-scale Embeddings Generation for Vector Search](large-embs-generation-for-vvs.ipynb): Demonstrates large-scale embeddings generation for Vertex AI Vector Search.
+- [Large-scale Embeddings Generation for Vector Search](large-embs-generation-for-vvs.ipynb): Demonstrates large-scale embeddings generation for Agent Platform Vector Search.
 
 ## Use Cases
 
