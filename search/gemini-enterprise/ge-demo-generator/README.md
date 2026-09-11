@@ -76,12 +76,7 @@ The **Gemini Enterprise Demo Generator** is a low-code web application built on 
    cd generative-ai/search/gemini-enterprise/ge-demo-generator
    ```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Log in to Clasp (if not already):
+2. Authenticate with Clasp (if not already):
    ```bash
    clasp login
    ```
@@ -93,10 +88,11 @@ The **Gemini Enterprise Demo Generator** is a low-code web application built on 
 1. Create a new Google Apps Script project at [script.google.com](https://script.google.com).
 2. Find the **Script ID**:
    - Open the Apps Script editor → **Project Settings** (Gear Icon) → **IDs** → copy the **Script ID**.
-3. Create a **`.clasp.json`** file in the project root (`search/gemini-enterprise/ge-demo-generator/`) to point to your script and declare the `app` subdirectory (this file is Git-ignored):
+3. Create a **`.clasp.json`** file in the project root (`search/gemini-enterprise/ge-demo-generator/` — **do not** create this inside the `app/` directory):
    ```json
    {"scriptId": "YOUR_SCRIPT_ID", "rootDir": "app"}
    ```
+   > **Important**: Keep your terminal in the project root (`search/gemini-enterprise/ge-demo-generator/`). Do not `cd app`. Clasp reads `.clasp.json` from the current directory and deploys the contents of the `app/` folder specified by `"rootDir": "app"`.
 
 ---
 
@@ -113,17 +109,20 @@ The **Gemini Enterprise Demo Generator** is a low-code web application built on 
 
 ### Push / Pull Commands
 
-With the `.clasp.json` in place, use standard `clasp` commands:
+With the `.clasp.json` in place at the project root, verify the tracked files and use standard `clasp` commands:
 
 ```bash
+# Check tracked files (should list 4 files: appsscript.json, Code.gs, index.html, SetupError.html)
+clasp status
+
 # Push local code to the Apps Script project
 clasp push
 
 # Pull latest code from the Apps Script project
 clasp pull
 
-# Open the Apps Script project in your browser
-clasp open
+# Open the Apps Script editor in your browser
+clasp open-script
 ```
 
 ### Files Deployed to Apps Script
@@ -263,12 +262,12 @@ TEMPLATE_SUBDIR  search/gemini-enterprise/ge-demo-generator/agent_template
 
 Even with correct scopes in `appsscript.json`, you **must** manually authorize the script to access your data.
 
-1. In the Apps Script editor, select the **`forceAuthorizeSpreadsheet`** function from the function dropdown.
+1. In the Apps Script editor, select the **`forceAuthorize`** function from the function dropdown.
 2. Click **Run** (▶️).
 3. A "Review Permissions" popup will appear. Follow the prompts to authorize access.
    - You may need to click **"Advanced" → "Go to [project name] (unsafe)"** if prompted with an "unverified app" warning.
 
-> **Note**: The `forceAuthorizeSpreadsheet` function explicitly triggers authorization for Spreadsheet scopes by performing a safe read test.
+> **Note**: The `forceAuthorize` function explicitly triggers authorization for Drive and Spreadsheet scopes by performing a safe read/write test.
 
 ---
 

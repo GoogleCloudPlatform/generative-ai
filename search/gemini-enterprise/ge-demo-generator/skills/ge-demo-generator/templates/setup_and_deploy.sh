@@ -682,12 +682,26 @@ grant_roles_fast() {
   grant_roles_fast "$PROJECT_ID" "serviceAccount" "$SCHED_SA" "roles/pubsub.publisher"
   grant_roles_fast "$PROJECT_ID" "serviceAccount" "$DISCOVERY_ENGINE_SA" "roles/run.invoker"
   # Signed download links are minted through the IAM signBlob API rather than a
-  # key file, which needs the runtime SA to impersonate ITSELF. Project-level
-  # roles cannot express that; it has to be a binding on the SA resource.
+  # key file, which needs the runtime SA to impersonate ITSELF. Resource-level
+  # self-binding is tried first; if restricted, falls back to project-level.
   gcloud iam service-accounts add-iam-policy-binding "$COMPUTE_SA" \
     --member="serviceAccount:$COMPUTE_SA" \
     --role="roles/iam.serviceAccountTokenCreator" \
-    --project="$PROJECT_ID" --quiet >/dev/null 2>&1 || true
+    --project="$PROJECT_ID" --quiet >/dev/null 2>&1 ||
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+      --member="serviceAccount:$COMPUTE_SA" \
+      --role="roles/iam.serviceAccountTokenCreator" \
+      --condition=None --quiet >/dev/null 2>&1 || true
+
+  # Cloud Tasks worker dispatch requires actAs on the runtime SA.
+  gcloud iam service-accounts add-iam-policy-binding "$COMPUTE_SA" \
+    --member="serviceAccount:$COMPUTE_SA" \
+    --role="roles/iam.serviceAccountUser" \
+    --project="$PROJECT_ID" --quiet >/dev/null 2>&1 ||
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+      --member="serviceAccount:$COMPUTE_SA" \
+      --role="roles/iam.serviceAccountUser" \
+      --condition=None --quiet >/dev/null 2>&1 || true
   if [ ! -z "$GCP_ACCOUNT" ] && [ "$GCP_ACCOUNT" != "Unknown" ]; then
     grant_roles_fast "$PROJECT_ID" "user" "$GCP_ACCOUNT" \
       "roles/mcp.toolUser" "roles/serviceusage.serviceUsageConsumer" "roles/storage.admin" \
@@ -884,6 +898,55 @@ if [ "$ENABLE_MANAGED_AGENT" = "1" ]; then
   fi
 fi
 
+# What an org-policy rejection means, and what would satisfy it. Defined here,
+# above Stage 1, because both Cloud Run deploys in this script can hit it - the
+# Data Viewer in a parallel subshell below, and the agent in Stage 2.
+#
+# Worth spelling out because the raw error names the constraint and stops: it
+# does not say that the violation is the ABSENCE of an annotation, and it does
+# not say that --vpc-egress cannot be supplied on its own. Neither is guessable
+# from the message, and both are the whole fix.
+ge_orgpolicy_diagnostic() {
+  _op_log="$1"
+  echo ""
+  echo "  🚧 Cloud Run rejected this deploy under an organization policy."
+  echo "     The service did not ask for anything unusual - it failed because it left"
+  echo "     an annotation UNSET that this project's policy requires to be set."
+  if grep -q "constraints/run.allowedVPCEgress" "$_op_log" 2>/dev/null; then
+    echo ""
+    echo "     • constraints/run.allowedVPCEgress"
+    echo "       Every service has to declare VPC egress. There is no value meaning"
+    echo "       'no VPC', and --vpc-egress is refused unless a network arrives with it,"
+    echo "       so satisfying this constraint means attaching a VPC:"
+    echo "         --network=NETWORK --subnet=SUBNET --vpc-egress=ALLOWED_VALUE"
+    echo "       With --vpc-egress=all-traffic the subnet also needs Private Google"
+    echo "       Access, or the container cannot reach googleapis.com at all:"
+    echo "         gcloud compute networks subnets update SUBNET --region=$REGION --enable-private-ip-google-access"
+  fi
+  if grep -q "constraints/run.allowedBinaryAuthorizationPolicies" "$_op_log" 2>/dev/null; then
+    echo ""
+    echo "     • constraints/run.allowedBinaryAuthorizationPolicies"
+    echo "       The service has to name an allowed Binary Authorization policy:"
+    echo "         --binary-authorization=ALLOWED_POLICY"
+  fi
+  if grep -q "constraints/run.allowedIngress" "$_op_log" 2>/dev/null; then
+    echo ""
+    echo "     • constraints/run.allowedIngress"
+    echo "       This project does not allow the ingress setting the service asked for."
+    echo "       Read the allowed values and pass one with --ingress."
+  fi
+  echo ""
+  echo "     Read the values this project allows (works without the Org Policy API):"
+  echo "       gcloud resource-manager org-policies describe constraints/run.allowedVPCEgress --project=$PROJECT_ID --effective"
+  echo "       gcloud resource-manager org-policies describe constraints/run.allowedBinaryAuthorizationPolicies --project=$PROJECT_ID --effective"
+  echo "     Then put them in .env and re-run - the agent deploy picks them up automatically:"
+  echo "       GE_RUN_NETWORK=... GE_RUN_SUBNET=... GE_RUN_VPC_EGRESS=... GE_RUN_BINAUTHZ=..."
+  echo "     If the policy leaves no workable value, an Organization Policy Administrator"
+  echo "     has to grant this project an exception; the deploying account usually cannot"
+  echo "     read or change the policy itself."
+  echo ""
+}
+
 # --- Stage 1: Parallel Background Initialization Jobs ---
 echo "⚡ [1/4] Launching Parallel Infrastructure & Data Pre-requisites..."
 
@@ -978,9 +1041,15 @@ PID_SANDBOX=$!
       rm -f .viewer_url
     fi
   else
-    if grep -q "run.allowedIngress" "$VIEWER_LOG" 2>/dev/null; then
-      echo "  🚧 Cause: org policy 'constraints/run.allowedIngress' does not allow public ingress."
-      echo "     If you hold Org Policy Admin, run: gcloud resource-manager org-policies allow constraints/run.allowedIngress all --project=$PROJECT_ID"
+    # Fail-soft: the viewer is optional, so a rejected deploy must not take the
+    # demo down with it. It does have to say WHY, though - "skipped (optional)"
+    # on its own reads as a choice rather than a policy refusal, and the three
+    # constraints that reject it here are all invisible in that sentence.
+    if grep -q "run.allowed" "$VIEWER_LOG" 2>/dev/null; then
+      ge_orgpolicy_diagnostic "$VIEWER_LOG"
+      echo "     Note: the GE_RUN_* keys above are read by the AGENT deploy only. The"
+      echo "     viewer additionally needs public ingress, which a project enforcing"
+      echo "     these constraints usually also refuses, so it stays optional."
     fi
     echo "  ⚠️  Data Viewer deploy skipped (optional component)."
     rm -f .viewer_url
@@ -1307,6 +1376,31 @@ if [ "$ENABLE_WORKSPACE_MCP" = "1" ] || [ "$ENABLE_WORKSPACE_AUTH" = "1" ]; then
   fi
 fi
 
+# Flags that only a project with hardened Cloud Run org policies needs. Empty
+# everywhere else, so the command below is byte-for-byte what it always was.
+#
+# Two constraints turn an ordinary deploy into a FAILED_PRECONDITION:
+# `constraints/run.allowedVPCEgress` and
+# `constraints/run.allowedBinaryAuthorizationPolicies`. Both are list policies,
+# and CreateService with the matching annotation UNSET counts as a violation of
+# a non-empty allowedValues list - so a project that enforces them rejects a
+# service that simply never mentioned VPC egress or Binary Authorization.
+#
+# Setting these four keys in .env is the manual way through: the values are
+# whatever your project's policies allow, and once a run has worked them out
+# they are written back so the next run starts with them.
+GE_RUN_EXTRA_FLAGS="${GE_RUN_EXTRA_FLAGS:-}"
+if [ -z "$GE_RUN_EXTRA_FLAGS" ] && [ -n "${GE_RUN_NETWORK:-}" ] && [ -n "${GE_RUN_SUBNET:-}" ]; then
+  # --vpc-egress is rejected on its own: it has to arrive with a network or a
+  # connector, so the three move together or not at all.
+  GE_RUN_EXTRA_FLAGS="--network=${GE_RUN_NETWORK} --subnet=${GE_RUN_SUBNET} --vpc-egress=${GE_RUN_VPC_EGRESS:-private-ranges-only}"
+fi
+if [ -n "${GE_RUN_BINAUTHZ:-}" ] && ! printf '%s' "$GE_RUN_EXTRA_FLAGS" | grep -q -- '--binary-authorization='; then
+  GE_RUN_EXTRA_FLAGS="${GE_RUN_EXTRA_FLAGS} --binary-authorization=${GE_RUN_BINAUTHZ}"
+fi
+
+AGENT_DEPLOY_LOG=$(mktemp /tmp/agent-deploy-XXXXXX.log)
+
 # Scale-to-zero by default: an idle demo costs nothing between conversations.
 # Three things make that safe -- background runs go through Cloud Tasks so they
 # survive the turn that started them, ADK sessions are mirrored to Firestore and
@@ -1325,24 +1419,61 @@ MIN_INSTANCES="${MIN_INSTANCES:-0}"
 # --no-allow-unauthenticated + --ingress internal is the posture the Web UI ships:
 # Gemini Enterprise reaches the service over Google-internal traffic, so nothing
 # needs to be exposed publicly.
-gcloud run deploy "$SERVICE_NAME" \
-  --source . \
-  --project "$PROJECT_ID" \
-  --region "$REGION" \
-  --platform managed \
-  --memory 8Gi \
-  --cpu 2 \
-  --no-cpu-throttling \
-  --cpu-boost \
-  --min-instances "$MIN_INSTANCES" \
-  --max-instances 1 \
-  --timeout 1800 \
-  --no-allow-unauthenticated \
-  --ingress internal \
-  --labels "created-by=adk" \
-  --set-env-vars="$CR_ENV_VARS" \
-  --quiet \
-  $SECRETS_FLAG
+#
+# In a function because it is retried: the org-policy repair path below changes
+# GE_RUN_EXTRA_FLAGS and runs exactly this command again.
+deploy_agent_service() {
+  gcloud run deploy "$SERVICE_NAME" \
+    --source . \
+    --project "$PROJECT_ID" \
+    --region "$REGION" \
+    --platform managed \
+    --memory 8Gi \
+    --cpu 2 \
+    --no-cpu-throttling \
+    --cpu-boost \
+    --min-instances "$MIN_INSTANCES" \
+    --max-instances 1 \
+    --timeout 1800 \
+    --no-allow-unauthenticated \
+    --ingress internal \
+    --labels "created-by=adk" \
+    --set-env-vars="$CR_ENV_VARS" \
+    --quiet \
+    $SECRETS_FLAG $GE_RUN_EXTRA_FLAGS 2>&1 | tee "$AGENT_DEPLOY_LOG"
+  return "${PIPESTATUS[0]}"
+}
+
+# Deploy first and read the failure, rather than probing the policies up front.
+# An org-policy rejection is refused by the control plane before Cloud Build is
+# asked for anything - measured at eleven seconds, with no build - so the cost of
+# being wrong is small, and every project that enforces nothing is spared two
+# extra API calls on every run.
+if ! deploy_agent_service; then
+  if grep -q "run.allowed" "$AGENT_DEPLOY_LOG" 2>/dev/null; then
+    ge_orgpolicy_diagnostic "$AGENT_DEPLOY_LOG"
+    AGENT_DEPLOY_HEALED=0
+    if [ "$(bool01 "${GE_ORGPOLICY_HEAL:-true}")" = "1" ] && [ -f scripts/internal/orgpolicy_heal.sh ]; then
+      # Optional: present only in environments that ship a repair helper. It is
+      # handed the failed log, may set GE_RUN_EXTRA_FLAGS, and retries by calling
+      # deploy_agent_service itself; a zero return means the service is up.
+      # shellcheck source=/dev/null
+      . scripts/internal/orgpolicy_heal.sh
+      if ge_orgpolicy_heal "$AGENT_DEPLOY_LOG"; then
+        AGENT_DEPLOY_HEALED=1
+      fi
+    fi
+    if [ "$AGENT_DEPLOY_HEALED" != "1" ]; then
+      echo "  ❌ Agent deploy stopped on organization policy - see the guidance above."
+      rm -f "$AGENT_DEPLOY_LOG"
+      exit 1
+    fi
+  else
+    rm -f "$AGENT_DEPLOY_LOG"
+    exit 1
+  fi
+fi
+rm -f "$AGENT_DEPLOY_LOG"
 
 AGENT_URL=$(gcloud run services describe "$SERVICE_NAME" --region="$REGION" --format="value(status.url)" 2>/dev/null || echo "")
 echo "  ✅ Agent Service URL: $AGENT_URL"

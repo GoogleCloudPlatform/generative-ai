@@ -515,6 +515,32 @@ merge; a stale `TEMPLATE_REPO` keeps every generated script pointed at the fork.
   `https://oauth2.googleapis.com/token` with a throwaway code to tell the
   cases apart: `invalid_grant` means the credentials are fine, `invalid_client`
   means the stored secret is stale.
+- **Do not collapse the Cloud Run deploy back into a bare command, and do not
+  move the org-policy diagnostic out of the failure path**. Both deploys — the
+  agent's in `skills/…/setup_and_deploy.sh` and the Web UI's in `app/Code.gs` —
+  can be refused by `constraints/run.allowedVPCEgress` and
+  `constraints/run.allowedBinaryAuthorizationPolicies`. Those are list policies,
+  and `CreateService` with the matching annotation **unset** counts as a
+  violation, so a project that enforces them rejects a service for an annotation
+  it never mentioned. The raw error names a policy and explains nothing, and the
+  operator concludes the generator is broken. The shape that keeps it legible is
+  load-bearing:
+  - The agent deploy lives in `deploy_agent_service` because it is **retried**
+    with different flags. Inlining the command again removes the retry point.
+  - `$GE_RUN_EXTRA_FLAGS` stays **unquoted and last** on the command; it is empty
+    on every unconstrained project, and quoting it passes one empty argument that
+    `gcloud run deploy` rejects outright.
+  - `ge_orgpolicy_diagnostic` is defined **above Stage 1** because the Data Viewer
+    job, which runs in a parallel subshell, calls it too. Moving it down to the
+    agent deploy takes the viewer's explanation away.
+  - The `[ -f scripts/internal/orgpolicy_heal.sh ]` hook is optional by design and
+    is a no-op here; keep the guard rather than removing the branch, so the file
+    stays identical to the copy that does ship a repair helper.
+  - `--vpc-egress` is rejected on its own: it must arrive with `--network`/
+    `--subnet` or a connector, so the three move together or not at all. With
+    `--vpc-egress=all-traffic` the subnet also needs Private Google Access, or the
+    container cannot reach `googleapis.com` and the deploy *succeeds* while the
+    agent breaks at run time.
 
 ## 7. Verification
 

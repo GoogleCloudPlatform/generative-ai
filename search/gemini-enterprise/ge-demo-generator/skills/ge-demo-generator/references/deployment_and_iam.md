@@ -175,6 +175,53 @@ The rest of the shape is not negotiable:
 | `--timeout 1800` | a deep inline analysis outlives a 600s request timeout |
 | `--no-allow-unauthenticated`, `--ingress internal` | Gemini Enterprise reaches the service over Google-internal traffic; nothing needs public exposure |
 
+#### When the project's org policies refuse this deploy
+
+Some organizations pin two list constraints on Cloud Run:
+
+| Constraint | What it rejects |
+|---|---|
+| `constraints/run.allowedVPCEgress` | a service that does not declare VPC egress |
+| `constraints/run.allowedBinaryAuthorizationPolicies` | a service that does not name an allowed Binary Authorization policy |
+
+Both reject the deploy for something it did **not** say: `CreateService` with the
+matching annotation unset counts as a violation of a non-empty `allowedValues`
+list. The error names the constraint and stops, which reads as a defect in this
+skill rather than a policy, so `setup_and_deploy.sh` explains it and names the
+flags that would satisfy it.
+
+There is no way to satisfy `run.allowedVPCEgress` without a VPC: `--vpc-egress` is
+rejected unless `--network`/`--subnet` (or a connector) arrives with it, and no
+value means "no VPC". Read what the project allows with
+`gcloud resource-manager org-policies describe constraints/run.allowedVPCEgress --project=$PROJECT_ID --effective`
+— the v1 surface, which answers even when `orgpolicy.googleapis.com` has never
+been enabled on the project, unlike `gcloud org-policies describe` — then set the
+values in `.env` and re-run:
+
+| Key | Value |
+|---|---|
+| `GE_RUN_NETWORK` | the VPC network to attach |
+| `GE_RUN_SUBNET` | a subnet of it in `$REGION` |
+| `GE_RUN_VPC_EGRESS` | an allowed egress value; defaults to `private-ranges-only` |
+| `GE_RUN_BINAUTHZ` | an allowed Binary Authorization policy |
+
+> [!IMPORTANT]
+> With `GE_RUN_VPC_EGRESS=all-traffic` every packet leaves through the subnet, so
+> the subnet needs Private Google Access
+> (`--enable-private-ip-google-access`) or the container cannot reach
+> `googleapis.com` at all — the deploy then succeeds and the agent fails at
+> runtime, which is much harder to read than the policy error was. With
+> `private-ranges-only` nothing about the path to Google APIs changes, so prefer
+> it whenever the policy allows it.
+
+The Data Viewer is not repaired this way. It needs public ingress, which a project
+enforcing these constraints usually also refuses, so it stays optional and the
+setup script continues without it.
+
+If the policy leaves no workable value, the project needs an exception from an
+Organization Policy Administrator. The deploying account normally cannot read or
+change the policy at all, because it is inherited from a folder.
+
 ---
 
 ### Step 5: Background Task Infrastructure & Post-Deploy Wire-up
@@ -355,6 +402,7 @@ tear the sandbox down, and a missing `AGENT_ENGINE_NAME` leaves an Agent Engine 
 | `SANDBOX_RESOURCE_NAME` | Sandbox resource injected into Cloud Run as the code executor target. |
 | `DATA_VIEWER_URL` | Deployed Data Viewer URL, injected into the main service. |
 | `DEMO_ID`, `SUFFIX`, `WORKER_QUEUE`, `WORKER_QUEUE_LOCATION`, `DASH_BUCKET`, `DOMAIN_SLUG`, `GCS_BUCKET_NAME`, `MANAGED_AGENT_ID` | The names that are *derived* rather than supplied. `SUFFIX` defaults to a timestamp tail, so a teardown run later cannot recompute any of them - it would guess a different suffix and walk straight past the scheduler jobs, topics, task collections and the dashboards bucket. Written only when the key is not already present, so a pinned value in `.env` wins. |
+| `GE_RUN_NETWORK`, `GE_RUN_SUBNET`, `GE_RUN_VPC_EGRESS`, `GE_RUN_BINAUTHZ` | Only in a project whose org policies refuse an ordinary Cloud Run deploy - see "When the project's org policies refuse this deploy" in Step 4. Set them yourself to get through on the first attempt; once a run has worked them out they are written back so the next one starts with them. The network they name is shared with every other demo in the project, so `cleanup.sh` does not delete it. |
 
 ### Runtime-only (set as Cloud Run env vars, not in `.env`)
 
