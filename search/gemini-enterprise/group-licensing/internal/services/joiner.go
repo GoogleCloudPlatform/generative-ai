@@ -219,13 +219,13 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 
 		} else {
 			// Default behavior for each user is to index by SKU which holds a slice of one or many LicenseUpdates
-		// LicenseConfigPath will be resolved per-entry when building each chunk.
-		pendingByKey[key] = append(pendingByKey[key], models.LicenseUpdate{
-			UserEmail: email,
-			SKU:       ent.SKU,
-			Location:  ent.Location,
-			Action:    models.LicenseActionGrant,
-		})
+			// LicenseConfigPath will be resolved per-entry when building each chunk.
+			pendingByKey[key] = append(pendingByKey[key], models.LicenseUpdate{
+				UserEmail: email,
+				SKU:       ent.SKU,
+				Location:  ent.Location,
+				Action:    models.LicenseActionGrant,
+			})
 		}
 	}
 
@@ -283,6 +283,7 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 			slog.String("project_id", projectID),
 			slog.Int("count", len(batch)),
 			slog.String("license_config_path", entry.Path),
+			slog.String("subscription_tier", string(batch[0].SKU)),
 		)
 		return len(batch), nil, nil
 	} else if !errors.Is(batchErr, models.ErrLicensesExhausted) {
@@ -314,7 +315,7 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 	for _, u := range batch {
 		if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, []models.LicenseUpdate{u}); retryErr != nil {
 			if errors.Is(retryErr, models.ErrLicensesExhausted) {
-				logger.DebugContext(ctx, "1-by-1 fallback hit hard limit; pool is completely exhausted",
+				logger.WarnContext(ctx, "1-by-1 fallback hit hard limit; pool is completely exhausted",
 					slog.String("project_id", projectID),
 					slog.Int("successful_so_far", successful),
 					slog.String("license_config_path", entry.Path),
@@ -343,8 +344,9 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 		slog.Int("successful_1_by_1_count", successful),
 		slog.Int("soft_failed_count", softFailedCount),
 		slog.String("license_config_path", entry.Path),
+		slog.String("subscription_tier", string(batch[0].SKU)),
 	)
-	
+
 	return successful, batch[successful:], nil
 }
 
