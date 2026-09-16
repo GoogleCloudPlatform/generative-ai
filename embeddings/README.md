@@ -5,7 +5,7 @@ This repository explores various techniques and use-cases for embedding in Machi
 ## Notebooks
 
 - [Agent Platform Vector Search Introduction](vector-search-2-intro.ipynb): An introduction to setting up and using Agent Platform Vector Search 2.0.
-- [Build a Travel Agent with Vector Search 2.0 and ADK](vector-search-2-travel-agent.ipynb): Ingest Airbnb listings into a Vector Search 2.0 Collection, then wrap hybrid search as a tool an ADK agent calls on its own.
+- [Build a Travel Agent with Agent Retrieval and ADK](vector-search-2-travel-agent.ipynb): Ingest Airbnb listings into an Agent Retrieval Collection, then wrap hybrid search as a tool an ADK agent calls on its own.
 - [Import from BigQuery into Vector Search](bigquery-import.ipynb): Learn how to import vector embedding data from a BigQuery data source into a Vector Search index.
 - [Use Gemini and OSS Text-Embedding Models Against Your BigQuery Data](bigquery_ml_gemini_and_oss_text_embedding.ipynb): Learn how to generate text embeddings using BigQuery in conjunction with both Gemini and OSS text embedding models.
 - [Agent Platform Vector Search Quickstart](vector-search-quickstart.ipynb): A quickstart guide to setting up and using Agent Platform Vector Search.
