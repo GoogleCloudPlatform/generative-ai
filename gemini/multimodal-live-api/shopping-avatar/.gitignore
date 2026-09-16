@@ -1,0 +1,126 @@
+.DS_STORE
+node_modules
+scripts/flow/*/.flowconfig
+.flowconfig
+*~
+*.pyc
+.grunt
+_SpecRunner.html
+__benchmarks__
+build/
+remote-repo/
+coverage/
+.module-cache
+fixtures/dom/public/react-dom.js
+fixtures/dom/public/react.js
+test/the-files-to-test.generated.js
+*.log*
+chrome-user-data
+*.sublime-project
+*.sublime-workspace
+.ide
+
+a
+*.iml
+.vscode
+*.swp
+*.swo
+/tmp
+/.worktrees
+.claude/*.local.*
+.gemini/skills/
+
+packages/react-devtools-core/dist
+packages/react-devtools-extensions/chrome/build
+packages/react-devtools-extensions/chrome/*.crx
+packages/react-devtools-extensions/chrome/*.pem
+packages/react-devtools-extensions/firefox/build
+packages/react-devtools-extensions/firefox/*.xpi
+packages/react-devtools-extensions/firefox/*.pem
+packages/react-devtools-extensions/shared/build
+packages/react-devtools-extensions/.tempUserDataDir
+packages/react-devtools-fusebox/dist
+packages/react-devtools-inline/dist
+packages/react-devtools-shell/dist
+packages/react-devtools-timeline/dist
+
+
+# GOlang
+
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
+
+# Editor/IDE
+# .idea/
+# .vscode/
+
+
+tmp
+conductor/archive/
+reference/
+temp_*.txt
+.scion/agents/
+.scion/workspaces/
+LEARNINGS.gemini.md
+
+# Scion agent workspaces
+agents/
+.scion/
+live-api-demo/
+
+# Excluded AI metadata
+.agent/
+GEMINI.md
+Developer's guide to Gemini Live Avatar.pdf
+*.pdf
+cr_argolis_deploy.sh
+
+# Scratch directory and generated outputs
+scratch/
+output_images/
+
+# Python-generated files & Virtual Environments
+__pycache__/
+*.py[oc]
+dist/
+wheels/
+*.egg-info
+.venv
+
+# Frontend build outputs
+dist-ssr/
+*.local
+
+# IDE & Editor files
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
