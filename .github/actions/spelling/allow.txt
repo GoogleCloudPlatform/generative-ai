@@ -32,6 +32,7 @@ agains
 agentcard
 agentchat
 agentic
+agentplatform
 agg
 AGG
 aggfunc
