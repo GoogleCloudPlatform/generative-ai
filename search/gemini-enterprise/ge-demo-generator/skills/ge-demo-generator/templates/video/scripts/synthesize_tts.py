@@ -69,7 +69,9 @@ VOICE_MAPPING = {
     "hi-IN": {"voice": "hi-IN-Chirp3-HD-Achernar", "language_code": "hi-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
     "hi": {"voice": "hi-IN-Chirp3-HD-Achernar", "language_code": "hi-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
     "ar-XA": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "ar": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
+        "ar": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
+    "th-TH": {"voice": "th-TH-Chirp3-HD-Orion", "language_code": "th-TH", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
+    "th": {"voice": "th-TH-Chirp3-HD-Orion", "language_code": "th-TH", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
 }
 
 
@@ -103,7 +105,8 @@ def resolve_voice_for_language(lang: str) -> dict:
         "pt": "pt-BR",
         "nl": "nl-NL",
         "hi": "hi-IN",
-        "ar": "ar-XA",
+                "ar": "ar-XA",
+        "th": "th-TH",
     }
     if prefix in prefix_map:
         target_key = prefix_map[prefix]
@@ -203,8 +206,9 @@ def validate_tts_readiness(project_id: str = "", lang: str = "en-US", mock: bool
 
 def estimate_speech_duration(text: str, lang: str) -> float:
     """Estimates speech duration in seconds for timing alignment and mock fallback."""
-    if lang.startswith("ja"):
-        # Average Japanese speech rate: ~5.0 characters per second
+    base_lang = lang.split("-")[0].lower()
+    if base_lang in ("ja", "zh", "ko", "cmn", "yue", "th"):
+        # Average CJK/Thai speech rate: ~5.0 characters per second
         clean_len = len(text.replace(" ", "").replace("\n", ""))
         return max(2.5, round(clean_len / 5.0, 2))
     else:
@@ -227,9 +231,13 @@ def generate_silent_audio(output_path: str, duration_sec: float):
     try:
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
     except Exception:
-        # If ffmpeg is not available, create an empty file
+        # If ffmpeg is not available, create a minimal silent MP3 audio stub
+        # Frame header: 0xFF, 0xFB, 0x90, 0x64 (MPEG1 Layer III, 128 kbps, 44.1 kHz, stereo)
+        # Followed by 414 bytes of zero padding = 418 bytes total per frame (~26ms)
+        frame = b"\xff\xfb\x90\x64" + b"\x00" * 414
+        num_frames = max(1, int(duration_sec * 38.28125))
         with open(output_path, "wb") as f:
-            f.write(b"")
+            f.write(frame * num_frames)
 
 
 def synthesize_scene_audio(text: str, output_path: str, lang: str = "en-US", mock: bool = False, project: str = "") -> float:
@@ -299,10 +307,13 @@ def synthesize_scene_audio(text: str, output_path: str, lang: str = "en-US", moc
 def split_subtitles(text: str, total_duration: float, lang: str) -> list:
     """Splits a narration text into timed subtitle segments for Remotion lower-thirds."""
     # Split by punctuation
-    if lang.startswith("ja"):
-        sentences = [s.strip() for s in text.replace("。", "。\n").replace("！", "！\n").split("\n") if s.strip()]
+    base_lang = lang.split("-")[0].lower()
+    if base_lang in ("ja", "zh", "ko", "cmn", "yue"):
+        sentences = [s.strip() for s in text.replace("。", "。\n").replace("！", "！\n").replace("？", "？\n").split("\n") if s.strip()]
+    elif base_lang == "th":
+        sentences = [s.strip() for s in text.replace(" ", " \n").split("\n") if s.strip()]
     else:
-        sentences = [s.strip() for s in text.replace(".", ".\n").replace("!", "!\n").split("\n") if s.strip()]
+        sentences = [s.strip() for s in text.replace(".", ".\n").replace("!", "!\n").replace("?", "?\n").split("\n") if s.strip()]
 
     if not sentences:
         return [{"text": text, "start_sec": 0.0, "end_sec": total_duration}]
@@ -327,41 +338,195 @@ def split_subtitles(text: str, total_duration: float, lang: str) -> list:
     return slices
 
 
-def build_narration_script(company: str, role: str, lang: str, prompts: list = None) -> list:
-    """Returns structured narration lines for demo scenes."""
-    is_ja = lang.startswith("ja")
-    num_prompts = len(prompts) if prompts else 7
+NARRATION_STRINGS = {
+    "en": {
+        "intro_title": "{company} AI Agent Demo",
+        "intro_text": "Welcome to this demonstration of {role}, an autonomous AI agent built on Gemini Enterprise for {company}.",
+        "agenda_title": "Walkthrough Agenda",
+        "agenda_text_full": "Today's demonstration covers {num_prompts} core operational workflows for enterprise operations. We will walk through situational briefing, catalog discovery, anomaly detection, immediate action approval, root cause analysis, simulation, and daily handover.",
+        "agenda_text_short": "Today's demonstration covers {num_prompts} core operational workflows. We will walk through situational briefing, catalog discovery, anomaly detection, immediate action approval, and daily handover.",
+        "scene_title": "Scene {s_num}: Demonstration Scenario {s_num}",
+        "scene_lead": "Now, let's proceed to demonstration scenario {s_num}.",
+        "scene_think": "The agent queries underlying enterprise data stores and synthesizes the required workflow actions.",
+        "scene_resp": "As the structured results appear, the agent consolidates multi-source metrics into clear recommendations. This accelerates complex operational workflows while maintaining enterprise data governance.",
+        "outro_title": "Conclusion",
+        "outro_text": "Gemini Enterprise empowers {company} to transform manual reviews into seamless autonomous operations. Thank you."
+    },
+    "ja": {
+        "intro_title": "{company} AI エージェント デモ",
+        "intro_text": "本日は、{company}のために開発されたGemini Enterpriseの自律型エージェント「{role}」の実演をご紹介します。",
+        "agenda_title": "実演デモシナリオ一覧",
+        "agenda_text_full": "本日のデモでは、製造オペレーションを変革する全{num_prompts}つの重要ワークフローをご紹介します。初期対話からデータ分析、即時承認、根本原因究明、生産シミュレーション、日次サマリーまで順を追って実演します。",
+        "agenda_text_short": "本日のデモでは、主要な全{num_prompts}つの重要ワークフローをご紹介します。初期対話からデータ分析、即時承認、そして日次サマリーまで順を追って実演します。",
+        "scene_title": "Scene {s_num}: デモシナリオ {s_num}",
+        "scene_lead": "それでは、続いてのデモシナリオの実演に移ります。",
+        "scene_think": "エージェントが基幹データソースを照会し、要求されたワークフローを自律的に推論しています。",
+        "scene_resp": "画面に構造化された分析結果が表示され、多角的な知見が整理されます。これにより、高度なエンタープライズ業務を迅速かつ確実に遂行できます。",
+        "outro_title": "まとめ",
+        "outro_text": "このように、{company}の業務オペレーションをGemini Enterpriseが強力に加速します。ご清聴ありがとうございました。"
+    },
+    "de": {
+        "intro_title": "{company} KI-Agent Demo",
+        "intro_text": "Herzlich willkommen zu dieser Demonstration von {role}, einem autonomen KI-Agenten auf Basis von Gemini Enterprise für {company}.",
+        "agenda_title": "Walkthrough-Agenda",
+        "agenda_text_full": "Die heutige Demonstration umfasst {num_prompts} zentrale operative Workflows für Unternehmensabläufe. Wir demonstrieren Situationsanalyse, Katalogabfragen, Anomalieerkennung, sofortige Handlungsfreigaben, Ursachenanalyse, Simulation und die tägliche Übergabe.",
+        "agenda_text_short": "Die heutige Demonstration umfasst {num_prompts} zentrale operative Workflows. Wir demonstrieren Situationsanalyse, Katalogabfragen, Anomalieerkennung, sofortige Handlungsfreigaben und die tägliche Übergabe.",
+        "scene_title": "Szene {s_num}: Demonstrationsszenario {s_num}",
+        "scene_lead": "Lassen Sie uns nun mit Demonstrationsszenario {s_num} fortfahren.",
+        "scene_think": "Der Agent fragt die zugrunde liegenden Unternehmensdaten ab und synthetisiert die erforderlichen Workflow-Aktionen.",
+        "scene_resp": "Sobald die strukturierten Ergebnisse erscheinen, konsolidiert der Agent Daten aus mehreren Quellen in klare Empfehlungen. Dies beschleunigt komplexe operative Abläufe unter Wahrung der Daten-Governance.",
+        "outro_title": "Fazit",
+        "outro_text": "Gemini Enterprise ermöglicht es {company}, manuelle Prüfungen in nahtlose autonome Prozesse zu transformieren. Vielen Dank."
+    },
+    "fr": {
+        "intro_title": "Démo de l'Agent IA {company}",
+        "intro_text": "Bienvenue dans cette démonstration de {role}, un agent IA autonome développé sur Gemini Enterprise pour {company}.",
+        "agenda_title": "Au programme",
+        "agenda_text_full": "La démonstration d'aujourd'hui couvre {num_prompts} processus opérationnels majeurs. Nous allons passer en revue l'analyse de situation, la découverte de catalogue, la détection d'anomalies, l'approbation d'actions immédiates, l'analyse des causes profondes, la simulation et le compte-rendu quotidien.",
+        "agenda_text_short": "La démonstration d'aujourd'hui couvre {num_prompts} processus opérationnels majeurs. Nous allons passer en revue l'analyse de situation, la découverte de catalogue, la détection d'anomalies, l'approbation d'actions immédiates et le compte-rendu quotidien.",
+        "scene_title": "Scène {s_num} : Scénario de démonstration {s_num}",
+        "scene_lead": "Passons maintenant au scénario de démonstration {s_num}.",
+        "scene_think": "L'agent interroge les bases de données de l'entreprise et synthétise les actions requises.",
+        "scene_resp": "À l'affichage des résultats structurés, l'agent consolide les mesures multi-sources en recommandations claires. Cela accélère les flux de travail complexes tout en maintenant la gouvernance des données.",
+        "outro_title": "Conclusion",
+        "outro_text": "Gemini Enterprise aide {company} à transformer des processus manuels en opérations autonomes fluides. Merci de votre attention."
+    },
+    "es": {
+        "intro_title": "Demostración del Agente de IA para {company}",
+        "intro_text": "Bienvenidos a esta demostración de {role}, un agente de IA autónomo desarrollado con Gemini Enterprise para {company}.",
+        "agenda_title": "Agenda de la Demostración",
+        "agenda_text_full": "La demostración de hoy abarca {num_prompts} flujos de trabajo operativos clave. Revisaremos el reporte de situación, la exploración del catálogo, la detección de anomalías, las aprobaciones inmediatas, el análisis de causa raíz, la simulación y el informe diario.",
+        "agenda_text_short": "La demostración de hoy abarca {num_prompts} flujos de trabajo operativos clave. Revisaremos el reporte de situación, la exploración del catálogo, la detección de anomalías, las aprobaciones inmediatas y el informe diario.",
+        "scene_title": "Escena {s_num}: Escenario de Demostración {s_num}",
+        "scene_lead": "A continuación, procedamos con el escenario de demostración {s_num}.",
+        "scene_think": "El agente consulta las fuentes de datos corporativas pertinentes y sintetiza las acciones necesarias para el flujo de trabajo.",
+        "scene_resp": "Al mostrar los resultados estructurados, el agente consolida las métricas de múltiples fuentes en recomendaciones claras. Esto acelera los flujos operativos complejos preservando la gobernanza de datos empresariales.",
+        "outro_title": "Conclusión",
+        "outro_text": "Gemini Enterprise impulsa a {company} para transformar revisiones manuales en operaciones autónomas y fluidas. Muchas gracias."
+    },
+    "it": {
+        "intro_title": "Demo dell'Agente IA per {company}",
+        "intro_text": "Benvenuti a questa dimostrazione di {role}, un agente IA autonomo sviluppato su Gemini Enterprise per {company}.",
+        "agenda_title": "Programma della Dimostrazione",
+        "agenda_text_full": "La dimostrazione di oggi riguarda {num_prompts} flussi di lavoro operativi fondamentali. Esamineremo il briefing situazionale, l'esplorazione del catalogo, il rilevamento di anomalie, l'approvazione immediata di azioni, l'analisi delle cause profonde, la simulazione e la consegna giornaliera.",
+        "agenda_text_short": "La dimostrazione di oggi riguarda {num_prompts} flussi di lavoro operativi fondamentali. Esamineremo il briefing situazionale, l'esplorazione del catalogo, il rilevamento di anomalie, l'approvazione immediata di azioni e la consegna giornaliera.",
+        "scene_title": "Scena {s_num}: Scenario Operativo {s_num}",
+        "scene_lead": "Procediamo ora con lo scenario operativo {s_num}.",
+        "scene_think": "L'agente interroga i database aziendali e sintetizza in autonomia le azioni richieste per il flusso di lavoro.",
+        "scene_resp": "Visualizzando i risultati, l'agente consolida le metriche da più fonti offrendo chiare raccomandazioni. Ciò accelera le operazioni complesse preservando la sicurezza dei dati aziendali.",
+        "outro_title": "Conclusione",
+        "outro_text": "Gemini Enterprise supporta {company} nel trasformare revisioni manuali in processi autonomi ottimizzati. Grazie per l'attenzione."
+    },
+    "ko": {
+        "intro_title": "{company} AI 에이전트 데모",
+        "intro_text": "환영합니다. 본 시연에서는 {company}를 위해 Gemini Enterprise를 기반으로 구축된 자율 AI 에이전트인 {role}을(를) 소개합니다.",
+        "agenda_title": "데모 시나리오 개요",
+        "agenda_text_full": "오늘 데모에서는 기업 운영을 위한 {num_prompts}가지 핵심 워크플로를 다룹니다. 상황 브리핑, 카탈로그 검색, 이상치 탐지, 즉각적인 조치 승인, 근본 원인 분석, 시뮬레이션 및 일일 인수인계 과정을 순서대로 보여드립니다.",
+        "agenda_text_short": "오늘 데모에서는 기업 운영을 위한 {num_prompts}가지 핵심 워크플로를 다룹니다. 상황 브리핑, 카탈로그 검색, 이상치 탐지, 즉각적인 조치 승인 및 일일 인수인계 과정을 순서대로 보여드립니다.",
+        "scene_title": "장면 {s_num}: 데모 시나리오 {s_num}",
+        "scene_lead": "이제 데모 시나리오 {s_num}을(를) 진행하겠습니다.",
+        "scene_think": "에이전트가 기반 기업 데이터 스토어를 쿼리하고 필요한 워크플로 조치를 도출합니다.",
+        "scene_resp": "구조화된 결과가 나타나면 에이전트는 다양한 출처의 지표를 명확한 권장 사항으로 통합합니다. 이는 엔터프라이즈 데이터 거버넌스를 유지하면서 복잡한 운영 워크플로를 가속화합니다.",
+        "outro_title": "결론",
+        "outro_text": "Gemini Enterprise는 {company}가 수동 검토 작업을 원활한 자율 운영으로 혁신할 수 있도록 지원합니다. 감사합니다."
+    },
+    "zh": {
+        "intro_title": "{company} AI 智能体演示",
+        "intro_text": "欢迎观看本次演示，了解我们为 {company} 打造的基于 Gemini Enterprise 的自主 AI 智能体 {role}。",
+        "agenda_title": "演示议程",
+        "agenda_text_full": "今天的演示将涵盖企业运营的 {num_prompts} 个核心工作流。我们将依次展示情况简报、目录查询、异常检测、即时操作审批、根本原因分析、模拟预测以及日常交接。",
+        "agenda_text_short": "今天的演示将涵盖企业运营的 {num_prompts} 个核心工作流。我们将依次展示情况简报、目录查询、异常检测、即时操作审批以及日常交接。",
+        "scene_title": "场景 {s_num}：演示场景 {s_num}",
+        "scene_lead": "现在，让我们进入演示场景 {s_num}。",
+        "scene_think": "智能体正在查询企业级底层数据存储，并综合出所需的工作流操作。",
+        "scene_resp": "随着结构化结果的显示，智能体会将多源指标整合为明确的建议。这在保持企业数据治理的同时，加速了复杂的运营工作流。",
+        "outro_title": "总结",
+        "outro_text": "Gemini Enterprise 赋能 {company}，帮助将人工审核转化为无缝的自动化运营。感谢您的观看。"
+    },
+    # Traditional Chinese. Keyed by full locale, not by base language: zh-TW and
+    # zh-HK resolve to Traditional-script voices, and pairing those with the
+    # Simplified copy above would put the wrong script on screen in the subtitles.
+    "zh-TW": {
+        "intro_title": "{company} AI 智慧代理程式展示",
+        "intro_text": "歡迎觀看本次展示，了解我們為 {company} 打造、以 Gemini Enterprise 為基礎的自主 AI 代理程式 {role}。",
+        "agenda_title": "展示議程",
+        "agenda_text_full": "今天的展示將涵蓋企業營運的 {num_prompts} 項核心工作流程。我們將依序展示情境簡報、目錄查詢、異常偵測、即時作業核准、根本原因分析、模擬預測以及每日交接。",
+        "agenda_text_short": "今天的展示將涵蓋企業營運的 {num_prompts} 項核心工作流程。我們將依序展示情境簡報、目錄查詢、異常偵測、即時作業核准以及每日交接。",
+        "scene_title": "場景 {s_num}：展示情境 {s_num}",
+        "scene_lead": "現在，讓我們進入展示情境 {s_num}。",
+        "scene_think": "代理程式正在查詢企業底層資料儲存區，並彙整出所需的工作流程動作。",
+        "scene_resp": "隨著結構化結果顯示，代理程式會將多來源指標整合為明確的建議。這在維持企業資料治理的同時，加速了複雜的營運流程。",
+        "outro_title": "總結",
+        "outro_text": "Gemini Enterprise 助力 {company}，將人工審查轉化為順暢的自主營運。感謝您的觀看。"
+    },
+    "pt": {
+        "intro_title": "Demonstração do Agente de IA para a {company}",
+        "intro_text": "Bem-vindos a esta demonstração do {role}, um agente de IA autônomo desenvolvido na plataforma Gemini Enterprise para a {company}.",
+        "agenda_title": "Agenda da Demonstração",
+        "agenda_text_full": "A demonstração de hoje aborda {num_prompts} fluxos operacionais centrais. Exploraremos: análise de situação, pesquisa de catálogo, detecção de anomalias, aprovação de ações imediatas, análise de causa raiz, simulação e o repasse diário.",
+        "agenda_text_short": "A demonstração de hoje aborda {num_prompts} fluxos operacionais centrais. Exploraremos: análise de situação, pesquisa de catálogo, detecção de anomalias, aprovação de ações imediatas e o repasse diário.",
+        "scene_title": "Cena {s_num}: Cenário de Demonstração {s_num}",
+        "scene_lead": "A seguir, avançaremos para o cenário de demonstração {s_num}.",
+        "scene_think": "O agente consulta os bancos de dados corporativos e organiza as ações requisitadas para o fluxo de trabalho.",
+        "scene_resp": "Conforme os resultados aparecem na tela, o agente consolida métricas de múltiplas fontes em recomendações claras. Isso acelera fluxos complexos, preservando a governança dos dados da empresa.",
+        "outro_title": "Conclusão",
+        "outro_text": "A plataforma Gemini Enterprise capacita a {company} na transformação de processos manuais em operações autônomas contínuas. Agradecemos a atenção."
+    },
+    "nl": {
+        "intro_title": "{company} AI-Agent Demo",
+        "intro_text": "Welkom bij deze demonstratie van {role}, een autonome AI-agent gebouwd op Gemini Enterprise voor {company}.",
+        "agenda_title": "Agenda van de Demonstratie",
+        "agenda_text_full": "Onze demonstratie van vandaag omvat {num_prompts} kernworkflows voor ondernemingsactiviteiten. We zullen kijken naar situatie-briefings, catalogusontdekkingen, anomaliedetecties, directe goedkeuringen van acties, oorzakenanalyses, simulaties en de dagelijkse overdracht.",
+        "agenda_text_short": "Onze demonstratie van vandaag omvat {num_prompts} kernworkflows voor ondernemingsactiviteiten. We zullen kijken naar situatie-briefings, catalogusontdekkingen, anomaliedetecties, directe goedkeuringen van acties en de dagelijkse overdracht.",
+        "scene_title": "Scène {s_num}: Demonstratiescenario {s_num}",
+        "scene_lead": "Laten we nu verdergaan met demonstratiescenario {s_num}.",
+        "scene_think": "De agent bevraagt de onderliggende datastores van de onderneming en synthetiseert de vereiste workflowacties.",
+        "scene_resp": "Zodra de gestructureerde resultaten verschijnen, consolideert de agent meetgegevens uit meerdere bronnen in heldere aanbevelingen. Dit versnelt complexe operationele workflows met behoud van datagovernance.",
+        "outro_title": "Conclusie",
+        "outro_text": "Gemini Enterprise stelt {company} in staat om handmatige reviews om te zetten in naadloos autonome operaties. Hartelijk dank."
+    },
+    "hi": {
+        "intro_title": "{company} एआई एजेंट डेमो",
+        "intro_text": "जेमिनी एंटरप्राइज़ पर {company} के लिए निर्मित एक स्वायत्त एआई एजेंट, {role}, के इस प्रदर्शन में आपका स्वागत है।",
+        "agenda_title": "प्रदर्शन कार्यसूची",
+        "agenda_text_full": "आज के प्रदर्शन में उद्यम संचालन के लिए {num_prompts} प्रमुख कार्यप्रवाह शामिल हैं। हम स्थिति ब्रीफिंग, कैटलॉग खोज, विसंगति का पता लगाने, तत्काल कार्रवाई की मंजूरी, मूल कारण विश्लेषण, सिमुलेशन, और दैनिक हैंडओवर (हस्तांतरण) की प्रक्रिया देखेंगे।",
+        "agenda_text_short": "आज के प्रदर्शन में उद्यम संचालन के लिए {num_prompts} प्रमुख कार्यप्रवाह शामिल हैं। हम स्थिति ब्रीफिंग, कैटलॉग खोज, विसंगति का पता लगाने, तत्काल कार्रवाई की मंजूरी और दैनिक हैंडओवर (हस्तांतरण) की प्रक्रिया देखेंगे।",
+        "scene_title": "दृश्य {s_num}: प्रदर्शन परिदृश्य {s_num}",
+        "scene_lead": "अब, हम प्रदर्शन परिदृश्य {s_num} की ओर बढ़ते हैं।",
+        "scene_think": "एजेंट उद्यम के डेटा स्रोतों में क्वेरी करता है और आवश्यक कार्यप्रवाह को निष्पादित करता है।",
+        "scene_resp": "जैसे ही संरचित परिणाम सामने आते हैं, एजेंट कई स्रोतों से प्राप्त मेट्रिक्स को स्पष्ट सुझावों में समेकित करता है। इससे डेटा गवर्नेंस को बनाए रखते हुए जटिल उद्यम कार्यप्रवाह में तेज़ी आती है।",
+        "outro_title": "निष्कर्ष",
+        "outro_text": "जेमिनी एंटरप्राइज़ {company} को मैन्युअल प्रक्रियाओं को सहज और स्वायत्त संचालन में बदलने का अधिकार देता है। धन्यवाद।"
+    },
+    "ar": {
+        "intro_title": "عرض وكيل الذكاء الاصطناعي لشركة {company}",
+        "intro_text": "مرحباً بكم في هذا العرض التوضيحي لـ {role}، وهو وكيل ذكاء اصطناعي مستقل مبني على جيميناي إنتربرايز لشركة {company}.",
+        "agenda_title": "جدول العرض التوضيحي",
+        "agenda_text_full": "يغطي العرض التوضيحي اليوم {num_prompts} من مسارات العمل التشغيلية الأساسية. سنتطرق إلى ملخص الحالة، واستكشاف الكتالوج، واكتشاف الحالات الشاذة، والموافقات الفورية على الإجراءات، وتحليل الأسباب الجذرية، والمحاكاة، بالإضافة إلى التسليم اليومي.",
+        "agenda_text_short": "يغطي العرض التوضيحي اليوم {num_prompts} من مسارات العمل التشغيلية الأساسية. سنتطرق إلى ملخص الحالة، واستكشاف الكتالوج، واكتشاف الحالات الشاذة، والموافقات الفورية على الإجراءات، بالإضافة إلى التسليم اليومي.",
+        "scene_title": "المشهد {s_num}: سيناريو العرض {s_num}",
+        "scene_lead": "الآن، دعونا ننتقل إلى سيناريو العرض {s_num}.",
+        "scene_think": "يقوم الوكيل بالاستعلام عن قواعد البيانات الخاصة بالمؤسسة ويقوم بتجميع الإجراءات المطلوبة لمسار العمل.",
+        "scene_resp": "بمجرد ظهور النتائج المنظمة، يقوم الوكيل بتوحيد المقاييس من مصادر متعددة في توصيات واضحة. مما يسرع العمليات التشغيلية المعقدة مع الحفاظ على حوكمة البيانات.",
+        "outro_title": "الخاتمة",
+        "outro_text": "تعمل جيميناي إنتربرايز على تمكين {company} من تحويل المراجعات اليدوية إلى عمليات مستقلة وسلسة. شكرًا لكم."
+    },
+    "th": {
+        "intro_title": "การสาธิต AI Agent ของ {company}",
+        "intro_text": "ยินดีต้อนรับสู่การสาธิต {role} ซึ่งเป็นตัวแทน AI อัตโนมัติที่พัฒนาบนแพลตฟอร์ม Gemini Enterprise สำหรับ {company}",
+        "agenda_title": "หัวข้อการสาธิต",
+        "agenda_text_full": "การสาธิตในวันนี้ครอบคลุมกระบวนการทำงานหลัก {num_prompts} ประการสำหรับการดำเนินธุรกิจ เราจะพิจารณาสรุปสถานการณ์, การสำรวจแค็ตตาล็อก, การตรวจจับความผิดปกติ, การอนุมัติการดำเนินการทันที, การวิเคราะห์สาเหตุที่แท้จริง, การจำลองสถานการณ์ และการส่งมอบงานประจำวัน",
+        "agenda_text_short": "การสาธิตในวันนี้ครอบคลุมกระบวนการทำงานหลัก {num_prompts} ประการสำหรับการดำเนินธุรกิจ เราจะพิจารณาสรุปสถานการณ์, การสำรวจแค็ตตาล็อก, การตรวจจับความผิดปกติ, การอนุมัติการดำเนินการทันที และการส่งมอบงานประจำวัน",
+        "scene_title": "ฉากที่ {s_num}: สถานการณ์จำลองที่ {s_num}",
+        "scene_lead": "ตอนนี้ เรามารับชมสถานการณ์จำลองที่ {s_num} กันเลย",
+        "scene_think": "ระบบ AI กำลังสืบค้นโครงสร้างข้อมูลพื้นฐานขององค์กรและวิเคราะห์การทำงานที่จำเป็นตามกระบวนการ",
+        "scene_resp": "เมื่อผลลัพธ์ที่เป็นโครงสร้างปรากฏขึ้น ระบบ AI จะรวบรวมข้อมูลจากหลายแหล่งให้เป็นข้อเสนอแนะที่ชัดเจน ซึ่งช่วยเร่งกระบวนการทำงานที่ซับซ้อนไปพร้อมกับการรักษาธรรมมาภิบาลของข้อมูลองค์กร",
+        "outro_title": "บทสรุป",
+        "outro_text": "Gemini Enterprise ช่วยให้ {company} สามารถเปลี่ยนกระบวนการตรวจสอบโดยมนุษย์ไปสู่ระบบการทำงานอัตโนมัติที่ไร้รอยต่อ ขอบคุณที่รับชม"
+    }
+}
 
-    agenda_text_ja = (
-        f"本日のデモでは、製造オペレーションを変革する全{num_prompts}つの重要ワークフローをご紹介します。"
-        f"初期対話からデータ分析、即時承認、根本原因究明、生産シミュレーション、日次サマリーまで順を追って実演します。"
-        if num_prompts >= 7 else
-        f"本日のデモでは、主要な全{num_prompts}つの重要ワークフローをご紹介します。"
-        f"初期対話からデータ分析、即時承認、そして日次サマリーまで順を追って実演します。"
-    )
-    agenda_text_en = (
-        f"Today's demonstration covers {num_prompts} core operational workflows for enterprise operations. "
-        f"We will walk through situational briefing, catalog discovery, anomaly detection, immediate action approval, root cause analysis, simulation, and daily handover."
-        if num_prompts >= 7 else
-        f"Today's demonstration covers {num_prompts} core operational workflows. "
-        f"We will walk through situational briefing, catalog discovery, anomaly detection, immediate action approval, and daily handover."
-    )
-
-    scenes = [
-        {
-            "scene_id": "intro",
-            "title": f"{company} AI エージェント デモ" if is_ja else f"{company} AI Agent Demo",
-            "text": f"本日は、{company}のために開発されたGemini Enterpriseの自律型エージェント「{role}」の実演をご紹介します。" if is_ja else f"Welcome to this demonstration of {role}, an autonomous AI agent built on Gemini Enterprise for {company}."
-        },
-        {
-            "scene_id": "agenda",
-            "title": "実演デモシナリオ一覧" if is_ja else "Walkthrough Agenda",
-            "text": agenda_text_ja if is_ja else agenda_text_en
-        }
-    ]
-
-    # Pre-crafted high-fidelity narrations for the 7 core enterprise scenarios (Lead-in, Thinking, Response & Business Impact)
-    script_templates_ja = {
+script_templates_ja = {
         1: (
             "Scene 1: 初期対話と状況把握",
             "それでは、プラントの初期対話と状況把握の実演を行います。",
@@ -406,7 +571,7 @@ def build_narration_script(company: str, role: str, lang: str, prompts: list = N
         ),
     }
 
-    script_templates_en = {
+script_templates_en = {
         1: (
             "Scene 1: Welcome & Situational Briefing",
             "Now, let's begin with our situational operational briefing by querying current assembly alerts.",
@@ -451,25 +616,93 @@ def build_narration_script(company: str, role: str, lang: str, prompts: list = N
         ),
     }
 
+def _narration_pack(lang: str, company: str, role: str, num_prompts: int) -> dict:
+    parts = lang.split("-")
+    base_lang = parts[0].lower()
+    region = parts[1].upper() if len(parts) > 1 else ""
+
+    # 1. Map known fallbacks for regional dialects if they weren't explicitly defined
+    if base_lang == "cmn":
+        base_lang = "zh"
+    elif base_lang == "yue":
+        # Cantonese is written in Traditional script.
+        base_lang = "zh"
+        region = region or "HK"
+
+    # 2. Select language pack. A full locale wins over its base language, because
+    #    some regions differ in script rather than only in accent: zh-TW and zh-HK
+    #    are read by Traditional-script voices, so Simplified copy would put the
+    #    wrong characters in the subtitles.
+    full_locale = "%s-%s" % (base_lang, region) if region else ""
+    if full_locale and full_locale in NARRATION_STRINGS:
+        pack = NARRATION_STRINGS[full_locale]
+    elif base_lang == "zh" and region in ("TW", "HK", "MO"):
+        pack = NARRATION_STRINGS["zh-TW"]
+    elif base_lang in NARRATION_STRINGS:
+        pack = NARRATION_STRINGS[base_lang]
+    else:
+        pack = NARRATION_STRINGS["en"]
+        print(f"Note: Narration language '{base_lang}' not fully defined. Falling back to English.", file=sys.stderr)
+
+    # 3. Choose agenda text based on num_prompts
+    agenda_key = "agenda_text_full" if num_prompts >= 7 else "agenda_text_short"
+    
+    # 4. Resolve templates for per-scene narratives
+    scene_templates = {}
+    if base_lang == "ja":
+        scene_templates = script_templates_ja
+    elif base_lang == "en":
+        scene_templates = script_templates_en
+    # Fallback uses empty dictionary, meaning the scene loop will use the default properties in `pack`
+
+    return {
+        "intro_title": pack["intro_title"].format(company=company, role=role),
+        "intro_text": pack["intro_text"].format(company=company, role=role),
+        "agenda_title": pack["agenda_title"],
+        "agenda_text": pack[agenda_key].format(num_prompts=num_prompts),
+        "scene_fallback": {
+            "title": pack["scene_title"],
+            "lead_text": pack["scene_lead"],
+            "think_text": pack["scene_think"],
+            "resp_text": pack["scene_resp"],
+        },
+        "outro_title": pack["outro_title"],
+        "outro_text": pack["outro_text"].format(company=company, role=role),
+        "scene_templates": scene_templates
+    }
+
+
+def build_narration_script(company: str, role: str, lang: str, prompts: list = None) -> list:
+    """Returns structured narration lines for demo scenes."""
+    num_prompts = len(prompts) if prompts else 7
+    pack = _narration_pack(lang, company, role, num_prompts)
+
+    scenes = [
+        {
+            "scene_id": "intro",
+            "title": pack["intro_title"],
+            "text": pack["intro_text"]
+        },
+        {
+            "scene_id": "agenda",
+            "title": pack["agenda_title"],
+            "text": pack["agenda_text"]
+        }
+    ]
+
     prompts_to_iterate = prompts if prompts else [f"Prompt {i}" for i in range(1, 8)]
     for idx, p in enumerate(prompts_to_iterate):
         s_num = idx + 1
-        if is_ja:
-            if s_num in script_templates_ja:
-                title, lead_text, think_text, resp_text = script_templates_ja[s_num]
-            else:
-                title = f"Scene {s_num}: デモシナリオ {s_num}"
-                lead_text = f"それでは、続いてのデモシナリオの実演に移ります。"
-                think_text = f"エージェントが基幹データソースを照会し、要求されたワークフローを自律的に推論しています。"
-                resp_text = f"画面に構造化された分析結果が表示され、多角的な知見が整理されます。これにより、高度なエンタープライズ業務を迅速かつ確実に遂行できます。"
+        
+        # Use full pre-crafted templates if available for this specific scene, else format the fallbacks
+        if s_num in pack["scene_templates"]:
+            title, lead_text, think_text, resp_text = pack["scene_templates"][s_num]
         else:
-            if s_num in script_templates_en:
-                title, lead_text, think_text, resp_text = script_templates_en[s_num]
-            else:
-                title = f"Scene {s_num}: Demonstration Scenario {s_num}"
-                lead_text = f"Now, let's proceed to demonstration scenario {s_num}."
-                think_text = f"The agent queries underlying enterprise data stores and synthesizes the required workflow actions."
-                resp_text = f"As the structured results appear, the agent consolidates multi-source metrics into clear recommendations. This accelerates complex operational workflows while maintaining enterprise data governance."
+            fb = pack["scene_fallback"]
+            title = fb["title"].format(s_num=s_num)
+            lead_text = fb["lead_text"].format(s_num=s_num)
+            think_text = fb["think_text"].format(s_num=s_num)
+            resp_text = fb["resp_text"].format(s_num=s_num)
 
         scenes.append({
             "scene_id": f"prompt_{s_num}",
@@ -482,12 +715,10 @@ def build_narration_script(company: str, role: str, lang: str, prompts: list = N
 
     scenes.append({
         "scene_id": "outro",
-        "title": "まとめ" if is_ja else "Conclusion",
-        "text": f"このように、{company}の業務オペレーションをGemini Enterpriseが強力に加速します。ご清聴ありがとうございました。" if is_ja else f"Gemini Enterprise empowers {company} to transform manual reviews into seamless autonomous operations. Thank you."
+        "title": pack["outro_title"],
+        "text": pack["outro_text"]
     })
     return scenes
-
-
 def synthesize_all(args) -> dict:
     """Synthesizes audio tracks and subtitle manifests for all scenes."""
     os.makedirs(args.outdir, exist_ok=True)

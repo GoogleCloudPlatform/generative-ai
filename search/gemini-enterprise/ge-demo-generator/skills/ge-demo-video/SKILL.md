@@ -3,10 +3,10 @@ name: ge-demo-video
 description: Records, edits, and delivers automated executive demo videos for agents deployed to Gemini Enterprise. Verifies typography fonts across all languages, connects to live Chrome via CDP (:9222) with automatic display/xvfb adaptation, automatically discovers and applies customer logo & corporate palette (default ON, --no-brand to opt out), enforces strict zero-mock live recording of the deployed agent chat interface, applies modern SaaS video styling in Remotion with dynamic zoom/pan and 4x wait-time acceleration, synthesizes Google Cloud TTS neural narration with synchronized subtitles (pure speech narration, optional ambient BGM), and delivers the rendered MP4 to the demo's Google Drive folder. Also triggered by /ge-demo-video.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.1.0
+  version: 2.2.0
 ---
 
-# GE Demo Video Generator Skill (v2.1.0)
+# GE Demo Video Generator Skill (v2.2.0)
 
 Automates the end-to-end production and delivery of professional **90–120s executive highlight reel demo videos** showcasing autonomous AI agents deployed on **Gemini Enterprise**.
 
@@ -105,13 +105,17 @@ Automates the end-to-end production and delivery of professional **90–120s exe
    *If Pre-Flight indicates expired credentials (`reauth_required`), append notice:*
    ```
    ⚠️ Note: Credentials expired for <account>. Run to re-authenticate:
-      gcloud auth login <account> --enable-gdrive-access
+      gcloud auth login <account> --enable-gdrive-access [--no-launch-browser]
    ```
+
+   *The pipeline prints the exact command for this host. On a host with no local
+   browser it appends `--no-launch-browser`; quote it verbatim rather than
+   reconstructing it, because the plain form opens nothing and looks like a hang.*
 
 3. **Mandatory `ask_question` Approval Gate**:
    Execute `ask_question` with the following selectable options.
    *(If `reauth_required` is detected on Tier 1, prioritize the single-click re-authentication action)*:
-   - *(If reauth required)*: `(Recommended) Re-authenticate Google account now (Agent will run 'gcloud auth login <account> --enable-gdrive-access')`
+   - *(If reauth required)*: `(Recommended) Re-authenticate Google account now (Agent will run the re-authentication command the pre-flight printed)`
    - `(Recommended) Approve and proceed with video generation as planned`
    - `Modify demo prompts / Select specific scenarios`
    - `Change language / voice settings (e.g. ja-JP / en-US)`
@@ -158,7 +162,12 @@ The script automatically detects missing typography (Kanji/Kana, Hanzi, Hangul, 
 
 ### Phase 5: Automated Execution & Video Composition
 
-The pipeline executes through `scripts/generate_demo_video.py`:
+The pipeline executes through `scripts/generate_demo_video.py`.
+
+> **Working directory**: run this, and every other command in this skill, from
+> the repository root. Every path here is relative to it, and so are the outputs:
+> `./deliverables/` and `./deliverables/delivery_report.json` are written relative
+> to the working directory, not to the script.
 
 ```bash
 # Standard Production Run
@@ -175,6 +184,10 @@ python3 scripts/generate_demo_video.py \
 # --drive-account    : Overrides destination Google Drive account
 ```
 
+The process exit code is the delivery verdict: `0` delivered, `3` Drive was
+expected and Cloud Storage caught the fall, `1` nothing accepted the video. See
+Phase 6.
+
 Key execution features:
 - **Zero Dead Air**: Voice narration begins immediately at scene start, introducing operational intent during prompt typing.
 - **1.50x Prompt Typing Zoom**: Camera zooms into prompt input field `(960, 920)` with natural human typing jitter.
@@ -186,28 +199,66 @@ Key execution features:
 
 ### Phase 6: Delivery to Google Drive / GCS & Local Staging
 
-1. **3-Tier Fallback Storage Delivery Mechanism**:
+1. **Delivery Account Precedence (Tier 1 / Tier 2 target)**:
+   The video must land in the **same Drive as the rest of the demo** — the PDFs,
+   spreadsheets and scans that `generate_and_upload_external_files.py` already
+   uploaded. The account is resolved in this order:
+   1. Explicit `--drive-account` or `DRIVE_ACCOUNT` (from the environment or `.env`).
+   2. `owner_account` in the demo's `drive_upload_summary.json`, if that account
+      still has credentials on this host. This is the Drive the demo's own files
+      are in.
+   3. The active `gcloud` account — the identity the demo was deployed with.
+   4. An account whose local part matches the host login name.
+   5. Any other credentialed non-service account.
+   6. The active account, or `default`.
+
+   > The host login match used to sit near the top, which sent the video to a
+   > corporate account under forced re-authentication while the demo itself was
+   > in a different tenant's Drive. One demo, two Drives, and a re-authentication
+   > prompt for an account nobody asked for.
+
+2. **3-Tier Fallback Storage Delivery Mechanism**:
    - **Tier 1: Host Operator Drive**:
      Uploaded via `gdrive` CLI using operator user credentials if configured. Saves to folder `GE Demo - <Company>` with owner-only private permissions (or `--share-public` if explicitly requested).
    - **Tier 2: Deploy Account Drive**:
      If Tier 1 is unavailable or unconfigured, falls back to Google Drive API using the deploy user/service account ADC credentials (`gcloud auth application-default print-access-token` / service account key).
    - **Tier 3: Google Cloud Storage (GCS) Fallback**:
      If Drive upload cannot proceed or fails, securely delivers the video to Google Cloud Storage (`gs://<project-id>-ge-demo-artifacts/videos/` or custom `--gcs-bucket`), generating an authenticated or signed URL (`https://storage.cloud.google.com/<bucket>/...`).
-2. **Local Staging Guarantee**:
+3. **Local Staging Guarantee**:
    - The final video is **always staged locally** in `./deliverables/[Demo-Video]_<Company>_-<Role>.mp4` regardless of remote upload status.
-3. **Present Output**:
-   - Display local deliverable path, remote delivery destination (Tier 1 Drive / Tier 2 Drive / Tier 3 GCS), video duration, and resolution (1080p 30fps).
-4. **Automated Post-Generation Interactive Delivery Recovery Gate**:
+4. **Read the delivery verdict — never assume success**:
+   - Delivery writes `./deliverables/delivery_report.json` and exits with a
+     distinct code. The agent **MUST** read one of the two before reporting an
+     outcome:
+
+     | Exit code | `headline` means | Agent action |
+     |---|---|---|
+     | `0` | Delivered to Drive, or Cloud Storage was the intended destination, or the upload was skipped on request | Report the destination URL |
+     | `3` | **Cloud Storage caught the fall — Drive was expected and did not accept the upload** | Fire the recovery gate in step 6 |
+     | `1` | No destination accepted the video | Report the local path and the error |
+
+   - The report carries `delivery_tier`, `target_account`, `target_account_reason`,
+     `drive_url`, `gcs_uri`, `headline` and `action_required`.
+   - Exit code `3` is **not** a success. The video exists, but it is not where the
+     rest of the demo is.
+5. **Present Output**:
+   - Display local deliverable path, remote delivery destination (Tier 1 Drive / Tier 2 Drive / Tier 3 GCS), the account it went to and why, video duration, and resolution (1080p 30fps).
+6. **Automated Post-Generation Interactive Delivery Recovery Gate**:
+   - **Trigger**: delivery exit code `3`, or `delivery_report.json` reporting a
+     non-empty `action_required`, or `tier_1_status: reauth_required`.
    - **Zero Copy-Paste Mandate**: If the video was successfully generated and staged in `./deliverables/[Demo-Video]_<Company>_-<Role>.mp4` but Google Drive delivery failed or was skipped due to expired OAuth credentials (`reauth_required`), the agent **MUST NEVER** ask the user to manually copy and paste bash upload commands.
    - **Interactive Recovery via `ask_question`**: The agent **MUST IMMEDIATELY** invoke `ask_question` offering automated re-authentication and recovery upload:
      - `(Recommended) Authenticate now and upload the generated video to Google Drive`
      - `Keep local deliverable only (and Cloud Storage if uploaded)`
    - **Single-Click Automated Execution**: Upon user selection of the recommended option, the agent automatically executes:
-     1. Re-authentication via `run_command`:
+     1. Re-authentication via `run_command`. Use the command printed by the
+        pipeline verbatim — on a host with no local browser (remote shell, Cloud
+        Shell, no `DISPLAY`) it carries `--no-launch-browser`, and without that
+        flag the command waits on a browser that will never open:
         ```bash
-        gcloud auth login <account> --enable-gdrive-access
+        gcloud auth login <account> --enable-gdrive-access [--no-launch-browser]
         ```
-     2. Standalone Drive delivery via `run_command`:
+     2. Standalone Drive delivery via `run_command`, from the repository root:
         ```bash
         python3 skills/ge-demo-generator/templates/video/scripts/upload_to_drive.py \
           --video "./deliverables/[Demo-Video]_${COMPANY}_-_${ROLE}.mp4" \
@@ -215,6 +266,8 @@ Key execution features:
           --role "${ROLE}" \
           --drive-account "${DRIVE_ACCOUNT}"
         ```
+        Omit `--drive-account` to let the precedence in step 1 pick the Drive the
+        demo already lives in.
      3. Present the confirmed Google Drive file URL and folder URL directly in the chat response.
 
 ---
@@ -248,3 +301,12 @@ Key execution features:
 | `--drive-folder` | `GE Demo - <Company>` | Google Drive folder name override |
 | `--share-public` | `false` | Enable public reader link sharing |
 | `--output` | `./output/demo_video/rendered_demo_video.mp4` | Final MP4 output path |
+
+### Delivery environment variables
+
+| Variable | Effect |
+|---|---|
+| `DRIVE_ACCOUNT` | Highest-precedence delivery account (same as `--drive-account`) |
+| `GE_DRIVE_SUMMARY` | Explicit path to the demo's `drive_upload_summary.json`, when it is not beside the deliverables |
+| `GE_NONINTERACTIVE` / `CI` | Declines every re-authentication prompt instead of waiting for an answer nobody is there to give |
+| `SKIP_VIDEO_DRIVE_UPLOAD` | Skips Drive delivery for the video only (does not affect the demo's other files) |

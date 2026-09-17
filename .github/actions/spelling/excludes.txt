@@ -119,3 +119,4 @@ py\.typed$
 ^\Q.gemini/styleguide.md\E$
 ^\Qgemini/sample-apps/prism-science-explainer/app/shell.html\E$
 ^\Qgemini/sample-apps/prism-science-explainer/frontend/index.html\E$
+^\Qsearch/gemini-enterprise/ge-demo-generator/skills/ge-demo-generator/templates/video/scripts/synthesize_tts.py\E$

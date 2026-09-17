@@ -15,12 +15,20 @@
 
 """Google Drive Uploader for GE Demo Highlight Reel Videos.
 
-Uploads the rendered demo video into the execution environment's Google Drive folder.
-Prioritizes the host execution environment's Google account rather than the demo deployment
-tenant, ensuring deliverables are saved to the operator's personal/corp Drive.
+Uploads the rendered demo video into the Google Drive that already holds the rest
+of the demo. The delivery account is resolved by `detect_host_drive_account`, which
+prefers the Drive the demo's own external sample files went to and then the active
+`gcloud` account, so the video does not land in a different Drive than the PDFs and
+spreadsheets it is a video *of*. See that function for the full precedence and for
+why the host login is no longer consulted first.
+
 Supports native `gdrive` CLI (when available) and Google Drive v3 REST API
 with `gcloud auth print-access-token --account=<target_account>`.
 Defaults to owner-only private permissions (no public link sharing).
+
+Delivery is reported twice, on purpose: a human-readable summary on stdout, and a
+machine-readable `delivery_report.json` plus a distinct process exit code, because
+the caller has no other way to tell a Drive upload apart from a silent fallback.
 """
 
 import argparse
@@ -32,6 +40,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -40,29 +49,156 @@ DRIVE_API = "https://www.googleapis.com/drive/v3"
 DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3"
 GDRIVE_BIN = "/google/bin/releases/gemini-agents-gdrive/gdrive"
 
+# Written by generate_and_upload_external_files.py next to the demo's sample
+# documents. It records which account owns the demo's Drive folder.
+DEMO_DRIVE_SUMMARY_NAME = "drive_upload_summary.json"
+
+# Upper bound on any interactive question this script asks. See prompt_yes_no.
+PROMPT_TIMEOUT_SEC = 120
+
+# Process exit codes. The caller distinguishes "delivered" from "the operator has
+# to do something" without parsing stdout.
+EXIT_OK = 0
+EXIT_FAILED = 1
+EXIT_ACTION_REQUIRED = 3
+
+# Machine-readable outcome, written next to the local deliverable.
+DELIVERY_REPORT_NAME = "delivery_report.json"
+
 
 def gdrive_cli_available() -> bool:
     """Checks if internal gdrive CLI is present and executable."""
     return os.path.exists(GDRIVE_BIN) and os.access(GDRIVE_BIN, os.X_OK)
 
 
-def detect_host_drive_account(env: dict = None) -> str:
-    """Dynamically detects the host execution environment's Google account without hardcoding.
+def host_has_local_browser() -> bool:
+    """Reports whether `gcloud auth login` can open a browser on this host.
 
-    Priority:
-    1. Explicit environment variable `DRIVE_ACCOUNT`
-    2. Corporate user account (@google.com) matching local host username / LDAP
-    3. Any corporate user account (@google.com) from `gcloud auth list`
-    4. Active non-service account in `gcloud auth list`
-    5. First non-service account in `gcloud auth list`
-    6. Fallback to active gcloud account or "default"
+    Every other authentication path in this project already makes this
+    distinction - setup_and_deploy.sh, verify_and_heal.py and
+    generate_and_upload_external_files.py all append --no-launch-browser on a
+    headless host. The video delivery path did not, so the single command it
+    printed to a remote tester over SSH was the one form of the command that
+    could not complete there.
     """
-    env = env or {}
-    env_acct = env.get("DRIVE_ACCOUNT") or os.environ.get("DRIVE_ACCOUNT", "")
-    if env_acct:
-        return env_acct.strip()
+    if os.environ.get("SSH_CONNECTION") or os.environ.get("SSH_TTY") or os.environ.get("SSH_CLIENT"):
+        return False
+    if os.environ.get("CLOUD_SHELL", "").strip().lower() in ("1", "true", "yes"):
+        return False
+    if sys.platform.startswith("linux"):
+        return bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
+    # macOS and Windows/WSL launch a browser by default.
+    return True
 
-    # Query gcloud credentialed accounts
+
+def drive_login_command(account: str = "") -> list:
+    """Builds the `gcloud auth login` argv that actually works on this host."""
+    target = (account or "").strip()
+    cmd = ["gcloud", "auth", "login"]
+    if target and target != "default":
+        cmd.append(target)
+    cmd.append("--enable-gdrive-access")
+    if not host_has_local_browser():
+        cmd.append("--no-launch-browser")
+    return cmd
+
+
+def drive_login_hint(account: str = "") -> str:
+    """Human-readable form of drive_login_command, with a placeholder if unknown."""
+    target = account.strip() if account and account != "default" else "<ACCOUNT>"
+    return " ".join(drive_login_command(target))
+
+
+def noninteractive_requested() -> bool:
+    """True when the environment has declared that nobody is at the keyboard."""
+    for var in ("GE_NONINTERACTIVE", "CI"):
+        if os.environ.get(var, "").strip().lower() in ("1", "true", "yes"):
+            return True
+    return False
+
+
+def _read_line_with_timeout(prompt: str, timeout_sec: int):
+    """Reads one line, giving up after timeout_sec. Returns None on timeout.
+
+    The read happens on a daemon thread rather than inline so that an
+    unanswered question cannot wedge the process: the thread stays parked on
+    input() but daemon threads do not hold up interpreter exit.
+    """
+    box = {}
+
+    def _reader():
+        try:
+            box["value"] = input(prompt)
+        except Exception:
+            box["value"] = ""
+
+    reader = threading.Thread(target=_reader, daemon=True)
+    reader.start()
+    reader.join(timeout_sec)
+    if reader.is_alive():
+        return None
+    return box.get("value", "")
+
+
+def prompt_yes_no(message: str, timeout_sec: int = PROMPT_TIMEOUT_SEC) -> bool:
+    """Asks a yes/no question that can never hang the pipeline.
+
+    `sys.stdin.isatty()` is not a test for "a human is watching". An agent that
+    runs this script over a pseudo-terminal gets isatty() == True with nobody at
+    the keyboard, and a bare input() there blocks forever - taking the entire
+    video pipeline down with it, because the caller runs this as a subprocess.
+    check_noninteractive_setup.py enforces exactly this rule for the generated
+    setup shell ("every prompt reachable without a terminal has to have a way
+    out"); this is the same rule, applied to the delivery step.
+    """
+    if noninteractive_requested():
+        print(f"   (non-interactive mode: declining '{message.strip()}')", file=sys.stderr)
+        return False
+    if not sys.stdin.isatty():
+        return False
+    answer = _read_line_with_timeout(message, timeout_sec)
+    if answer is None:
+        print(f"\n   (no answer within {timeout_sec}s - continuing without re-authentication)",
+              file=sys.stderr)
+        return False
+    return answer.strip().lower() in ("", "y", "yes")
+
+
+def find_demo_drive_summary(start_dir: str = "") -> dict:
+    """Loads the Drive summary the demo's own external-file upload left behind.
+
+    generate_and_upload_external_files.py writes drive_upload_summary.json into
+    its output directory, recording `owner_account` - the account that actually
+    owns the demo's Drive folder. Reading it is what keeps the video in the same
+    Drive as the documents the demo is built around.
+    """
+    candidates = []
+    explicit = os.environ.get("GE_DRIVE_SUMMARY", "").strip()
+    if explicit:
+        candidates.append(explicit)
+    roots = []
+    for root in (start_dir, os.getcwd()):
+        if root and root not in roots:
+            roots.append(root)
+    for root in roots:
+        candidates.append(os.path.join(root, DEMO_DRIVE_SUMMARY_NAME))
+        candidates.append(os.path.join(root, "external_files", DEMO_DRIVE_SUMMARY_NAME))
+        candidates.append(os.path.join(root, "output", "external_files", DEMO_DRIVE_SUMMARY_NAME))
+    for path in candidates:
+        try:
+            if path and os.path.isfile(path):
+                with open(path, "r", encoding="utf-8") as handle:
+                    data = json.load(handle)
+                if isinstance(data, dict):
+                    data["_summary_path"] = path
+                    return data
+        except Exception:
+            continue
+    return {}
+
+
+def credentialed_accounts() -> tuple:
+    """Returns (non_service_accounts, active_account) from `gcloud auth list`."""
     accounts = []
     active_acct = ""
     try:
@@ -84,33 +220,80 @@ def detect_host_drive_account(env: dict = None) -> str:
             accounts.append(acct)
     except Exception:
         pass
+    return accounts, active_acct
 
+
+def resolve_drive_account(env: dict = None, start_dir: str = "") -> tuple:
+    """Resolves the Google account the demo video should be delivered to.
+
+    Returns:
+        tuple[str, str]: (account, reason) where reason names the rule that fired.
+
+    Priority:
+    1. Explicit `DRIVE_ACCOUNT` (from .env or the process environment)
+    2. `owner_account` from the demo's own drive_upload_summary.json, when that
+       account still holds a credential on this host
+    3. The active `gcloud` account - the account that owns the demo project
+    4. An account whose local part matches the host login
+    5. Any other credentialed non-service account
+    6. The active account, or "default"
+
+    Why 2 and 3 now outrank 4. The video belongs in the same Drive as the rest of
+    the demo: generate_and_upload_external_files.py uploads the sample PDFs,
+    spreadsheets and scans using the *active* account, and the generator skill
+    states that contract outright ("the owner is ${GCP_ACCOUNT} - the same
+    account, because the upload uses this token").
+
+    Ranking the host login first broke that contract on the most ordinary setup
+    there is: an operator whose workstation login differs from the account that
+    owns the demo project. The sample documents went to the demo tenant's Drive
+    and the video went to the operator's own, so one demo ended up split across
+    two Drives. Worse, the account picked by the host-login rule is typically the
+    one behind a corporate single-sign-on policy that forces periodic
+    re-authentication, so the old order chose the account most likely to hand
+    back an expired refresh token - which is exactly how this surfaced in the
+    field, as a video that silently fell through to Cloud Storage.
+    """
+    env = env or {}
+    env_acct = env.get("DRIVE_ACCOUNT") or os.environ.get("DRIVE_ACCOUNT", "")
+    if env_acct:
+        return env_acct.strip(), "explicit DRIVE_ACCOUNT override"
+
+    accounts, active_acct = credentialed_accounts()
+    known = {a.lower(): a for a in accounts}
+
+    # Priority 2: the Drive the demo's own external files already went to.
+    summary = find_demo_drive_summary(start_dir)
+    owner = (summary.get("owner_account") or "").strip()
+    if owner and owner.lower() in known:
+        return known[owner.lower()], "owner of the demo's existing Drive folder"
+
+    # Priority 3: the account that owns the demo project.
+    if active_acct:
+        return active_acct, "active gcloud account (demo deployment identity)"
+
+    # Priority 4: an account matching the host login.
     try:
         host_user = getpass.getuser().strip().lower()
     except Exception:
         host_user = ""
-
-    # Priority 2: Account matching host user LDAP
     if host_user:
         for a in accounts:
-            a_lower = a.lower()
-            if a_lower.startswith(host_user + "@") or a_lower == f"{host_user}@google.com":
-                return a
+            if a.lower().startswith(host_user + "@"):
+                return a, "account matching the host login"
 
-    # Priority 3: Any corporate @google.com account
-    corp_accounts = [a for a in accounts if a.lower().endswith("@google.com")]
-    if corp_accounts:
-        return corp_accounts[0]
-
-    # Priority 4: Active gcloud account (if non-service)
-    if active_acct and active_acct in accounts:
-        return active_acct
-
-    # Priority 5: First available non-service account
+    # Priority 5: anything else that is credentialed.
     if accounts:
-        return accounts[0]
+        return accounts[0], "first credentialed non-service account"
 
-    return active_acct or "default"
+    return (active_acct or "default"), "no credentialed account found"
+
+
+def detect_host_drive_account(env: dict = None) -> str:
+    """Account the demo video is delivered to. See resolve_drive_account."""
+    account, _reason = resolve_drive_account(env)
+    return account
+
 
 
 def format_drive_scope_diagnostic_banner(account: str = "") -> str:
@@ -123,9 +306,9 @@ def format_drive_scope_diagnostic_banner(account: str = "") -> str:
         f"   Target Account : {target}",
         "",
         "👉 To grant Google Drive access to gcloud, run:",
-        f"   gcloud auth login {target} --enable-gdrive-access",
+        f"   {drive_login_hint(target)}",
         "",
-        "   (Or configure DRIVE_ACCOUNT=<user@google.com> or pass --drive-account=<account>)",
+        "   (Or configure DRIVE_ACCOUNT=<user@domain> or pass --drive-account=<account>)",
         "=" * 80,
         ""
     ]
@@ -142,7 +325,7 @@ def format_drive_reauth_diagnostic_banner(account: str = "") -> str:
         f"   Target Account : {target}",
         "",
         "👉 To re-authenticate and enable Google Drive access, run:",
-        f"   gcloud auth login {target} --enable-gdrive-access",
+        f"   {drive_login_hint(target)}",
         "",
         "   (Or configure DRIVE_ACCOUNT=<user@domain> or pass --drive-account=<account>)",
         "=" * 80,
@@ -341,13 +524,13 @@ def verify_delivery_destinations(project_id: str = "", drive_account: str = "",
                 return info
             elif test_status == 403:
                 info["tier_1"]["status"] = "scope_insufficient"
-                info["tier_1"]["reason"] = f"HTTP 403 (missing Drive scope; run: gcloud auth login {target_account} --enable-gdrive-access)"
+                info["tier_1"]["reason"] = f"HTTP 403 (missing Drive scope; run: {drive_login_hint(target_account)})"
             else:
                 info["tier_1"]["status"] = "unverified"
                 info["tier_1"]["reason"] = f"HTTP {test_status}"
         elif t1_status == "reauth_required":
             info["tier_1"]["status"] = "reauth_required"
-            info["tier_1"]["reason"] = f"OAuth credentials expired for {target_account} (run: gcloud auth login {target_account} --enable-gdrive-access)"
+            info["tier_1"]["reason"] = f"OAuth credentials expired for {target_account} (run: {drive_login_hint(target_account)})"
         else:
             info["tier_1"]["status"] = "missing_token"
             info["tier_1"]["reason"] = t1_err or "No access token available"
@@ -366,13 +549,13 @@ def verify_delivery_destinations(project_id: str = "", drive_account: str = "",
                 return info
             elif test_status2 == 403:
                 info["tier_2"]["status"] = "scope_insufficient"
-                info["tier_2"]["reason"] = f"HTTP 403 (missing Drive scope; run: gcloud auth login {resolved_deploy} --enable-gdrive-access)"
+                info["tier_2"]["reason"] = f"HTTP 403 (missing Drive scope; run: {drive_login_hint(resolved_deploy)})"
             else:
                 info["tier_2"]["status"] = "unverified"
                 info["tier_2"]["reason"] = f"HTTP {test_status2}"
         elif t2_status == "reauth_required":
             info["tier_2"]["status"] = "reauth_required"
-            info["tier_2"]["reason"] = f"OAuth credentials expired for {resolved_deploy} (run: gcloud auth login {resolved_deploy} --enable-gdrive-access)"
+            info["tier_2"]["reason"] = f"OAuth credentials expired for {resolved_deploy} (run: {drive_login_hint(resolved_deploy)})"
         else:
             info["tier_2"]["status"] = "missing_token"
             info["tier_2"]["reason"] = t2_err or "No access token available"
@@ -632,10 +815,17 @@ def deliver_video(
         print(f"📁 Local deliverable preserved at: {local_dest}")
 
     # Resolve target accounts dynamically without hardcoding
-    target_account = drive_account.strip() or detect_host_drive_account()
+    if drive_account.strip():
+        target_account = drive_account.strip()
+        account_reason = "explicit --drive-account"
+    else:
+        target_account, account_reason = resolve_drive_account()
     target_folder_name = drive_folder.strip() or f"GE Demo - {company}"
     resolved_deploy = deploy_account.strip() or detect_deploy_account()
     resolved_project = project_id.strip() or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("PROJECT_ID") or ""
+
+    env_skip = os.environ.get("SKIP_VIDEO_DRIVE_UPLOAD", "").strip().lower() in ("1", "true", "yes")
+    drive_expected = not (skip_drive or env_skip)
 
     result = {
         "local_path": local_dest,
@@ -644,6 +834,12 @@ def deliver_video(
         "folder_name": target_folder_name,
         "file_name": f"{clean_name}.mp4",
         "target_account": target_account,
+        "target_account_reason": account_reason,
+        "deploy_account": resolved_deploy,
+        # Whether a Drive upload was even attempted. Without this, a run that was
+        # told to stay local and a run whose Drive auth collapsed both end up
+        # looking like "no Drive link", and only one of them needs a human.
+        "drive_expected": drive_expected,
         "sharing_mode": "public" if share_public else "owner_private",
         "drive_file_id": "",
         "drive_url": "",
@@ -654,13 +850,13 @@ def deliver_video(
         "upload_status": "pending"
     }
 
-    env_skip = os.environ.get("SKIP_VIDEO_DRIVE_UPLOAD", "").strip().lower() in ("1", "true", "yes")
-    if skip_drive or env_skip:
+    if not drive_expected:
         print("ℹ️ Google Drive upload skipped (SKIP_VIDEO_DRIVE_UPLOAD or --skip-drive). Deliverable preserved locally.")
         result["upload_status"] = "skipped"
         return result
 
     print(f"🎯 Target Google Drive Account (Tier 1): {target_account}")
+    print(f"   ↳ chosen by                          : {account_reason}")
     print(f"📂 Target Folder                       : {target_folder_name}")
     print(f"🔒 Sharing Mode                        : {'Public Link' if share_public else 'Owner-only Private'}")
 
@@ -699,12 +895,11 @@ def deliver_video(
     token, t1_status, t1_err = _fetch_token_and_status(target_account)
     if not token and t1_status == "reauth_required":
         print(format_drive_reauth_diagnostic_banner(target_account), file=sys.stderr)
-        if interactive and sys.stdin.isatty():
+        if interactive:
             try:
-                prompt_msg = f"👉 Credentials expired for '{target_account}'. Run 'gcloud auth login {target_account} --enable-gdrive-access' now? [Y/n]: "
-                resp = input(prompt_msg).strip().lower()
-                if resp in ("", "y", "yes"):
-                    login_cmd = ["gcloud", "auth", "login", target_account, "--enable-gdrive-access"]
+                login_cmd = drive_login_command(target_account)
+                prompt_msg = f"👉 Credentials expired for '{target_account}'. Run '{' '.join(login_cmd)}' now? [Y/n]: "
+                if prompt_yes_no(prompt_msg):
                     subprocess.run(login_cmd, check=True)
                     token, t1_status, _ = _fetch_token_and_status(target_account)
             except Exception as login_err:
@@ -714,12 +909,11 @@ def deliver_video(
         test_info, test_status, _ = drive_request(token, "GET", f"{DRIVE_API}/about?fields=user")
         if test_status == 403:
             print(format_drive_scope_diagnostic_banner(target_account), file=sys.stderr)
-            if interactive and sys.stdin.isatty():
+            if interactive:
                 try:
-                    prompt_msg = f"👉 Would you like to run 'gcloud auth login {target_account} --enable-gdrive-access' now? [Y/n]: "
-                    resp = input(prompt_msg).strip().lower()
-                    if resp in ("", "y", "yes"):
-                        login_cmd = ["gcloud", "auth", "login", target_account, "--enable-gdrive-access"]
+                    login_cmd = drive_login_command(target_account)
+                    prompt_msg = f"👉 Would you like to run '{' '.join(login_cmd)}' now? [Y/n]: "
+                    if prompt_yes_no(prompt_msg):
                         subprocess.run(login_cmd, check=True)
                         token, _, _ = _fetch_token_and_status(target_account)
                         if token:
@@ -825,6 +1019,66 @@ def deliver_video(
         return result
 
 
+def classify_delivery(result: dict) -> tuple:
+    """Grades a delivery result into (exit_code, headline, action).
+
+    The caller of this script is usually generate_demo_video.py, which used to
+    print an unconditional "DELIVERY COMPLETE" banner because a plain
+    subprocess.run() told it nothing. An orchestrating agent read that banner,
+    concluded the video was in Drive, and never offered the recovery step the
+    skill defines - while the operator had no Drive link at all. A delivery has
+    to be verifiable from outside the process, so this is the single place that
+    decides what happened.
+    """
+    status = result.get("upload_status", "")
+    tier = result.get("delivery_tier", "none")
+    expected = result.get("drive_expected", True)
+    account = result.get("target_account", "<account>")
+
+    if status == "skipped":
+        return EXIT_OK, "Local deliverable only (Drive upload was skipped on request)", ""
+
+    if status == "success" and tier in ("tier_1_operator_drive", "tier_2_deploy_drive"):
+        return EXIT_OK, f"Delivered to Google Drive ({account})", ""
+
+    if status == "success" and tier == "tier_3_gcs":
+        if not expected:
+            return EXIT_OK, "Delivered to Cloud Storage", ""
+        # Drive was wanted and Cloud Storage caught the fall. The video exists,
+        # but it is not where the rest of the demo lives, so somebody has to act.
+        return (
+            EXIT_ACTION_REQUIRED,
+            "Delivered to Cloud Storage only - Google Drive was expected and did not accept the upload",
+            f"Re-authenticate and retry: {drive_login_hint(account)}",
+        )
+
+    return (
+        EXIT_FAILED,
+        f"Delivery failed: {result.get('error') or 'no destination accepted the video'}",
+        f"The rendered video is still at {result.get('local_path', '(unknown)')}",
+    )
+
+
+def write_delivery_report(result: dict, report_path: str) -> str:
+    """Writes the machine-readable delivery report. Returns the path written."""
+    exit_code, headline, action = classify_delivery(result)
+    payload = dict(result)
+    payload["exit_code"] = exit_code
+    payload["headline"] = headline
+    payload["action_required"] = action
+    payload["drive_delivered"] = bool(result.get("drive_url"))
+    try:
+        parent = os.path.dirname(os.path.abspath(report_path))
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with open(report_path, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=2, ensure_ascii=False)
+        return report_path
+    except Exception as write_err:
+        print(f"⚠️ Could not write delivery report to {report_path}: {write_err}", file=sys.stderr)
+        return ""
+
+
 def main():
     parser = argparse.ArgumentParser(description="Deliver demo video using 3-tier storage hierarchy.")
     parser.add_argument("--video", required=True, help="Path to rendered MP4 video")
@@ -832,7 +1086,7 @@ def main():
     parser.add_argument("--role", default="Operations Director", help="Agent role")
     parser.add_argument("--suffix", default="", help="Demo suffix if any")
     parser.add_argument("--outdir", default="./deliverables", help="Local directory for deliverables")
-    parser.add_argument("--drive-account", default="", help="Target Google Drive account (defaults to execution environment account)")
+    parser.add_argument("--drive-account", default="", help="Target Google Drive account (defaults to the demo's own Drive owner, then the active gcloud account)")
     parser.add_argument("--drive-folder", default="", help="Google Drive folder name override")
     parser.add_argument("--deploy-account", default="", help="Deploy destination account for Tier 2 Drive delivery")
     parser.add_argument("--gcs-bucket", default="", help="Google Cloud Storage fallback bucket")
@@ -840,6 +1094,7 @@ def main():
     parser.add_argument("--share-public", action="store_true", help="Enable public link sharing (default: False, owner-only private)")
     parser.add_argument("--skip-drive", action="store_true", help="Skip Google Drive upload (save to ./deliverables/ only)")
     parser.add_argument("--interactive", action="store_true", help="Prompt interactively to re-authenticate on expired credentials or scope errors")
+    parser.add_argument("--report", default="", help="Path for the machine-readable delivery report (default: <outdir>/delivery_report.json)")
     args = parser.parse_args()
 
     res = deliver_video(
@@ -857,22 +1112,40 @@ def main():
         gcs_bucket=args.gcs_bucket,
         interactive=args.interactive,
     )
+    report_path = args.report or os.path.join(args.outdir, DELIVERY_REPORT_NAME)
+    written = write_delivery_report(res, report_path)
+    exit_code, headline, action = classify_delivery(res)
+
     print("\n" + "=" * 60)
     print("🎥 Video Delivery Summary")
     print(f"   Local File    : {res['local_path']}")
     print(f"   Delivery Tier : {res.get('delivery_tier', 'N/A')}")
     print(f"   Upload Status : {res.get('upload_status', 'N/A')}")
+    print(f"   Target Account: {res.get('target_account', 'N/A')}")
+    print(f"   Chosen By     : {res.get('target_account_reason', 'N/A')}")
     if res.get("drive_url"):
         print(f"   Drive File    : {res['drive_url']}")
         print(f"   Folder URL    : {res['folder_url']}")
     if res.get("gcs_uri"):
         print(f"   GCS URI       : {res['gcs_uri']}")
         print(f"   Console URL   : {res.get('gcs_console_url', 'N/A')}")
+    if written:
+        print(f"   Report        : {written}")
     if res.get("tier_1_status") == "reauth_required":
         t_acct = res.get("target_account", "<account>")
         print(f"   ⚠️ Tier 1 Notice: OAuth credentials for '{t_acct}' expired.")
-        print(f"   👉 Run to re-authenticate: gcloud auth login {t_acct} --enable-gdrive-access")
+        print(f"   👉 Run to re-authenticate: {drive_login_hint(t_acct)}")
+    print("-" * 60)
+    if exit_code == EXIT_OK:
+        print(f"   ✅ {headline}")
+    elif exit_code == EXIT_ACTION_REQUIRED:
+        print(f"   🚨 ACTION REQUIRED: {headline}")
+    else:
+        print(f"   ❌ {headline}")
+    if action:
+        print(f"   👉 {action}")
     print("=" * 60)
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

@@ -35,6 +35,39 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VIDEO_TEMPLATE_DIR = os.path.join(REPO_ROOT, "skills/ge-demo-generator/templates/video")
 VIDEO_SCRIPTS_DIR = os.path.join(VIDEO_TEMPLATE_DIR, "scripts")
 
+# Delivery can prompt for re-authentication. Bound it so an unattended run fails
+# loudly instead of hanging forever on a question nobody is there to answer.
+DELIVERY_TIMEOUT_SEC = 900
+
+
+def _delivery_module():
+    """Imports the uploader module, or returns None if it is unavailable."""
+    try:
+        if VIDEO_SCRIPTS_DIR not in sys.path:
+            sys.path.insert(0, VIDEO_SCRIPTS_DIR)
+        import upload_to_drive
+        return upload_to_drive
+    except Exception:
+        return None
+
+
+def drive_login_hint(account: str) -> str:
+    """Returns the exact re-authentication command for this host.
+
+    Deliberately delegates to the uploader so the operator is never told to run
+    a command that differs from the one the uploader itself would run. On a host
+    with no local browser the plain form opens nothing and appears to hang, so
+    the uploader appends --no-launch-browser there.
+    """
+    module = _delivery_module()
+    if module is not None:
+        try:
+            return module.drive_login_hint(account)
+        except Exception:
+            pass
+    return f"gcloud auth login {account or '<ACCOUNT>'} --enable-gdrive-access"
+
+
 
 def ensure_prerequisites() -> None:
     """Ensures Python virtual environment and required libraries are ready."""
@@ -468,13 +501,13 @@ def format_demo_plan_overview(
         lines.extend([
             "",
             f"⚠️ Note: Credentials expired for {t1_acct}. Run to re-authenticate:",
-            f"   gcloud auth login {t1_acct} --enable-gdrive-access"
+            f"   {drive_login_hint(t1_acct)}"
         ])
     elif dest_info.get("tier_1", {}).get("status") == "scope_insufficient":
         lines.extend([
             "",
             f"💡 Note: Drive scope missing for {t1_acct}. Run to enable:",
-            f"   gcloud auth login {t1_acct} --enable-gdrive-access"
+            f"   {drive_login_hint(t1_acct)}"
         ])
 
     lines.extend([
@@ -775,27 +808,46 @@ def run_pipeline(args):
         f'if [ ! -d "node_modules" ]; then npm install --prefer-offline --no-audit --no-fund; fi && '
         f'npx remotion render src/index.ts DemoHighlightReel "{output_mp4}" --props="{props_file}"'
     )
+
+    # Say what is missing before spending a dependency install finding out.
+    # "Remotion rendering failed" after several silent minutes is not a
+    # diagnosis a remote tester can act on.
+    probe = subprocess.run(
+        ["bash", "-c", 'source "$HOME/.nvm/nvm.sh" 2>/dev/null || true; command -v node && command -v npx'],
+        capture_output=True, text=True,
+    )
+    if probe.returncode != 0:
+        print("❌ [Rendering Error] Node.js and npx are required to render, and neither was found.", file=sys.stderr)
+        print("   Install Node.js 20 or later, or make an existing install visible on PATH", file=sys.stderr)
+        print("   (a Node Version Manager install is picked up from $HOME/.nvm/nvm.sh).", file=sys.stderr)
+        sys.exit(1)
+
     try:
-        print("Running Remotion rendering engine...")
-        res = subprocess.run(["bash", "-c", render_cmd], capture_output=True, text=True)
-        if res.returncode == 0 and os.path.exists(output_mp4) and os.path.getsize(output_mp4) > 1000:
+        print("Running Remotion rendering engine (streaming output)...")
+        # Streamed, not captured. A render takes minutes, and a process that
+        # prints nothing for minutes is indistinguishable from one that has hung
+        # - which is how this stage got reported as a freeze. The tail is kept
+        # for the failure summary so the useful lines are not lost in the scroll.
+        tail = []
+        proc = subprocess.Popen(
+            ["bash", "-c", render_cmd],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
+        )
+        for line in proc.stdout:
+            line = line.rstrip()
+            print(f"  | {line}", flush=True)
+            tail.append(line)
+            if len(tail) > 60:
+                tail.pop(0)
+        returncode = proc.wait()
+        if returncode == 0 and os.path.exists(output_mp4) and os.path.getsize(output_mp4) > 1000:
             remotion_success = True
             print(f"  ✅ Remotion render successful: {output_mp4}")
         else:
-            print(f"  ⚠️ Remotion command finished with code {res.returncode}.")
-            stderr_text = (res.stderr or "").strip()
-            if stderr_text:
-                lines = stderr_text.splitlines()
-                if len(lines) > 50:
-                    print("  --- Remotion Stderr (tail) ---")
-                    print("\n".join(lines[-50:]))
-                else:
-                    print("  --- Remotion Stderr ---")
-                    print(stderr_text)
-            elif res.stdout:
-                lines = res.stdout.strip().splitlines()
-                print("  --- Remotion Stdout (tail) ---")
-                print("\n".join(lines[-30:]))
+            print(f"  ⚠️ Remotion command finished with code {returncode}.")
+            if tail:
+                print("  --- Remotion output (tail) ---")
+                print("\n".join(tail))
     except Exception as e:
         print(f"  ⚠️ Remotion invocation exception: {e}")
 
@@ -831,14 +883,71 @@ def run_pipeline(args):
         cmd_deliver.append("--share-public")
     if getattr(args, "skip_drive", False) or os.environ.get("SKIP_VIDEO_DRIVE_UPLOAD", "").strip().lower() in ("1", "true", "yes"):
         cmd_deliver.append("--skip-drive")
+    delivery_report = os.path.abspath(os.path.join("./deliverables", "delivery_report.json"))
+    cmd_deliver.extend(["--report", delivery_report])
     if sys.stdin.isatty():
         cmd_deliver.append("--interactive")
-    subprocess.run(cmd_deliver)
+
+    # The uploader is the only component that knows where the video actually
+    # landed. Read its verdict rather than assuming success: a silent fallback to
+    # Cloud Storage used to be announced here as a completed Drive delivery, so
+    # the operator was told to look in a folder that had no video in it.
+    try:
+        os.makedirs("./deliverables", exist_ok=True)
+    except Exception:
+        pass
+    if os.path.exists(delivery_report):
+        # A stale report from an earlier run must never be mistaken for this one.
+        try:
+            os.remove(delivery_report)
+        except Exception:
+            pass
+
+    try:
+        proc = subprocess.run(cmd_deliver, timeout=DELIVERY_TIMEOUT_SEC)
+        delivery_code = proc.returncode
+    except subprocess.TimeoutExpired:
+        print(f"  ⚠️ Delivery timed out after {DELIVERY_TIMEOUT_SEC}s.", file=sys.stderr)
+        delivery_code = 1
+    except Exception as deliver_err:
+        print(f"  ⚠️ Delivery invocation exception: {deliver_err}", file=sys.stderr)
+        delivery_code = 1
+
+    report = {}
+    try:
+        with open(delivery_report, "r", encoding="utf-8") as handle:
+            report = json.load(handle)
+    except Exception:
+        report = {}
+
+    local_hint = report.get("local_path") or f"./deliverables/[Demo-Video]_{company.replace(' ', '_')}_-_{role.replace(' ', '_')}.mp4"
+    headline = report.get("headline", "")
+    action = report.get("action_required", "")
+    drive_url = report.get("drive_url", "")
+    gcs_uri = report.get("gcs_uri", "")
 
     print("\n" + "=" * 80)
-    print("🎉 DEMO VIDEO PRODUCTION & DELIVERY COMPLETE!")
-    print(f"   Local Deliverable : ./deliverables/[Demo-Video]_{company.replace(' ', '_')}_-_{role.replace(' ', '_')}.mp4")
+    if delivery_code == 0:
+        print("🎉 DEMO VIDEO PRODUCTION & DELIVERY COMPLETE!")
+    elif delivery_code == 3:
+        print("🚨 ACTION REQUIRED: GOOGLE DRIVE DELIVERY DID NOT COMPLETE")
+    else:
+        print("❌ DEMO VIDEO RENDERED, BUT DELIVERY FAILED")
+    if headline:
+        print(f"   Outcome           : {headline}")
+    print(f"   Local Deliverable : {local_hint}")
+    if drive_url:
+        print(f"   Google Drive      : {drive_url}")
+    if gcs_uri:
+        print(f"   Cloud Storage     : {gcs_uri}")
+    if action:
+        print(f"   👉 Next Step       : {action}")
+    if os.path.exists(delivery_report):
+        print(f"   Delivery Report   : {delivery_report}")
     print("=" * 80 + "\n")
+
+    if delivery_code != 0:
+        sys.exit(delivery_code)
 
 
 def main():
