@@ -15,6 +15,7 @@
 /generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @awaemmanuel
 /generative-ai/gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb                                                              @GoogleCloudPlatform/generative-ai-devrel @averikitsch
 /generative-ai/gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @averikitsch
+/generative-ai/gemini/agentic-video/gemini-agentic-video-go                                                                         @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
 /generative-ai/gemini/agents/genai-experience-concierge                                                                          @GoogleCloudPlatform/generative-ai-devrel @pablofgaeta
 /generative-ai/gemini/code-execution                                                                                             @GoogleCloudPlatform/generative-ai-devrel @koverholt
 /generative-ai/gemini/evaluation                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @inardini @jsondai
