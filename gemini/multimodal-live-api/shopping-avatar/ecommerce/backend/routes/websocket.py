@@ -28,12 +28,12 @@ router = APIRouter()
 async def live_avatar_proxy(client_ws: WebSocket, path: str = ""):
     """
     WebSocket endpoint that acts as a secure, authenticated proxy between the React
-    client and Google's Gemini Live BidiGenerateContent WebSocket API.
+    client and Gemini Live BidiGenerateContent WebSocket API.
     """
     await client_ws.accept()
     logger.info(f"Client WebSocket connection upgraded for path: {path}")
 
-    # 1. Resolve Auth token and Upstream target for Cloud / Vertex AI
+    # 1. Resolve Auth token and Upstream target
     use_vertex = True
     model_location = VERTEX_LOCATION or "global"
     host = f"{model_location}-aiplatform.googleapis.com" if model_location != "global" else "aiplatform.googleapis.com"

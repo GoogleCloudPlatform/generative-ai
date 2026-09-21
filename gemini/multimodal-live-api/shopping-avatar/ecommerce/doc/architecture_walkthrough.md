@@ -6,7 +6,7 @@ This guide explains the architecture of the Multimodal Avatar application and ho
 
 ## High-Level Architecture Diagram
 
-The diagram below visualizes how the **React Frontend**, **FastAPI Backend**, **Vertex AI (Gemini Live)**, and **Cloud Spanner** communicate:
+The diagram below visualizes how the **React Frontend**, **FastAPI Backend**, **Gemini Live**, and **Cloud Spanner** communicate:
 
 ```mermaid
 %%{init: {
@@ -42,14 +42,14 @@ sequenceDiagram
         participant MCP as MCP Server (/api/mcp)
     end
     box rgb(241, 243, 244) Google Cloud Platform
-        participant Vertex as Vertex AI (Gemini Live)
+        participant Vertex as Gemini Live
         participant Embed as Gemini Embeddings API
         participant DB as Cloud Spanner Database
     end
 
     User->>Frontend: Speaks: "Find me a blue backpack"
     Frontend->>Proxy: Streams Audio (WebSockets)
-    Note over Proxy: Backend attaches dynamic GCP OAuth<br/>Access Token (ADC) securely
+    Note over Proxy: Backend attaches dynamic OAuth<br/>Access Token (ADC) securely
     Proxy->>Vertex: Forwards Audio
     
     Note over Vertex: Gemini Live processes audio<br/>and determines tool call is needed
@@ -90,7 +90,7 @@ The client browser runs the user interface and coordinates the real-time experie
 ### 2. FastAPI Backend
 The backend plays two distinct roles in the architecture:
 * **Secure WebSocket Proxy ([websocket.py](file:///usr/local/google/home/ankurwahi/antigravity/gemini-live-multimodal-avatar/ecommerce/backend/routes/websocket.py)):**
-  The client browser connects to `/api/live-avatar`. The proxy upgrades the request, obtains a secure GCP OAuth Access Token via [auth.py](file:///usr/local/google/home/ankurwahi/antigravity/gemini-live-multimodal-avatar/ecommerce/backend/auth.py), qualifies the requested model path server-side, and initiates the secure upstream connection to Vertex AI.
+  The client browser connects to `/api/live-avatar`. The proxy upgrades the request, obtains a secure Google OAuth Access Token via [auth.py](file:///usr/local/google/home/ankurwahi/antigravity/gemini-live-multimodal-avatar/ecommerce/backend/auth.py), qualifies the requested model path server-side, and initiates the secure upstream connection to Agent platform.
 * **MCP JSON-RPC Server ([mcp.py](file:///usr/local/google/home/ankurwahi/antigravity/gemini-live-multimodal-avatar/ecommerce/backend/routes/mcp.py)):**
   Exposes local capabilities (catalog search, shopping cart management, checkout) over a standardized protocol.
 
@@ -101,7 +101,7 @@ Exposed at the `/api/mcp` endpoint in [mcp.py](file:///usr/local/google/home/ank
    * `add_to_cart`: Verify inventory and add items to a user's session cart.
    * `checkout_cart`: Finalize and place an order.
 2. **Tool Execution (`tools/call`):** Matches incoming methods to local services:
-   * Generating search vector embeddings via Vertex AI (`ai_client.models.embed_content`).
+   * Generating search vector embeddings via Agent platform (`ai_client.models.embed_content`).
    * Executing database queries on Spanner ([database.py](file:///usr/local/google/home/ankurwahi/antigravity/gemini-live-multimodal-avatar/ecommerce/backend/database.py)) like `search_products`, `add_to_cart`, or `checkout_cart`.
 
 ---
@@ -127,7 +127,7 @@ Exposed at the `/api/mcp` endpoint in [mcp.py](file:///usr/local/google/home/ank
 * **WebSocket:** Like a telephone call. The browser and backend set up a single, permanent connection that stays open. Both sides can send data (audio, video, text) back and forth instantly at the same time.
 
 ### 2. The Security Problem (Why we need a Backend Proxy)
-To connect to Google Vertex AI's Gemini Live API, the connection must be authenticated.
+To connect to Gemini Live API, the connection must be authenticated.
 * **The Dangerous Way:** If we connect directly from the browser (React), we would have to send Google Cloud credentials or a private API key from the browser. Anyone could open the browser console (pressing F12), read the keys, and use them to access the company's Google Cloud project.
 * **The Secure Way (The Proxy):** 
   * The browser only connects to **our backend server** (at `/api/live-avatar`).
@@ -136,9 +136,9 @@ To connect to Google Vertex AI's Gemini Live API, the connection must be authent
   * The browser never sees the access tokens or private API keys.
 
 ```
-+------------------+                   +--------------------+                   +--------------------+
-|  React Frontend  |  Local WebSocket  |  FastAPI Backend   |  Google WebSocket  | Vertex AI (Google) |
++------------------+                   +--------------------+                   +--------------------------+
+|  React Frontend  |  Local WebSocket  |  FastAPI Backend   |  Google WebSocket  | Agent Platform (Google) |
 |     (Browser)    | ================= | (WebSocket Proxy)  | ================== | (Gemini Live API)  |
-|                  |                   |  Attaches GCP Auth |                   |                    |
-+------------------+                   +--------------------+                   +--------------------+
+|                  |                   |  Attaches  Auth |                   |                    |
++------------------+                   +--------------------+                   +---------------------------+
 ```

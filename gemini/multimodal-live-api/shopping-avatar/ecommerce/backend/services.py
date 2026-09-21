@@ -33,7 +33,6 @@ MULTIMODAL_EMBEDDING_LOCATION = settings.multimodal_embedding_location
 # Initialize Clients
 db = SpannerDatabase(SPANNER_INSTANCE, SPANNER_DATABASE, VERTEX_PROJECT_ID)
 
-# Set standard Google GenAI SDK environment variables for Vertex AI mode
 if "GOOGLE_CLOUD_PROJECT" not in os.environ and VERTEX_PROJECT_ID:
     os.environ["GOOGLE_CLOUD_PROJECT"] = VERTEX_PROJECT_ID
 if "GOOGLE_CLOUD_LOCATION" not in os.environ and VERTEX_LOCATION:
