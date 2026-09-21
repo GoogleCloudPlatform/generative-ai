@@ -89,11 +89,11 @@ export function ArchitecturePage({ navigate }: ArchitecturePageProps) {
       actor: "FastAPI Proxy",
       description: "Backend proxy forwards audio to Gemini Live API",
       file: "websocket.py & auth.py",
-      details: "Upgrades the connection, grabs temporary GCP credentials via Application Default Credentials (ADC), and passes them upstream safely."
+      details: "Upgrades the connection, grabs temporary credentials via Application Default Credentials (ADC), and passes them upstream safely."
     },
     {
       title: "3. Tool Decision",
-      actor: "Vertex AI (Gemini)",
+      actor: "Gemini",
       description: "Gemini decides a database lookup tool is needed",
       file: "Gemini Live Session",
       details: "Gemini Live analyzes the request, triggers a functionCall event for 'search_products' with prompt terms."
