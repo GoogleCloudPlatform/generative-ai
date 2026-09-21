@@ -57,8 +57,8 @@ export function ArchitecturePage({ navigate }: ArchitecturePageProps) {
       tag: "Live Audio / H.264 Video"
     },
     {
-      title: "WebSocket Proxy & GCP Auth Gateway",
-      description: "Upgrades browser connections to a secure socket proxy. Attaches temporary GCP OAuth Access Tokens dynamically, keeping API keys hidden from client-side inspectors.",
+      title: "WebSocket Proxy & Auth Gateway",
+      description: "Upgrades browser connections to a secure socket proxy. Attaches temporary OAuth Access Tokens dynamically, keeping API keys hidden from client-side inspectors.",
       icon: <SwapHoriz color="primary" sx={{ fontSize: 32 }} />,
       tag: "FastAPI / ADC Gateway"
     },
