@@ -35,7 +35,7 @@ This project showcases a next-generation conversational shopping experience:
 - Shoppers can converse naturally using **real-time bidirectional audio & video** with an AI avatar.
 - The assistant retrieves real catalog items from **Cloud Spanner** using **semantic vector search** via Gemini embeddings (`gemini-embedding-2`).
 - As the user browses, the assistant can execute shopping actions (adding to cart, updating quantities, viewing reviews, checking out) via **Model Context Protocol (MCP)** tool execution.
-- Store owners can switch brand identities dynamically (Target, Best Buy, Sephora, or custom retailers) with real-time UI theme generation powered by Gemini.
+- Store owners can switch brand identities dynamically (Target, Best Buy, Sephora, or custom retailers) with real-time UI theme generation.
 
 ---
 
