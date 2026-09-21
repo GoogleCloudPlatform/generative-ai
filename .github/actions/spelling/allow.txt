@@ -1516,6 +1516,7 @@ outdir
 outro
 overwiew
 owlbot
+Oxc
 oxml
 padus
 Pageable
@@ -2231,6 +2232,7 @@ Vardhan
 Vaswani
 Vayots
 VBG
+VBORw
 vcodec
 VCPU
 vdb
