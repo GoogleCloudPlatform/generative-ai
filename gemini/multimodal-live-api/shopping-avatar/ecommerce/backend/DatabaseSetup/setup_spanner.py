@@ -118,7 +118,7 @@ def main():
     clean_sql = " ".join(clean_lines)
     ddl_statements = [stmt.strip() for stmt in clean_sql.split(";") if stmt.strip()]
 
-    # 3. Create Spanner Database with schema DDLs
+    # 3. Create Spanner Database with schema DDL
     database = instance.database(database_id, ddl_statements=ddl_statements)
     
     logger.info(f"Checking if Spanner Database '{database_id}' exists...")

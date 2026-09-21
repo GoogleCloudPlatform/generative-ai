@@ -41,7 +41,7 @@ BASE_PROMPTS = [
     "A sleek minimalist tan leather backpack, front view",
     "An ergonomic aluminum alloy laptop stand on a clean desk",
     "A copper double-walled insulated travel mug",
-    "A retro mechanical keyboard with pastel keycaps",
+    "A retro mechanical keyboard with pastel keys",
     "A high-fidelity noise-canceling wireless headphones in slate gray",
     "A minimalist concrete desktop organizer tray",
     "A portable glass water bottle with a cork sleeve",
@@ -90,13 +90,12 @@ PROMPT_DEFAULT_COLORS = [
     "dark green", "light wood"
 ]
 
-# Attempt to import Google GenAI library, with dynamic mock fallbacks
 try:
     from google import genai
     from google.genai import types
     HAS_GENAI = True
 except ImportError:
-    logger.warn("Google GenAI library not installed. Falling back to simulated mocks.")
+    logger.warn("Google library not installed. Falling back to simulated mocks.")
     HAS_GENAI = False
 
 def write_status(stage: str, current: int, total: int, message: str, is_running: bool = True):
@@ -127,7 +126,7 @@ def generate_ai_products(count: int, project_id: str, location: str, category_fi
     gcs_token = None
     if HAS_GENAI:
         try:
-            # Initialize the unified google-genai Client for Cloud / Vertex AI mode
+            # Initialize the unified google-genai Client 
             client = genai.Client(vertexai=True, project=project_id, location=location)
         except Exception as e:
             logger.error(f"Failed to initialize AI SDK: {e}. Mocks active.")

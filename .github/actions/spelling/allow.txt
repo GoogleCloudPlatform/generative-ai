@@ -18,6 +18,7 @@ acrossfade
 acs
 adamw
 ADAS
+adc
 addfont
 adk
 ADK
@@ -904,6 +905,7 @@ Hlc
 hline
 Hmmm
 HMO
+HMR
 hnsw
 Hogwarts
 Homesley
@@ -1425,6 +1427,7 @@ Nominatim
 NOMINATIM
 NOMINMAX
 nonroot
+NOooooah
 norigin
 normalise
 Norsk
@@ -1689,6 +1692,7 @@ Qsxq
 quadrotor
 qubit
 qubits
+Queeen
 quickbot
 Quickbot
 quicktime
@@ -2266,6 +2270,7 @@ vos
 VOS
 votre
 VPs
+vqa
 VQA
 VRAM
 vreason
@@ -2381,6 +2386,7 @@ xytext
 xzn
 YAjjpd
 yanchor
+Yasss
 yaxes
 yaxis
 ycol

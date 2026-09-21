@@ -37,7 +37,7 @@ class RPCRequest(BaseModel):
 @router.post("/api/mcp")
 async def handle_mcp(rpc_req: RPCRequest, persona: str = "default"):
     """
-    Exposes e-commerce catalog catalog search and cart execution APIs over standard JSON-RPC 2.0 protocol.
+    Exposes e-commerce catalog search and cart execution APIs over standard JSON-RPC 2.0 protocol.
     """
     if rpc_req.jsonrpc != "2.0":
          raise HTTPException(status_code=400, detail="Invalid JSON-RPC version")
