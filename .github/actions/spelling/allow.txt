@@ -145,6 +145,7 @@ autorater
 Autorater
 autosxs
 AUVs
+avc
 avec
 Avenir
 avgs
@@ -1322,6 +1323,7 @@ moviepy
 mpb
 mpe
 mpegps
+mpegts
 mpga
 mpim
 mpld

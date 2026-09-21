@@ -79,7 +79,7 @@ async def live_avatar_proxy(client_ws: WebSocket, path: str = ""):
                                         qualified_model = f"projects/{VERTEX_PROJECT_ID}/locations/{model_location}/publishers/google/models/{model_name_only}"
                                         setup_cfg["model"] = qualified_model
                                     
-                                    # Ensure single snake_case field for avatar_config to avoid oneof collision
+                                    # Ensure single snake_case field for avatar_config to avoid collision
                                     avatar_obj = setup_cfg.pop("avatarConfig", None) or setup_cfg.get("avatar_config")
                                     if avatar_obj:
                                         avatar_name = (
