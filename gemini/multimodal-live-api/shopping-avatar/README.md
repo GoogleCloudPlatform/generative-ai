@@ -67,14 +67,14 @@ sequenceDiagram
         participant MCP as MCP Server (/api/mcp)
     end
     box rgb(241, 243, 244) Google Cloud Platform
-        participant Vertex as Vertex AI (Gemini Live)
+        participant Vertex as Gemini Live
         participant Embed as Gemini Embeddings API
         participant DB as Cloud Spanner Database
     end
 
     User->>Frontend: Speaks: "Find me a blue backpack"
     Frontend->>Proxy: Streams Audio (WebSockets)
-    Note over Proxy: Backend attaches dynamic GCP OAuth<br/>Access Token (ADC) securely
+    Note over Proxy: Backend attaches dynamic OAuth<br/>Access Token (ADC) securely
     Proxy->>Vertex: Forwards Audio
     
     Note over Vertex: Gemini Live processes audio<br/>and determines tool call is needed
@@ -138,7 +138,7 @@ The backend exposes the following tools to Gemini Live via `/api/mcp`:
 
 ### Secure WebSocket Proxy & Authentication
 
-Direct connections from the browser to Vertex AI would require exposing Google Cloud service account keys or OAuth tokens on the client. To eliminate this security risk:
+Direct connections from the browser to Agent platform would require exposing Google Cloud service account keys or OAuth tokens on the client. To eliminate this security risk:
 - The React frontend establishes a WebSocket connection only with the local FastAPI backend (`/api/live-avatar`).
 - The backend acquires a short-lived OAuth access token via `google-auth` / Application Default Credentials (ADC).
 - The backend connects upstream to `wss://{region}-aiplatform.googleapis.com/.../BidiGenerateContent` and bi-directionally pipes audio, video, and tool signals between the client and Google.
@@ -163,13 +163,13 @@ Direct connections from the browser to Vertex AI would require exposing Google C
 │   │   │   ├── mcp.py                 # Model Context Protocol JSON-RPC 2.0 endpoints
 │   │   │   ├── products.py            # Product catalog & image caching endpoints
 │   │   │   └── websocket.py           # Authenticated Gemini Live WebSocket proxy
-│   │   ├── auth.py                    # GCP ADC Token Service
+│   │   ├── auth.py                    # ADC Token Service
 │   │   ├── config.py                  # Pydantic environment configuration loader
 │   │   ├── database.py                # Spanner database queries & transactions
 │   │   ├── main.py                    # FastAPI application entrypoint & static mount
 │   │   ├── pyproject.toml             # Python dependencies
 │   │   ├── schema.sql                 # Cloud Spanner DDL table schemas
-│   │   └── services.py                # Client initializations (Spanner, GenAI)
+│   │   └── services.py                # Client initializations (Spanner)
 │   ├── doc/
 │   │   └── architecture_walkthrough.md # Detailed architecture & flow guide
 │   └── frontend/
@@ -201,7 +201,7 @@ Direct connections from the browser to Vertex AI would require exposing Google C
    - [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install)
    - Python 3.11 or 3.12 (with [uv](https://github.com/astral-sh/uv) or standard `pip`)
    - Node.js 20+ and `npm`
-3. **GCP Authentication**:
+3. **Authentication**:
    Authenticate local application default credentials:
    ```bash
    gcloud auth login
@@ -213,7 +213,7 @@ Direct connections from the browser to Vertex AI would require exposing Google C
    | Role | Role ID | Description |
    | :--- | :--- | :--- |
    | **Cloud Spanner Database User** | `roles/spanner.databaseUser` | Creates Spanner sessions, runs catalog queries, and writes cart/order records. |
-   | **Vertex AI User** | `roles/aiplatform.user` | Gemini Live streaming (`BidiGenerateContent`), vector embeddings, and dynamic theming. |
+   | **AI User** | `roles/aiplatform.user` | Gemini Live streaming (`BidiGenerateContent`), vector embeddings, and dynamic theming. |
    | **Storage Object User** | `roles/storage.objectUser` | Reading product images and uploading generated images during catalog seeding. |
    | **Logs Writer** | `roles/logging.logWriter` | Writing application logs to Cloud Logging. |
 
