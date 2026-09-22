@@ -18,6 +18,7 @@ acrossfade
 acs
 adamw
 ADAS
+adc
 addfont
 ADK
 adk
@@ -144,6 +145,7 @@ Autorater
 autorater
 autosxs
 AUVs
+avc
 avec
 Avenir
 avgs
@@ -904,6 +906,7 @@ Hlc
 hline
 Hmmm
 HMO
+HMR
 hnsw
 Hogwarts
 Homesley
@@ -1322,6 +1325,7 @@ moviepy
 mpb
 mpe
 mpegps
+mpegts
 mpga
 mpim
 mpld
@@ -1427,6 +1431,7 @@ Nominatim
 NOMINATIM
 NOMINMAX
 nonroot
+NOooooah
 norigin
 normalise
 Norsk
@@ -1513,6 +1518,7 @@ outdir
 outro
 overwiew
 owlbot
+Oxc
 oxml
 padus
 Pageable
@@ -1691,6 +1697,7 @@ Qsxq
 quadrotor
 qubit
 qubits
+Queeen
 quickbot
 Quickbot
 quicktime
@@ -2227,6 +2234,7 @@ Vardhan
 Vaswani
 Vayots
 VBG
+VBORw
 vcodec
 VCPU
 vdb
@@ -2268,6 +2276,7 @@ vos
 VOS
 votre
 VPs
+vqa
 VQA
 VRAM
 vreason
@@ -2383,6 +2392,7 @@ xytext
 xzn
 YAjjpd
 yanchor
+Yasss
 yaxes
 yaxis
 ycol
