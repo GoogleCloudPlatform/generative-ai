@@ -42,7 +42,7 @@ During Phase 3, the generator executes:
 
 ```bash
 # 1. Generate PDF and Excel files locally
-uv run --no-project \
+uv run --isolated --no-project \
   --with "openpyxl>=3.1.0,<4.0.0" \
   --with "reportlab>=4.0.0,<6.0.0" \
   --with "pillow>=10.0.0,<13.0.0" \

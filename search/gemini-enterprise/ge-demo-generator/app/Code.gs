@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v12.23-public',
+  APP_VERSION: 'v12.24-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -2641,20 +2641,15 @@ function generateSetupScript(params) {
     firestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
     logging: 'google-cloud-logging>=3.0.0,<4.0.0',
 
-    // (v11.93) google-api-core is a TRANSITIVE dependency of every Google Cloud
-    // client here, declared directly only to hold this cap. 2.35.0 (2026-08-24)
-    // added urllib.parse.quote(val, safe="/") to
-    // path_template._expand_variable_match as path-traversal hardening, and that
-    // encodes the parentheses in Firestore's default database id: every call
-    // becomes
-    //   InvalidArgument: 400 Invalid database id %28default%29
-    // which takes down session persistence, the idempotency claim, task storage
-    // and the autonomous worker in one go. Bisected 2026-08-25 against a live
-    // project - firestore 2.28.1 and 2.29.0 both fail on api-core 2.35.0 and
-    // both pass on 2.34.0, so the cap belongs here and NOT on the firestore
-    // line. Independently hit by a demo author the same day. Lift the cap once
-    // a release above 2.35.0 restores the unencoded id.
-    apiCore: 'google-api-core>=2.20.0,<2.35.0',
+    // (v11.93 / v12.24) google-api-core is a TRANSITIVE dependency of every
+    // Google Cloud client here, declared directly to hold both a floor and a ceiling:
+    // - Ceiling <2.35.0: 2.35.0 (2026-08-24) added urllib.parse.quote(val, safe="/")
+    //   to path_template._expand_variable_match as path-traversal hardening, encoding
+    //   the parentheses in Firestore's default database id (%28default%29 -> 400).
+    // - Floor >=2.28.0: google-cloud-firestore 2.30.0+ calls
+    //   google.api_core.check_python_version() at import time, which was introduced
+    //   in google-api-core 2.28.0.
+    apiCore: 'google-api-core>=2.28.0,<2.35.0',
 
     // Utilities
     dotenv: 'python-dotenv>=1.0.0,<2.0.0',
@@ -2665,14 +2660,15 @@ function generateSetupScript(params) {
     pythonImage: 'python:3.11.12-slim',
     uvImage: 'ghcr.io/astral-sh/uv:0.11.17',
     uvVersion: '0.11.17',
+    excludeNewer: '2026-09-25T00:00:00Z',
     supergateway: 'supergateway@3.4.3',
 
     // Viewer app
     viewerFunctionsFramework: 'functions-framework>=3.5.0,<4.0.0',
     viewerFlask: 'flask>=3.0.3,<4.0.0',
     viewerFirestore: 'google-cloud-firestore>=2.16.0,<3.0.0',
-    // The viewer reads the same Firestore collections, so it needs the same cap.
-    viewerApiCore: 'google-api-core>=2.20.0,<2.35.0',
+    // The viewer reads the same Firestore collections, so it needs the same bounds.
+    viewerApiCore: 'google-api-core>=2.28.0,<2.35.0',
 
     // Computer Use (browser agent) -- only added when enableComputerUse is set.
     // playwright pin matches the official reference impl
@@ -2838,8 +2834,10 @@ if __name__ == '__main__':
     init_data()
 __PY_EOF__\n`;
 
-    firestoreCommands += `uv run --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python setup_fs.py\n`;
-    firestoreCommands += `rm setup_fs.py\n\n`;
+    firestoreCommands += `if ! uv run --isolated --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python setup_fs.py; then\n`
+      + '  echo "    WARNING: Initial Firestore data seeding failed (continuing setup)..."\n'
+      + 'fi\n'
+      + 'rm -f setup_fs.py\n\n';
 
     firestoreCommands += `echo "🌐 Deploying Real-time Data Viewer Web App (Cloud Run Functions)..."\n`;
     firestoreCommands += `mkdir -p ${dirName}/viewer_app\n`;
@@ -3896,10 +3894,16 @@ if ! git --version | awk '{split(\$3, gv, "."); exit !(gv[1] > 2 || (gv[1] == 2 
   exit 1
 fi
 
-# --- Network resiliency for package installation ---
+# --- Network resiliency & deterministic host isolation for package installation ---
 echo "⚙️  Configuring robust network timeouts for package resolution..."
 export UV_HTTP_TIMEOUT=600
 export UV_RETRIES=10
+export UV_ISOLATED=1
+export PYTHONNOUSERSITE=1
+unset PYTHONPATH
+if [ -z "$UV_EXCLUDE_NEWER" ]; then
+  export UV_EXCLUDE_NEWER="${PINNED_DEPS.excludeNewer}"
+fi
 
 # --- Detect Project ID early ---
 PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
@@ -4177,7 +4181,7 @@ ${ enableManagedAgent ? `
     echo ""
     echo "🔥 Deleting Firestore Collection: ${fsCollection}..."
     if command -v uv >/dev/null 2>&1; then
-      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python3 -c "from google.cloud import firestore; db=firestore.Client(); [d.reference.delete() for d in db.collection('${fsCollection}').stream()]" 2>/dev/null && echo "   ✅ Firestore documents in collection deleted." || echo "   ⚠️  Could not clear Firestore collection automatically."
+      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --isolated --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python3 -c "from google.cloud import firestore; db=firestore.Client(); [d.reference.delete() for d in db.collection('${fsCollection}').stream()]" 2>/dev/null && echo "   ✅ Firestore documents in collection deleted." || echo "   ⚠️  Could not clear Firestore collection automatically."
     fi
 
     echo ""
@@ -4349,7 +4353,7 @@ ${ enableManagedAgent ? `
 
     echo ""
     echo "📁 Deleting Firestore task collections..."
-    GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python3 -c "
+    GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --isolated --no-project --with "${PINNED_DEPS.firestore}" --with "${PINNED_DEPS.apiCore}" python3 -c "
 from google.cloud import firestore
 db = firestore.Client()
 for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '${dirName}_task_push_configs', '${dirName}_adk_sessions']:
@@ -5181,6 +5185,7 @@ FROM ${PINNED_DEPS.pythonImage}
 COPY --from=${PINNED_DEPS.uvImage} /uv /uvx /bin/
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+ENV UV_EXCLUDE_NEWER=${PINNED_DEPS.excludeNewer}
 COPY requirements.txt pyproject.toml ./
 RUN uv pip install --system -r requirements.txt
 __DOCKER_EOF__
@@ -5621,7 +5626,7 @@ export SANDBOX_OUT="/tmp/sandbox_result_$$.txt"
 # If Dockerfile/MCP files exist in CWD, the SDK tries to build them → hang.
 SANDBOX_TMPDIR=$(mktemp -d)
 pushd "$SANDBOX_TMPDIR" > /dev/null
-GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "${PINNED_DEPS.aiplatform}" python3 << '__SANDBOX_PROVISION_EOF__'
+GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --isolated --no-project --with "${PINNED_DEPS.aiplatform}" python3 << '__SANDBOX_PROVISION_EOF__'
 import sys, os, warnings, time, vertexai
 from vertexai import types
 

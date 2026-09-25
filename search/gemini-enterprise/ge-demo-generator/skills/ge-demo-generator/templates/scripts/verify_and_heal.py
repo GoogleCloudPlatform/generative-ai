@@ -24,7 +24,7 @@
 
 
 # =============================================================================
-# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.25.0)
+# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.27.0)
 # Automatically audits 9 infrastructure layers and heals discrepancies in real time:
 #   1. BigQuery Dataset & Tables (Row counts, _id column for DataStores, schema metadata)
 #   2. Firestore Collection & Seeding (Task queue documents >= 3)
@@ -42,6 +42,7 @@
 import os
 import sys
 import json
+import shutil
 import time
 import datetime
 import subprocess
@@ -301,10 +302,26 @@ try:
         if os.path.exists("scripts/setup_fs.py"):
             # Tell it which project and collection - it defaults to the
             # environment, and this script may not be running with the deploy's.
-            heal = subprocess.run(
-                ["python3", "scripts/setup_fs.py",
-                 "--project", PROJECT_ID, "--collection", FIRESTORE_COLLECTION],
-                capture_output=True, text=True)
+            _heal_env = os.environ.copy()
+            _heal_env.pop("PYTHONPATH", None)
+            _heal_env["PYTHONNOUSERSITE"] = "1"
+            _heal_env["UV_ISOLATED"] = "1"
+            _heal_env.setdefault("UV_EXCLUDE_NEWER", "2026-09-25T00:00:00Z")
+            _heal_cmd = (
+                [
+                    "uv", "run", "--isolated", "--no-project",
+                    "--with", "google-cloud-firestore>=2.16.0,<3.0.0",
+                    "--with", "google-api-core>=2.28.0,<2.35.0",
+                    "python3", "scripts/setup_fs.py",
+                    "--project", PROJECT_ID, "--collection", FIRESTORE_COLLECTION,
+                ]
+                if shutil.which("uv")
+                else [
+                    "python3", "scripts/setup_fs.py",
+                    "--project", PROJECT_ID, "--collection", FIRESTORE_COLLECTION,
+                ]
+            )
+            heal = subprocess.run(_heal_cmd, env=_heal_env, capture_output=True, text=True)
             # Then look again. Reporting HEALED because the heal *ran* is how a
             # clean project with no Firestore database at all got a 100% healthy
             # verification report and a demo whose task queue had nowhere to write.
