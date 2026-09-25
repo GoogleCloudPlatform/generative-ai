@@ -13,72 +13,100 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Google Cloud Text-to-Speech Narration & Subtitle Timecode Synthesizer.
+"""Google Cloud Voice Narration & Subtitle Timecode Synthesizer.
 
 Generates professional studio-quality voice audio tracks and synchronized subtitle
 timecodes matching the demo's detected language (Japanese, English, German, French, etc.)
-using Google Cloud Text-to-Speech API (Neural2 / Journey / Chirp voices).
+using Vertex AI Agent Platform Gemini 3.8 Flash TTS (`gemini-3.8-flash-tts`) as the primary
+engine, with automatic fallback to `gemini-3.8-flash-lite-tts` and Google Cloud Text-to-Speech API
+(Chirp 3: HD / WaveNet foundation voices).
 Outputs a narration_manifest.json containing audio durations and subtitle segment slices.
 """
 
 import argparse
+import base64
 import json
 import os
+import shutil
 import subprocess
 import sys
+import urllib.error
+import urllib.request
+import wave
 
 try:
     from google.cloud import texttospeech
 except ImportError:
     texttospeech = None
 
-# Language code to recommended neural voices (Google Cloud Chirp 3 HD foundation voices)
+# Primary and fallback Gemini 3.8 TTS models on Vertex AI Agent Platform
+DEFAULT_GEMINI_TTS_MODEL = "gemini-3.8-flash-tts"
+FALLBACK_GEMINI_TTS_MODEL = "gemini-3.8-flash-lite-tts"
+DEFAULT_GEMINI_TTS_STYLE = "Professional, warm, clear, articulate executive presentation narrator"
+
+# Language code to recommended neural voices (Google Cloud Chirp 3 HD foundation voices + Gemini 3.8 Flash TTS speakers)
 VOICE_MAPPING = {
-    "en-US": {"voice": "en-US-Chirp3-HD-Achernar", "language_code": "en-US", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "en": {"voice": "en-US-Chirp3-HD-Achernar", "language_code": "en-US", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "en-GB": {"voice": "en-GB-Chirp3-HD-Achernar", "language_code": "en-GB", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "en-AU": {"voice": "en-AU-Chirp3-HD-Achernar", "language_code": "en-AU", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "en-IN": {"voice": "en-IN-Chirp3-HD-Achernar", "language_code": "en-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "ja-JP": {"voice": "ja-JP-Chirp3-HD-Aoede", "language_code": "ja-JP", "ssml_gender": "FEMALE", "speaking_rate": 1.05},
-    "ja": {"voice": "ja-JP-Chirp3-HD-Aoede", "language_code": "ja-JP", "ssml_gender": "FEMALE", "speaking_rate": 1.05},
-    "de-DE": {"voice": "de-DE-Chirp3-HD-Achernar", "language_code": "de-DE", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "de": {"voice": "de-DE-Chirp3-HD-Achernar", "language_code": "de-DE", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "fr-FR": {"voice": "fr-FR-Chirp3-HD-Achernar", "language_code": "fr-FR", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "fr": {"voice": "fr-FR-Chirp3-HD-Achernar", "language_code": "fr-FR", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "fr-CA": {"voice": "fr-CA-Chirp3-HD-Achernar", "language_code": "fr-CA", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "es-ES": {"voice": "es-ES-Chirp3-HD-Achernar", "language_code": "es-ES", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "es": {"voice": "es-ES-Chirp3-HD-Achernar", "language_code": "es-ES", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "es-US": {"voice": "es-US-Chirp3-HD-Achernar", "language_code": "es-US", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "it-IT": {"voice": "it-IT-Chirp3-HD-Achernar", "language_code": "it-IT", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "it": {"voice": "it-IT-Chirp3-HD-Achernar", "language_code": "it-IT", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "ko-KR": {"voice": "ko-KR-Chirp3-HD-Achernar", "language_code": "ko-KR", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "ko": {"voice": "ko-KR-Chirp3-HD-Achernar", "language_code": "ko-KR", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "cmn-CN": {"voice": "cmn-CN-Chirp3-HD-Achernar", "language_code": "cmn-CN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "zh-CN": {"voice": "cmn-CN-Chirp3-HD-Achernar", "language_code": "cmn-CN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "zh": {"voice": "cmn-CN-Chirp3-HD-Achernar", "language_code": "cmn-CN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "cmn-TW": {"voice": "cmn-TW-Wavenet-A", "language_code": "cmn-TW", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "zh-TW": {"voice": "cmn-TW-Wavenet-A", "language_code": "cmn-TW", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "yue-HK": {"voice": "yue-HK-Chirp3-HD-Achernar", "language_code": "yue-HK", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "zh-HK": {"voice": "yue-HK-Chirp3-HD-Achernar", "language_code": "yue-HK", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "pt-BR": {"voice": "pt-BR-Chirp3-HD-Achernar", "language_code": "pt-BR", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "pt": {"voice": "pt-BR-Chirp3-HD-Achernar", "language_code": "pt-BR", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "pt-PT": {"voice": "pt-PT-Wavenet-E", "language_code": "pt-PT", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "nl-NL": {"voice": "nl-NL-Chirp3-HD-Achernar", "language_code": "nl-NL", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "nl": {"voice": "nl-NL-Chirp3-HD-Achernar", "language_code": "nl-NL", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "nl-BE": {"voice": "nl-BE-Chirp3-HD-Achernar", "language_code": "nl-BE", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "hi-IN": {"voice": "hi-IN-Chirp3-HD-Achernar", "language_code": "hi-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "hi": {"voice": "hi-IN-Chirp3-HD-Achernar", "language_code": "hi-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "ar-XA": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-        "ar": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "th-TH": {"voice": "th-TH-Chirp3-HD-Orion", "language_code": "th-TH", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
-    "th": {"voice": "th-TH-Chirp3-HD-Orion", "language_code": "th-TH", "ssml_gender": "FEMALE", "speaking_rate": 1.0},
+    "en-US": {"voice": "en-US-Chirp3-HD-Achernar", "language_code": "en-US", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "en": {"voice": "en-US-Chirp3-HD-Achernar", "language_code": "en-US", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "en-GB": {"voice": "en-GB-Chirp3-HD-Achernar", "language_code": "en-GB", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "en-AU": {"voice": "en-AU-Chirp3-HD-Achernar", "language_code": "en-AU", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "en-IN": {"voice": "en-IN-Chirp3-HD-Achernar", "language_code": "en-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "ja-JP": {"voice": "ja-JP-Chirp3-HD-Aoede", "language_code": "ja-JP", "ssml_gender": "FEMALE", "speaking_rate": 1.05, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Aoede"},
+    "ja": {"voice": "ja-JP-Chirp3-HD-Aoede", "language_code": "ja-JP", "ssml_gender": "FEMALE", "speaking_rate": 1.05, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Aoede"},
+    "de-DE": {"voice": "de-DE-Chirp3-HD-Achernar", "language_code": "de-DE", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "de": {"voice": "de-DE-Chirp3-HD-Achernar", "language_code": "de-DE", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "fr-FR": {"voice": "fr-FR-Chirp3-HD-Achernar", "language_code": "fr-FR", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "fr": {"voice": "fr-FR-Chirp3-HD-Achernar", "language_code": "fr-FR", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "fr-CA": {"voice": "fr-CA-Chirp3-HD-Achernar", "language_code": "fr-CA", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "es-ES": {"voice": "es-ES-Chirp3-HD-Achernar", "language_code": "es-ES", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "es": {"voice": "es-ES-Chirp3-HD-Achernar", "language_code": "es-ES", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "es-US": {"voice": "es-US-Chirp3-HD-Achernar", "language_code": "es-US", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "it-IT": {"voice": "it-IT-Chirp3-HD-Achernar", "language_code": "it-IT", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "it": {"voice": "it-IT-Chirp3-HD-Achernar", "language_code": "it-IT", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "ko-KR": {"voice": "ko-KR-Chirp3-HD-Achernar", "language_code": "ko-KR", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "ko": {"voice": "ko-KR-Chirp3-HD-Achernar", "language_code": "ko-KR", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "cmn-CN": {"voice": "cmn-CN-Chirp3-HD-Achernar", "language_code": "cmn-CN", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "zh-CN": {"voice": "cmn-CN-Chirp3-HD-Achernar", "language_code": "cmn-CN", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "zh": {"voice": "cmn-CN-Chirp3-HD-Achernar", "language_code": "cmn-CN", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "cmn-TW": {"voice": "cmn-TW-Wavenet-A", "language_code": "cmn-TW", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "zh-TW": {"voice": "cmn-TW-Wavenet-A", "language_code": "cmn-TW", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "yue-HK": {"voice": "yue-HK-Chirp3-HD-Achernar", "language_code": "yue-HK", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "zh-HK": {"voice": "yue-HK-Chirp3-HD-Achernar", "language_code": "yue-HK", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "pt-BR": {"voice": "pt-BR-Chirp3-HD-Achernar", "language_code": "pt-BR", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "pt": {"voice": "pt-BR-Chirp3-HD-Achernar", "language_code": "pt-BR", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "pt-PT": {"voice": "pt-PT-Wavenet-E", "language_code": "pt-PT", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "nl-NL": {"voice": "nl-NL-Chirp3-HD-Achernar", "language_code": "nl-NL", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "nl": {"voice": "nl-NL-Chirp3-HD-Achernar", "language_code": "nl-NL", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "nl-BE": {"voice": "nl-BE-Chirp3-HD-Achernar", "language_code": "nl-BE", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "hi-IN": {"voice": "hi-IN-Chirp3-HD-Achernar", "language_code": "hi-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "hi": {"voice": "hi-IN-Chirp3-HD-Achernar", "language_code": "hi-IN", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "ar-XA": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "ar": {"voice": "ar-XA-Chirp3-HD-Achernar", "language_code": "ar-XA", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Achernar"},
+    "th-TH": {"voice": "th-TH-Chirp3-HD-Orion", "language_code": "th-TH", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Orion"},
+    "th": {"voice": "th-TH-Chirp3-HD-Orion", "language_code": "th-TH", "ssml_gender": "FEMALE", "speaking_rate": 1.0, "gemini_model": DEFAULT_GEMINI_TTS_MODEL, "gemini_voice": "Orion"},
 }
+
+
+def _extract_gemini_speaker(voice_name: str) -> str:
+    """Extracts the Gemini TTS prebuilt voice speaker name from a Cloud TTS voice identifier."""
+    if "-Chirp3-HD-" in voice_name:
+        return voice_name.split("-Chirp3-HD-", 1)[1]
+    return "Achernar"
+
+
+def _enrich_voice_info(info: dict) -> dict:
+    """Ensures Gemini 3.8 Flash TTS metadata fields are present alongside Cloud TTS fields."""
+    info.setdefault("gemini_model", DEFAULT_GEMINI_TTS_MODEL)
+    info.setdefault("gemini_fallback_model", FALLBACK_GEMINI_TTS_MODEL)
+    info.setdefault("gemini_voice", _extract_gemini_speaker(info.get("voice", "")))
+    info.setdefault("style", DEFAULT_GEMINI_TTS_STYLE)
+    return info
 
 
 def resolve_voice_for_language(lang: str) -> dict:
     """Dynamically resolves neural voice parameters for any language code without Japanese leakage."""
     if not lang:
-        return dict(VOICE_MAPPING["en-US"])
+        return _enrich_voice_info(dict(VOICE_MAPPING["en-US"]))
 
     normalized = lang.strip().replace("_", "-")
     # 1. Exact match (case-insensitive)
@@ -86,7 +114,7 @@ def resolve_voice_for_language(lang: str) -> dict:
         if k.lower() == normalized.lower():
             info = dict(v)
             info.setdefault("language_code", k if "-" in k else f"{k}-{k.upper()}")
-            return info
+            return _enrich_voice_info(info)
 
     # 2. Language prefix match
     norm_lower = normalized.lower()
@@ -105,17 +133,17 @@ def resolve_voice_for_language(lang: str) -> dict:
         "pt": "pt-BR",
         "nl": "nl-NL",
         "hi": "hi-IN",
-                "ar": "ar-XA",
+        "ar": "ar-XA",
         "th": "th-TH",
     }
     if prefix in prefix_map:
         target_key = prefix_map[prefix]
         info = dict(VOICE_MAPPING[target_key])
-        return info
+        return _enrich_voice_info(info)
 
     # 3. Dynamic BCP-47 candidate or neutral fallback.
     # Non-Japanese languages NEVER fall back to Japanese! Neutral fallback is strictly en-US.
-    return dict(VOICE_MAPPING["en-US"])
+    return _enrich_voice_info(dict(VOICE_MAPPING["en-US"]))
 
 
 resolve_voice_for_locale = resolve_voice_for_language
@@ -240,8 +268,195 @@ def generate_silent_audio(output_path: str, duration_sec: float):
             f.write(frame * num_frames)
 
 
+def get_gcp_access_token() -> str:
+    """Retrieves Google Cloud access token via gcloud auth or google.auth."""
+    try:
+        res = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True, timeout=10)
+        if res.returncode == 0 and res.stdout.strip():
+            return res.stdout.strip()
+    except Exception:
+        pass
+    try:
+        import google.auth
+        import google.auth.transport.requests
+        creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        creds.refresh(google.auth.transport.requests.Request())
+        if creds.token:
+            return creds.token
+    except Exception:
+        pass
+    return ""
+
+
+def _write_audio_bytes_to_mp3(raw_audio: bytes, output_path: str, mime_type: str = "") -> None:
+    """Writes or transcodes Gemini TTS audio bytes (WAV, PCM, or MP3) into the target MP3 path."""
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    mime_lower = (mime_type or "").lower()
+
+    # Case 1: RIFF WAV container (default unary output from gemini-3.8-flash-tts)
+    if raw_audio[:4] == b"RIFF":
+        if output_path.endswith(".mp3") and shutil.which("ffmpeg"):
+            temp_wav = output_path + ".tmp.wav"
+            try:
+                with open(temp_wav, "wb") as wf:
+                    wf.write(raw_audio)
+                conv_cmd = ["ffmpeg", "-y", "-i", temp_wav, "-acodec", "libmp3lame", "-q:a", "2", output_path]
+                res = subprocess.run(conv_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if res.returncode == 0 and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    return
+            finally:
+                if os.path.exists(temp_wav):
+                    try:
+                        os.remove(temp_wav)
+                    except Exception:
+                        pass
+        with open(output_path, "wb") as out:
+            out.write(raw_audio)
+        return
+
+    # Case 2: Raw linear16 PCM stream (24kHz mono 16-bit)
+    if ("l16" in mime_lower or "pcm" in mime_lower) and raw_audio[:3] != b"ID3" and raw_audio[:2] not in (b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"):
+        temp_wav = output_path + ".tmp.wav"
+        try:
+            with wave.open(temp_wav, "wb") as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)
+                wf.setframerate(24000)
+                wf.writeframes(raw_audio)
+            if output_path.endswith(".mp3") and shutil.which("ffmpeg"):
+                conv_cmd = ["ffmpeg", "-y", "-i", temp_wav, "-acodec", "libmp3lame", "-q:a", "2", output_path]
+                res = subprocess.run(conv_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if res.returncode == 0 and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    return
+            shutil.copy2(temp_wav, output_path)
+            return
+        finally:
+            if os.path.exists(temp_wav):
+                try:
+                    os.remove(temp_wav)
+                except Exception:
+                    pass
+
+    # Case 3: Already MP3 or directly playable stream
+    with open(output_path, "wb") as out:
+        out.write(raw_audio)
+
+
+def synthesize_with_gemini_tts(
+    text: str,
+    output_path: str,
+    lang: str = "en-US",
+    quota_project: str = "",
+    model_id: str = "",
+) -> bool:
+    """Synthesizes speech using Vertex AI Agent Platform Gemini 3.8 Flash TTS (:generateContent).
+
+    Tries `gemini-3.8-flash-tts` first and falls back to `gemini-3.8-flash-lite-tts`
+    if model_id is not explicitly pinned. Returns True if synthesis succeeded.
+    """
+    token = get_gcp_access_token()
+    if not token or not quota_project:
+        return False
+
+    v_info = resolve_voice_for_language(lang)
+    language_code = v_info.get("language_code") or "en-US"
+    gemini_voice = v_info.get("gemini_voice") or "Achernar"
+    style_prompt = v_info.get("style") or DEFAULT_GEMINI_TTS_STYLE
+
+    models_to_try = [model_id] if model_id else [
+        v_info.get("gemini_model", DEFAULT_GEMINI_TTS_MODEL),
+        v_info.get("gemini_fallback_model", FALLBACK_GEMINI_TTS_MODEL),
+    ]
+
+    payload = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": text,
+                        "speech_metadata": {"style": style_prompt},
+                    }
+                ],
+            }
+        ],
+        "generationConfig": {
+            "responseModalities": ["AUDIO"],
+            "speechConfig": {
+                "languageCode": language_code,
+                "voiceConfig": {
+                    "prebuiltVoiceConfig": {
+                        "voiceName": gemini_voice,
+                    }
+                },
+            },
+        },
+    }
+    body_bytes = json.dumps(payload).encode("utf-8")
+
+    for target_model in models_to_try:
+        if not target_model:
+            continue
+        url = (
+            f"https://aiplatform.googleapis.com/v1beta1/projects/{quota_project}"
+            f"/locations/global/publishers/google/models/{target_model}:generateContent"
+        )
+        req = urllib.request.Request(
+            url,
+            data=body_bytes,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+                "x-goog-user-project": quota_project,
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=45) as resp:
+                resp_data = json.loads(resp.read().decode("utf-8"))
+            candidates = resp_data.get("candidates", [])
+            for cand in candidates:
+                parts = cand.get("content", {}).get("parts", [])
+                for part in parts:
+                    inline = part.get("inlineData") or part.get("inline_data") or {}
+                    b64_audio = inline.get("data", "")
+                    if b64_audio:
+                        mime_type = inline.get("mimeType") or inline.get("mime_type") or ""
+                        raw_audio = base64.b64decode(b64_audio)
+                        if raw_audio:
+                            _write_audio_bytes_to_mp3(raw_audio, output_path, mime_type=mime_type)
+                            if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                                return True
+        except Exception:
+            continue
+
+    return False
+
+
+def _probe_audio_duration(output_path: str, text: str, lang: str) -> float:
+    """Returns exact audio duration in seconds via ffprobe or wave header, or estimated speech duration."""
+    if shutil.which("ffprobe"):
+        try:
+            cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", output_path]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode == 0 and res.stdout.strip():
+                return round(float(res.stdout.strip()), 2)
+        except Exception:
+            pass
+    try:
+        if os.path.exists(output_path):
+            with wave.open(output_path, "rb") as wf:
+                frames = wf.getnframes()
+                rate = wf.getframerate()
+                if rate > 0 and frames > 0:
+                    return round(frames / float(rate), 2)
+    except Exception:
+        pass
+    return estimate_speech_duration(text, lang)
+
+
 def synthesize_scene_audio(text: str, output_path: str, lang: str = "en-US", mock: bool = False, project: str = "") -> float:
-    """Synthesizes speech for a single scene via Google Cloud TTS or fallback."""
+    """Synthesizes speech for a single scene via Gemini 3.8 Flash TTS with Cloud TTS Chirp 3: HD fallback."""
     if mock:
         duration = estimate_speech_duration(text, lang)
         generate_silent_audio(output_path, duration)
@@ -262,23 +477,37 @@ def synthesize_scene_audio(text: str, output_path: str, lang: str = "en-US", moc
         except Exception:
             pass
 
+    # Primary Engine: Vertex AI Agent Platform Gemini 3.8 Flash TTS (unless disabled or Cloud TTS client is mocked)
+    tts_client_cls = getattr(texttospeech, "TextToSpeechClient", None) if texttospeech else None
+    cloud_tts_mocked = type(tts_client_cls).__name__ in ("MagicMock", "NonCallableMagicMock")
+    gemini_tts_mocked = type(synthesize_with_gemini_tts).__name__ in ("MagicMock", "NonCallableMagicMock")
+    disable_gemini_tts = (
+        os.environ.get("GE_DISABLE_GEMINI_TTS", "").strip().lower() in ("1", "true", "yes")
+        or os.environ.get("GE_TTS_ENGINE", "").strip().lower() == "cloud-tts"
+    )
+
+    if not disable_gemini_tts and (not cloud_tts_mocked or gemini_tts_mocked):
+        if synthesize_with_gemini_tts(text, output_path, lang=lang, quota_project=quota_project):
+            return _probe_audio_duration(output_path, text, lang)
+
+    # Fallback Engine: Google Cloud Text-to-Speech API (Chirp 3: HD / WaveNet)
     try:
-        from google.cloud import texttospeech
+        from google.cloud import texttospeech as tts_mod
         from google.api_core.client_options import ClientOptions
 
         client_options = ClientOptions(quota_project_id=quota_project) if quota_project else None
-        client = texttospeech.TextToSpeechClient(client_options=client_options)
+        client = tts_mod.TextToSpeechClient(client_options=client_options)
         v_info = resolve_voice_for_language(lang)
         language_code = v_info.get("language_code") or "en-US"
 
-        synthesis_input = texttospeech.SynthesisInput(text=text)
-        voice = texttospeech.VoiceSelectionParams(
+        synthesis_input = tts_mod.SynthesisInput(text=text)
+        voice = tts_mod.VoiceSelectionParams(
             language_code=language_code,
             name=v_info["voice"],
-            ssml_gender=getattr(texttospeech.SsmlVoiceGender, v_info.get("ssml_gender", "FEMALE"))
+            ssml_gender=getattr(tts_mod.SsmlVoiceGender, v_info.get("ssml_gender", "FEMALE"))
         )
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3,
+        audio_config = tts_mod.AudioConfig(
+            audio_encoding=tts_mod.AudioEncoding.MP3,
             speaking_rate=v_info.get("speaking_rate", 1.0)
         )
 
@@ -291,12 +520,7 @@ def synthesize_scene_audio(text: str, output_path: str, lang: str = "en-US", moc
         with open(output_path, "wb") as out:
             out.write(response.audio_content)
 
-        # Get exact duration via ffprobe if available
-        cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", output_path]
-        res = subprocess.run(cmd, capture_output=True, text=True)
-        if res.returncode == 0 and res.stdout.strip():
-            return round(float(res.stdout.strip()), 2)
-        return estimate_speech_duration(text, lang)
+        return _probe_audio_duration(output_path, text, lang)
 
     except Exception as e:
         diag = format_tts_diagnostic_banner(str(e), quota_project)

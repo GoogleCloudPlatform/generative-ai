@@ -1,12 +1,12 @@
 ---
 name: ge-demo-video
-description: Records, edits, and delivers automated executive demo videos for agents deployed to Gemini Enterprise. Verifies typography fonts across all languages, connects to live Chrome via CDP (:9222) with automatic display/xvfb adaptation, automatically discovers and applies customer logo & corporate palette (default ON, --no-brand to opt out), enforces strict zero-mock live recording of the deployed agent chat interface, applies modern SaaS video styling in Remotion with dynamic zoom/pan and 4x wait-time acceleration, synthesizes Google Cloud TTS neural narration with synchronized subtitles (pure speech narration, optional ambient BGM), and delivers the rendered MP4 to the demo's Google Drive folder. Also triggered by /ge-demo-video.
+description: Records, edits, and delivers automated executive demo videos for agents deployed to Gemini Enterprise. Verifies typography fonts across all languages, connects to live Chrome via CDP (:9222) with automatic display/xvfb adaptation, automatically discovers and applies customer logo & corporate palette (default ON, --no-brand to opt out), enforces strict zero-mock live recording of the deployed agent chat interface, applies modern SaaS video styling in Remotion with dynamic zoom/pan and 4x wait-time acceleration, synthesizes Gemini 3.8 Flash TTS (with Google Cloud TTS Chirp 3: HD fallback) neural narration with synchronized subtitles (pure speech narration, optional ambient BGM), and delivers the rendered MP4 to the demo's Google Drive folder. Also triggered by /ge-demo-video.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.2.0
+  version: 2.3.0
 ---
 
-# GE Demo Video Generator Skill (v2.2.0)
+# GE Demo Video Generator Skill (v2.3.0)
 
 Automates the end-to-end production and delivery of professional **90–120s executive highlight reel demo videos** showcasing autonomous AI agents deployed on **Gemini Enterprise**.
 
@@ -47,7 +47,7 @@ Automates the end-to-end production and delivery of professional **90–120s exe
 [Phase 4: Browser Session Verification & Interactive Authentication Handoff]
   ↓ Live Chrome CDP (port 9222) verified, chat input DOM element ready
 [Phase 5: Automated Execution, TTS Synthesis & Remotion Video Rendering]
-  ↓ Google Cloud TTS, Bézier typing jitter, 4x fast-forward thinking, dynamic camera
+  ↓ Gemini 3.8 Flash TTS (Chirp 3: HD fallback), Bézier typing jitter, 4x fast-forward thinking, dynamic camera
 [Phase 6: Google Drive Delivery & Local Staging]
 ```
 
@@ -57,7 +57,7 @@ Automates the end-to-end production and delivery of professional **90–120s exe
    Dynamically inspect environment and execute pre-flight destination verification:
    - **Company Name**: `${COMPANY_NAME}` (e.g. `Acme Corp`)
    - **Agent Persona**: `${DEMO_DISPLAY_NAME}` or `${AGENT_ROLE}` (e.g. `Supply Chain Director`)
-   - **Target Locale & Voice**: `${LANG}` (e.g. `en-US` with Studio Neural2 / Chirp3-HD voice, or `ja-JP`, `de-DE`, etc.)
+   - **Target Locale & Voice**: `${LANG}` (e.g. `en-US` with `gemini-3.8-flash-tts` primary and `Chirp3-HD` fallback, or `ja-JP`, `de-DE`, etc.)
    - **Session URL**: `${GE_SESSION_URL}` or derived from `CONFIG_ID` and `AGENT_ID`
    - **3-Tier Storage Delivery Hierarchy & Destination Pre-Flight**:
      - **Tier 1 (Primary)**: Host Operator Drive (via `gdrive` CLI if configured and authorized)
