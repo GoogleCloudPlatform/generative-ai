@@ -436,9 +436,11 @@ def format_demo_plan_overview(
                 sys.path.insert(0, VIDEO_SCRIPTS_DIR)
             import synthesize_tts
             v_info = synthesize_tts.resolve_voice_for_language(lang)
-            selected_voice = v_info.get("voice", f"{lang}-Chirp3-HD-Achernar")
+            base_voice = v_info.get("voice", f"{lang}-Chirp3-HD-Achernar")
+            gemini_model = v_info.get("gemini_model", "gemini-3.8-flash-tts")
+            selected_voice = f"{gemini_model} ({base_voice})"
         except Exception:
-            selected_voice = f"{lang}-Chirp3-HD-Achernar"
+            selected_voice = f"gemini-3.8-flash-tts ({lang}-Chirp3-HD-Achernar)"
 
     # Resolve Agent Display Name
     if agent_name:
