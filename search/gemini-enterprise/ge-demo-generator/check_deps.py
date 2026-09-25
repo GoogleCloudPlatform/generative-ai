@@ -52,7 +52,7 @@ PYPROJECT = HERE / "agent_template" / "pyproject.toml"
 PYPROJECT_KEYS = ("adk", "mcp", "genai", "storage", "apiCore")
 
 # PINNED_DEPS keys that are not pip requirements.
-NON_PIP_KEYS = {"pythonImage", "uvImage", "uvVersion", "supergateway"}
+NON_PIP_KEYS = {"pythonImage", "uvImage", "uvVersion", "excludeNewer", "supergateway"}
 # Keys emitted only in the enableComputerUse branch of the requirements heredoc.
 COMPUTER_USE_KEYS = {
     "playwright",

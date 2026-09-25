@@ -265,6 +265,16 @@ run_environment_doctor() {
     fi
   fi
 
+  # Enforce hermetic ephemeral uv environments and deterministic PyPI resolution cutoff
+  export UV_HTTP_TIMEOUT=600
+  export UV_RETRIES=10
+  export UV_ISOLATED=1
+  export PYTHONNOUSERSITE=1
+  unset PYTHONPATH
+  if [ -z "$UV_EXCLUDE_NEWER" ]; then
+    export UV_EXCLUDE_NEWER="2026-09-25T00:00:00Z"
+  fi
+
   # 2. Multilingual fonts for operational document & video rendering
   if [ -f "scripts/ensure_fonts.py" ]; then
     python3 scripts/ensure_fonts.py --check-only >/dev/null 2>&1 || true
@@ -964,7 +974,7 @@ PID_CATALOG=$!
   echo "  🧪 [Parallel] Provisioning Agent Engine Sandbox..."
   SANDBOX_TMPDIR=$(mktemp -d)
   pushd "$SANDBOX_TMPDIR" >/dev/null 2>&1
-  GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "google-cloud-aiplatform[agent_engines]>=1.112.0,<2.0.0" python3 - <<'__SANDBOX_PROV_EOF__' 2>/dev/null || true
+  GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --isolated --no-project --with "google-cloud-aiplatform[agent_engines]>=1.112.0,<2.0.0" python3 - <<'__SANDBOX_PROV_EOF__' 2>/dev/null || true
 import os, sys, vertexai
 from vertexai import types
 
@@ -1121,7 +1131,7 @@ PID_BQ=$!
     EXT_SPEC_ARG=""
     [ -f data/external_files_spec.json ] && EXT_SPEC_ARG="--spec-file ./data/external_files_spec.json"
     EXT_LOG=$(mktemp /tmp/ge-extfiles-XXXXXX.log)
-    uv run --no-project \
+    uv run --isolated --no-project \
       --with "openpyxl>=3.1.0,<4.0.0" \
       --with "reportlab>=4.0.0,<6.0.0" \
       --with "pillow>=10.0.0,<13.0.0" \
@@ -1210,8 +1220,8 @@ PID_DRIVE=$!
   if [ -f scripts/setup_fs.py ]; then
     # Report what happened. The seed silently failing is exactly the case that
     # has to be visible: every Firestore-backed feature of the demo depends on it.
-    if _FS_SEED_OUT=$(uv run --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0" \
-      --with "google-api-core>=2.20.0,<2.35.0" \
+    if _FS_SEED_OUT=$(uv run --isolated --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0" \
+      --with "google-api-core>=2.28.0,<2.35.0" \
       python3 scripts/setup_fs.py \
       --project "$PROJECT_ID" \
       --collection "$FIRESTORE_COLLECTION" 2>&1); then

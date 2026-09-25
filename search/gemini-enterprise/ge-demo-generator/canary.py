@@ -181,17 +181,24 @@ def write_context(out, variant):
     return hard, optional
 
 
-def run_venv(out, uv_version):
+def run_venv(out, uv_version, table=None):
     """Resolve and run the smoke test in a venv -- the Docker-free fast path."""
+    import os
     venv = out / ".venv"
     uv = ["uvx", "uv@" + uv_version]
+    # Canary deliberately ignores UV_EXCLUDE_NEWER so daily CI catches upstream
+    # PyPI breakages immediately, while user deployments remain protected by
+    # the verified cutoff timestamp.
+    clean_env = {k: v for k, v in os.environ.items() if k != "UV_EXCLUDE_NEWER"}
+    clean_env.pop("PYTHONPATH", None)
+    clean_env["PYTHONNOUSERSITE"] = "1"
     steps = [
         (uv + ["venv", "--python", "3.11", str(venv)], "create venv"),
         (uv + ["pip", "install", "--python", str(venv), "-q",
                "-r", str(out / "requirements.txt")], "install requirements"),
     ]
     for command, label in steps:
-        proc = subprocess.run(command, capture_output=True, text=True, timeout=1800)
+        proc = subprocess.run(command, env=clean_env, capture_output=True, text=True, timeout=1800)
         if proc.returncode != 0:
             print("canary: FAILED to " + label)
             print((proc.stderr or proc.stdout)[:4000])
@@ -203,7 +210,7 @@ def run_venv(out, uv_version):
          "import importlib.metadata as m;"
          "print('\\n'.join('  ' + p + ' ' + m.version(p) for p in "
          "['google-adk','mcp','google-genai','a2a-sdk','a2ui-agent-sdk']))"],
-        capture_output=True, text=True)
+        env=clean_env, capture_output=True, text=True)
     print("resolved:")
     print(versions.stdout.rstrip())
 
@@ -212,11 +219,28 @@ def run_venv(out, uv_version):
         ([python, "dep_smoke_test.py"], "dependency import smoke test"),
         ([python, "-c", A2UI_INTERFACE_CHECK], "a2ui interface check"),
     ):
-        proc = subprocess.run(command, cwd=str(out), capture_output=True, text=True)
+        proc = subprocess.run(command, cwd=str(out), env=clean_env, capture_output=True, text=True)
         output = (proc.stdout + proc.stderr).strip()
         print("\n== " + label + " ==")
         print("\n".join(l for l in output.split("\n")
                         if "UserWarning" not in l and "check_feature_enabled" not in l))
+        if proc.returncode != 0:
+            failed = 1
+
+    if table:
+        fs_spec = table.get("firestore", "google-cloud-firestore>=2.16.0,<3.0.0")
+        ac_spec = table.get("apiCore", "google-api-core>=2.28.0,<2.35.0")
+        host_cmd = uv + [
+            "run", "--isolated", "--no-project", "--python", "3.11",
+            "--with", fs_spec, "--with", ac_spec,
+            "python", "-c",
+            "from google.cloud import firestore; import google.api_core; "
+            "assert hasattr(google.api_core, 'check_python_version'); "
+            "print('host uv run --isolated firestore + api_core OK')",
+        ]
+        proc = subprocess.run(host_cmd, cwd=str(out), env=clean_env, capture_output=True, text=True, timeout=600)
+        print("\n== host uv run --isolated check ==")
+        print((proc.stdout + proc.stderr).strip())
         if proc.returncode != 0:
             failed = 1
     return failed
@@ -235,7 +259,7 @@ def main():
         return 0
 
     table = dict(parse_pinned_deps(CODE_GS.read_text(encoding="utf-8")))
-    return run_venv(out, table.get("uvVersion", "0.11.17"))
+    return run_venv(out, table.get("uvVersion", "0.11.17"), table)
 
 
 if __name__ == "__main__":
