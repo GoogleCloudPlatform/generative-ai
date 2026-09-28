@@ -112,6 +112,29 @@ while this prompt runs.
 Write it in the same language as the prompts. It is the difference between a demo where
 the audience sees the payoff and one where it scrolls past.
 
+### 3.1 Explicit Attachment / Data-Source Mapping & Cross-File Content Alignment (MANDATORY)
+
+Because prompt text itself never names raw filenames (§7), the operator playbook MUST
+explicitly state for every prompt whether a file from `external_files/` should be attached
+in chat or whether the prompt queries database tables directly:
+
+1. **Per-Prompt `Attachment / Data Source` Line**: Every prompt in the delivered playbook
+   must carry an explicit `Attachment / Data Source` line naming either the exact file(s)
+   to attach (e.g. `<domain>_audit_report.pdf + <domain>_external_ledger.xlsx`,
+   `handwritten_order_1.jpg`) or `None — Direct DB Query`. Never leave the operator
+   guessing which file in `external_files/` belongs to which prompt.
+2. **Cross-File Record ID Alignment (PDF ↔ Excel ↔ BigQuery)**: Every specific record ID
+   cited as a flagged case in the PDF report or in any prompt's Watch Point MUST exist
+   verbatim in BOTH the BigQuery CSV tables AND the Excel ledger rows (whenever the Excel
+   ledger tracks the same entity/transaction ID prefix). Never generate an Excel range
+   stopping at `ID-0040` while the PDF cites `ID-0041`.
+3. **Both Document Scans Must Contain Audit Seeds**: Both `handwritten_order_1.jpg` and
+   `handwritten_order_2.jpg` must include 2-3 normal rows PLUS at least 1 audit-seed
+   discrepancy row (e.g. obsolete SKU code or quantity mismatch matching the BigQuery
+   master table). The customer/sender, item codes, and discrepancy described in the Vision
+   Showcase prompt (Prompt 3 or Prompt 4) and its Watch Point must match the exact scan
+   bound to that prompt.
+
 ---
 
 ## 4. Prompt Details, Categories & Persona Rotation

@@ -31,8 +31,10 @@ a folder. See `references/datastore_connectors.md` §2.3 for the live evidence.
 
 To ensure impressive demonstration moments ("WOW Moments"):
 1. **Logical Key Symmetry**: The primary keys (e.g. `order_id`, `lot_id`, `invoice_id`) cited in the external PDF and Excel files MUST actually exist in the BigQuery tables.
-2. **Intentional Variance (Audit Discrepancy)**: 2-4 specific records in the external files have slightly different values (e.g. quantity received = 1,050 vs system expected = 1,200) or status deviations.
-3. **Autonomous Cross-Referencing**: When given a high-level strategic question (Prompt 3), the agent autonomously discovers this anomaly by querying internal tables and comparing them with the external Drive file.
+2. **Cross-File ID Alignment (PDF ↔ Excel ↔ BigQuery)**: Every specific record ID cited as a flagged discrepancy in the PDF report or in any prompt's Watch Point MUST exist in BOTH the BigQuery CSV tables AND the Excel ledger rows (do not generate an Excel range `REF-0101..REF-0140` while the PDF cites `REF-0141`).
+3. **Intentional Variance (Audit Discrepancy)**: 2-4 specific records in the external files have slightly different values (e.g. quantity received = 1,050 vs system expected = 1,200) or status deviations.
+4. **Both Scanned Images Carry Audit Seeds**: Both `handwritten_order_1.jpg` and `handwritten_order_2.jpg` must contain 2-3 normal rows plus at least 1 discrepancy row (e.g. obsolete/superseded code or quantity mismatch matching the BigQuery master table), and the Vision Showcase prompt's customer/item description must match the exact scan bound to that prompt.
+5. **Autonomous Cross-Referencing**: When given a high-level strategic question (Prompt 3), the agent autonomously discovers this anomaly by querying internal tables and comparing them with the external Drive file.
 
 ---
 
@@ -63,7 +65,7 @@ uv run --isolated --no-project \
 #   "excel":  {"title": "...", "kpis": [{"label": "...", "value": "..."}],
 #              "headers": [...], "rows": [[...], ...]},
 #   "scans":  [{"title": "...", "doc_no": "...", "date": "...", "headers": [...],
-#               "rows": [[...], ...], "is_discrepancy": false}, {...}]
+#               "rows": [[...], ...], "is_discrepancy": true}, {...}]
 # }
 # Everything above is written in the demo's language and domain. The script itself
 # ships only generic placeholders - never bake a customer's content into it.

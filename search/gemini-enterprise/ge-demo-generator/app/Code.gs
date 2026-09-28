@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v12.24-public',
+  APP_VERSION: 'v12.25-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -950,6 +950,15 @@ function planAndGenerateData(userGoal, options) {
       }
     }
   }
+  // Density repair BEFORE validation and image rendering: cheaply top up an
+  // under-dense transaction table instead of failing the whole run (v11.25).
+  expandThinTables_(parsed, options);
+
+  // Repair externalFiles <-> demoGuide <-> tables consistency BEFORE image
+  // generation so any discrepancy row injected into imageRows is rendered
+  // into the image by buildImagePromptWithRows_.
+  validateAndRepairExternalFileBindings_(parsed);
+
   // Generate in-memory simulated images using Vertex AI Agent Platform gemini-3-pro-image
   if (parsed.externalFiles && parsed.externalFiles.length > 0) {
     console.log('[ImageGen-Pipeline] Scanning externalFiles for dynamic images...');
@@ -972,10 +981,6 @@ function planAndGenerateData(userGoal, options) {
       }
     }
   }
-
-  // Density repair BEFORE validation: cheaply top up an under-dense
-  // transaction table instead of failing the whole run (v11.25).
-  expandThinTables_(parsed, options);
 
   // Validation and Clean-up
   validateGeneratedData(parsed, options.rowCount, options.dataProfile);
@@ -1484,9 +1489,10 @@ If the Business Problem naturally involves processing non-structured inputs like
         3. **Sender**: Sender company details on the top-right (matching generated client data, with appropriate localized suffixes if applicable).
         4. **Table Grid**: Neatly printed columns for details. Translate the column headers into the target language. Inside the cells, write the handwritten items corresponding exactly to BQ/Firestore transaction data (translated to the target language if they are text descriptions or comments). **You MUST ensure the table contains AT LEAST TWO (2) OR MORE distinct row items (e.g., multiple different products or services ordered) to represent a realistic multi-line business document. Never generate a document with only a single item row.**
         5. **Footer**: Total amounts, and a designated seal/signature box. If culturally appropriate to the target language (e.g., Japanese domain), include: **"in the designated space, a small, faint red ink corporate seal stamp is printed."** Otherwise, include a formal handwritten signature block.
-- **VARIATION & SEED (CRITICAL)**:
-  - Image 1 (e.g., Task 1): Depict a standard operational sheet (e.g., handwritten order from Customer A with normal quantities and readable items).
-  - Image 2 (e.g., Task 2): Depict a different customer, showing a clear discrepancy (e.g., handwritten order from Customer B specifying an abnormally high quantity, discontinued code, or fuzzy specs matching L1211 audit seeds) using a slightly different handwriting style to trigger the agent's detection.
+- **VARIATION & SEED (CRITICAL - BOTH IMAGES MUST CONTAIN AUDIT SEEDS)**:
+  - **BOTH** Image 1 and Image 2 MUST contain 2-3 normal transaction rows PLUS at least 1 audit-seed discrepancy row in 'imageRows' (e.g., an obsolete/discontinued SKU code, non-standard capacity/size, or fuzzy product name requiring master/history resolution) so that WHICHEVER image is attached during the Vision Showcase prompt, the agent discovers a genuine cross-silo discrepancy.
+  - Image 1 (e.g., Task 1 - primary scan bound to the Vision Showcase prompt): Depict a handwritten document from Customer A containing 2-3 standard readable items PLUS at least 1 clear discrepancy row (e.g., an obsolete/discontinued code or capacity mismatch that exists in the BigQuery master table). The Vision Showcase prompt's customer description, line items, and watchPoint MUST match Image 1's exact content.
+  - Image 2 (e.g., Task 2 - secondary scan for additional testing): Depict a different customer (Customer B) with a slightly different handwriting style, also containing 2-3 normal rows PLUS a distinct discrepancy row (e.g., abnormal quantity or fuzzy specification matching Section 6a audit seeds).
 - DO NOT design generic vectors, cartoon icons, or generic illustrations. It must mimic real-world scanned or photographed flat documents to demonstrate the agent's advanced vision capabilities.
 
 
@@ -1563,19 +1569,26 @@ Output in the following JSON format. Output **pure JSON only without code blocks
       "id": "file2",
       "fileName": "handwritten_fax_order_task1.jpg",
       "mimeType": "image/jpeg",
-      "description": "Simulated operational document 1 (e.g. handwritten purchase order from Client A with normal quantities)",
+      "description": "Simulated operational document 1 (e.g. handwritten purchase order from Client A containing 2 normal items plus 1 obsolete/discrepancy item matching the Vision Showcase prompt)",
       "imagePrompt": "A highly detailed, realistic top-down flat-lay scan of a formal purchase order sheet. The clean white document page fills the entire frame with zero background, completely isolated. At the top center, a bold formal header matching the domain (e.g., 'PURCHASE ORDER') is printed. On the top-left, recipient details and company name are printed in a clean corporate font. On the top-right, sender company details along with localized contact information are printed. In the center, a neatly aligned printed table grid with thin gray lines features the column headers listed below. Inside the table cells, highly realistic, messy, and hurried human handwriting in black ballpoint pen ink is neatly filled (showing realistic human imperfections, hurried scribbles, varying character sizes, and slight character misalignment). Natural flat daylight illuminates the scene, showing subtle paper folds and real-world operational handling texture. Sharp contrast, flat perspective, and zero angled shots.",
       "imageColumns": ["Item No.", "Product Name", "Quantity"],
-      "imageRows": ["1 | <localized product A> | 50", "2 | <localized product B> | 120", "3 | <localized product C> | 30"]
+      "imageRows": ["A-101 | <localized product A> | 50", "A-102 | <localized product B> | 120", "B-330 | <localized discontinued product C (obsolete code - check replacement)> | 30"]
     },
     {
       "id": "file3",
       "fileName": "handwritten_fax_order_task2.jpg",
       "mimeType": "image/jpeg",
-      "description": "Simulated operational document 2 (e.g. handwritten purchase order from Client B showcasing a clear quantity or product ID discrepancy for audit verification)",
+      "description": "Simulated operational document 2 (e.g. handwritten purchase order from Client B showcasing a quantity anomaly or fuzzy spec for additional verification)",
       "imagePrompt": "A high-quality, top-down flat scan of a different formal transaction document (e.g., 'INVOICE' or 'DELIVERY SLIP') filling the entire frame with no background. Features a bold domain-specific printed header with date and document reference numbers. Recipient and sender corporate details are cleanly aligned at the top. In the center, a printed table grid features the column headers listed below. Inside the grid cells, highly realistic, hurried, and messy human handwriting in dark blue ink lists the line items. The handwriting is slightly untidy, hurried, and scribble-like, showcasing human imperfection and hasty pen strokes. A designated signature block or faint red ink corporate stamp is present in the designated footer space. Clear flat document view with zero perspective blur.",
       "imageColumns": ["Code", "Item", "Quantity"],
-      "imageRows": ["A-101 | <localized item X> | 40", "A-205 | <localized item Y> | 999", "B-330 | <localized discontinued item Z> | 15"]
+      "imageRows": ["A-201 | <localized item X> | 40", "A-205 | <localized item Y (abnormal quantity spike)> | 999", "B-330 | <localized discontinued item Z> | 15"]
+    },
+    {
+      "id": "file4",
+      "fileName": "supplier_surcharge_ledger.xlsx",
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "fileContent": "Supplier Surcharge Reconciliation Ledger\\tFY2026\\nTotal Audited Rows\\t45\\nFlagged Variance Cases\\t3\\n\\nOrder ID\\tCustomer ID\\tMaterial ID\\tDate\\tSystem Amount\\tBilled Amount\\tVariance\\tStatus\\tRemarks\\n...",
+      "description": "Detailed tabular supplier/reconciliation ledger (40-80 TSV rows) containing the exact record IDs cited in the PDF audit report and BigQuery tables"
     }
   ],
   "tables": [
@@ -1631,7 +1644,7 @@ Output in the following JSON format. Output **pure JSON only without code blocks
     {
       "title": "...",
       "prompt": "...",
-      "requiredFileId": "file1 or empty",${CROSSORG ? `
+      "requiredFileId": "Exact externalFiles id(s) required by this prompt (e.g., 'file1', 'file2', or 'file1,file4' if both PDF and Excel are needed), or '' if no file attachment is needed",${CROSSORG ? `
       "watchPoint": "One short sentence for the demo OPERATOR (not the agent): what to watch on screen when this prompt runs (e.g., after the approval click, the item moves to the next department on the operations console). Same language as the prompts.",` : ''}
       "tags": [...]
     }
@@ -1653,12 +1666,14 @@ ${narrativeArc}
         - **INTERACTIVE DASHBOARD (MANDATORY)**: Exactly ONE of the 7 prompts MUST ask the agent to build an interactive dashboard the user can OPEN AND EXPLORE IN A BROWSER. The prompt text MUST contain an explicit open-in-browser / interactive signal (e.g. 'that I can open and explore in my browser', 'an interactive dashboard I can click into') - this is what makes the agent publish a hosted interactive page instead of a static summary slide. Do NOT phrase it as a pure 'summarize / analyze' request (e.g. avoid 'Generate a dashboard that summarizes ...'), because that reads as an analysis and yields a slide, not an interactive dashboard. Good example: 'Build me an interactive executive dashboard I can open in my browser and explore - key metrics, top segments, trends, and risk items.' Fold this into a natural overview or strategic prompt so the total stays EXACTLY 7. Phrase it generically (no product names).
     2. **PERSONA ROTATION (CRITICAL)**: Vary the tone and perspective by rotating personas for each prompt (e.g., CFO, Ops Manager, Regional Director, Front-line Lead).${anchorRotationNote}
     2b. **FILE BINDING - requiredFileId (MANDATORY)**: Set "requiredFileId" ONLY on prompts that cannot succeed without that uploaded file. Never leave requiredFileId empty on ALL 7 prompts.
-        - The CROSS-SOURCE DISCOVERY prompt (Prompt 3) MUST set requiredFileId to the id of the Excel or PDF file it reconciles against the database.
-        - **VISION SHOWCASE (when 'externalFiles' contains image files)**: Either Prompt 3 or Prompt 4 MUST be a workflow that STARTS from reading the photographed/handwritten document image (read the document -> decompose it into individual line items -> reconcile each item against the database -> flag discrepancies -> route exceptions to human approval), and that prompt MUST set requiredFileId to the image file id. This is the multimodal vision showcase - do NOT leave the generated images unused by the demo script.
-        - Prompts that need no uploaded file MUST set requiredFileId to an empty string.${hitlChoreo}
+        - The CROSS-SOURCE DISCOVERY prompt (Prompt 3) MUST set requiredFileId to the id(s) of the external file(s) it reconciles against the database. If the prompt text mentions BOTH the audit report (PDF) and the supplier/reconciliation feed (Excel), set requiredFileId to BOTH ids separated by a comma (e.g., "file1,file4").
+        - **VISION SHOWCASE (when 'externalFiles' contains image files)**: Either Prompt 3 or Prompt 4 MUST be a workflow that STARTS from reading the photographed/handwritten document image (read the document -> decompose it into individual line items -> reconcile each item against the database -> flag discrepancies -> route exceptions to human approval), and that prompt MUST set requiredFileId to the image file id (e.g., "file2"). **STRICT CONTENT ALIGNMENT**: The customer/sender, item codes, and discrepancy described in the Vision Showcase prompt and its watchPoint MUST exist in the 'imageRows' of the exact image file referenced by its requiredFileId! Never describe Customer A from file2 while asking to flag an obsolete code that only exists in file3.
+        - **NO ORPHAN / MISPLACED BINDINGS**: Never assign an external file id to a prompt whose text does not actually read that file (e.g., do NOT set requiredFileId to the Excel file on Prompt 7 if Prompt 7 only asks for live web browsing plus internal database synthesis).
+        - Prompts that need no uploaded file MUST set requiredFileId to an empty string "".${hitlChoreo}
     3. **EXTERNAL DATA NECESSITY & LOGICAL CONSISTENCY (CRITICAL)**: You MUST generate exactly one PDF file AND exactly one Excel file (.xlsx) unless it is completely impossible for the business context. The files generated MUST be external data (not inside the current system) and MUST be unstructured or semi-structured in format.
         - **LOGICAL LINKAGE**: ALL discrepancies or specific transaction IDs (e.g., "INV-7829") mentioned in the external file content MUST correspond to standard records that ACTUALLY EXIST inside the generated BigQuery CSV tables. Do NOT make up transaction IDs in the external file that do not exist in the database tables. This allows the user to find the anomaly by comparing the external file against the database.
         - **CROSS-SOURCE BINDING (MANDATORY)**: The Excel file MUST contain a column whose values are a SUBSET of a BigQuery table's primary key or unique identifier (e.g., order_id, invoice_number). At least 70% of the Excel rows MUST have matching records in the BigQuery tables to enable reliable JOIN-based cross-referencing. The PDF file MUST reference at least 3 specific record identifiers (IDs, invoice numbers, etc.) that exist in the BigQuery tables, enabling the agent to look up those exact records via SQL. This structural binding GUARANTEES that cross-source analysis will succeed during the demo.
+        - **CROSS-FILE ID ALIGNMENT (PDF <-> EXCEL <-> BIGQUERY, MANDATORY)**: Every specific record identifier cited as a flagged case in the PDF fileContent or in any demoGuide watchPoint MUST exist verbatim in BOTH the BigQuery CSV tables AND the Excel TSV rows (whenever the Excel file tracks that same entity/transaction ID prefix). For example, if the PDF cites CFG-2026-8802, CFG-2026-8815, and CFG-2026-8841, the Excel TSV MUST also include rows for all three IDs (do NOT stop the Excel sequence at CFG-2026-8840).
         - **PDF ID SELF-CHECK (MANDATORY)**: After writing the PDF fileContent, VERIFY it quotes at least 3 record identifiers copied VERBATIM from the generated CSV key columns (order/application/invoice IDs etc.). Aggregate figures and entity names are NOT sufficient - the demo's cross-source lookup depends on these exact IDs being queryable via SQL. If fewer than 3 verbatim IDs are present, ADD a "specific flagged cases" section to the PDF that lists the affected records BY ID before finalizing your response.
     3. **FILE FORMAT & REALISM (CRITICAL)**: 
         - For PDF files, generate **substantial, realistic, and highly structured business document content (at least 1,500 characters)** with clear titles, multiple sections using Markdown headings (e.g., '# Summary', '## Background', '### Details'), and bullet points ('- '). It MUST be unstructured text in a rich report format. 
@@ -1706,7 +1721,8 @@ ${narrativeArc}
 ## FINAL SELF-CHECK BEFORE EMITTING (MANDATORY — do this LAST, right before you output the JSON)
 1. **COUNT the data rows in every csvData.** At least one transaction/log table MUST contain ${profile.txnRowTarget}+ rows (hard floor: ${profile.txnMinRows} — responses under the floor are automatically REJECTED and the entire generation is retried, wasting the whole run). Master tables need ${profile.masterRows} rows. If any table is short, ADD realistic rows NOW — never summarize, sample, or truncate.
 2. **VERIFY externalFiles**: exactly one PDF (citing 3+ verbatim record IDs) and one Excel (40-80 detail rows), plus the two images when the scenario is paper-based. A missing file breaks a mandatory demo moment.
-3. Only after both checks pass, emit the JSON.
+3. **VERIFY PROMPT-TO-FILE & CROSS-FILE ID CONSISTENCY**: (a) Every record ID cited in the PDF or in any demoGuide watchPoint MUST appear verbatim in both the BigQuery CSV tables and the Excel TSV rows; (b) the image bound via requiredFileId to the Vision Showcase prompt MUST contain the obsolete/discrepancy row in its 'imageRows' and match the customer/items described in that prompt; (c) every prompt's requiredFileId MUST list the exact externalFiles id(s) its text requires (and '' when no file is needed).
+4. Only after all checks pass, emit the JSON.
 `;
 }
 
@@ -1775,6 +1791,645 @@ function expandThinTables_(parsed, options) {
     }
   } catch (e) {
     console.warn('[DENSITY REPAIR] skipped: ' + e.message);
+  }
+}
+
+/**
+ * Validates and repairs cross-artifact consistency between externalFiles,
+ * demoGuide prompts (requiredFileId, prompt text, watchPoint), and BigQuery
+ * tables. Runs BEFORE image rendering in planAndGenerateData so any repaired
+ * imageRows are reflected in generated document images, and again in
+ * validateGeneratedData and restoreDemo (idempotent).
+ */
+function validateAndRepairExternalFileBindings_(planResult) {
+  try {
+    if (!planResult || typeof planResult !== 'object') return;
+    const extFiles = Array.isArray(planResult.externalFiles) ? planResult.externalFiles : [];
+    const guide = Array.isArray(planResult.demoGuide) ? planResult.demoGuide : [];
+    const tables = (Array.isArray(planResult.tables) && planResult.tables.length > 0)
+      ? planResult.tables
+      : ((Array.isArray(planResult.rawTables) && planResult.rawTables.length > 0)
+        ? planResult.rawTables
+        : (Array.isArray(planResult.dataPreview) ? planResult.dataPreview : []));
+
+    // 1. Canonicalize externalFiles IDs and classify by file type
+    const byId = {};
+    const byName = {};
+    const pdfFiles = [];
+    const excelFiles = [];
+    const imageFiles = [];
+
+    for (let i = 0; i < extFiles.length; i++) {
+      const f = extFiles[i];
+      if (!f || typeof f !== 'object') continue;
+      const posId = 'file' + (i + 1);
+      const canonicalId = String(f.id || posId).trim();
+      f.id = canonicalId;
+      byId[canonicalId] = f;
+      byId[canonicalId.toLowerCase()] = f;
+      const fname = String(f.fileName || '').trim();
+      if (fname) {
+        byName[fname.toLowerCase()] = f;
+        const base = fname.toLowerCase().replace(/\.[a-z0-9]+$/i, '');
+        if (base) byName[base] = f;
+      }
+      const mime = String(f.mimeType || '').toLowerCase();
+      if (mime === 'application/pdf' || /\.pdf$/i.test(fname)) {
+        pdfFiles.push(f);
+      } else if (
+        mime.indexOf('spreadsheet') !== -1 ||
+        mime.indexOf('excel') !== -1 ||
+        mime === 'text/tab-separated-values' ||
+        /\.(xlsx|xls|tsv|csv)$/i.test(fname)
+      ) {
+        excelFiles.push(f);
+      } else if (mime.indexOf('image/') === 0 || /\.(jpg|jpeg|png|webp)$/i.test(fname)) {
+        imageFiles.push(f);
+      }
+    }
+    // Register positional file1..fileN aliases when custom IDs are used
+    for (let i = 0; i < extFiles.length; i++) {
+      const f = extFiles[i];
+      if (!f || typeof f !== 'object') continue;
+      const posId = 'file' + (i + 1);
+      if (!byId[posId]) byId[posId] = f;
+    }
+
+    if (extFiles.length === 0) {
+      for (let i = 0; i < guide.length; i++) {
+        if (guide[i] && typeof guide[i] === 'object') guide[i].requiredFileId = '';
+      }
+      return;
+    }
+
+    // 2. Index structured record IDs and obsolete/discontinued items from BigQuery tables
+    //    Supports both full CSV tables (tbl.csvData) and dataPreview objects (tbl.headers + tbl.rows).
+    const idTokenRe = /\b([A-Z]{2,10}-(?:[A-Z0-9]{2,6}-)?(?=[A-Z0-9]*\d)[A-Z0-9]{2,10})(?![A-Z0-9])/g;
+    const getIdPrefix = function(idStr) {
+      const s = String(idStr);
+      const lastDash = s.lastIndexOf('-');
+      return lastDash !== -1 ? s.slice(0, lastDash + 1) : s + '-';
+    };
+
+    const bqIdsByPrefix = {};
+    const bqAllIds = {};
+    const bqObsoleteItems = [];
+
+    for (let tIdx = 0; tIdx < tables.length; tIdx++) {
+      const tbl = tables[tIdx];
+      if (!tbl || typeof tbl !== 'object') continue;
+      let headers = [];
+      const dataRows = [];
+      if (tbl.csvData) {
+        const lines = String(tbl.csvData).trim().split('\n');
+        if (lines.length < 2) continue;
+        headers = parseCSVLine(lines[0]).map(function(h) {
+          return String(h).trim().replace(/^"|"$/g, '');
+        });
+        for (let rIdx = 1; rIdx < lines.length; rIdx++) {
+          dataRows.push(parseCSVLine(lines[rIdx]).map(function(v) {
+            return String(v).trim().replace(/^"|"$/g, '');
+          }));
+        }
+      } else if (Array.isArray(tbl.headers) && Array.isArray(tbl.rows)) {
+        headers = tbl.headers.map(function(h) {
+          return String(h === null || h === undefined ? '' : h).trim().replace(/^"|"$/g, '');
+        });
+        for (let rIdx = 0; rIdx < tbl.rows.length; rIdx++) {
+          const r = tbl.rows[rIdx];
+          if (!Array.isArray(r)) continue;
+          dataRows.push(r.map(function(v) {
+            return String(v === null || v === undefined ? '' : v).trim().replace(/^"|"$/g, '');
+          }));
+        }
+      } else {
+        continue;
+      }
+
+      for (let rIdx = 0; rIdx < dataRows.length; rIdx++) {
+        const vals = dataRows[rIdx];
+        const rowObj = {};
+        for (let cIdx = 0; cIdx < headers.length; cIdx++) {
+          rowObj[headers[cIdx]] = vals[cIdx] !== undefined ? vals[cIdx] : '';
+        }
+        for (let cIdx = 0; cIdx < vals.length; cIdx++) {
+          const cellVal = vals[cIdx];
+          if (/^[A-Z]{2,10}-(?:[A-Z0-9]{2,6}-)?(?=[A-Z0-9]*\d)[A-Z0-9]{2,10}$/.test(cellVal)) {
+            const pfx = getIdPrefix(cellVal);
+            if (!bqIdsByPrefix[pfx]) bqIdsByPrefix[pfx] = [];
+            if (!bqAllIds[cellVal]) {
+              const entry = {
+                id: cellVal,
+                prefix: pfx,
+                rowObj: rowObj,
+                headers: headers,
+                vals: vals,
+                tableName: tbl.tableName
+              };
+              bqAllIds[cellVal] = entry;
+              bqIdsByPrefix[pfx].push(entry);
+            }
+          }
+        }
+        const rowJoined = vals.join(' | ');
+        if (/\b(OBSOLETE|DISCONTINUED|DEPRECATED|INACTIVE|END_OF_LIFE)\b|\u5ec3\u756a|\u5ec3\u6b62|\u65e7\u54c1\u756a|\u8ca9\u58f2\u7d42\u4e86/i.test(rowJoined)) {
+          bqObsoleteItems.push({ rowObj: rowObj, headers: headers, vals: vals, tableName: tbl.tableName });
+        }
+      }
+    }
+
+    // 3. Validate & repair structured record IDs in PDF fileContent and demoGuide against BigQuery
+    const extractIds = function(text) {
+      const found = [];
+      const s = String(text || '');
+      let m;
+      idTokenRe.lastIndex = 0;
+      while ((m = idTokenRe.exec(s)) !== null) {
+        if (found.indexOf(m[1]) === -1) found.push(m[1]);
+      }
+      return found;
+    };
+
+    const usedIds = {};
+    const pdfValidIdsByPrefix = {};
+    for (let pIdx = 0; pIdx < pdfFiles.length; pIdx++) {
+      const pdf = pdfFiles[pIdx];
+      if (!pdf.fileContent) continue;
+      const pdfIds = extractIds(pdf.fileContent);
+      for (let i = 0; i < pdfIds.length; i++) usedIds[pdfIds[i]] = true;
+
+      for (let i = 0; i < pdfIds.length; i++) {
+        const cid = pdfIds[i];
+        const pfx = getIdPrefix(cid);
+        if (bqAllIds[cid]) {
+          if (!pdfValidIdsByPrefix[pfx]) pdfValidIdsByPrefix[pfx] = [];
+          if (pdfValidIdsByPrefix[pfx].indexOf(cid) === -1) pdfValidIdsByPrefix[pfx].push(cid);
+          continue;
+        }
+        const candidates = bqIdsByPrefix[pfx] || [];
+        let replacement = '';
+        for (let c = 0; c < candidates.length; c++) {
+          if (!usedIds[candidates[c].id]) {
+            replacement = candidates[c].id;
+            break;
+          }
+        }
+        if (replacement) {
+          usedIds[replacement] = true;
+          if (!pdfValidIdsByPrefix[pfx]) pdfValidIdsByPrefix[pfx] = [];
+          if (pdfValidIdsByPrefix[pfx].indexOf(replacement) === -1) pdfValidIdsByPrefix[pfx].push(replacement);
+          pdf.fileContent = String(pdf.fileContent).split(cid).join(replacement);
+          for (let gIdx = 0; gIdx < guide.length; gIdx++) {
+            const st = guide[gIdx];
+            if (!st || typeof st !== 'object') continue;
+            if (st.prompt) st.prompt = String(st.prompt).split(cid).join(replacement);
+            if (st.watchPoint) st.watchPoint = String(st.watchPoint).split(cid).join(replacement);
+          }
+          console.log('[BINDING REPAIR] Replaced unmatched PDF ID ' + cid + ' with BigQuery ID ' + replacement);
+        }
+      }
+    }
+
+    // Also repair any unmatched BigQuery-prefix IDs cited directly in demoGuide prompt/watchPoint
+    for (let gIdx = 0; gIdx < guide.length; gIdx++) {
+      const st = guide[gIdx];
+      if (!st || typeof st !== 'object') continue;
+      const gText = (st.prompt || '') + ' ' + (st.watchPoint || '');
+      const gIds = extractIds(gText);
+      for (let i = 0; i < gIds.length; i++) {
+        const gid = gIds[i];
+        if (bqAllIds[gid]) continue;
+        const pfx = getIdPrefix(gid);
+        const candidates = bqIdsByPrefix[pfx] || [];
+        if (candidates.length === 0) continue;
+        const pdfCandidates = pdfValidIdsByPrefix[pfx] || [];
+        let replacement = '';
+        for (let c = 0; c < pdfCandidates.length; c++) {
+          if (gIds.indexOf(pdfCandidates[c]) === -1) {
+            replacement = pdfCandidates[c];
+            break;
+          }
+        }
+        if (!replacement && pdfCandidates.length > 0) {
+          replacement = pdfCandidates[0];
+        }
+        if (!replacement) {
+          for (let c = 0; c < candidates.length; c++) {
+            if (!usedIds[candidates[c].id]) {
+              replacement = candidates[c].id;
+              break;
+            }
+          }
+        }
+        if (!replacement && candidates.length > 0) {
+          replacement = candidates[0].id;
+        }
+        if (replacement) {
+          usedIds[replacement] = true;
+          if (st.prompt) st.prompt = String(st.prompt).split(gid).join(replacement);
+          if (st.watchPoint) st.watchPoint = String(st.watchPoint).split(gid).join(replacement);
+          console.log('[BINDING REPAIR] Replaced unmatched demoGuide ID ' + gid + ' with BigQuery ID ' + replacement);
+        }
+      }
+    }
+
+    // 4. Ensure every structured record ID cited in PDF or demoGuide watchPoint/prompt
+    //    also exists in the Excel TSV when the Excel sheet uses that ID prefix.
+    const citedValidIds = [];
+    const addCitedIdIfValid = function(id) {
+      if (!id || citedValidIds.indexOf(id) !== -1) return;
+      const pfx = getIdPrefix(id);
+      if (bqIdsByPrefix[pfx] && bqIdsByPrefix[pfx].length > 0 && !bqAllIds[id]) return;
+      citedValidIds.push(id);
+    };
+    for (let pIdx = 0; pIdx < pdfFiles.length; pIdx++) {
+      const ids = extractIds(pdfFiles[pIdx].fileContent);
+      for (let i = 0; i < ids.length; i++) addCitedIdIfValid(ids[i]);
+    }
+    for (let gIdx = 0; gIdx < guide.length; gIdx++) {
+      const st = guide[gIdx];
+      if (!st || typeof st !== 'object') continue;
+      const ids = extractIds((st.prompt || '') + ' ' + (st.watchPoint || ''));
+      for (let i = 0; i < ids.length; i++) addCitedIdIfValid(ids[i]);
+    }
+
+    for (let xIdx = 0; xIdx < excelFiles.length; xIdx++) {
+      const xFile = excelFiles[xIdx];
+      if (!xFile.fileContent) continue;
+      let xContent = String(xFile.fileContent);
+      const xIds = extractIds(xContent);
+      const xPrefixes = {};
+      for (let i = 0; i < xIds.length; i++) {
+        xPrefixes[getIdPrefix(xIds[i])] = true;
+      }
+
+      for (let i = 0; i < citedValidIds.length; i++) {
+        const cid = citedValidIds[i];
+        const pfx = getIdPrefix(cid);
+        if (!xPrefixes[pfx]) continue;
+        if (xContent.indexOf(cid) !== -1) continue;
+
+        // Find a template TSV line in xContent with the same ID prefix (preferring
+        // another cited + discrepancy-flagged ID so discrepancy columns/remarks match).
+        const xLines = xContent.split('\n');
+        let templateLine = '';
+        let templateId = '';
+        let bestTplScore = 0;
+        for (let lIdx = 0; lIdx < xLines.length; lIdx++) {
+          const line = xLines[lIdx];
+          if (line.indexOf('\t') === -1) continue;
+          const lineIds = extractIds(line);
+          const isFlaggedLine = /discrepancy|discrepancies|exceed|alert|fail|anomaly|anomalies|mismatch|shortage|deficit|unbilled|critical|\b[2-9]\d\.\d%/i.test(line);
+          for (let li = 0; li < lineIds.length; li++) {
+            if (getIdPrefix(lineIds[li]) === pfx) {
+              const isCited = citedValidIds.indexOf(lineIds[li]) !== -1;
+              const score = (isCited ? 2 : 1) + (isFlaggedLine ? 2 : 0);
+              if (score > bestTplScore) {
+                bestTplScore = score;
+                templateLine = line;
+                templateId = lineIds[li];
+              }
+            }
+          }
+        }
+
+        if (templateLine && templateId) {
+          const cells = templateLine.split('\t');
+          // Increment the row's own primary/log ID in cells[0] if it is a sequential ID distinct from templateId
+          if (cells.length > 0 && cells[0] !== templateId && !bqAllIds[cells[0]]) {
+            const pkMatch = /^([A-Z]{2,10}-(?:[A-Z0-9]{2,6}-)?)(\d+)$/.exec(cells[0].trim());
+            if (pkMatch) {
+              const pkPrefix = pkMatch[1];
+              const padLen = pkMatch[2].length;
+              let maxNum = parseInt(pkMatch[2], 10);
+              const allIdsInSheet = extractIds(xContent);
+              for (let aIdx = 0; aIdx < allIdsInSheet.length; aIdx++) {
+                const aid = allIdsInSheet[aIdx];
+                if (aid.indexOf(pkPrefix) === 0) {
+                  const tail = aid.slice(pkPrefix.length);
+                  if (/^\d+$/.test(tail)) {
+                    const n = parseInt(tail, 10);
+                    if (n > maxNum) maxNum = n;
+                  }
+                }
+              }
+              cells[0] = pkPrefix + String(maxNum + 1).padStart(padLen, '0');
+            }
+          }
+
+          for (let cIdx = 0; cIdx < cells.length; cIdx++) {
+            if (cells[cIdx].indexOf(templateId) !== -1) {
+              cells[cIdx] = cells[cIdx].split(templateId).join(cid);
+            }
+          }
+
+          const bqTarget = bqAllIds[cid];
+          const bqTpl = bqAllIds[templateId];
+          if (bqTarget && bqTpl) {
+            let targetDateIso = '';
+            for (let vIdx = 0; vIdx < bqTpl.vals.length; vIdx++) {
+              const oldVal = String(bqTpl.vals[vIdx] || '').trim();
+              const newVal = String(bqTarget.vals[vIdx] || '').trim();
+              if (/^\d{4}-\d{2}-\d{2}/.test(newVal)) {
+                targetDateIso = newVal.slice(0, 10);
+              }
+              if (!oldVal || !newVal || oldVal === newVal || oldVal === templateId) continue;
+
+              // Structured ID replacement
+              if (/^[A-Z]{2,10}-(?:[A-Z0-9]{2,6}-)?(?=[A-Z0-9]*\d)[A-Z0-9]{2,10}$/.test(oldVal)) {
+                for (let cIdx = 0; cIdx < cells.length; cIdx++) {
+                  cells[cIdx] = cells[cIdx].split(oldVal).join(newVal);
+                }
+                continue;
+              }
+
+              // Date / timestamp replacement (handles "YYYY-MM-DD HH:MM:SS" -> "YYYY-MM-DD")
+              if (/^\d{4}-\d{2}-\d{2}/.test(oldVal) && /^\d{4}-\d{2}-\d{2}/.test(newVal)) {
+                const oldDate = oldVal.slice(0, 10);
+                const newDate = newVal.slice(0, 10);
+                for (let cIdx = 0; cIdx < cells.length; cIdx++) {
+                  if (cells[cIdx].indexOf(oldVal) !== -1) {
+                    cells[cIdx] = cells[cIdx].split(oldVal).join(newVal);
+                  } else if (cells[cIdx].indexOf(oldDate) !== -1) {
+                    cells[cIdx] = cells[cIdx].split(oldDate).join(newDate);
+                  }
+                }
+                continue;
+              }
+
+              // Numeric replacement (handles "380.0" in BQ vs "380 kg" or "380" in TSV)
+              if (/^\d+(?:\.\d+)?$/.test(oldVal) && /^\d+(?:\.\d+)?$/.test(newVal)) {
+                const oldNorm = String(Number(oldVal));
+                const newNorm = String(Number(newVal));
+                for (let cIdx = 0; cIdx < cells.length; cIdx++) {
+                  const cellTrim = cells[cIdx].trim();
+                  if (cellTrim === oldVal) {
+                    cells[cIdx] = newVal;
+                  } else if (cellTrim === oldNorm) {
+                    cells[cIdx] = newNorm;
+                  } else if (cellTrim.indexOf(oldVal + ' ') === 0) {
+                    cells[cIdx] = newVal + cellTrim.slice(oldVal.length);
+                  } else if (cellTrim.indexOf(oldNorm + ' ') === 0) {
+                    cells[cIdx] = newNorm + cellTrim.slice(oldNorm.length);
+                  }
+                }
+                continue;
+              }
+
+              // Exact cell match for descriptive strings (customer name, grade, series, etc.)
+              if (oldVal.length >= 4) {
+                for (let cIdx = 0; cIdx < cells.length; cIdx++) {
+                  if (cells[cIdx].trim() === oldVal) {
+                    cells[cIdx] = newVal;
+                  }
+                }
+              }
+            }
+
+            // If the TSV row has a standalone YYYY-MM-DD cell and bqTarget has a date, align it
+            if (targetDateIso) {
+              for (let cIdx = 0; cIdx < cells.length; cIdx++) {
+                if (/^\d{4}-\d{2}-\d{2}$/.test(cells[cIdx].trim())) {
+                  cells[cIdx] = targetDateIso;
+                }
+              }
+            }
+          }
+
+          const newRow = cells.join('\t');
+          xContent = xContent.trim() + '\n' + newRow;
+          xFile.fileContent = xContent;
+          console.log('[BINDING REPAIR] Appended missing cited ID ' + cid + ' to Excel file ' + xFile.fileName);
+        }
+      }
+    }
+
+    // 5. Ensure every image in imageFiles contains at least one discrepancy row
+    const discrepancyRe = /obsolete|discontinued|mismatch|discrepancy|discrepancies|anomaly|anomalies|invalid|legacy|error|exceed|abnormal|fuzzy|missing|unlisted|non-standard|check replacement|\b999\b|\u5ec3\u756a|\u5ec3\u6b62|\u65e7\u54c1\u756a|\u4e0d\u4e00\u81f4|\u7570\u5e38|\u4e0d\u660e|\u6b20\u54c1|\u8981\u78ba\u8a8d/i;
+    const isDiscrepancyRow = function(rowStr) {
+      const s = String(rowStr || '');
+      if (discrepancyRe.test(s)) return true;
+      for (let i = 0; i < bqObsoleteItems.length; i++) {
+        const vals = bqObsoleteItems[i].vals;
+        const headers = bqObsoleteItems[i].headers || [];
+        for (let j = 0; j < vals.length; j++) {
+          const v = String(vals[j] || '').trim();
+          const h = String(headers[j] || '').toLowerCase();
+          const isIdCol = j === 0 || /(?:^|_)(id|code|sku|part|model|item)(?:_|$)/.test(h);
+          const isCodeToken = /^(?=[A-Z0-9-]*\d)[A-Z0-9]{1,10}-[A-Z0-9-]{2,12}$/.test(v) && !/^\d{4}-\d{2}-\d{2}$/.test(v);
+          if (isIdCol && isCodeToken && s.indexOf(v) !== -1) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    const adaptDonorRowForImage = function(rawDonor, targetImg) {
+      const existingRows = Array.isArray(targetImg.imageRows) ? targetImg.imageRows : [];
+      const targetCols = Array.isArray(targetImg.imageColumns) ? targetImg.imageColumns : [];
+      const nextPos = existingRows.length + 1;
+      const donorCells = String(rawDonor).split('|').map(function(c) { return c.trim(); });
+      const donorHasLeadingPos = donorCells.length >= 3 && /^\d{1,2}$/.test(donorCells[0]);
+      const targetHasLeadingPos = (existingRows.length > 0 && /^\s*\d{1,2}\s*\|/.test(existingRows[0])) ||
+        (targetCols.length > 0 && /^(pos\.?|no\.?|#|line|seq|\u9805\u756a|\u756a\u53f7)$/i.test(String(targetCols[0]).trim()));
+      if (targetHasLeadingPos && donorHasLeadingPos) {
+        donorCells[0] = String(nextPos);
+        return donorCells.join(' | ');
+      }
+      if (targetHasLeadingPos && !donorHasLeadingPos) {
+        if (targetCols.length === 0 || donorCells.length + 1 === targetCols.length) {
+          return [String(nextPos)].concat(donorCells).join(' | ');
+        }
+      }
+      if (!targetHasLeadingPos && donorHasLeadingPos && targetCols.length > 0 && donorCells.length - 1 === targetCols.length) {
+        return donorCells.slice(1).join(' | ');
+      }
+      return donorCells.join(' | ');
+    };
+
+    let donorRow = '';
+    let donorImgId = '';
+    for (let i = 0; i < imageFiles.length; i++) {
+      const img = imageFiles[i];
+      const rows = Array.isArray(img.imageRows) ? img.imageRows : [];
+      for (let r = 0; r < rows.length; r++) {
+        if (isDiscrepancyRow(rows[r])) {
+          donorRow = rows[r];
+          donorImgId = img.id;
+          break;
+        }
+      }
+      if (donorRow) break;
+    }
+
+    if (!donorRow && bqObsoleteItems.length > 0 && imageFiles.length > 0) {
+      const obs = bqObsoleteItems[0];
+      const cols = Array.isArray(imageFiles[0].imageColumns) ? imageFiles[0].imageColumns : [];
+      const targetLen = Math.max(3, cols.length);
+      const picked = [];
+      for (let j = 0; j < obs.vals.length && picked.length < targetLen - 1; j++) {
+        if (obs.vals[j]) picked.push(obs.vals[j]);
+      }
+      picked.push('Obsolete code - check replacement');
+      donorRow = picked.join(' | ');
+    }
+
+    if (!donorRow && imageFiles.length > 0) {
+      donorRow = 'OBS-999 | Discontinued Legacy Spec (Obsolete code - check replacement) | 1';
+    }
+
+    if (donorRow) {
+      for (let i = 0; i < imageFiles.length; i++) {
+        const img = imageFiles[i];
+        if (!Array.isArray(img.imageRows)) img.imageRows = [];
+        const hasDisc = img.imageRows.some(isDiscrepancyRow);
+        if (!hasDisc) {
+          const adaptedRow = adaptDonorRowForImage(donorRow, img);
+          img.imageRows.push(adaptedRow);
+          // Only mark _repairedDiscrepancyFrom when base64Data was ALREADY rendered before
+          // this row was injected (i.e., legacy restored backups). During planAndGenerateData,
+          // this runs BEFORE [ImageGen-Pipeline] renders base64Data, so the rendered image
+          // will natively contain the injected discrepancy row.
+          if (img.base64Data && donorImgId && donorImgId !== img.id) {
+            img._repairedDiscrepancyFrom = donorImgId;
+          }
+          if (img.description && /normal quantities/i.test(img.description)) {
+            img.description = img.description.replace(/with normal quantities/i, 'with normal items plus an audit-seed discrepancy row');
+          }
+          console.log('[BINDING REPAIR] Injected audit-seed discrepancy row into ' + img.fileName);
+        }
+      }
+    }
+
+    // 6. Normalize demoGuide[].requiredFileId and repair prompt-to-file bindings
+    const stopWords = {
+      file: 1, files: 1, data: 1, report: 1, table: 1, tables: 1, internal: 1,
+      company: 1, business: 1, system: 1, analysis: 1, summary: 1, order: 1,
+      orders: 1, custom: 1, task: 1, task1: 1, task2: 1, item: 1, items: 1,
+      record: 1, records: 1, sheet: 1, document: 1, quarterly: 1, handwritten: 1,
+      scanned: 1, image: 1, catalog: 1
+    };
+    const getFileKeywords = function(f) {
+      const base = String(f.fileName || '').toLowerCase().replace(/\.[a-z0-9]+$/i, '');
+      return base.split(/[^a-z0-9]+/).filter(function(w) {
+        return w.length >= 4 && !stopWords[w];
+      });
+    };
+    const countKeywordHits = function(keywords, text) {
+      const lower = String(text || '').toLowerCase();
+      let hits = 0;
+      for (let i = 0; i < keywords.length; i++) {
+        const kw = keywords[i];
+        const stem = kw.length >= 5 ? kw.slice(0, kw.length - 1) : kw;
+        if (lower.indexOf(stem) !== -1) hits++;
+      }
+      return hits;
+    };
+
+    const resolveFileTokens = function(rawVal) {
+      if (!rawVal) return [];
+      const list = Array.isArray(rawVal) ? rawVal : String(rawVal).split(/[,;|]+/);
+      const resolved = [];
+      for (let i = 0; i < list.length; i++) {
+        const tok = String(list[i] || '').trim();
+        if (!tok) continue;
+        if (/^(none|null|empty|false|n\/a|file1\s+or\s+empty)$/i.test(tok)) continue;
+        const match = byId[tok] || byId[tok.toLowerCase()] || byName[tok.toLowerCase()];
+        if (match && resolved.indexOf(match.id) === -1) {
+          resolved.push(match.id);
+        }
+      }
+      return resolved;
+    };
+
+    const boundInEarlierPrompts = {};
+
+    for (let gIdx = 0; gIdx < guide.length; gIdx++) {
+      const st = guide[gIdx];
+      if (!st || typeof st !== 'object') continue;
+      let ids = resolveFileTokens(st.requiredFileId);
+      const stepText = String(st.title || '') + ' ' + String(st.prompt || '') + ' ' + String(st.watchPoint || '');
+
+      const isVisionPrompt = /\b(handwritten|scanned|fax(?:ed)?|order\s+sheet|requisition\s+form|vision\s+showcase|ocr)\b|\u624b\u66f8\u304d|\u6ce8\u6587\u66f8|\u767a\u6ce8\u66f8|\u30b9\u30ad\u30e3\u30f3/i.test(stepText);
+      const isCrossSourcePrompt = /\b(cross-reference|cross-source|audit\s+findings|audit\s+report|supplier\s+\w*\s*feeds?|surcharge\s+feeds?|surcharge\s+ledger)\b|\u76e3\u67fb\u5831\u544a|\u76e3\u67fb\u30ec\u30dd\u30fc\u30c8|\u7a81\u5408/i.test(stepText);
+
+      // If a Cross-Source prompt accidentally bound an image (e.g. due to reordered externalFiles), strip the image
+      if ((gIdx === 2 || isCrossSourcePrompt) && !isVisionPrompt && (pdfFiles.length > 0 || excelFiles.length > 0)) {
+        ids = ids.filter(function(id) { return imageFiles.indexOf(byId[id]) === -1; });
+      }
+
+      // Check if this step is a Cross-Source Discovery prompt referencing both PDF and Excel
+      const hasPdf = ids.some(function(id) { return pdfFiles.indexOf(byId[id]) !== -1; });
+      const hasExcel = ids.some(function(id) { return excelFiles.indexOf(byId[id]) !== -1; });
+
+      if ((hasPdf || gIdx === 2) && !hasExcel && !isVisionPrompt && excelFiles.length > 0) {
+        const xFile = excelFiles[0];
+        const xKeywordHits = countKeywordHits(getFileKeywords(xFile), stepText);
+        const hasExcelCue = /\b(supplier\s+\w*\s*feeds?|surcharge\s+feeds?|surcharge\s+ledger|external\s+ledger|spreadsheet|rate\s+sheet|carrier\s+log)\b|\u30b5\u30d7\u30e9\u30a4\u30e4\u30fc|\u53f0\u5e33|\u660e\u7d30/i.test(stepText);
+        if (xKeywordHits >= 2 || hasExcelCue) {
+          if (ids.indexOf(xFile.id) === -1) ids.push(xFile.id);
+        }
+      }
+      if ((hasExcel || gIdx === 2) && !hasPdf && !isVisionPrompt && pdfFiles.length > 0) {
+        const pFile = pdfFiles[0];
+        const pKeywordHits = countKeywordHits(getFileKeywords(pFile), stepText);
+        const hasPdfCue = /\b(audit\s+findings|audit\s+report|procurement\s+audit|compliance\s+report|inspection\s+report)\b|\u76e3\u67fb\u5831\u544a|\u76e3\u67fb\u30ec\u30dd\u30fc\u30c8/i.test(stepText);
+        if (pKeywordHits >= 2 || hasPdfCue) {
+          ids.unshift(pFile.id);
+        }
+      }
+
+      // Ensure Vision Showcase prompts bind to an image file (and not an Excel/PDF if externalFiles was reordered)
+      if (isVisionPrompt && !isCrossSourcePrompt && imageFiles.length > 0) {
+        ids = ids.filter(function(id) { return imageFiles.indexOf(byId[id]) !== -1; });
+        if (ids.length === 0) {
+          let bestImg = imageFiles[0];
+          let bestScore = -1;
+          for (let imgIdx = 0; imgIdx < imageFiles.length; imgIdx++) {
+            const candidateImg = imageFiles[imgIdx];
+            const imgTokens = String((candidateImg.fileName || '') + ' ' + (candidateImg.description || ''))
+              .toLowerCase()
+              .split(/[^a-z0-9]+/)
+              .filter(function(w) { return w.length >= 4 && !stopWords[w]; });
+            const score = countKeywordHits(imgTokens, stepText);
+            if (score > bestScore) {
+              bestScore = score;
+              bestImg = candidateImg;
+            }
+          }
+          ids.push(bestImg.id);
+        }
+      }
+
+      // Check Vision prompt image binding for legacy restored backups
+      for (let ii = 0; ii < ids.length; ii++) {
+        const boundObj = byId[ids[ii]];
+        if (boundObj && imageFiles.indexOf(boundObj) !== -1 && boundObj.base64Data && boundObj._repairedDiscrepancyFrom) {
+          // Legacy restored backup where base64Data was already baked without the discrepancy row:
+          // also bind the sibling image that has the discrepancy rendered in its pixels.
+          if (ids.indexOf(boundObj._repairedDiscrepancyFrom) === -1) {
+            ids.push(boundObj._repairedDiscrepancyFrom);
+          }
+        }
+      }
+
+      // Clear misplaced duplicate file bindings on late prompts (e.g. Prompt 7 live web browse + deck)
+      if (gIdx >= 4 && ids.length > 0) {
+        const isWebBrowseOrDeck = /\b(browse|trading\s*economics|online|web\s+research|presentation\s+deck|board\s+deck|autonomous\s+agent)/i.test(stepText);
+        const mentionsExternalUpload = /\b(uploaded|attached|audit\s+report|supplier\s+\w*\s*feed|surcharge\s+feed|surcharge\s+ledger|handwritten|scanned\s+order)/i.test(String(st.prompt || ''));
+        if (isWebBrowseOrDeck && !mentionsExternalUpload) {
+          ids = ids.filter(function(id) { return !boundInEarlierPrompts[id]; });
+        }
+      }
+
+      for (let ii = 0; ii < ids.length; ii++) {
+        boundInEarlierPrompts[ids[ii]] = true;
+      }
+      st.requiredFileId = ids.join(',');
+    }
+  } catch (err) {
+    console.warn('[BINDING REPAIR] skipped: ' + err.message);
   }
 }
 
@@ -1936,6 +2591,9 @@ function validateGeneratedData(planResult, targetRows, dataProfileId) {
     
     table.csvData = cleanedLines.join('\n');
   }
+
+  // Ensure externalFiles, demoGuide requiredFileId, and cross-file IDs are aligned
+  validateAndRepairExternalFileBindings_(planResult);
 }
 
 /**

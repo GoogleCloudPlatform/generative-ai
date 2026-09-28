@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 # Deployed as a runtime template into the user's Cloud Shell (not imported by
 # repo tooling); validated by py_compile and end-to-end demo deployments.
 # Repo-level strict lint/typing is intentionally skipped for this generated-
@@ -21,7 +22,6 @@
 # pylint: skip-file
 # mypy: ignore-errors
 # ruff: noqa
-
 
 """
 Generates external demo files (PDF Audit Report, Excel Spreadsheet Ledger, Simulated Scanned Images)
@@ -35,6 +35,9 @@ which a plain `gcloud auth login` does not grant - see get_drive_identity().
 """
 
 import os
+import re
+import csv
+import glob
 import sys
 import json
 import mimetypes
@@ -515,6 +518,190 @@ def drive_upload_file(token: str, path: str, parent_id: str):
     print(f"    ⚠️ Upload failed ({status}): {err}", file=sys.stderr)
     return "", f"{status}: {err}"
 
+def heal_external_files_spec(spec: dict, spec_file_path: str = "", data_dir: str = "") -> list:
+    """Deterministically aligns external_files_spec.json with data/*.csv before rendering.
+
+    1. Remaps any structured record ID cited in pdf.sections or pdf.discrepancy
+       that shares a prefix with data/*.csv IDs but does not exist in data/*.csv.
+    2. Appends any PDF-cited ID missing from excel.rows when excel.rows tracks
+       that ID prefix, incrementing the primary key and setting FLAGGED_DISCREPANCY.
+    3. Ensures every scan in scans[] contains at least one discrepancy row and
+       sets is_discrepancy=True so whichever scan is attached in Prompt 4 works.
+    """
+    repairs = []
+    if not isinstance(spec, dict) or not spec:
+        return repairs
+
+    id_re = re.compile(r"\b([A-Z]{2,10}-(?:[A-Z0-9]{2,6}-)?(?=[A-Z0-9]*\d)[A-Z0-9]{2,10})(?![A-Z0-9])")
+    disc_re = re.compile(
+        r"obsolete|discontinued|mismatch|discrepancy|discrepancies|anomaly|anomalies|invalid|legacy|error|exceed|abnormal|fuzzy|missing|unlisted|check replacement|\b999\b|廃番|廃止|旧品番|不一致|異常|不明|欠品|要確認",
+        re.I,
+    )
+
+    def _prefix(cid: str) -> str:
+        idx = cid.rfind("-")
+        return cid[:idx + 1] if idx != -1 else cid + "-"
+
+    search_dirs = []
+    if data_dir and os.path.isdir(data_dir):
+        search_dirs.append(data_dir)
+    if spec_file_path:
+        spec_dir = os.path.dirname(os.path.abspath(spec_file_path))
+        if os.path.isdir(spec_dir) and spec_dir not in search_dirs:
+            search_dirs.append(spec_dir)
+    if os.path.isdir("./data") and os.path.abspath("./data") not in [os.path.abspath(d) for d in search_dirs]:
+        search_dirs.append("./data")
+
+    csv_ids = set()
+    csv_by_prefix = {}
+    for d in search_dirs:
+        for csv_path in sorted(glob.glob(os.path.join(d, "*.csv"))):
+            if csv_path.endswith(".hero.csv"):
+                continue
+            try:
+                with open(csv_path, encoding="utf-8") as fh:
+                    for row in csv.reader(fh):
+                        for cell in row:
+                            for m in id_re.findall(str(cell)):
+                                csv_ids.add(m)
+                                csv_by_prefix.setdefault(_prefix(m), [])
+                                if m not in csv_by_prefix[_prefix(m)]:
+                                    csv_by_prefix[_prefix(m)].append(m)
+            except Exception:
+                continue
+
+    # 1. Repair unmatched PDF IDs against data/*.csv
+    pdf_spec = spec.get("pdf")
+    if isinstance(pdf_spec, dict):
+        pdf_dump = json.dumps(pdf_spec, ensure_ascii=False)
+        cited_pdf_ids = []
+        for m in id_re.findall(pdf_dump):
+            if m not in cited_pdf_ids:
+                cited_pdf_ids.append(m)
+        used_ids = set(cited_pdf_ids)
+        replacements = {}
+        for cid in cited_pdf_ids:
+            pfx = _prefix(cid)
+            if pfx in csv_by_prefix and cid not in csv_ids:
+                candidates = [c for c in csv_by_prefix[pfx] if c not in used_ids] or csv_by_prefix[pfx]
+                if candidates:
+                    rep = candidates[0]
+                    used_ids.add(rep)
+                    replacements[cid] = rep
+                    repairs.append(f"Replaced unmatched PDF ID {cid} -> {rep}")
+        if replacements:
+            for sec in pdf_spec.get("sections") or []:
+                if isinstance(sec, dict) and isinstance(sec.get("content"), str):
+                    for old_id, new_id in replacements.items():
+                        sec["content"] = sec["content"].replace(old_id, new_id)
+            disc_tbl = (pdf_spec.get("discrepancy") or {}).get("table_data") or []
+            for r_idx, row in enumerate(disc_tbl):
+                if isinstance(row, list):
+                    disc_tbl[r_idx] = [
+                        re.sub(
+                            r"\b(" + "|".join(re.escape(k) for k in replacements) + r")(?![A-Z0-9])",
+                            lambda m: replacements[m.group(1)],
+                            str(cell),
+                        )
+                        for cell in row
+                    ]
+
+    # 2. Ensure every PDF-cited ID exists in excel.rows when excel tracks that prefix
+    xl_spec = spec.get("excel")
+    if isinstance(xl_spec, dict) and isinstance(xl_spec.get("rows"), list) and xl_spec["rows"]:
+        xl_rows = xl_spec["rows"]
+        excel_ids = set()
+        excel_by_prefix = {}
+        col_for_prefix = {}
+        for row in xl_rows:
+            if not isinstance(row, list):
+                continue
+            for c_idx, cell in enumerate(row):
+                for m in id_re.findall(str(cell)):
+                    excel_ids.add(m)
+                    pfx = _prefix(m)
+                    excel_by_prefix.setdefault(pfx, []).append(m)
+                    if pfx not in col_for_prefix:
+                        col_for_prefix[pfx] = c_idx
+
+        pdf_dump_after = json.dumps(spec.get("pdf") or {}, ensure_ascii=False)
+        for cid in id_re.findall(pdf_dump_after):
+            pfx = _prefix(cid)
+            if pfx in col_for_prefix and cid not in excel_ids:
+                target_col = col_for_prefix[pfx]
+                new_row = [str(c) for c in xl_rows[-1]]
+                if target_col != 0 and new_row:
+                    pk_m = re.match(r"^(.*?)(\d+)$", str(new_row[0]).strip())
+                    if pk_m:
+                        prefix_str, num_str = pk_m.group(1), pk_m.group(2)
+                        max_num = int(num_str)
+                        for r in xl_rows:
+                            if isinstance(r, list) and r:
+                                rm = re.match(r"^" + re.escape(prefix_str) + r"(\d+)$", str(r[0]).strip())
+                                if rm:
+                                    max_num = max(max_num, int(rm.group(1)))
+                        new_row[0] = prefix_str + str(max_num + 1).zfill(len(num_str))
+                if target_col < len(new_row):
+                    new_row[target_col] = cid
+                if len(new_row) >= 2 and not disc_re.search(" ".join(new_row)):
+                    new_row[-1] = "FLAGGED_DISCREPANCY"
+                xl_rows.append(new_row)
+                excel_ids.add(cid)
+                repairs.append(f"Appended missing PDF ID {cid} to excel.rows")
+
+    # 3. Ensure every scan in scans[] contains at least one discrepancy row
+    scans = spec.get("scans")
+    if isinstance(scans, list) and scans:
+        donor_row = None
+        for sc in scans:
+            if not isinstance(sc, dict):
+                continue
+            for r in sc.get("rows") or []:
+                if isinstance(r, list) and disc_re.search(" ".join(str(c) for c in r)):
+                    donor_row = [str(c) for c in r]
+                    break
+            if donor_row:
+                break
+        if not donor_row:
+            donor_row = ["1", "Legacy Superseded Item", "REF-999", "1", "Obsolete - check replacement"]
+
+        for s_idx, sc in enumerate(scans):
+            if not isinstance(sc, dict):
+                continue
+            sc_rows = sc.setdefault("rows", [])
+            has_row_disc = any(
+                isinstance(r, list) and disc_re.search(" ".join(str(c) for c in r))
+                for r in sc_rows
+            )
+            if not has_row_disc:
+                injected = list(donor_row)
+                if sc_rows and isinstance(sc_rows[-1], list):
+                    target_len = len(sc_rows[-1])
+                    if len(injected) < target_len:
+                        injected.extend(["Obsolete - check replacement"] * (target_len - len(injected)))
+                    elif len(injected) > target_len:
+                        injected = injected[:target_len]
+                        if not disc_re.search(" ".join(injected)):
+                            injected[-1] = "Obsolete - check replacement"
+                sc_rows.append(injected)
+                for r_i, r in enumerate(sc_rows):
+                    if isinstance(r, list) and r and str(r[0]).strip().isdigit():
+                        r[0] = str(r_i + 1)
+                repairs.append(f"Injected discrepancy row into Scan #{s_idx + 1}")
+            if not sc.get("is_discrepancy"):
+                sc["is_discrepancy"] = True
+
+    if repairs and spec_file_path and os.path.exists(spec_file_path):
+        try:
+            with open(spec_file_path, "w", encoding="utf-8") as wf:
+                json.dump(spec, wf, indent=2, ensure_ascii=False)
+            print(f"🔧 Auto-healed external_files_spec.json ({len(repairs)} repair(s)): " + "; ".join(repairs))
+        except Exception as exc:
+            print(f"⚠️ Could not persist healed spec: {exc}", file=sys.stderr)
+
+    return repairs
+
+
 def upload_to_google_drive(company_name: str, suffix: str, files_to_upload: list) -> dict:
     """Creates a Google Drive folder and uploads all external demo files into the deploy target's Drive."""
     target_account = get_active_account()
@@ -714,6 +901,7 @@ def main():
             return 1
         with open(args.spec_file, encoding="utf-8") as f:
             spec = json.load(f)
+        heal_external_files_spec(spec, args.spec_file)
 
     style = spec.get("style", {})
 
@@ -742,10 +930,10 @@ def main():
         "heading": "Discrepancy Summary",
         "table_data": [
             ["Reference ID", "Counterparty", "System Value", "Document Value"],
-            ["REF-0001", "Counterparty A", "1,200", "1,050 (mismatch)"],
-            ["REF-0002", "Counterparty B", "850", "850 (match)"],
-            ["REF-0003", "Counterparty C", "2,400", "2,160 (mismatch)"],
-            ["REF-0004", "Counterparty D", "500", "500 (match)"]
+            ["REF-0101", "Counterparty B", "162,500", "146,250 (mismatch)"],
+            ["REF-0102", "Counterparty C", "175,000", "175,000 (match)"],
+            ["REF-0107", "Counterparty B", "237,500", "213,750 (mismatch)"],
+            ["REF-0114", "Counterparty C", "325,000", "292,500 (mismatch)"]
         ]
     })
     generate_pdf(pdf_path, pdf_title, pdf_sections, discrepancy_info)
@@ -776,7 +964,8 @@ def main():
             ])
     generate_excel(xlsx_path, xlsx_title, kpis, headers, rows)
 
-    # 3 & 4. Scanned forms - one routine, one carrying a deliberate discrepancy.
+    # 3 & 4. Scanned forms - both include at least one discrepancy row so whichever
+    # scan is attached during the Vision Showcase prompt surfaces an anomaly.
     scan_specs = spec.get("scans", [])
     default_headers = ["No.", "Description", "Reference", "Value", "Status"]
     scan_defaults = [
@@ -787,10 +976,10 @@ def main():
             "headers": default_headers,
             "rows": [
                 ["1", "Item A (standard)", "REF-0101", "1,200", "Accepted"],
-                ["2", "Item B (extended)", "REF-0204", "850", "Accepted"],
-                ["3", "Item C (bundle)", "REF-0309", "2,400", "Accepted"],
+                ["2", "Item B (extended)", "REF-0102", "850", "Accepted"],
+                ["3", "Item C (superseded code)", "REF-9901", "2,400", "Obsolete - check replacement"],
             ],
-            "is_discrepancy": False,
+            "is_discrepancy": True,
         },
         {
             "title": f"{args.company} - Exception Review Form",
@@ -800,7 +989,7 @@ def main():
             "rows": [
                 ["1", "Item A (standard)", "REF-0101", "1,050", "Mismatch (-150)"],
                 ["2", "Item D (superseded)", "REF-9901", "300", "Superseded reference"],
-                ["3", "Item C (bundle)", "REF-0309", "2,160", "Mismatch (-240)"],
+                ["3", "Item C (bundle)", "REF-0107", "2,160", "Mismatch (-240)"],
             ],
             "is_discrepancy": True,
         },
