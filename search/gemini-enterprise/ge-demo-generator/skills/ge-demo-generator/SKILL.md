@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.27.0
+  version: 2.28.0
 ---
 
-# GE Demo Generator Skill (v2.27.0)
+# GE Demo Generator Skill (v2.28.0)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.8 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, **automated browser video recording & Remotion highlight reel delivery to Google Drive**, and **global multilingual localization (i18n/l10n)**.
 
@@ -970,42 +970,49 @@ The template below is the base progression, before those overrides:
 
 #### 1. [Role Title] Foundation & Data Overview
 - **Tags**: `[Foundation]` `[Data Overview]`
+- **Attachment / Data Source**: None — Direct DB Query (`<master_table>`, `<transaction_table>`)
 - **Prompt Text**: (Generically phrased request to explore data landscape and operational KPIs in target language)
 - **Expected Outcome**: Analyzes master/transaction tables and renders KPI summary in an A2UI Card.
 - **Watch Point**: (What the operator should notice - e.g. the console already shows items mid-process across departments)
 
 #### 2. [Role Title] Metadata & Knowledge Catalog Discovery
 - **Tags**: `[Metadata Discovery]` `[Knowledge Catalog]`
+- **Attachment / Data Source**: None — Direct Knowledge Catalog + DB Query
 - **Prompt Text**: (Generically phrased request inquiring about available data resources, metrics definitions, and relationships)
 - **Expected Outcome**: Consults Knowledge Catalog MCP (`search_entries`, `lookup_entry`) before writing queries.
 - **Watch Point**: (e.g. the agent reads the catalog before it writes a single query)
 
 #### 3. [Role Title] Cross-Source Anomaly & Risk Detection [WOW MOMENT]
 - **Tags**: `[Cross-Source WOW]` `[Drive File Binding]`
+- **Attachment / Data Source**: Attach `<domain>_audit_report.pdf` + `<domain>_external_ledger.xlsx` (or read from Drive when Workspace MCP is enabled)
 - **Prompt Text**: (Strategic inquiry about untracked discrepancies across recent deliveries/records)
 - **Expected Outcome**: Autonomously cross-references the external PDF/Excel against BigQuery tables, isolates the 5-15% discrepancy, and renders discrepancy cards and infographics.
 - **Watch Point**: (e.g. nobody told it to open the external report - it decided to)
 
 #### 4. [Role Title] Multi-Step Dependent Immediate Workflow [WOW MOMENT]
 - **Tags**: `[Immediate Workflow WOW]` `[A2UI Batch Editor]`
+- **Attachment / Data Source**: Attach `handwritten_order_1.jpg` (alternate scan: `handwritten_order_2.jpg`)
 - **Prompt Text**: (Request to scan unverified items, resolve mappings, and update records)
 - **Expected Outcome**: Executes `SCAN -> RESOLVE -> PRESENT -> EXECUTE -> AUDIT`, presenting the (J) Dynamic Multi-Entity Batch Editor A2UI form for human confirmation before writing to DB.
 - **Watch Point**: (e.g. after the approval click, the item moves to the next department on the operations console)
 
 #### 5. [Role Title] Large-Scope Batch / Background Reconciliation [WOW MOMENT]
 - **Tags**: `[Background Workflow WOW]` `[Execution Mode Dialog]`
+- **Attachment / Data Source**: None — Direct DB + Operational Queue Batch
 - **Prompt Text**: (Comprehensive quarterly reconciliation request across all historical records)
 - **Expected Outcome**: Recognizes large batch scope and presents Execution Mode Dialog (Immediate vs Background vs Scheduled), kicking `/execute_task` when background mode is selected.
 - **Watch Point**: (e.g. the agent proposes background mode on its own, then keeps the chat usable while it runs)
 
 #### 6. [Role Title] Scheduled Automated Monitoring Setup
 - **Tags**: `[Scheduled Monitoring]` `[Pub/Sub Task]`
+- **Attachment / Data Source**: None — Scheduled Background Task Registration
 - **Prompt Text**: (Request to set up automated recurring threshold monitoring every morning at 09:00 AM)
 - **Expected Outcome**: Explains monitoring logic, registers recurring cron schedule with Pub/Sub.
 - **Watch Point**: (e.g. the schedule it proposes matches the department's own escalation rule)
 
 #### 7. [Role Title] End-to-End Strategic Automation
 - **Tags**: `[Strategic Automation]` `[End-to-End]`
+- **Attachment / Data Source**: Live Web Research + Internal DB (no manual file attachment unless explicitly specified)
 - **Prompt Text**: (Comprehensive executive request combining cross-source analytics, workflow execution, notification drafting, and audit logging)
 - **Expected Outcome**: Synthesizes all data sources, produces executive summary infographic, updates records, and logs audit trail.
 - **Watch Point**: (e.g. the closing summary states the before/after cycle time for the instance the whole demo followed)
