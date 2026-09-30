@@ -310,14 +310,113 @@ def _normalize_a2ui_icons_in_data(data):
         _normalize_a2ui_icon_component(data)
         return {k: _normalize_a2ui_icons_in_data(v) for k, v in data.items()}
     return data
+_HEALED_IFRAME_URL_CACHE = {}
+
+
+def _extract_html_text_summary(raw_html: str, max_chars: int = 600) -> str:
+    """Extract a readable plain-text summary from an HTML document."""
+    import html as _html_mod
+    import re as _re_mod
+    if not isinstance(raw_html, str) or not raw_html.strip():
+        return ""
+    cleaned = _re_mod.sub(r"<(script|style|noscript)\b[^>]*>.*?</\1>", " ", raw_html, flags=_re_mod.IGNORECASE | _re_mod.DOTALL)
+    cleaned = _re_mod.sub(r"<(br|/p|/div|/tr|/li|/h[1-6])\b[^>]*>", "\n", cleaned, flags=_re_mod.IGNORECASE)
+    cleaned = _re_mod.sub(r"<[^>]+>", " ", cleaned)
+    cleaned = _html_mod.unescape(cleaned)
+    lines = []
+    for raw_line in cleaned.splitlines():
+        line = " ".join(raw_line.split())
+        if line:
+            lines.append(line)
+    summary = " | ".join(lines)
+    if len(summary) > max_chars:
+        summary = summary[:max_chars - 1].rstrip() + "…"
+    return summary
+
+
+def _heal_a2ui_iframe_component(comp):
+    """Convert IFrameSrcdoc / IFrameUrl in-place into MaterialText.
+
+    Gemini Enterprise disables inline A2UI iframe rendering by default, so inline
+    iframe components render as empty 0px boxes. When a model still emits one
+    despite the prompt prohibition, this healer uploads the HTML to
+    DASHBOARDS_BUCKET (if configured) to mint a signed URL link and falls
+    back to an extracted text summary.
+    """
+    if not isinstance(comp, dict):
+        return False
+    _ctype = comp.get("component")
+    if _ctype not in ("IFrameSrcdoc", "IFrameUrl"):
+        return False
+
+    _cid = comp.get("id") or "frame"
+    _fallback_text = ""
+
+    if _ctype == "IFrameUrl":
+        _url = str(comp.get("url") or comp.get("src") or "").strip()
+        if _url:
+            _fallback_text = f"📊 [Open Interactive View]({_url})"
+        else:
+            _fallback_text = "📊 Interactive view (inline iframe rendering is disabled in Gemini Enterprise)."
+    else:
+        _html = str(comp.get("htmlContent") or comp.get("srcdoc") or "").strip()
+        _summary = _extract_html_text_summary(_html)
+        _signed_url = ""
+        _bucket = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+        if _bucket and _html and "<" in _html:
+            import hashlib as _hashlib
+            _cache_key = _bucket + ":" + _hashlib.sha256(_html.encode("utf-8")).hexdigest()
+            _signed_url = _HEALED_IFRAME_URL_CACHE.get(_cache_key, "")
+            if not _signed_url:
+                try:
+                    import uuid as _uuid_mod
+                    from google.cloud import storage as _gcs_storage
+                    _tools_mod = globals().get("_agent_tools")
+                    if _tools_mod is None:
+                        import adk_agent.app.tools as _tools_mod
+                    _obj_name = f"dashboards/dash_{_uuid_mod.uuid4().hex}.html"
+                    _ct = "text/html; charset=utf-8"
+                    _client = _gcs_storage.Client()
+                    _blob = _client.bucket(_bucket).blob(_obj_name)
+                    _blob.upload_from_string(_html, content_type=_ct)
+                    _signed_url = _tools_mod._generate_v4_signed_url(_bucket, _obj_name, _ct) or ""
+                    if _signed_url:
+                        if len(_HEALED_IFRAME_URL_CACHE) >= 32:
+                            _HEALED_IFRAME_URL_CACHE.clear()
+                        _HEALED_IFRAME_URL_CACHE[_cache_key] = _signed_url
+                except Exception as _exc:
+                    try:
+                        logger.log_text(f"[healer_iframe] fallback to text summary (upload/sign failed): {_exc}")
+                    except Exception:
+                        pass
+        if _signed_url and _summary:
+            _fallback_text = f"📊 [Open Interactive Dashboard]({_signed_url})\n\n{_summary}"
+        elif _signed_url:
+            _fallback_text = f"📊 [Open Interactive Dashboard]({_signed_url})"
+        elif _summary:
+            _fallback_text = _summary
+        else:
+            _fallback_text = "📊 Inline HTML view converted to text (iframe rendering is disabled in Gemini Enterprise)."
+
+    comp.clear()
+    comp.update({
+        "id": _cid,
+        "component": "MaterialText",
+        "text": _fallback_text,
+        "usageHint": "body",
+    })
+    return True
+
+
 def _heal_a2ui_message_list(messages):
     """Whole-list repairs applied to MODEL-authored A2UI before delivery.
 
     v0.9 lost most of what this used to do: the blank-button pass is obsolete
     (MaterialButton.label is a flat string, so a button cannot render label-less
     without the schema catching it), and Divider no longer needs its properties
-    scrubbed. What remains is the surfaceId typo normalization and the basic-Icon
-    upgrade, both of which are cheap and still observed in the wild.
+    scrubbed. What remains is the surfaceId typo normalization, the basic-Icon
+    upgrade, and defense-in-depth conversion of IFrameSrcdoc / IFrameUrl into
+    MaterialText (since GE disables inline iframe rendering by default).
     """
     import json as _json
     try:
@@ -343,6 +442,7 @@ def _heal_a2ui_message_list(messages):
         if _a2ui_kind(m) == 'updateComponents':
             for comp in (_body.get('components') or []):
                 _normalize_a2ui_icon_component(comp)
+                _heal_a2ui_iframe_component(comp)
 
         healed_messages.append(m)
 
