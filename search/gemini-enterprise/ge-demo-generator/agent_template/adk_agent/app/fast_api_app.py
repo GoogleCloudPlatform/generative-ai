@@ -308,6 +308,15 @@ def _normalize_a2ui_icons_in_data(data):
         return [_normalize_a2ui_icons_in_data(item) for item in data]
     if isinstance(data, dict):
         _normalize_a2ui_icon_component(data)
+        _ctype = data.get("component")
+        if _ctype == "IFrameSrcdoc":
+            _srcdoc = data.pop("srcdoc", "")
+            if "htmlContent" not in data:
+                data["htmlContent"] = _srcdoc
+        elif _ctype == "IFrameUrl":
+            _src = data.pop("src", "")
+            if "url" not in data:
+                data["url"] = _src
         return {k: _normalize_a2ui_icons_in_data(v) for k, v in data.items()}
     return data
 _HEALED_IFRAME_URL_CACHE = {}
@@ -319,9 +328,35 @@ def _extract_html_text_summary(raw_html: str, max_chars: int = 600) -> str:
     import re as _re_mod
     if not isinstance(raw_html, str) or not raw_html.strip():
         return ""
-    cleaned = _re_mod.sub(r"<(script|style|noscript)\b[^>]*>.*?</\1>", " ", raw_html, flags=_re_mod.IGNORECASE | _re_mod.DOTALL)
-    cleaned = _re_mod.sub(r"<(br|/p|/div|/tr|/li|/h[1-6])\b[^>]*>", "\n", cleaned, flags=_re_mod.IGNORECASE)
+    cleaned = _re_mod.sub(r"<!--.*?-->", " ", raw_html, flags=_re_mod.DOTALL)
+    cleaned = _re_mod.sub(r"<!--.*$", " ", cleaned, flags=_re_mod.DOTALL)
+    cleaned = _re_mod.sub(
+        r"<(head|script|style|noscript|svg|template)\b[^>]*>.*?</\1\s*>",
+        " ",
+        cleaned,
+        flags=_re_mod.IGNORECASE | _re_mod.DOTALL,
+    )
+    cleaned = _re_mod.sub(
+        r"<(script|style|noscript|svg|template)\b[^>]*>.*$",
+        " ",
+        cleaned,
+        flags=_re_mod.IGNORECASE | _re_mod.DOTALL,
+    )
+    cleaned = _re_mod.sub(
+        r"<title\b[^>]*>.*?</title\s*>",
+        " ",
+        cleaned,
+        flags=_re_mod.IGNORECASE | _re_mod.DOTALL,
+    )
+    cleaned = _re_mod.sub(
+        r"<(br|/p|/div|/tr|/li|/h[1-6]|/section|/article|/header|/footer|/table)\b[^>]*>",
+        "\n",
+        cleaned,
+        flags=_re_mod.IGNORECASE,
+    )
+    cleaned = _re_mod.sub(r"<(/td|/th)\b[^>]*>", " ", cleaned, flags=_re_mod.IGNORECASE)
     cleaned = _re_mod.sub(r"<[^>]+>", " ", cleaned)
+    cleaned = _re_mod.sub(r"<[a-zA-Z!/][^>]*$", " ", cleaned)
     cleaned = _html_mod.unescape(cleaned)
     lines = []
     for raw_line in cleaned.splitlines():
@@ -334,7 +369,33 @@ def _extract_html_text_summary(raw_html: str, max_chars: int = 600) -> str:
     return summary
 
 
-def _heal_a2ui_iframe_component(comp):
+def _resolve_a2ui_str_prop(val, data_model=None) -> str:
+    """Resolve a component string property from a plain str, v0.8 literal wrapper, or v0.9 DataBinding."""
+    if isinstance(val, str):
+        return val.strip()
+    if isinstance(val, dict):
+        for _lk in ("literalString", "literal"):
+            _lv = val.get(_lk)
+            if isinstance(_lv, str):
+                return _lv.strip()
+        _path = val.get("path") or val.get("dataBinding")
+        if isinstance(_path, str) and _path.strip() and isinstance(data_model, dict):
+            _p = _path.strip()
+            if _p in data_model and isinstance(data_model[_p], str):
+                return data_model[_p].strip()
+            _cur = data_model
+            for _part in [s for s in _p.strip("/").split("/") if s]:
+                if isinstance(_cur, dict) and _part in _cur:
+                    _cur = _cur[_part]
+                else:
+                    _cur = None
+                    break
+            if isinstance(_cur, str):
+                return _cur.strip()
+    return ""
+
+
+def _heal_a2ui_iframe_component(comp, data_model=None):
     """Convert IFrameSrcdoc / IFrameUrl in-place into MaterialText.
 
     Gemini Enterprise disables inline A2UI iframe rendering by default, so inline
@@ -345,22 +406,42 @@ def _heal_a2ui_iframe_component(comp):
     """
     if not isinstance(comp, dict):
         return False
-    _ctype = comp.get("component")
+    _raw_ctype = comp.get("component")
+    if isinstance(_raw_ctype, dict) and len(_raw_ctype) == 1:
+        _comp_name, _comp_props = next(iter(_raw_ctype.items()))
+        if isinstance(_comp_props, dict) and _comp_name in ("IFrameSrcdoc", "IFrameUrl"):
+            comp["component"] = _comp_name
+            for _pk, _pv in _comp_props.items():
+                comp.setdefault(_pk, _pv)
+            _raw_ctype = _comp_name
+    _ctype = _raw_ctype
     if _ctype not in ("IFrameSrcdoc", "IFrameUrl"):
         return False
 
     _cid = comp.get("id") or "frame"
+    _weight = comp.get("weight")
+    _has_weight = isinstance(_weight, (int, float)) and not isinstance(_weight, bool)
+    _title = _resolve_a2ui_str_prop(comp.get("title"), data_model)
     _fallback_text = ""
 
     if _ctype == "IFrameUrl":
-        _url = str(comp.get("url") or comp.get("src") or "").strip()
-        if _url:
-            _fallback_text = f"📊 [Open Interactive View]({_url})"
+        _url = (
+            _resolve_a2ui_str_prop(comp.get("url"), data_model)
+            or _resolve_a2ui_str_prop(comp.get("src"), data_model)
+        )
+        if _url and _url.lower().startswith(("http://", "https://")) and not any(c.isspace() for c in _url):
+            _label = _title or "Open Interactive View"
+            _fallback_text = f"📊 [{_label}]({_url})"
+        elif _title:
+            _fallback_text = f"📊 {_title}"
         else:
             _fallback_text = "📊 Interactive view (inline iframe rendering is disabled in Gemini Enterprise)."
     else:
-        _html = str(comp.get("htmlContent") or comp.get("srcdoc") or "").strip()
-        _summary = _extract_html_text_summary(_html)
+        _html = (
+            _resolve_a2ui_str_prop(comp.get("htmlContent"), data_model)
+            or _resolve_a2ui_str_prop(comp.get("srcdoc"), data_model)
+        )
+        _summary = _extract_html_text_summary(_html) or _title
         _signed_url = ""
         _bucket = os.environ.get("DASHBOARDS_BUCKET", "").strip()
         if _bucket and _html and "<" in _html:
@@ -405,6 +486,8 @@ def _heal_a2ui_iframe_component(comp):
         "text": _fallback_text,
         "usageHint": "body",
     })
+    if _has_weight:
+        comp["weight"] = _weight
     return True
 
 
@@ -427,6 +510,43 @@ def _heal_a2ui_message_list(messages):
     if not isinstance(messages, list):
         return messages
 
+    _surface_data_models = {}
+    for _dm_msg in messages:
+        if not isinstance(_dm_msg, dict):
+            continue
+        _dm_body = _dm_msg.get("updateDataModel") if isinstance(_dm_msg.get("updateDataModel"), dict) else (
+            _dm_msg.get("dataModelUpdate") if isinstance(_dm_msg.get("dataModelUpdate"), dict) else None
+        )
+        if not isinstance(_dm_body, dict):
+            continue
+        _dm_sid = _dm_body.get("surfaceId") or ""
+        if _dm_sid == "welcome-root":
+            _dm_sid = "welcome-card"
+        _dm_store = _surface_data_models.setdefault(_dm_sid, {})
+        _dm_path = _dm_body.get("path")
+        _has_val = "value" in _dm_body
+        _dm_val = _dm_body.get("value")
+        if not _has_val and isinstance(_dm_body.get("contents"), list):
+            _dm_val = {}
+            for _entry in _dm_body["contents"]:
+                if isinstance(_entry, dict) and isinstance(_entry.get("key"), str):
+                    _dm_val[_entry["key"]] = _entry.get("valueString", _entry.get("value"))
+            _has_val = True
+        if _has_val:
+            if isinstance(_dm_path, str) and _dm_path.strip() and _dm_path.strip() != "/":
+                _norm_path = _dm_path.strip()
+                _dm_store[_norm_path] = _dm_val
+                _parts = [s for s in _norm_path.strip("/").split("/") if s]
+                _cur = _dm_store
+                for _part in _parts[:-1]:
+                    if not isinstance(_cur.get(_part), dict):
+                        _cur[_part] = {}
+                    _cur = _cur[_part]
+                if _parts:
+                    _cur[_parts[-1]] = _dm_val
+            elif isinstance(_dm_val, dict):
+                _dm_store.update(_dm_val)
+
     healed_messages = []
     # NOTE: Root IDs are intentionally left as the LLM produced them.
     # GE expects the model's original root IDs; renaming them breaks rendering.
@@ -436,13 +556,17 @@ def _heal_a2ui_message_list(messages):
             continue
 
         _body = _a2ui_body(m)
+        if not isinstance(_body, dict) and isinstance(m.get('surfaceUpdate'), dict):
+            _body = m['surfaceUpdate']
         if isinstance(_body, dict) and _body.get('surfaceId') == 'welcome-root':
             _body['surfaceId'] = 'welcome-card'
 
-        if _a2ui_kind(m) == 'updateComponents':
-            for comp in (_body.get('components') or []):
+        if _a2ui_kind(m) == 'updateComponents' or isinstance(m.get('surfaceUpdate'), dict):
+            _sid = (_body.get('surfaceId') or '') if isinstance(_body, dict) else ''
+            _data_model = _surface_data_models.get(_sid)
+            for comp in ((_body.get('components') if isinstance(_body, dict) else None) or []):
                 _normalize_a2ui_icon_component(comp)
-                _heal_a2ui_iframe_component(comp)
+                _heal_a2ui_iframe_component(comp, data_model=_data_model)
 
         healed_messages.append(m)
 
@@ -981,6 +1105,7 @@ def _a2ui_normalize_component(_comp):
     if isinstance(_comp.get('action'), dict):
         _comp['action'] = _a2ui_upgrade_action(_comp['action'])
     _normalize_a2ui_icon_component(_comp)
+    _heal_a2ui_iframe_component(_comp)
     # A v0.8 Button carried a flat 'label'. The BASIC v0.9 Button has no label
     # at all - it requires a 'child' id pointing at a Text component - so the
     # pruner below would delete the caption and leave a childless Button, which

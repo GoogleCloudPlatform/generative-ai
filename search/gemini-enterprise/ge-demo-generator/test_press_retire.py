@@ -120,7 +120,7 @@ CASES = [
 def load_iframe_healer(logger, fake_tools=None):
     """Exec the A2UI healer out of the template with controllable GCS/tools stubs."""
     src = open(TEMPLATE, encoding="utf-8").read()
-    start = src.index("_HEALED_IFRAME_URL_CACHE = {}")
+    start = src.index("def _normalize_a2ui_icons_in_data(")
     end = src.index("def _a2ui_iter_msgs(", start)
     ns = {
         "os": os,
@@ -305,6 +305,106 @@ def run_iframe_healer_tests(logger):
     failures += 0 if ok5 else 1
     print("  %-4s %-52s url=%r" % ("ok" if ok5 else "FAIL", "empty IFrameSrcdoc and IFrameUrl edge cases", c_url.get("text")))
 
+    # 6. DataBinding {"path": "/..."} and v0.8 {"literalString": "..."} wrappers + non-http URL rejection
+    msgs6 = [
+        {
+            "version": "v0.9",
+            "updateDataModel": {
+                "surfaceId": "dash-6",
+                "path": "/dashboard",
+                "value": {"html": "<h2>Bound KPI: 99.4%</h2>", "url": "https://example.com/bound"},
+            },
+        },
+        {
+            "version": "v0.9",
+            "updateComponents": {
+                "surfaceId": "dash-6",
+                "components": [
+                    {"id": "boundHtml", "component": "IFrameSrcdoc", "htmlContent": {"path": "/dashboard/html"}},
+                    {"id": "missingBind", "component": "IFrameSrcdoc", "htmlContent": {"path": "/missing/path"}},
+                    {"id": "litHtml", "component": "IFrameSrcdoc", "htmlContent": {"literalString": "<h3>Literal KPI</h3>"}},
+                    {"id": "boundUrl", "component": "IFrameUrl", "url": {"path": "/dashboard/url"}, "title": "Bound Report"},
+                    {"id": "badUrl", "component": "IFrameUrl", "url": "javascript:alert(1)"},
+                ],
+            },
+        },
+    ]
+    ns["_heal_a2ui_message_list"](msgs6)
+    c_bound_html, c_missing_bind, c_lit_html, c_bound_url, c_bad_url = msgs6[1]["updateComponents"]["components"]
+    ok6 = (
+        c_bound_html.get("text") == "Bound KPI: 99.4%"
+        and "{'path'" not in c_missing_bind.get("text", "")
+        and c_lit_html.get("text") == "Literal KPI"
+        and c_bound_url.get("text") == "📊 [Bound Report](https://example.com/bound)"
+        and "javascript:" not in c_bad_url.get("text", "")
+    )
+    failures += 0 if ok6 else 1
+    print("  %-4s %-52s bound=%r" % ("ok" if ok6 else "FAIL", "DataBinding/literalString resolved & bad URL blocked", c_bound_html.get("text")))
+
+    # 7. v0.8 surfaceUpdate + wrapped component dict + layout weight & title preservation
+    msgs7 = [{
+        "surfaceUpdate": {
+            "surfaceId": "dash-7",
+            "components": [
+                {
+                    "id": "wrappedFrame",
+                    "weight": 2,
+                    "component": {"IFrameSrcdoc": {"htmlContent": "<div>Wrapped Content</div>", "height": 200}},
+                },
+                {
+                    "id": "titledEmpty",
+                    "component": "IFrameSrcdoc",
+                    "htmlContent": "",
+                    "title": "Q3 Revenue Summary",
+                },
+            ],
+        },
+    }]
+    ns["_heal_a2ui_message_list"](msgs7)
+    c_wrap, c_titled = msgs7[0]["surfaceUpdate"]["components"]
+    ok7 = (
+        c_wrap.get("component") == "MaterialText"
+        and c_wrap.get("text") == "Wrapped Content"
+        and c_wrap.get("weight") == 2
+        and "height" not in c_wrap
+        and c_titled.get("component") == "MaterialText"
+        and c_titled.get("text") == "Q3 Revenue Summary"
+    )
+    failures += 0 if ok7 else 1
+    print("  %-4s %-52s weight=%r" % ("ok" if ok7 else "FAIL", "v0.8 surfaceUpdate/wrapped dict & weight preserved", c_wrap.get("weight")))
+
+    # 8. Pre-parser _normalize_a2ui_icons_in_data maps srcdoc -> htmlContent and src -> url
+    raw_pre = [
+        {"id": "f1", "component": "IFrameSrcdoc", "srcdoc": "<p>Legacy srcdoc</p>"},
+        {"id": "f2", "component": "IFrameUrl", "src": "https://example.com/legacy"},
+    ]
+    norm_pre = ns["_normalize_a2ui_icons_in_data"](raw_pre)
+    ok8 = (
+        norm_pre[0].get("htmlContent") == "<p>Legacy srcdoc</p>"
+        and "srcdoc" not in norm_pre[0]
+        and norm_pre[1].get("url") == "https://example.com/legacy"
+        and "src" not in norm_pre[1]
+    )
+    failures += 0 if ok8 else 1
+    print("  %-4s %-52s keys=%s" % ("ok" if ok8 else "FAIL", "pre-parser normalizes legacy srcdoc/src keys", sorted(norm_pre[0].keys())))
+
+    # 9. _extract_html_text_summary strips comments with '>', <head><title>, and unclosed <script>
+    hostile_html = (
+        "<!-- comment with a > b comparison -->"
+        "<head><title>Duplicate Title</title></head>"
+        "<body><h2>Clean Heading</h2><p>Metric &gt; 90%</p>"
+        "<script>const x = 1; if (x > 0) alert('leaked');"
+    )
+    summary9 = ns["_extract_html_text_summary"](hostile_html)
+    ok9 = (
+        summary9 == "Clean Heading | Metric > 90%"
+        and "comment" not in summary9
+        and "Duplicate Title" not in summary9
+        and "alert" not in summary9
+    )
+    failures += 0 if ok9 else 1
+    print("  %-4s %-52s got=%r" % ("ok" if ok9 else "FAIL", "HTML summary strips '>' comments & unclosed script", summary9))
+
     return failures
 
 
@@ -333,7 +433,7 @@ def main():
     if failures:
         print("\n%d case(s) FAILED" % failures)
         return 1
-    print("\nAll %d case(s) passed." % (len(CASES) + 1 + 5))
+    print("\nAll %d case(s) passed." % (len(CASES) + 1 + 9))
     return 0
 
 
