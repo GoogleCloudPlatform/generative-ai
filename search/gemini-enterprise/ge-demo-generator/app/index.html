@@ -4748,19 +4748,45 @@ limitations under the License.
       currentSuffix = res.suffix || '';
       currentDomainName = res.domainName || '';
 
+      // Helper to resolve which externalFiles are bound to each demoGuide step
+      const extFilesArr = Array.isArray(res.externalFiles) ? res.externalFiles : [];
+      const guideArr = Array.isArray(res.demoGuide) ? res.demoGuide : [];
+      const resolveStepFiles = (step, stepIdx) => resolveStepExternalFiles(step, stepIdx, extFilesArr);
+
+      const stepBindings = guideArr.map((st, idx) => resolveStepFiles(st, idx));
+      // Find which prompt index is the primary Vision showcase prompt
+      const visionPromptIdx = guideArr.findIndex((st, idx) =>
+        stepBindings[idx].some(m => /\.(jpg|jpeg|png|webp)$/i.test(m.file.fileName || '') || (m.file.mimeType && m.file.mimeType.startsWith('image/')))
+      );
+
       // External Files Population
       const extFilesSection = document.getElementById('externalFilesSection');
       const extFilesList = document.getElementById('externalFilesList');
       if (extFilesSection && extFilesList) {
         extFilesList.innerHTML = '';
-        if (res.externalFiles && res.externalFiles.length > 0) {
+        if (extFilesArr.length > 0) {
           extFilesSection.classList.remove('hidden');
-          res.externalFiles.forEach((file, index) => {
+          extFilesArr.forEach((file, index) => {
             const isExcel = file.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.fileName.endsWith('.xlsx') || file.fileName.endsWith('.csv');
             const isImage = file.fileName.endsWith('.jpg') || file.fileName.endsWith('.jpeg') || file.fileName.endsWith('.png') || (file.mimeType && file.mimeType.startsWith('image/'));
             
             const fileTypeLabel = isExcel ? 'Excel (.xlsx)' : (isImage ? 'Image (JPEG/PNG)' : 'PDF (.pdf)');
             const fileIcon = isExcel ? '📊' : (isImage ? '🖼️' : '📄');
+            const downloadFnName = isExcel ? 'downloadExternalExcel' : (isImage ? 'downloadExternalImage' : 'downloadExternalPDF');
+
+            // Determine which Demo Guide prompt(s) use this file
+            const usedInPrompts = [];
+            stepBindings.forEach((boundList, sIdx) => {
+              if (boundList.some(b => b.index === index)) {
+                usedInPrompts.push(`#${sIdx + 1}`);
+              }
+            });
+            let usageBadgeHtml = '';
+            if (usedInPrompts.length > 0) {
+              usageBadgeHtml = `<div class="inline-flex items-center gap-1.5 px-2.5 py-1 mb-2.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-[10px] font-bold text-amber-300">📎 Attach in Prompt ${usedInPrompts.join(', ')}</div>`;
+            } else if (isImage && visionPromptIdx !== -1) {
+              usageBadgeHtml = `<div class="inline-flex items-center gap-1.5 px-2.5 py-1 mb-2.5 rounded-lg bg-sky-500/15 border border-sky-500/30 text-[10px] font-bold text-sky-300">📎 Alternate Vision Scan for Prompt #${visionPromptIdx + 1}</div>`;
+            }
             
             // Generate dedicated high-fidelity preview header block for each file type
             let previewHeaderHtml = '';
@@ -4769,7 +4795,7 @@ limitations under the License.
               // Image thumbnail preview
               previewHeaderHtml = `
                 <div class="mb-3 rounded-xl overflow-hidden border border-white/10 bg-black/50 flex items-center justify-center cursor-pointer hover:border-amber-500/40 transition-all aspect-video relative group/img" onclick="openDocModal(${index})" title="Click to preview document">
-                  <img src="data:image/jpeg;base64,${file.base64Data}" class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300" alt="${file.fileName}"/>
+                  <img src="data:image/jpeg;base64,${file.base64Data}" class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300" alt="${esc(file.fileName)}"/>
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path></svg>
                     Preview Document
@@ -4808,15 +4834,16 @@ limitations under the License.
               <div>
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-xl">${fileIcon}</span>
-                  <span class="text-[12px] font-bold text-white font-mono break-all">${file.fileName}</span>
+                  <span class="text-[12px] font-bold text-white font-mono break-all">${esc(file.fileName)}</span>
                 </div>
+                ${usageBadgeHtml}
                 ${previewHeaderHtml}
-                <p class="text-[11px] text-gray-400 mb-3">${file.description || 'No description'}</p>
+                <p class="text-[11px] text-gray-400 mb-3">${esc(file.description || 'No description')}</p>
                 <div class="text-[10px] text-gray-500 mb-3">Type: ${fileTypeLabel}</div>
               </div>
-              <button onclick="${isExcel ? 'downloadExternalExcel' : (isImage ? 'downloadExternalImage' : 'downloadExternalPDF')}(${index})" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold rounded-lg text-[11px] transition-all uppercase tracking-wider border border-amber-500/30 cursor-pointer">
+              <button onclick="${downloadFnName}(${index})" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold rounded-lg text-[11px] transition-all uppercase tracking-wider border border-amber-500/30 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a2 2 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
                 Download
               </button>
@@ -4831,12 +4858,53 @@ limitations under the License.
       // Guide
       const guideContainer = document.getElementById('demoGuideSteps');
       guideContainer.innerHTML = '';
-      if (res.demoGuide && res.demoGuide.length) {
-        res.demoGuide.forEach((step, i) => {
+      if (guideArr.length) {
+        guideArr.forEach((step, i) => {
           const title = step.title || `Scenario ${i + 1}`;
           const prompt = typeof step === 'object' ? step.prompt : step;
-          const isAWT = typeof step === 'object' && step.requiredFileId ? true : false;
+          const boundFiles = stepBindings[i] || [];
+          const isAWT = boundFiles.length > 0;
           const tags = typeof step === 'object' && step.tags ? step.tags : [];
+
+          const renderFileChip = (entry, isSecondary) => {
+            const f = entry.file;
+            const idx = entry.index;
+            const fExcel = f.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || (f.fileName && (f.fileName.endsWith('.xlsx') || f.fileName.endsWith('.csv')));
+            const fImage = (f.fileName && (f.fileName.endsWith('.jpg') || f.fileName.endsWith('.jpeg') || f.fileName.endsWith('.png'))) || (f.mimeType && f.mimeType.startsWith('image/'));
+            const fIcon = fExcel ? '📊' : (fImage ? '🖼️' : '📄');
+            const dlFn = fExcel ? 'downloadExternalExcel' : (fImage ? 'downloadExternalImage' : 'downloadExternalPDF');
+            const tone = isSecondary
+              ? 'bg-sky-500/10 border-sky-500/30 text-sky-200'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-200';
+            return `
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-mono ${tone}">
+                <span>${fIcon} ${esc(f.fileName)}</span>
+                <button onclick="openDocModal(${idx})" class="ml-1 px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[9px] font-sans font-bold text-white uppercase cursor-pointer" title="Preview file">Preview</button>
+                <button onclick="${dlFn}(${idx})" class="px-1.5 py-0.5 rounded bg-amber-500/30 hover:bg-amber-500 hover:text-slate-950 text-[9px] font-sans font-bold text-amber-100 uppercase cursor-pointer" title="Download file">Download</button>
+              </div>
+            `;
+          };
+
+          let attachmentFooterHtml = '';
+          if (boundFiles.length > 0) {
+            // Check if there is an additional sibling image scan not already in boundFiles
+            let extraImageHtml = '';
+            if (i === visionPromptIdx) {
+              const extraImages = extFilesArr
+                .map((f, idx) => ({ file: f, index: idx }))
+                .filter(e => ((e.file.fileName && /\.(jpg|jpeg|png|webp)$/i.test(e.file.fileName)) || (e.file.mimeType && e.file.mimeType.startsWith('image/'))) && !boundFiles.some(b => b.index === e.index));
+              if (extraImages.length > 0) {
+                extraImageHtml = `<span class="text-[10px] font-bold uppercase tracking-wider text-sky-400/90 ml-2">Alternate Scan:</span>` + extraImages.map(e => renderFileChip(e, true)).join('');
+              }
+            }
+            attachmentFooterHtml = `
+              <div class="mt-3 pt-2.5 border-t border-amber-500/20 flex flex-wrap items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">📎 Attach to this prompt in chat:</span>
+                ${boundFiles.map(e => renderFileChip(e, false)).join('')}
+                ${extraImageHtml}
+              </div>
+            `;
+          }
 
           const div = document.createElement('div');
           div.className = "flex flex-col gap-3 p-5 rounded-2xl bg-black/40 border border-white/5 group hover:border-emerald-500/30 transition-all shadow-xl";
@@ -4844,8 +4912,11 @@ limitations under the License.
                <div class="flex items-center justify-between gap-3">
                   <div class="flex items-center gap-3 flex-wrap">
                     <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 w-6 h-6 rounded-lg flex items-center justify-center shadow-inner tracking-tighter">${i + 1}</span>
-                    <p class="text-[11px] font-bold text-gray-300 uppercase tracking-widest">${title}</p>
-                    ${isAWT ? `<span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">AWT</span>` : ''}
+                    <p class="text-[11px] font-bold text-gray-300 uppercase tracking-widest">${esc(title)}</p>
+                    ${isAWT
+                      ? `<span class="text-[10px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-lg border border-amber-500/30" title="Attach the specified file(s) from External Domain Files when sending this prompt">📎 Attach: ${boundFiles.map(b => esc(b.file.fileName)).join(' + ')}</span>`
+                      : `<span class="text-[10px] font-medium text-emerald-300/80 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20" title="No file upload needed — queries database tables directly">🗄️ Direct DB Query (No File Attachment)</span>`
+                    }
                     ${tags.includes('encore') ? `<span class="text-[10px] font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/30" title="Optional overflow showcase - run if time allows">ENCORE · OPTIONAL</span>` : ''}
                     ${tags.filter(t => t !== 'encore').map(tag => `<span class="text-[9px] font-medium text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">${tag}</span>`).join('')}
                   </div>
@@ -4860,6 +4931,7 @@ limitations under the License.
                 <div class="relative bg-black/60 rounded-xl p-4 border border-white/5 hover:border-emerald-500/30 transition-all min-w-0 group/copy">
                   <p class="guide-prompt-text text-[13px] text-sky-200 select-text leading-relaxed font-mono">${prompt}</p>
                   ${typeof step === 'object' && step.watchPoint ? `<p class="text-[10px] text-purple-300/90 mt-2 pt-2 border-t border-white/5">👀 <span class="font-bold uppercase tracking-wider text-purple-400/80 mr-1">Watch</span>${step.watchPoint}</p>` : ''}
+                  ${attachmentFooterHtml}
                   <button onclick="copyToClipboard(this.parentElement.querySelector('.guide-prompt-text').innerText)" class="absolute top-3 right-3 p-2 rounded-lg bg-emerald-500/10 backdrop-blur-md text-emerald-400/70 opacity-0 group-hover/copy:opacity-100 transition-all border border-emerald-500/20 shadow-lg hover:text-emerald-300 hover:bg-emerald-500/30 hover:border-emerald-500/50 active:bg-emerald-500 active:text-white active:border-emerald-400 active:scale-95 flex items-center gap-1.5 cursor-pointer duration-200" title="Copy prompt">
                     <span class="text-[10px] font-bold tracking-wide">COPY</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
@@ -6030,6 +6102,64 @@ limitations under the License.
      * Uses the Web App URL from GAS with the demoId query parameter.
      */
     /**
+     * Resolves which entries from extFilesArr are bound to a demoGuide step.
+     * Supports canonical file1..fileN IDs, custom f.id values, exact or base
+     * filenames, and Cross-Source PDF + Excel multi-file heuristics.
+     */
+    function resolveStepExternalFiles(step, stepIdx, extFilesArr) {
+      if (!step || typeof step !== 'object' || !Array.isArray(extFilesArr) || !extFilesArr.length) return [];
+      const raw = step.requiredFileId;
+      const tokens = Array.isArray(raw)
+        ? raw
+        : (raw ? String(raw).split(/[,;|]+/) : []);
+      const matched = [];
+      const addMatch = (idx) => {
+        if (idx >= 0 && idx < extFilesArr.length && !matched.some(m => m.index === idx)) {
+          matched.push({ file: extFilesArr[idx], index: idx });
+        }
+      };
+      tokens.forEach(tok => {
+        const clean = String(tok || '').trim();
+        if (!clean || /^(none|null|empty|false|n\/a|file1\s+or\s+empty)$/i.test(clean)) return;
+        const lower = clean.toLowerCase();
+        const idx = extFilesArr.findIndex((f, i) => {
+          if (!f || typeof f !== 'object') return false;
+          const posId = `file${i + 1}`;
+          const fid = String(f.id || posId).trim().toLowerCase();
+          const fname = String(f.fileName || '').trim().toLowerCase();
+          const baseName = fname.replace(/\.[a-z0-9]+$/i, '');
+          return fid === lower || posId === lower || fname === lower || (baseName && baseName === lower);
+        });
+        if (idx !== -1) addMatch(idx);
+      });
+      // Heuristic multi-file resolution for Cross-Source prompt (e.g. Prompt 3 mentioning both PDF audit report and Excel supplier feed)
+      const stepText = `${step.title || ''} ${step.prompt || ''} ${step.watchPoint || ''}`.toLowerCase();
+      const hasPdf = matched.some(m => (m.file.mimeType === 'application/pdf' || /\.pdf$/i.test(m.file.fileName || '')));
+      const hasExcel = matched.some(m => /\.(xlsx|xls|tsv|csv)$/i.test(m.file.fileName || '') || /spreadsheet|excel/i.test(m.file.mimeType || ''));
+      if ((hasPdf || stepIdx === 2) && !hasExcel) {
+        const xIdx = extFilesArr.findIndex(f => f && (/\.(xlsx|xls|tsv|csv)$/i.test(f.fileName || '') || /spreadsheet|excel/i.test(f.mimeType || '')));
+        if (xIdx !== -1) {
+          const xWords = String(extFilesArr[xIdx].fileName || '').toLowerCase().replace(/\.[a-z0-9]+$/, '').split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !/^(file|data|report|table|order|orders|sheet|custom)$/.test(w));
+          const hits = xWords.filter(w => stepText.includes(w.length >= 5 ? w.slice(0, -1) : w)).length;
+          if (hits >= 2 || /\b(supplier\s+\w*\s*feeds?|surcharge\s+feeds?|surcharge\s+ledger|spreadsheet)/i.test(stepText)) {
+            addMatch(xIdx);
+          }
+        }
+      }
+      if ((hasExcel || stepIdx === 2) && !hasPdf) {
+        const pIdx = extFilesArr.findIndex(f => f && (f.mimeType === 'application/pdf' || /\.pdf$/i.test(f.fileName || '')));
+        if (pIdx !== -1) {
+          const pWords = String(extFilesArr[pIdx].fileName || '').toLowerCase().replace(/\.[a-z0-9]+$/, '').split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !/^(file|data|report|table|order|orders|sheet|custom)$/.test(w));
+          const hits = pWords.filter(w => stepText.includes(w.length >= 5 ? w.slice(0, -1) : w)).length;
+          if (hits >= 2 || /\b(audit\s+findings|audit\s+report|procurement\s+audit|compliance\s+report|inspection\s+report)/i.test(stepText)) {
+            matched.unshift({ file: extFilesArr[pIdx], index: pIdx });
+          }
+        }
+      }
+      return matched;
+    }
+
+    /**
      * Copies the demo name and all demo guide prompts to clipboard as formatted text.
      * Users can paste into Google Docs, Notion, or any document editor.
      */
@@ -6052,14 +6182,18 @@ limitations under the License.
       lines.push('---');
       lines.push('');
 
+      const extFiles = Array.isArray(currentData.externalFiles) ? currentData.externalFiles : [];
       currentData.demoGuide.forEach((step, i) => {
         const title = step.title || `Scenario ${i + 1}`;
         const prompt = typeof step === 'object' ? step.prompt : step;
-        const isAWT = typeof step === 'object' && step.requiredFileId;
+        const attachedNames = resolveStepExternalFiles(step, i, extFiles)
+          .map(m => (m.file && m.file.fileName) ? m.file.fileName : '')
+          .filter(Boolean);
         const tags = typeof step === 'object' && step.tags ? step.tags : [];
 
-        lines.push(`## ${i + 1}. ${title}${isAWT ? ' [AWT - File Required]' : ''}`);
+        lines.push(`## ${i + 1}. ${title}${attachedNames.length ? ` [Attach: ${attachedNames.join(' + ')}]` : ' [Direct DB Query - No Attachment]'}`);
         if (tags.length) lines.push(`Tags: ${tags.join(', ')}`);
+        if (attachedNames.length) lines.push(`Required File(s): ${attachedNames.join(', ')}`);
         lines.push('');
         lines.push(prompt);
         lines.push('');

@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+ENV UV_EXCLUDE_NEWER=2026-09-25T00:00:00Z
 COPY requirements.txt ./
 RUN uv pip install --system -r requirements.txt
 

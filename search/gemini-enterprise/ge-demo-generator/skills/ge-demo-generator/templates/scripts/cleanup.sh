@@ -21,6 +21,15 @@
 
 set -e
 
+export UV_HTTP_TIMEOUT=600
+export UV_RETRIES=10
+export UV_ISOLATED=1
+export PYTHONNOUSERSITE=1
+unset PYTHONPATH
+if [ -z "$UV_EXCLUDE_NEWER" ]; then
+  export UV_EXCLUDE_NEWER="2026-09-25T00:00:00Z"
+fi
+
 # Load environment variables.
 # set -a exports every assignment below (and everything sourced from .env), so
 # the inline `python3 - << EOF` heredocs further down can read them via
@@ -380,8 +389,8 @@ if [ -n "$FIRESTORE_COLLECTION" ] || [ -n "$DEMO_ID" ]; then
     # `|| true` turned that into a silent no-op under a "completed successfully"
     # banner. setup_and_deploy.sh already installs uv, so borrow its runner.
     if command -v uv >/dev/null 2>&1; then
-      FS_PY=(uv run --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0"
-        --with "google-api-core>=2.20.0,<2.35.0" python3)
+      FS_PY=(uv run --isolated --no-project --with "google-cloud-firestore>=2.16.0,<3.0.0"
+        --with "google-api-core>=2.28.0,<2.35.0" python3)
     else
       FS_PY=(python3)
       echo "   ⚠️  uv not found - falling back to the system python3; if google-cloud-firestore is not installed there, clear the collections by hand."

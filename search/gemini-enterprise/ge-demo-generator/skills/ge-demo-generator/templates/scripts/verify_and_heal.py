@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 # Deployed as a runtime template into the user's Cloud Shell (not imported by
 # repo tooling); validated by py_compile and end-to-end demo deployments.
 # Repo-level strict lint/typing is intentionally skipped for this generated-
@@ -22,9 +23,8 @@
 # mypy: ignore-errors
 # ruff: noqa
 
-
 # =============================================================================
-# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.25.0)
+# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.28.0)
 # Automatically audits 9 infrastructure layers and heals discrepancies in real time:
 #   1. BigQuery Dataset & Tables (Row counts, _id column for DataStores, schema metadata)
 #   2. Firestore Collection & Seeding (Task queue documents >= 3)
@@ -40,8 +40,11 @@
 # =============================================================================
 
 import os
+import re
 import sys
+import glob
 import json
+import shutil
 import time
 import datetime
 import subprocess
@@ -301,10 +304,26 @@ try:
         if os.path.exists("scripts/setup_fs.py"):
             # Tell it which project and collection - it defaults to the
             # environment, and this script may not be running with the deploy's.
-            heal = subprocess.run(
-                ["python3", "scripts/setup_fs.py",
-                 "--project", PROJECT_ID, "--collection", FIRESTORE_COLLECTION],
-                capture_output=True, text=True)
+            _heal_env = os.environ.copy()
+            _heal_env.pop("PYTHONPATH", None)
+            _heal_env["PYTHONNOUSERSITE"] = "1"
+            _heal_env["UV_ISOLATED"] = "1"
+            _heal_env.setdefault("UV_EXCLUDE_NEWER", "2026-09-25T00:00:00Z")
+            _heal_cmd = (
+                [
+                    "uv", "run", "--isolated", "--no-project",
+                    "--with", "google-cloud-firestore>=2.16.0,<3.0.0",
+                    "--with", "google-api-core>=2.28.0,<2.35.0",
+                    "python3", "scripts/setup_fs.py",
+                    "--project", PROJECT_ID, "--collection", FIRESTORE_COLLECTION,
+                ]
+                if shutil.which("uv")
+                else [
+                    "python3", "scripts/setup_fs.py",
+                    "--project", PROJECT_ID, "--collection", FIRESTORE_COLLECTION,
+                ]
+            )
+            heal = subprocess.run(_heal_cmd, env=_heal_env, capture_output=True, text=True)
             # Then look again. Reporting HEALED because the heal *ran* is how a
             # clean project with no Firestore database at all got a 100% healthy
             # verification report and a demo whose task queue had nowhere to write.
@@ -822,6 +841,71 @@ except Exception as e:
 # -----------------------------------------------------------------------------
 # Layer 8: External Files & Google Drive Verification & Self-Healing
 # -----------------------------------------------------------------------------
+def check_external_files_consistency(demo_root="."):
+    """Validate that external_files_spec.json IDs exist in CSVs/Excel and scans include discrepancies."""
+    spec_path = os.path.join(demo_root, "data", "external_files_spec.json")
+    if not os.path.exists(spec_path):
+        return True, "No external_files_spec.json present (using fallback generator)"
+    try:
+        with open(spec_path, "r", encoding="utf-8") as sf:
+            spec = json.load(sf)
+    except Exception as exc:
+        return False, f"Invalid external_files_spec.json: {exc}"
+
+    id_re = re.compile(r"\b([A-Z]{2,10}-(?:[A-Z0-9]{2,6}-)?(?=[A-Z0-9]*\d)[A-Z0-9]{2,10})\b")
+    csv_ids = set()
+    csv_prefixes = set()
+    for csv_file in glob.glob(os.path.join(demo_root, "data", "*.csv")):
+        try:
+            with open(csv_file, "r", encoding="utf-8") as cf:
+                for m in id_re.finditer(cf.read()):
+                    tok = m.group(1)
+                    csv_ids.add(tok)
+                    last_dash = tok.rfind("-")
+                    if last_dash != -1:
+                        csv_prefixes.add(tok[: last_dash + 1])
+        except Exception:
+            pass
+
+    excel_obj = spec.get("excel") or {}
+    excel_text = json.dumps(excel_obj, ensure_ascii=False)
+    excel_ids = set(id_re.findall(excel_text))
+    excel_prefixes = {t[: t.rfind("-") + 1] for t in excel_ids if "-" in t}
+
+    pdf_obj = spec.get("pdf") or {}
+    pdf_text = json.dumps(pdf_obj, ensure_ascii=False)
+    pdf_ids = []
+    for m in id_re.finditer(pdf_text):
+        tok = m.group(1)
+        if tok not in pdf_ids:
+            pdf_ids.append(tok)
+
+    issues = []
+    for pid in pdf_ids:
+        pfx = pid[: pid.rfind("-") + 1] if "-" in pid else ""
+        if pfx in csv_prefixes and pid not in csv_ids:
+            issues.append(f"PDF ID {pid} missing from data/*.csv")
+        if pfx in excel_prefixes and pid not in excel_ids:
+            issues.append(f"PDF ID {pid} missing from excel.rows")
+
+    disc_re = re.compile(
+        r"obsolete|discontinued|mismatch|discrepancy|discrepancies|anomaly|anomalies|invalid|legacy|error|exceed|abnormal|fuzzy|missing|unlisted|check replacement|\b999\b|廃番|廃止|旧品番|不一致|異常|不明|欠品|要確認",
+        re.I,
+    )
+    scans = spec.get("scans") or []
+    for idx, scan in enumerate(scans):
+        if not isinstance(scan, dict):
+            continue
+        rows_text = json.dumps(scan.get("rows") or [], ensure_ascii=False)
+        has_disc = bool(scan.get("is_discrepancy")) or bool(disc_re.search(rows_text))
+        if not has_disc:
+            issues.append(f"Scan #{idx + 1} lacks an audit-seed discrepancy row")
+
+    if issues:
+        return False, "; ".join(issues)
+    return True, f"Verified {len(pdf_ids)} PDF ID(s) and {len(scans)} scan(s) aligned with CSV/Excel data"
+
+
 print("\n🔍 Layer 8: Verifying External Sample Files...")
 ext_files = []
 if os.path.exists("external_files"):
@@ -834,6 +918,30 @@ else:
         record_check("External Files", "Sample Documents", "HEALED", "Generated external PDF/Excel/Image files", "Staged in external_files/")
     else:
         record_check("External Files", "Sample Documents", "WARN", "external_files/ empty", "No external sample files generated")
+
+spec_ok, spec_msg = check_external_files_consistency(".")
+if spec_ok:
+    record_check("External Files", "Cross-File ID & Scan Alignment", "PASS", "None", spec_msg)
+else:
+    if os.path.exists("scripts/generate_and_upload_external_files.py") and os.path.exists("data/external_files_spec.json"):
+        subprocess.run(
+            ["python3", "scripts/generate_and_upload_external_files.py",
+             "--domain", DOMAIN_SLUG if "DOMAIN_SLUG" in globals() else "demo.example.com",
+             "--company", COMPANY_NAME if "COMPANY_NAME" in globals() else "Demo Company",
+             "--suffix", SUFFIX if "SUFFIX" in globals() else "1234",
+             "--spec-file", "data/external_files_spec.json",
+             "--outdir", "external_files"],
+            capture_output=True, text=True,
+        )
+        spec_ok_after, spec_msg_after = check_external_files_consistency(".")
+        if spec_ok_after:
+            record_check("External Files", "Cross-File ID & Scan Alignment", "HEALED",
+                         "Auto-healed external_files_spec.json & regenerated PDF/Excel/Scans", spec_msg_after)
+        else:
+            record_check("External Files", "Cross-File ID & Scan Alignment", "WARN",
+                         "Spec inconsistency detected", spec_msg_after)
+    else:
+        record_check("External Files", "Cross-File ID & Scan Alignment", "WARN", "Spec inconsistency detected", spec_msg)
 
 # The bucket is the only copy of these documents that outlives this machine: the
 # completion banner links to it, and in rag mode it is what the datastore indexes.
@@ -886,7 +994,6 @@ if GCS_BUCKET_NAME:
     elif _envs is not None:
         record_check("External Files", "Bucket Name Wiring", "PASS", "None",
                      "Cloud Run carries GCS_BUCKET_NAME")
-
 
 # Check 8.4: Google Drive delivery verification & healing
 summary_file = os.path.join("external_files", "drive_upload_summary.json")

@@ -12,10 +12,13 @@ acked
 acking
 acli
 AClient
+acodec
 acomplete
+acrossfade
 acs
 adamw
 ADAS
+adc
 addfont
 adk
 ADK
@@ -32,6 +35,7 @@ agains
 agentcard
 agentchat
 agentic
+agentplatform
 agg
 AGG
 aggfunc
@@ -68,6 +72,7 @@ Anant
 Andaz
 Ankarsrum
 antiword
+anullsrc
 ANZ
 aoa
 AOT
@@ -105,6 +110,7 @@ arun
 arxiv
 asdf
 AServer
+asetpts
 ASF
 ASGI
 Ashish
@@ -113,11 +119,13 @@ asis
 Asis
 ASML
 Aspeed
+asplit
 astype
 ation
 ATitle
 atleast
 atms
+atrim
 Atulan
 auc
 aujourd'hui
@@ -137,6 +145,7 @@ autorater
 Autorater
 autosxs
 AUVs
+avc
 avec
 Avenir
 avgs
@@ -176,6 +185,9 @@ betulus
 Beyonce
 bff
 BFirst
+bgm
+Bgm
+BGM
 bgr
 BGR
 bgswap
@@ -189,6 +201,7 @@ BIKBEAR
 bikeshare
 Bikeshare
 biloba
+BINAUTHZ
 bitbucket
 BITCODE
 bitcoin
@@ -204,6 +217,7 @@ bml
 bname
 bnb
 bom
+bookable
 booktitle
 bools
 boop
@@ -247,6 +261,7 @@ Byzance
 cacio
 cais
 CALIPSO
+Camden
 campestre
 CAMQAA
 Camry
@@ -274,6 +289,7 @@ CDIP
 cdiv
 cdn
 CDNs
+cdp
 ceb
 Ceccotti
 Centros
@@ -312,6 +328,7 @@ cloudtasks
 cloudtrace
 cloudveil
 clsx
+Cmaj
 cmap
 cmn
 cnf
@@ -601,6 +618,7 @@ Eventarc
 EVs
 evse
 evt
+execv
 Exfil
 expl
 expr
@@ -618,6 +636,7 @@ fastapi
 fastmcp
 Fastmcp
 fastrtc
+faststart
 fda
 FDCWD
 fea
@@ -656,6 +675,7 @@ Flirbles
 floormat
 flowables
 FLX
+Fmaj
 fmeasure
 fmeta
 FMWK
@@ -832,6 +852,7 @@ gws
 HACCP
 hacer
 hackathon
+Hackney
 hadolint
 hahaha
 Haichao
@@ -841,6 +862,7 @@ Hamers
 handover
 handovers
 Hannaneh
+Hanzi
 hardlink
 Harvick
 hashtag
@@ -884,6 +906,7 @@ Hlc
 hline
 Hmmm
 HMO
+HMR
 hnsw
 Hogwarts
 Homesley
@@ -935,6 +958,7 @@ IIT
 ILB
 Ilkay
 iloc
+ilter
 imagefont
 imageno
 imagetext
@@ -949,6 +973,7 @@ inbox
 indica
 inds
 inermis
+infobars
 INFOPLIST
 informati
 infosys
@@ -956,6 +981,7 @@ inpaint
 inpainted
 inr
 INR
+insideairbnb
 ints
 IOMGR
 ionate
@@ -974,6 +1000,7 @@ isdigit
 isdir
 isess
 isfile
+Islington
 itable
 itables
 itb
@@ -1072,6 +1099,7 @@ Kleiser
 kmeans
 KMEANS
 knative
+knn
 KNN
 kok
 kokkai
@@ -1107,6 +1135,7 @@ langgraph
 Laomedeia
 lastb
 latte
+lavfi
 lbl
 LCEL
 LEBRON
@@ -1121,6 +1150,7 @@ Leventer
 lexer
 lexers
 liberties
+libmp
 lic
 likelier
 linalg
@@ -1238,6 +1268,7 @@ meme
 Memegen
 memes
 mentoring
+mercari
 Merhaba
 mesop
 Mesop
@@ -1268,6 +1299,8 @@ Misaki
 misroutes
 Mitani
 Miyabi
+mjpeg
+MJPEG
 MLB
 mlit
 MLIT
@@ -1281,16 +1314,19 @@ MMO
 mmol
 mmr
 Mnih
+modelarmor
 modelfile
 Molaison
 monty
 Mookie
 morty
 Mosi
+movflags
 moviepy
 mpb
 mpe
 mpegps
+mpegts
 mpga
 mpim
 mpld
@@ -1351,6 +1387,7 @@ ndocs
 nec
 Nederlands
 neering
+neighbourhood
 neighbouring
 neil
 Nemar
@@ -1395,6 +1432,7 @@ Nominatim
 NOMINATIM
 NOMINMAX
 nonroot
+NOooooah
 norigin
 normalise
 Norsk
@@ -1423,6 +1461,7 @@ objc
 ocr
 ODb
 odr
+Offthread
 oglevel
 Ohashi
 ohlcv
@@ -1453,6 +1492,7 @@ ood
 OOD
 OOM
 OOMs
+oop
 Oort
 ootb
 OOTB
@@ -1466,6 +1506,8 @@ opsz
 oraw
 Orbelians
 ord
+orgpolicy
+ORGPOLICY
 Orus
 osm
 oss
@@ -1477,6 +1519,7 @@ outdir
 outro
 overwiew
 owlbot
+Oxc
 oxml
 padus
 Pageable
@@ -1574,6 +1617,7 @@ podfile
 podhelper
 podman
 Poirot
+polic
 polong
 Polong
 polski
@@ -1654,6 +1698,7 @@ Qsxq
 quadrotor
 qubit
 qubits
+Queeen
 quickbot
 Quickbot
 quicktime
@@ -1689,6 +1734,8 @@ rbm
 rdoc
 RDONLY
 reallocations
+reauth
+Reauth
 REAUTH
 recontext
 Recontext
@@ -1921,6 +1968,7 @@ ssr
 SSRF
 sss
 SSZ
+STARTPTS
 Statcast
 staticmethod
 stdcall
@@ -2188,6 +2236,7 @@ Vardhan
 Vaswani
 Vayots
 VBG
+VBORw
 vcodec
 VCPU
 vdb
@@ -2198,6 +2247,7 @@ veo
 Verbinski
 Verilog
 versioned
+veryfast
 Ves
 Vesia
 vesselin
@@ -2228,6 +2278,7 @@ vos
 VOS
 votre
 VPs
+vqa
 VQA
 VRAM
 vreason
@@ -2247,6 +2298,7 @@ WAI
 Wakatipu
 waterjet
 WAU
+Wavenet
 wcontext
 wcslen
 wdir
@@ -2343,6 +2395,7 @@ xytext
 xzn
 YAjjpd
 yanchor
+Yasss
 yaxes
 yaxis
 ycol
@@ -2360,6 +2413,7 @@ yref
 ytd
 ytick
 yticks
+yue
 Yuxi
 Yuxuan
 Yuzuru
@@ -2387,38 +2441,4 @@ Zscaler
 Zuv
 Zvrm
 ZWSP
-veryfast
-lavfi
-infobars
-MJPEG
-mjpeg
-movflags
-faststart
-anullsrc
-acodec
-libmp
-Offthread
-cdp
-oop
-BGM
-Fmaj
-asplit
-atrim
-asetpts
-STARTPTS
-acrossfade
-bgm
-Bgm
-Cmaj
-ilter
-Wavenet
-yue
-execv
-Hanzi
-reauth
-Reauth
-BINAUTHZ
-ORGPOLICY
-orgpolicy
-modelarmor
-polic
+Saa

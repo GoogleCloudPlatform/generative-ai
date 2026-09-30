@@ -1,0 +1,5 @@
+google-cloud-spanner>=3.40.0
+google-cloud-aiplatform>=1.38.0
+google-genai>=0.1.0
+faker>=20.0.0
+pillow>=10.0.0

@@ -612,7 +612,12 @@ Two things to know before editing a requirement:
   in Firestore's default database id, and every call in a freshly built demo
   returned `InvalidArgument: 400 Invalid database id %28default%29` —
   session persistence, the idempotency claim, task storage and the autonomous
-  worker at once. It is listed in `PINNED_DEPS` purely to hold `<2.35.0`.
+  worker at once. Conversely, `google-cloud-firestore>=2.30.0` calls
+  `google.api_core.check_python_version()` at import time, a symbol added in
+  `google-api-core` 2.28.0, so the floor must be `>=2.28.0,<2.35.0` and every
+  host `uv run` invocation must pass `--isolated` (`UV_ISOLATED=1`,
+  `PYTHONNOUSERSITE=1`, `unset PYTHONPATH`) with `UV_EXCLUDE_NEWER` set so
+  pre-installed host packages cannot leak into ephemeral setup environments.
   Bisect before choosing where the cap goes: `google-cloud-firestore` 2.28.1
   and 2.29.0 both fail on api-core 2.35.0 and both pass on 2.34.0, so capping
   the Firestore line would have pinned the wrong package and still broken.
