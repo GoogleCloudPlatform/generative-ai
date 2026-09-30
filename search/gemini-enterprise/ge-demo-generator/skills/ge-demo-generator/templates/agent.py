@@ -252,10 +252,11 @@ from a2ui.schema.common_modifiers import remove_strict_validation
 PROJECT_ID = os.environ.get("PROJECT_ID") or os.environ.get("PROJECT_ID") or os.environ.get("GOOGLE_CLOUD_PROJECT", "")
 
 # Gemini Enterprise A2UI v0.9 composite catalog: the Material component set plus
-# the basic v0.9 primitives plus the GE-only components (Canvas, IFrameSrcdoc,
-# IFrameUrl, VegaChart, GcbpTable, InteractiveChart). Fetched into the build
-# context by the setup script and baked into the image by the Dockerfile's
-# "COPY . ." - see A2UI_COMPOSITE_CATALOG_PATH below.
+# the basic v0.9 primitives plus the GE-only components (Canvas, VegaChart,
+# GcbpTable, InteractiveChart; IFrameSrcdoc and IFrameUrl remain in the schema
+# for healer interception, as GE disables inline iframe rendering by default). Fetched
+# into the build context by the setup script and baked into the image by the
+# Dockerfile's "COPY . ." - see A2UI_COMPOSITE_CATALOG_PATH below.
 A2UI_COMPOSITE_CATALOG_PATH = "adk_agent/app/catalogs/gemini_enterprise_composite_catalog.json"
 A2UI_EXAMPLES_PATH = "adk_agent/app/examples/0.9"
 
@@ -591,7 +592,7 @@ CRITICAL OPERATIONAL RULES:
       - Tabular data (query results, comparisons, rankings): Use a MaterialTable ("columns" + "rows", or "rows" bound to a data-model path filled by updateDataModel). Never dump raw text tables and never fake a table out of nested rows of text.
       - Charts and trends: Use a VegaChart with a Vega-Lite "spec" (inline, or bound to a path). This renders natively — do NOT generate a chart image for something VegaChart can draw.
       - A long report, a multi-section briefing, or anything that would dominate the chat stream: Use a Canvas root so it opens in a resizable side panel; set cardTitle, cardDescription, cardIcon and autoOpen on it. THRESHOLD (MANDATORY): if the answer has 3+ headed sections, or is a review / briefing / whitepaper / anything the user would call a report, it goes in a Canvas — put a 2-3 sentence lead in the chat text and the FULL body inside the Canvas. Streaming a long markdown report into the chat instead is a failure, not a shortcut.
-      - A custom, self-contained HTML view (bespoke dashboard, styled layout): Use IFrameSrcdoc with a complete "htmlContent" document and a "height". This is the right answer for a dashboard the user wants to read INSIDE the chat (no interactive / open-in-the-browser signal): build the HTML yourself from the query results. A generate_image slide is a static picture of numbers and MUST NOT be substituted for it. Use IFrameUrl for an allowlisted external URL.
+      - Inline dashboards and multi-KPI views: Compose native A2UI v0.9 components inside a MaterialCard (KPI MaterialRow tiles with MaterialIcon, MaterialTabs for sections, MaterialTable for tabular breakdowns, and VegaChart for trends; see the html-dashboard and tabbed-view examples). For a full interactive HTML dashboard opened in a browser tab, call publish_dashboard(html=..., title=...) and return its signed URL as a Markdown link [Open Executive Dashboard](URL) alongside a native A2UI summary card. IFrameSrcdoc and IFrameUrl are FORBIDDEN — Gemini Enterprise disables inline iframe rendering by default, so they appear as blank 0px boxes.
       - Entity profiles (person, product, location details): Use a MaterialCard with key-value MaterialRows, a MaterialImage where available, and MaterialButtons.
       - Status or progress updates: Use MaterialProgressBar / MaterialProgressSpinner, or MaterialBadge for state labels.
       - Lists of items or options: Use a MaterialColumn or MaterialGridList; for a repeated row shape, bind "children" to a template {"componentId": "<row-template-id>", "path": "/items"}.
@@ -971,10 +972,11 @@ if os.environ.get("DASHBOARDS_BUCKET", ""):
         "ALONGSIDE, but you MUST still call publish_dashboard and deliver the link.\n\n"
         "(A plain 'overview / snapshot / current numbers' request WITHOUT an interactive/"
         "open-in-browser signal is still a fast inline card - do not publish a page for it.)\n\n"
-        "INLINE DASHBOARDS (A2UI): if the user asks for a dashboard but wants it IN THE "
-        "CHAT (no interactive/open-in-browser signal), that is neither publish_dashboard "
-        "nor generate_image - render an IFrameSrcdoc component whose htmlContent is a "
-        "complete self-contained HTML document built from the query results.\n\n"
+        "INLINE DASHBOARDS (A2UI - NO IFRAMES): if the user asks for a dashboard IN THE "
+        "CHAT (no interactive/open-in-browser signal), render a native A2UI v0.9 dashboard "
+        "card (MaterialCard + MaterialTabs + KPI MaterialRow + MaterialTable + VegaChart). "
+        "NEVER emit IFrameSrcdoc or IFrameUrl — they are FORBIDDEN and render as blank 0px "
+        "boxes in Gemini Enterprise.\n\n"
         "EXECUTION DISCIPLINE (CRITICAL - PREVENTS DEAD-END TURNS):\n"
         "- Your VERY FIRST action for a dashboard request MUST be an actual tool call "
         "(execute_sql / execute_sql_readonly to gather the numbers). Do NOT reply with only a "

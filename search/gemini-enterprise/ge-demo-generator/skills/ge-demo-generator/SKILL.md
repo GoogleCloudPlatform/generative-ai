@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.28.0
+  version: 2.29.0
 ---
 
-# GE Demo Generator Skill (v2.28.0)
+# GE Demo Generator Skill (v2.29.0)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.8 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, **automated browser video recording & Remotion highlight reel delivery to Google Drive**, and **global multilingual localization (i18n/l10n)**.
 
@@ -636,7 +636,7 @@ ge-demo-<domain>-<suffix>/
 
 ### Critical A2UI System Instruction Requirements (v0.9 Composite Catalog)
 1. **Output Placement Rule (Rule #0)**: Any text in the same response turn as a tool call is hidden. Only output `🔍 Analyzing...` during tool execution. Final analytical reports, A2UI cards, and chips MUST appear in a separate turn with ZERO tool calls.
-2. **Mandatory A2UI Cards (v0.9 Standard)**: Plain text markdown tables and bullet lists are forbidden for data presentation. Wrap results in `<a2ui-json> ... </a2ui-json>` using `MaterialCard`, `MaterialTable`, `VegaChart`, `MaterialRow`, `MaterialColumn`, and `MaterialDivider`.
+2. **Mandatory A2UI Cards (v0.9 Standard)**: Plain text markdown tables and bullet lists are forbidden for data presentation. Wrap results in `<a2ui-json> ... </a2ui-json>` using `MaterialCard`, `MaterialTabs`, `MaterialTable`, `VegaChart`, `MaterialRow`, `MaterialColumn`, and `MaterialDivider`. Never emit `IFrameSrcdoc` or `IFrameUrl` (Gemini Enterprise disables inline iframe rendering by default, so they appear as blank 0px boxes); use native A2UI components for inline dashboards, or `publish_dashboard` returning a signed URL Markdown link alongside a summary card for full interactive browser dashboards.
 3. **A2UI v0.9 Component Model (CRITICAL)**:
    - Every message stamped with `"version": "v0.9"`.
    - `createSurface` has **NO `root` key**: `{"version": "v0.9", "createSurface": {"surfaceId": "...", "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"}}`.

@@ -1282,7 +1282,7 @@ generator used to fake are now native:
 |---|---|
 | Tables built from nested `Row`/`Column` of `Text` | `MaterialTable` / `GcbpTable` |
 | Charts rendered as generated PNG images | `VegaChart` |
-| Dashboards opened in a separate browser tab | `IFrameSrcdoc` (sandboxed, inline) |
+| Multi-view inline dashboards | `MaterialCard` + `MaterialTabs` + `MaterialTable` + `VegaChart` (`IFrameSrcdoc` is disabled in GE because inline iframe rendering is off by default) |
 | Long reports crammed into the chat stream | `Canvas` (resizable side panel) |
 
 No dependency bump: the already-pinned `a2ui-agent-sdk` revision ships

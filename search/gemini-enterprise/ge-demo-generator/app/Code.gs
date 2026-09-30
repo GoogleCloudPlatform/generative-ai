@@ -101,7 +101,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v12.25-public',
+  APP_VERSION: 'v12.26-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -1026,7 +1026,7 @@ function getTechnicalInstruction_() {
     "This visual MUST be in the style of a professional business document or slide (e.g., an Executive Summary card, a high-level business infographic) " +
     "that summarizes the insights. " +
     "**NO IMAGE TOOL RAW RESPONSE OUTFALL (CRITICAL)**: When you call 'generate_image', the system automatically handles the image rendering. You MUST NEVER copy, reference, or output the tool's JSON return payload (e.g., `{'status': 'success', 'detail': '...'}`) in your conversational text response. Do NOT write statements like 'Image generated successfully' or repeat the status dictionary. Keep your text focused purely on business insights.\n" +
-    "4b. **INTERACTIVE DASHBOARD**: Instruct the agent that it can publish a full interactive HTML dashboard (opened in a browser tab) via the 'publish_dashboard' tool whenever the user asks for a dashboard, an executive dashboard, or an interactive/clickable report. The agent first gathers aggregated numbers (e.g. via execute_sql), then authors ONE complete self-contained HTML document (inline CSS/JS, charts from a CDN, data embedded as a JSON snapshot, interactive tabs/filters/dark mode, all labels in the user's language), calls 'publish_dashboard', and presents the returned dashboard_url as a Markdown link like [Open Executive Dashboard](URL) — never a bare URL, never an A2UI/openUrl button. The dashboard is a point-in-time snapshot. As with images, NEVER output the tool's raw JSON return payload.\n" +
+    "4b. **INTERACTIVE DASHBOARD**: Instruct the agent that it can publish a full interactive HTML dashboard (opened in a browser tab) via the 'publish_dashboard' tool whenever the user asks for a dashboard, an executive dashboard, or an interactive/clickable report. The agent first gathers aggregated numbers (e.g. via execute_sql), then authors ONE complete self-contained HTML document (inline CSS/JS, charts from a CDN, data embedded as a JSON snapshot, interactive tabs/filters/dark mode, all labels in the user's language), calls 'publish_dashboard', and presents the returned dashboard_url as a Markdown link like [Open Executive Dashboard](URL) alongside a native A2UI summary card — never a bare URL, never an A2UI/openUrl button. For an inline chat dashboard (no open-in-browser signal), compose native A2UI v0.9 components (MaterialCard + MaterialTabs + KPI MaterialRow + MaterialTable + VegaChart); IFrameSrcdoc and IFrameUrl are FORBIDDEN because Gemini Enterprise disables inline iframe rendering by default. The dashboard is a point-in-time snapshot. As with images, NEVER output the tool's raw JSON return payload.\n" +
     "5. Instruct to wait for user input before acting, but be persistent in error recovery.\n" +
     "6. **TRANSPARENCY & GROUNDING (CRITICAL)**: Instruct the agent to be highly transparent about its reasoning, " +
     "explicitly mentioning which tables and files it is consulting and what specific values it found, " +
@@ -1078,7 +1078,7 @@ function getTechnicalInstruction_() {
     "Tabular data MUST use the MaterialTable component (columns + rows), so values align visually.\n" +
     "**RICH COMPONENTS (USE THEM)**: the catalog is the Gemini Enterprise composite catalog, so prefer the native component over a hand-rolled imitation: " +
     "MaterialTable for any tabular result, VegaChart (a Vega-Lite spec) for a chart, MaterialProgressBar for a ratio/utilization, " +
-    "IFrameSrcdoc for a self-contained HTML mini-dashboard rendered inline, and a Canvas root when the answer is a long report that deserves a resizable side panel.\n" +
+    "MaterialTabs + KPI MaterialRow + MaterialTable + VegaChart inside a MaterialCard for an inline dashboard (IFrameSrcdoc and IFrameUrl are FORBIDDEN — Gemini Enterprise disables inline iframe rendering by default), and a Canvas root when the answer is a long report that deserves a resizable side panel.\n" +
     "**WHAT-IF SIMULATION CARD (WOW MOMENT)**: When an analysis result depends on a tunable parameter (threshold, budget, quantity), follow the result card with a what-if card: " +
     "a MaterialSlider (min / max / step, value bound to a /form path, with its caption supplied by a MaterialText above it — MaterialSlider has no label property) " +
     "plus a MaterialButton whose event context carries the /form value to request recalculation. " +

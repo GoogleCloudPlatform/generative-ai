@@ -117,6 +117,197 @@ CASES = [
 ]
 
 
+def load_iframe_healer(logger, fake_tools=None):
+    """Exec the A2UI healer out of the template with controllable GCS/tools stubs."""
+    src = open(TEMPLATE, encoding="utf-8").read()
+    start = src.index("_HEALED_IFRAME_URL_CACHE = {}")
+    end = src.index("def _a2ui_iter_msgs(", start)
+    ns = {
+        "os": os,
+        "logger": logger,
+        "_a2ui_kind": lambda m: next(
+            (k for k in ("createSurface", "updateComponents", "updateDataModel", "deleteSurface")
+             if k in m), None),
+        "_a2ui_body": lambda m: next(
+            (m[k] for k in ("createSurface", "updateComponents", "updateDataModel", "deleteSurface")
+             if k in m and isinstance(m[k], dict)), None),
+        "_normalize_a2ui_icon_component": lambda c: False,
+        "_agent_tools": fake_tools,
+    }
+    exec(compile(src[start:end], TEMPLATE, "exec"), ns)  # noqa: S102
+    return ns
+
+
+def run_iframe_healer_tests(logger):
+    import types
+
+    failures = 0
+    print("\niframe-healer (v12.26)")
+
+    sample_html = (
+        "<!DOCTYPE html><html><head><style>body{color:red}</style>"
+        "<script>alert(1)</script></head><body>"
+        "<h2>Regional Performance</h2><div><b>$12.4M</b> Total revenue</div>"
+        "</body></html>"
+    )
+
+    # 1. Without DASHBOARDS_BUCKET -> falls back to extracted text summary
+    os.environ.pop("DASHBOARDS_BUCKET", None)
+    ns = load_iframe_healer(logger)
+    msgs = [{
+        "version": "v0.9",
+        "updateComponents": {
+            "surfaceId": "dash-1",
+            "components": [
+                {"id": "root", "component": "MaterialCard", "children": ["frame1"]},
+                {"id": "frame1", "component": "IFrameSrcdoc", "height": 260, "htmlContent": sample_html},
+            ],
+        },
+    }]
+    healed = ns["_heal_a2ui_message_list"](msgs)
+    comp = healed[0]["updateComponents"]["components"][1]
+    ok = (
+        comp.get("id") == "frame1"
+        and comp.get("component") == "MaterialText"
+        and comp.get("usageHint") == "body"
+        and "Regional Performance" in comp.get("text", "")
+        and "$12.4M Total revenue" in comp.get("text", "")
+        and "color:red" not in comp.get("text", "")
+        and "alert(1)" not in comp.get("text", "")
+        and "htmlContent" not in comp
+        and "height" not in comp
+    )
+    failures += 0 if ok else 1
+    print("  %-4s %-52s got=%r" % ("ok" if ok else "FAIL", "IFrameSrcdoc without bucket extracts clean text", comp))
+
+    # 2. With DASHBOARDS_BUCKET and stubbed GCS + _generate_v4_signed_url
+    uploaded = []
+
+    class _FakeBlob:
+        def __init__(self, name):
+            self.name = name
+
+        def upload_from_string(self, data, content_type=None):
+            uploaded.append((self.name, data, content_type))
+
+    class _FakeBucket:
+        def blob(self, name):
+            return _FakeBlob(name)
+
+    class _FakeClient:
+        def bucket(self, name):
+            return _FakeBucket()
+
+    fake_storage = types.ModuleType("google.cloud.storage")
+    fake_storage.Client = _FakeClient
+    fake_cloud = types.ModuleType("google.cloud")
+    fake_cloud.storage = fake_storage
+    fake_google = types.ModuleType("google")
+    fake_google.cloud = fake_cloud
+    saved_mods = {k: sys.modules.get(k) for k in ("google", "google.cloud", "google.cloud.storage")}
+    sys.modules["google"] = fake_google
+    sys.modules["google.cloud"] = fake_cloud
+    sys.modules["google.cloud.storage"] = fake_storage
+
+    fake_tools = types.SimpleNamespace(
+        _generate_v4_signed_url=lambda b, o, ct: f"https://storage.googleapis.com/{b}/{o}?sig=v4"
+    )
+    try:
+        os.environ["DASHBOARDS_BUCKET"] = "test-dash-bucket"
+        ns = load_iframe_healer(logger, fake_tools=fake_tools)
+        msgs2 = [{
+            "version": "v0.9",
+            "updateComponents": {
+                "surfaceId": "dash-2",
+                "components": [
+                    {"id": "frame2", "component": "IFrameSrcdoc", "height": 300, "htmlContent": sample_html},
+                ],
+            },
+        }]
+        ns["_heal_a2ui_message_list"](msgs2)
+        comp2 = msgs2[0]["updateComponents"]["components"][0]
+        ok2 = (
+            comp2.get("id") == "frame2"
+            and comp2.get("component") == "MaterialText"
+            and "[Open Interactive Dashboard](https://storage.googleapis.com/test-dash-bucket/dashboards/dash_" in comp2.get("text", "")
+            and "Regional Performance" in comp2.get("text", "")
+            and len(uploaded) == 1
+        )
+        failures += 0 if ok2 else 1
+        print("  %-4s %-52s uploads=%d" % ("ok" if ok2 else "FAIL", "IFrameSrcdoc with bucket uploads & signs V4 URL", len(uploaded)))
+
+        # 3. Cache hit on identical HTML in same bucket avoids duplicate upload
+        msgs3 = [{
+            "version": "v0.9",
+            "updateComponents": {
+                "surfaceId": "dash-3",
+                "components": [
+                    {"id": "frame3", "component": "IFrameSrcdoc", "htmlContent": sample_html},
+                ],
+            },
+        }]
+        ns["_heal_a2ui_message_list"](msgs3)
+        ok3 = len(uploaded) == 1 and "[Open Interactive Dashboard](" in msgs3[0]["updateComponents"]["components"][0].get("text", "")
+        failures += 0 if ok3 else 1
+        print("  %-4s %-52s uploads=%d" % ("ok" if ok3 else "FAIL", "IFrameSrcdoc cache hit skips duplicate GCS upload", len(uploaded)))
+
+        # 4. Upload exception falls back to text summary cleanly
+        fake_tools_err = types.SimpleNamespace(
+            _generate_v4_signed_url=lambda b, o, ct: (_ for _ in ()).throw(RuntimeError("IAM signBlob denied"))
+        )
+        ns_err = load_iframe_healer(logger, fake_tools=fake_tools_err)
+        msgs4 = [{
+            "version": "v0.9",
+            "updateComponents": {
+                "surfaceId": "dash-4",
+                "components": [
+                    {"id": "frame4", "component": "IFrameSrcdoc", "htmlContent": sample_html},
+                ],
+            },
+        }]
+        ns_err["_heal_a2ui_message_list"](msgs4)
+        comp4 = msgs4[0]["updateComponents"]["components"][0]
+        ok4 = (
+            comp4.get("component") == "MaterialText"
+            and "Regional Performance" in comp4.get("text", "")
+            and "Open Interactive Dashboard" not in comp4.get("text", "")
+        )
+        failures += 0 if ok4 else 1
+        print("  %-4s %-52s got=%r" % ("ok" if ok4 else "FAIL", "IFrameSrcdoc sign failure falls back to summary", comp4.get("text")))
+    finally:
+        os.environ.pop("DASHBOARDS_BUCKET", None)
+        for k, v in saved_mods.items():
+            if v is not None:
+                sys.modules[k] = v
+            else:
+                sys.modules.pop(k, None)
+
+    # 5. Empty IFrameSrcdoc and IFrameUrl edge cases
+    msgs5 = [{
+        "version": "v0.9",
+        "updateComponents": {
+            "surfaceId": "dash-5",
+            "components": [
+                {"id": "emptyFrame", "component": "IFrameSrcdoc", "htmlContent": ""},
+                {"id": "urlFrame", "component": "IFrameUrl", "url": "https://example.com/report"},
+                {"id": "emptyUrlFrame", "component": "IFrameUrl", "url": ""},
+            ],
+        },
+    }]
+    ns["_heal_a2ui_message_list"](msgs5)
+    c_empty, c_url, c_empty_url = msgs5[0]["updateComponents"]["components"]
+    ok5 = (
+        c_empty.get("component") == "MaterialText" and bool(c_empty.get("text"))
+        and c_url.get("component") == "MaterialText"
+        and c_url.get("text") == "📊 [Open Interactive View](https://example.com/report)"
+        and c_empty_url.get("component") == "MaterialText" and bool(c_empty_url.get("text"))
+    )
+    failures += 0 if ok5 else 1
+    print("  %-4s %-52s url=%r" % ("ok" if ok5 else "FAIL", "empty IFrameSrcdoc and IFrameUrl edge cases", c_url.get("text")))
+
+    return failures
+
+
 def main():
     os.environ.pop("A2UI_KEEP_PRESSED_SURFACE", None)
     logger = _Logger()
@@ -137,10 +328,12 @@ def main():
                                    "kill switch keeps every surface", got))
     os.environ.pop("A2UI_KEEP_PRESSED_SURFACE", None)
 
+    failures += run_iframe_healer_tests(logger)
+
     if failures:
         print("\n%d case(s) FAILED" % failures)
         return 1
-    print("\nAll %d case(s) passed." % (len(CASES) + 1))
+    print("\nAll %d case(s) passed." % (len(CASES) + 1 + 5))
     return 0
 
 

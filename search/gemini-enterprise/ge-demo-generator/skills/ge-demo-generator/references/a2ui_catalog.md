@@ -1,6 +1,6 @@
 # A2UI (Agent-to-User Interface) v0.9 & Composite Catalog Reference
 
-The A2UI v0.9 protocol enables AI agents in Gemini Enterprise to declaratively stream rich, interactive user interface components (Cards, Material Tables, Vega Charts, Sandboxed Dashboards, Action Buttons, Suggestion Chips, Side-panel Canvases) directly into the chat interface.
+The A2UI v0.9 protocol enables AI agents in Gemini Enterprise to declaratively stream rich, interactive user interface components (Cards, Material Tables, Vega Charts, Tabbed Dashboards, Action Buttons, Suggestion Chips, Side-panel Canvases) directly into the chat interface.
 
 ---
 
@@ -90,7 +90,7 @@ There are 4 server-to-client message types:
 | **Client Press** | Arrived as `TextPart` (`{"userAction": ...}`) | Arrives as `DataPart` (`{"version": "v0.9", "action": ...}`) |
 | **Data Tables** | Faked with nested `Row` / `Column` | Native `MaterialTable` / `GcbpTable` |
 | **Charts** | Faked with generated PNG images | Native `VegaChart` (interactive JSON spec) |
-| **Dashboards** | Faked with external URL in new browser tab | Native `IFrameSrcdoc` (sandboxed inline iframe) |
+| **Dashboards** | Faked with static markdown or raw tables | Native `MaterialCard` + `MaterialTabs` + `MaterialTable` + `VegaChart` inline, or `publish_dashboard` signed URL in browser tab (`IFrameSrcdoc` / `IFrameUrl` are FORBIDDEN: GE disables inline iframe rendering by default) |
 | **Reports** | Streamed as long markdown text | Native `Canvas` (interactive side panel) |
 
 ---
