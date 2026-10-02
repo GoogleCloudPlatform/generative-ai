@@ -3,7 +3,7 @@
 ## Mandatory First Step: Read the Service TDD
 
 > [!IMPORTANT]
-> **Before making any code changes, architectural decisions, or refactoring in this codebase**, any skill, agent, or subagent **MUST first read the service Technical Design Document (TDD)** located at [docs/TDD.md](file:///usr/local/google/home/williamsmt/Projects/development/generative-ai/search/gemini-enterprise/group-licensing/docs/TDD.md) (in the `docs/` subdirectory). This document contains the definitive architectural requirements, data flows, and design rationale for the service.
+> **Before making any code changes, architectural decisions, or refactoring in this codebase**, any skill, agent, or subagent **MUST first read the service Technical Design Document (TDD)** located at [docs/TDD.md](docs/TDD.md) (in the `docs/` subdirectory). This document contains the definitive architectural requirements, data flows, and design rationale for the service.
 
 ## Project identity
 
@@ -165,7 +165,6 @@ Environment variables (`internal/config/job_settings.go`):
 | `DIRECT_LAW` | No | `false` | When true, assignments map to admin-specified subscription IDs |
 | `GC_SKIP_GROUP_EVAL` | No | `false` | When true, GC skips group membership checks and revokes based on staleness only |
 | `GC_GROUP_CACHING_MODE` | No | `false` | When true, GC pre-fetches and caches group members in memory |
-| `VERBOSE` | No | `false` | Enables verbose debug logging |
 | `CLOUD_RUN_TASK_INDEX` | No | `0` | Injected by Cloud Run |
 | `CLOUD_RUN_TASK_COUNT` | No | `1` | Injected by Cloud Run |
 
@@ -251,7 +250,7 @@ You can also define custom subagents using `define_subagent` and invoke them wit
 
 ### Delegation Guidelines for this Repository
 
-- **Mandatory TDD Review:** When delegating any task that involves modifying code or architecture, explicitly instruct the invoked subagent or skill to read [docs/TDD.md](file:///usr/local/google/home/williamsmt/Projects/development/generative-ai/search/gemini-enterprise/group-licensing/docs/TDD.md) before making any changes.
+- **Mandatory TDD Review:** When delegating any task that involves modifying code or architecture, explicitly instruct the invoked subagent or skill to read [docs/TDD.md](docs/TDD.md) before making any changes.
 - **Research & Exploration:** For tasks requiring exploration across multiple adapters (`discoveryengine`, `cloudidentity`, `resourcemanager`), delegate investigation to a `research` subagent.
 - **Isolated Adapter Refactoring:** When modifying an individual adapter or adding a new port/adapter implementation, delegate to a `self` subagent in a `branch` or `share` workspace to keep changes isolated and test them cleanly before merging back.
 - **Direct Implementation:** For focused, single-package edits (e.g., updating a sentinel error in `models/errors.go` or modifying a service test), perform the work directly in the main conversation.
