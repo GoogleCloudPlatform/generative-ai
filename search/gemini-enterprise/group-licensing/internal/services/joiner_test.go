@@ -55,7 +55,7 @@ const projectNumber = "123456789"
 // billing account with one subscription per SKU+project+location.
 func licenseIndexForProject(number string) models.LicenseConfigIndex {
 	return models.LicenseConfigIndex{
-		{SKU: models.SKUAgentspaceBusiness, ProjectNumber: number, Location: models.LocationGlobal}: {{Path: "projects/" + number + "/locations/global/licenseConfigs/biz-config", AllocatedCount: 100}},
+		{SKU: models.SKUGeminiBusiness, ProjectNumber: number, Location: models.LocationGlobal}: {{Path: "projects/" + number + "/locations/global/licenseConfigs/biz-config", AllocatedCount: 100}},
 		{SKU: models.SKUEnterprise, ProjectNumber: number, Location: models.LocationGlobal}:         {{Path: "projects/" + number + "/locations/global/licenseConfigs/ent-config", AllocatedCount: 50}},
 	}
 }
@@ -113,7 +113,7 @@ func TestJoinerService_Run_HappyPath_SKUPrecedence(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{groupBiz}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{groupBiz}},
 			{SubscriptionTier: models.SKUEnterprise, Location: models.LocationGlobal, Groups: []string{groupEnt}},
 		},
 	})
@@ -156,7 +156,7 @@ func TestJoinerService_Run_DryRun_NoAPIWrite(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -185,7 +185,7 @@ func TestJoinerService_Run_FetchLicenseConfigIndexError_ReturnsError(t *testing.
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		"proj-x": {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 		},
 	})
 
@@ -212,7 +212,7 @@ func TestJoinerService_Run_ResolveProjectNumberError_ReturnsError(t *testing.T) 
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		"proj-x": {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 		},
 	})
 
@@ -245,7 +245,7 @@ func TestJoinerService_Run_ListMembersError_ReturnsWrappedError(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -284,7 +284,7 @@ func TestJoinerService_Run_BatchUpdateError_ReturnsError(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -333,7 +333,7 @@ func TestJoinerService_Run_MultiPagePagination_AllMembersCollected(t *testing.T)
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -370,7 +370,7 @@ func TestJoinerService_Run_EmptyGroup_NoBatchCall(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -397,7 +397,7 @@ func TestJoinerService_Run_ContextCancelled_ReturnsError(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		"proj-ctx-joiner": {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 		},
 	})
 
@@ -439,7 +439,7 @@ func TestJoinerService_Run_GroupTypeMembersIgnored(t *testing.T) {
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -851,7 +851,7 @@ func TestJoinerService_collectGroupMembers_PageLimitReached(t *testing.T) {
 	svc := NewJoinerService(idp, gemini, new(MockResourceManagerClient))
 	userBestEntitlement := make(map[string]userEntitlement)
 
-	err := svc.collectGroupMembers(ctx, groupEmail, models.SKUAgentspaceBusiness, "", models.LocationGlobal, userBestEntitlement, false)
+	err := svc.collectGroupMembers(ctx, groupEmail, models.SKUGeminiBusiness, "", models.LocationGlobal, userBestEntitlement, false)
 
 	require.NoError(t, err)
 	idp.AssertNumberOfCalls(t, "ListMembers", models.MaxPagesPerGroup)
@@ -933,7 +933,7 @@ func TestJoinerService_Run_DirectLaw_MissingSubscriptionInIndex(t *testing.T) {
 		projectID = "proj-missing-dl"
 		group     = "direct-grp@example.com"
 		userEmail = "user-dl@example.com"
-		subID     = "non-existent-sub-id"
+		subID     = "nonexistent-sub-id"
 	)
 
 	// Empty index - no matching subscriptions

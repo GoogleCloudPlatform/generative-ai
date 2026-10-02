@@ -139,6 +139,46 @@ func TestLoadJobSettings(t *testing.T) {
 			wantErr: models.ErrConfigInvalid,
 		},
 		{
+			name: "happy path: GC_GROUP_CACHING_MODE explicitly set to true",
+			env: map[string]string{
+				"JOB_TYPE":              "garbage_collection",
+				"GC_GROUP_CACHING_MODE": "true",
+			},
+			want: &JobSettings{
+				JobType:            models.WorkflowGarbageCollection,
+				DryRun:             false,
+				DirectLaw:          false,
+				GCSkipGroupEval:    false,
+				GCGroupCachingMode: true,
+				TaskIndex:          0,
+				TaskCount:          1,
+			},
+		},
+		{
+			name: "happy path: GC_GROUP_CACHING_MODE explicitly set to false",
+			env: map[string]string{
+				"JOB_TYPE":              "garbage_collection",
+				"GC_GROUP_CACHING_MODE": "false",
+			},
+			want: &JobSettings{
+				JobType:            models.WorkflowGarbageCollection,
+				DryRun:             false,
+				DirectLaw:          false,
+				GCSkipGroupEval:    false,
+				GCGroupCachingMode: false,
+				TaskIndex:          0,
+				TaskCount:          1,
+			},
+		},
+		{
+			name: "invalid GC_GROUP_CACHING_MODE value returns ErrConfigInvalid",
+			env: map[string]string{
+				"JOB_TYPE":              "garbage_collection",
+				"GC_GROUP_CACHING_MODE": "not-a-bool",
+			},
+			wantErr: models.ErrConfigInvalid,
+		},
+		{
 			name: "TaskIndex >= TaskCount",
 			env: map[string]string{
 				"JOB_TYPE":             "joiner",
@@ -153,7 +193,7 @@ func TestLoadJobSettings(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Unset all relevant vars so each sub-test starts from a clean slate,
 			// then apply only the vars declared for this case.
-			for _, key := range []string{"JOB_TYPE", "DRY_RUN", "DIRECT_LAW", "GC_SKIP_GROUP_EVAL", "CLOUD_RUN_TASK_INDEX", "CLOUD_RUN_TASK_COUNT"} {
+			for _, key := range []string{"JOB_TYPE", "DRY_RUN", "DIRECT_LAW", "GC_SKIP_GROUP_EVAL", "GC_GROUP_CACHING_MODE", "CLOUD_RUN_TASK_INDEX", "CLOUD_RUN_TASK_COUNT"} {
 				t.Setenv(key, "")
 			}
 			for k, v := range tc.env {

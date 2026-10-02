@@ -44,9 +44,10 @@ type SyncAddResponse struct {
 // SyncRemoveRequest is the HTTP request body for POST /sync/remove.
 type SyncRemoveRequest struct {
 	// DryRun overrides the config-level dry_run setting when present.
-	DryRun          *bool `json:"dry_run,omitempty"`
-	DirectLaw       *bool `json:"direct_law,omitempty"`
-	GCSkipGroupEval *bool `json:"gc_skip_group_eval,omitempty"`
+	DryRun             *bool `json:"dry_run,omitempty"`
+	DirectLaw          *bool `json:"direct_law,omitempty"`
+	GCSkipGroupEval    *bool `json:"gc_skip_group_eval,omitempty"`
+	GCGroupCachingMode *bool `json:"gc_group_caching_mode,omitempty"`
 }
 
 // Validate checks that SyncRemoveRequest contains only valid field values.
@@ -56,10 +57,11 @@ func (r *SyncRemoveRequest) Validate() error {
 
 // SyncRemoveResponse is the HTTP response body for POST /sync/remove.
 type SyncRemoveResponse struct {
-	RequestID       string `json:"request_id"`
-	LicensesRevoked int    `json:"licenses_revoked"`
-	UsersEvaluated  int    `json:"users_evaluated"`
-	DryRun          bool   `json:"dry_run"`
-	DirectLaw       bool   `json:"direct_law"`
-	GCSkipGroupEval bool   `json:"gc_skip_group_eval"`
+	RequestID          string `json:"request_id"`
+	LicensesRevoked    int    `json:"licenses_revoked"`
+	UsersEvaluated     int    `json:"users_evaluated"`
+	DryRun             bool   `json:"dry_run"`
+	DirectLaw          bool   `json:"direct_law"`
+	GCSkipGroupEval    bool   `json:"gc_skip_group_eval"`
+	GCGroupCachingMode bool   `json:"gc_group_caching_mode"`
 }

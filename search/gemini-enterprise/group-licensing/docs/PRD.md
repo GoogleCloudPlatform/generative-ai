@@ -54,7 +54,7 @@ Enterprise customers managing Gemini Enterprise licenses face significant fricti
 
 * **FR-01:** The system MUST allow admins to define a configuration file (or map) linking one or more Google Groups identified by group email address(es) to a specific Gemini License SKU ID.
 
-* **FR-02:** The system MUST support multiple distinct mappings within the same GCP Project. This also needs to be scalable across multiple GCP Projects.
+* **FR-02:** The system MUST support multiple distinct mappings within the same Google Cloud Project. This also needs to be scalable across multiple Google Cloud Projects.
 
 ### **5.2 Batch Reconciliation Engine** {#5.2-batch-reconciliation-engine}
 
@@ -77,7 +77,7 @@ Enterprise customers managing Gemini Enterprise licenses face significant fricti
 
 * **Latency:** License assignment and revocation are eventually consistent and occur based on the execution frequency of the scheduled batch jobs.
 
-* **License Type:** Customer should be on Gemini Enterprise subscription licensing SKUs (not on the legacy Agentspace licensing mechanism).
+* **License Type:** Customer should be on Gemini Enterprise subscription licensing SKUs (not on the legacy licensing mechanism that predates Gemini Enterprise).
 
 ## **7. Metrics & Success Criteria** {#7.-metrics-&-success-criteria}
 

@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/config"
@@ -30,21 +31,31 @@ import (
 	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/ports"
 )
 
+// groupMemberCache maps a normalized (lowercased, trimmed) group email address
+// to a set of normalized user email addresses belonging to that group.
+type groupMemberCache map[string]map[string]bool
+
+// normalizeEmail trims leading/trailing whitespace and lowercases an email
+// address so that in-memory cache storage and lookups are case-insensitive.
+func normalizeEmail(email string) string {
+	return strings.ToLower(strings.TrimSpace(email))
+}
+
 // GCService implements the "garbage_collection" workflow: for every configured
 // project it pages through all licensed users, determines which are stale or
 // no longer entitled to any configured group, and revokes their licenses in
 // batches.
 type GCService struct {
-	idp    ports.IdpClient
-	gemini ports.GeminiClient
+	idp          ports.IdpClient
+	geminiClient ports.GeminiClient
 }
 
 // NewGCService constructs a GCService wired to the supplied port
 // implementations. Logging is provided per-request via middleware.LoggerFromContext.
-func NewGCService(idp ports.IdpClient, gemini ports.GeminiClient) *GCService {
+func NewGCService(idp ports.IdpClient, geminiClient ports.GeminiClient) *GCService {
 	return &GCService{
-		idp:    idp,
-		gemini: gemini,
+		idp:          idp,
+		geminiClient: geminiClient,
 	}
 }
 
@@ -70,6 +81,10 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 	if req.GCSkipGroupEval != nil {
 		gcSkipGroupEval = *req.GCSkipGroupEval
 	}
+	gcGroupCachingMode := false
+	if req.GCGroupCachingMode != nil {
+		gcGroupCachingMode = *req.GCGroupCachingMode
+	}
 
 	start := time.Now()
 	logger.InfoContext(ctx, "garbage collection workflow starting",
@@ -78,12 +93,18 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		slog.Bool("dry_run", dryRun),
 		slog.Bool("direct_law_mode", directLaw),
 		slog.Bool("gc_skip_group_eval", gcSkipGroupEval),
+		slog.Bool("gc_group_caching_mode", gcGroupCachingMode),
 	)
 
 	var totalRevoked, totalEvaluated int
 
+	var groupCache groupMemberCache
+	if gcGroupCachingMode && !gcSkipGroupEval {
+		groupCache = make(groupMemberCache)
+	}
+
 	for projectID, projectCfg := range cfg.Projects {
-		revoked, evaluated, err := s.processProject(ctx, projectID, projectCfg, cfg.Settings.StalenessThresholdDays, dryRun, gcSkipGroupEval)
+		revoked, evaluated, err := s.processProject(ctx, projectID, projectCfg, cfg.Settings.StalenessThresholdDays, dryRun, gcSkipGroupEval, groupCache)
 		if err != nil {
 			logger.ErrorContext(ctx, "garbage collection workflow failed",
 				slog.String("project_id", projectID),
@@ -104,6 +125,7 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 			slog.Bool("dry_run", dryRun),
 			slog.Bool("direct_law_mode", directLaw),
 			slog.Bool("gc_skip_group_eval", gcSkipGroupEval),
+			slog.Bool("gc_group_caching_mode", gcGroupCachingMode),
 		)
 	}
 
@@ -115,18 +137,75 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		slog.Bool("dry_run", dryRun),
 		slog.Bool("direct_law_mode", directLaw),
 		slog.Bool("gc_skip_group_eval", gcSkipGroupEval),
+		slog.Bool("gc_group_caching_mode", gcGroupCachingMode),
 	)
 
 	return dto.SyncRemoveResponse{
-		LicensesRevoked: totalRevoked,
-		UsersEvaluated:  totalEvaluated,
-		DryRun:          dryRun,
-		DirectLaw:       directLaw,
-		GCSkipGroupEval: gcSkipGroupEval,
+		LicensesRevoked:    totalRevoked,
+		UsersEvaluated:     totalEvaluated,
+		DryRun:             dryRun,
+		DirectLaw:          directLaw,
+		GCSkipGroupEval:    gcSkipGroupEval,
+		GCGroupCachingMode: gcGroupCachingMode,
 	}, nil
 }
 
-// processProject pages through all licensed users for a single GCP project and
+// prefetchProjectGroups populates groupCache with the flattened USER members
+// of every group in projectCfg that has not already been cached during this run.
+func (s *GCService) prefetchProjectGroups(ctx context.Context, projectID string, projectCfg config.ProjectConfig, groupCache groupMemberCache) error {
+	for _, entry := range projectCfg {
+		for _, groupEmail := range entry.Groups {
+			normGroup := normalizeEmail(groupEmail)
+			if _, alreadyCached := groupCache[normGroup]; alreadyCached {
+				continue
+			}
+
+			membersSet := make(map[string]bool)
+			var pageToken string
+			var pageCount int
+
+			for {
+				if err := ctx.Err(); err != nil {
+					return fmt.Errorf("context cancelled: %w", err)
+				}
+				if pageCount >= models.MaxPagesPerGroup {
+					middleware.LoggerFromContext(ctx).WarnContext(ctx,
+						"group member enumeration exceeded page limit during GC prefetch, truncating",
+						slog.String("project_id", projectID),
+						slog.String("group_email", groupEmail),
+						slog.Int("max_pages", models.MaxPagesPerGroup),
+					)
+					break
+				}
+				pageCount++
+
+				members, next, err := s.idp.ListMembers(ctx, groupEmail, pageToken)
+				if err != nil {
+					return fmt.Errorf("project %q group %q: %w", projectID, groupEmail, err)
+				}
+
+				for _, m := range members {
+					if m.Type != models.MemberTypeUser {
+						continue
+					}
+					if normMember := normalizeEmail(m.Email); normMember != "" {
+						membersSet[normMember] = true
+					}
+				}
+
+				if next == "" {
+					break
+				}
+				pageToken = next
+			}
+
+			groupCache[normGroup] = membersSet
+		}
+	}
+	return nil
+}
+
+// processProject pages through all licensed users for a single Google Cloud project and
 // revokes licences from users who are stale or no longer entitled. It returns
 // the number of licenses revoked and users evaluated.
 //
@@ -135,7 +214,13 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 // correct location. Revocation candidates are chunked and flushed per page so
 // that memory usage is bounded to one page of candidates at any point rather
 // than accumulating the full result set before issuing any writes.
-func (s *GCService) processProject(ctx context.Context, projectID string, projectCfg config.ProjectConfig, thresholdDays int, dryRun bool, gcSkipGroupEval bool) (licensesRevoked, usersEvaluated int, err error) {
+func (s *GCService) processProject(ctx context.Context, projectID string, projectCfg config.ProjectConfig, thresholdDays int, dryRun bool, gcSkipGroupEval bool, groupCache groupMemberCache) (licensesRevoked, usersEvaluated int, err error) {
+	if groupCache != nil {
+		if err := s.prefetchProjectGroups(ctx, projectID, projectCfg, groupCache); err != nil {
+			return 0, 0, err
+		}
+	}
+
 	seen := make(map[models.Location]bool)
 	var locations []models.Location
 	for _, entry := range projectCfg {
@@ -162,7 +247,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 				break
 			}
 			pageCount++
-			licenses, next, err := s.gemini.ListUserLicenses(ctx, projectID, location, pageToken)
+			licenses, next, err := s.geminiClient.ListUserLicenses(ctx, projectID, location, pageToken)
 			if err != nil {
 				return 0, 0, fmt.Errorf("project %q listing licenses: %w", projectID, err)
 			}
@@ -178,7 +263,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 				}
 				usersEvaluated++
 
-				shouldRevoke, err := s.shouldRevoke(ctx, license, projectCfg, thresholdDays, gcSkipGroupEval)
+				shouldRevoke, err := s.shouldRevoke(ctx, license, projectCfg, thresholdDays, gcSkipGroupEval, groupCache)
 				if err != nil {
 					return 0, 0, fmt.Errorf("project %q evaluating license: %w", projectID, err)
 				}
@@ -195,7 +280,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 			if len(pageRevocations) > 0 {
 				if !dryRun {
 					for _, chunk := range chunkLicenseUpdates(pageRevocations, models.MaxBatchSize) {
-						if err := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, chunk); err != nil {
+						if err := s.geminiClient.BatchUpdateUserLicenses(ctx, projectID, location, chunk); err != nil {
 							return 0, 0, fmt.Errorf("project %q batch revoke: %w", projectID, err)
 						}
 						// verbose debug logging: Emitted per batch
@@ -231,7 +316,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 //     before the user has had a chance to sign in.
 //   - When both are zero (pathological; should not occur in practice), the user
 //     is treated as immediately stale and the license is revoked.
-func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense, projectCfg config.ProjectConfig, thresholdDays int, gcSkipGroupEval bool) (bool, error) {
+func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense, projectCfg config.ProjectConfig, thresholdDays int, gcSkipGroupEval bool, groupCache groupMemberCache) (bool, error) {
 	// Staleness check: only performed when thresholdDays > 0.
 	if thresholdDays > 0 {
 		ref := license.LastLoginTime
@@ -248,6 +333,21 @@ func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense
 	// If the skip entitlement check flag is enabled, bypass the group checks.
 	if gcSkipGroupEval {
 		return false, nil
+	}
+
+	// Fast path: when group caching mode is enabled, check the pre-fetched
+	// in-memory group membership cache first (case-insensitive). On a cache
+	// hit, the user is entitled and no HasMember API call is needed. On a
+	// cache miss, fall back to HasMember below to guard against corner cases.
+	if groupCache != nil {
+		normUser := normalizeEmail(license.UserEmail)
+		for _, entry := range projectCfg {
+			for _, groupEmail := range entry.Groups {
+				if members, ok := groupCache[normalizeEmail(groupEmail)]; ok && members[normUser] {
+					return false, nil
+				}
+			}
+		}
 	}
 
 	// Entitlement check: the user must be a member of at least one group

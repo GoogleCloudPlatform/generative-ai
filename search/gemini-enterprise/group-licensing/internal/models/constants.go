@@ -18,7 +18,7 @@ package models
 
 const (
 	// ConfigFilePath is the filesystem path where the entitlement configuration
-	// is mounted from GCP Secret Manager.
+	// is mounted from Google Cloud Secret Manager.
 	ConfigFilePath = "/run/secrets/entitlements.json"
 
 	// MaxBatchSize is the maximum number of license modifications that may be
@@ -34,5 +34,5 @@ const (
 	// warning and stops processing further pages rather than failing the run —
 	// partial results are preferable to a full job failure for a scheduled
 	// reconciliation job.
-	MaxPagesPerGroup = 500
+	MaxPagesPerGroup = 5000
 )

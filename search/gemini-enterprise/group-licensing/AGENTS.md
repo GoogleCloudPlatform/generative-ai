@@ -3,7 +3,7 @@
 ## Mandatory First Step: Read the Service TDD
 
 > [!IMPORTANT]
-> **Before making any code changes, architectural decisions, or refactoring in this codebase**, any skill, agent, or subagent **MUST first read the service Technical Design Document (TDD)** located at [docs/TDD.md](file:///usr/local/google/home/williamsmt/Projects/development/generative-ai/search/gemini-enterprise/group-licensing/docs/TDD.md) (in the `docs/` subdirectory). This document contains the definitive architectural requirements, data flows, and design rationale for the service.
+> **Before making any code changes, architectural decisions, or refactoring in this codebase**, any skill, agent, or subagent **MUST first read the service Technical Design Document (TDD)** located at [docs/TDD.md](docs/TDD.md) (in the `docs/` subdirectory). This document contains the definitive architectural requirements, data flows, and design rationale for the service.
 
 ## Project identity
 
@@ -63,7 +63,7 @@ Add this to any new adapter you write.
 | `internal/models/types.go` | Domain data structures: `Member`, `UserLicense`, `LicenseUpdate`, `LicenseConfigKey`, `LicenseConfigEntry`, `LicenseConfigIndex` |
 | `internal/models/enums.go` | All typed-string enums: `SKU`, `WorkflowType`, `LicenseState`, `LicenseAction`, `Location`, `MemberType` |
 | `internal/models/errors.go` | All sentinel errors — use `errors.Is` against these |
-| `internal/models/constants.go` | `MaxBatchSize=100`, `MembersListPageSize=200`, `MaxPagesPerGroup=500`, `ConfigFilePath` |
+| `internal/models/constants.go` | `MaxBatchSize=100`, `MembersListPageSize=200`, `MaxPagesPerGroup=5000`, `ConfigFilePath` |
 | `internal/models/dto/sync.go` | Request and response DTOs (`SyncAddRequest`/`Response`, `SyncRemoveRequest`/`Response`) |
 | `internal/config/config.go` | JSON config parsing and validation rules for entitlement configuration |
 | `internal/config/job_settings.go` | Parses and validates Cloud Run Job runtime environment variables (`JOB_TYPE`, `DRY_RUN`, etc.) |
@@ -76,7 +76,7 @@ Add this to any new adapter you write.
 ```go
 // ports/gemini.go
 type GeminiClient interface {
-    FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error)
+    FetchLicenseConfigIndex(ctx context.Context, billingAccountID string, directLaw bool) (models.LicenseConfigIndex, error)
     ListUserLicenses(ctx context.Context, projectID string, location models.Location, pageToken string) ([]models.UserLicense, string, error)
     BatchUpdateUserLicenses(ctx context.Context, projectID string, location models.Location, updates []models.LicenseUpdate) error
     FetchLicenseUsageStats(ctx context.Context, projectID string, location models.Location) (map[string]int64, error)
@@ -102,7 +102,7 @@ type ResourceManagerClient interface {
 2. `ResolveProjectNumber` — project IDs → numeric project numbers (Discovery Engine paths use numbers).
 3. Per project: page through all group members via `ListMembers` (with `includeDerivedMembership=true`), resolve the highest-precedence SKU per user via `SKU.HasHigherPrecedenceThan`.
 4. Group grant updates by `LicenseConfigKey`, chunk to `MaxBatchSize=100`, call `BatchUpdateUserLicenses`.
-5. On `ErrLicensesExhausted`: call `FetchLicenseUsageStats`, compute available seats, retry trimmed batch, carry remainder to next subscription pool in the slice. After all pools exhausted, soft-fail remaining users (`licenses_soft_failed` in summary log). Exit 0.
+5. On `ErrLicensesExhausted`: call `FetchLicenseUsageStats` for observability, retry remaining users in the batch 1-by-1 so no-op grants do not strand available seats, and carry ungranted remainder to the next subscription pool in the slice. After all pools exhausted, soft-fail remaining users (`licenses_soft_failed` in summary log). Exit 0.
 
 ### Garbage Collection (`JOB_TYPE=garbage_collection`)
 
@@ -121,7 +121,7 @@ type ResourceManagerClient interface {
 
 | Error | Classification | Behavior |
 |---|---|---|
-| `ErrLicensesExhausted` | Soft failure (joiner only) | Fetch usage stats, trim retry, spill to next pool, `WARN` log, exit 0 |
+| `ErrLicensesExhausted` | Soft failure (joiner only) | Fetch usage stats, retry 1-by-1, spill to next pool, `WARN` log, exit 0 |
 | `ErrInvalidMemberKey` | Soft failure (GC only) | Skip user, `WARN` log with `problematic_username`, no revocation |
 | `ErrAPIRateLimited` | Hard failure | Return error, job exits 1 |
 | All other errors | Hard failure | Return error, job exits 1 |
@@ -162,6 +162,9 @@ Environment variables (`internal/config/job_settings.go`):
 |---|---|---|---|
 | `JOB_TYPE` | Yes | — | `joiner` or `garbage_collection` |
 | `DRY_RUN` | No | `false` | Skips all write API calls when `true` |
+| `DIRECT_LAW` | No | `false` | When true, assignments map to admin-specified subscription IDs |
+| `GC_SKIP_GROUP_EVAL` | No | `false` | When true, GC skips group membership checks and revokes based on staleness only |
+| `GC_GROUP_CACHING_MODE` | No | `false` | When true, GC pre-fetches and caches group members in memory |
 | `CLOUD_RUN_TASK_INDEX` | No | `0` | Injected by Cloud Run |
 | `CLOUD_RUN_TASK_COUNT` | No | `1` | Injected by Cloud Run |
 
@@ -172,7 +175,7 @@ Environment variables (`internal/config/job_settings.go`):
 - Adapter tests inject testable interfaces via package-private `newWith*` constructors (e.g., `cloudidentity.newWithMembers`, `discoveryengine.newWithClient`). Follow this pattern for any new adapter.
 - Service tests are white-box (same package, `package services`). Use table-driven tests with `t.Run` sub-tests.
 - Config tests write fixture JSON to `t.TempDir()` — never write to the module root.
-- Do not add integration tests or tests that require GCP credentials.
+- Do not add integration tests or tests that require Google Cloud credentials.
 
 ## Known constraints and non-obvious decisions
 
@@ -184,7 +187,7 @@ Environment variables (`internal/config/job_settings.go`):
 
 **`LicenseConfigIndex` maps to a slice, not a single entry:** A billing account can have multiple active subscriptions for the same `(SKU, ProjectNumber, Location)`. The slice preserves all pools in order; the joiner iterates them to spill ungranted users from an exhausted pool into the next one. Never collapse this to a single entry.
 
-**`MaxPagesPerGroup=500` is a safety net, not a hard error:** When the limit is hit, a `WARN` is logged and processing continues with partial results. This applies to both `collectGroupMembers` (joiner) and the license listing loop (GC). Partial results are always preferred over a full job failure for a scheduled reconciliation job.
+**`MaxPagesPerGroup=5000` is a safety net, not a hard error:** When the limit is hit, a `WARN` is logged and processing continues with partial results. This applies to both `collectGroupMembers` (joiner) and the license listing loop (GC). Partial results are always preferred over a full job failure for a scheduled reconciliation job.
 
 **DTOs carry vestigial HTTP tags:** `dto.SyncAddRequest` and `dto.SyncRemoveRequest` have `json` struct tags referencing `POST /sync/add` and `POST /sync/remove`. These are from an earlier HTTP server design. The structs are constructed directly in `main.go`; no HTTP deserialization occurs. Do not add an HTTP server without re-evaluating the entire auth model.
 
@@ -247,7 +250,7 @@ You can also define custom subagents using `define_subagent` and invoke them wit
 
 ### Delegation Guidelines for this Repository
 
-- **Mandatory TDD Review:** When delegating any task that involves modifying code or architecture, explicitly instruct the invoked subagent or skill to read [docs/TDD.md](file:///usr/local/google/home/williamsmt/Projects/development/generative-ai/search/gemini-enterprise/group-licensing/docs/TDD.md) before making any changes.
+- **Mandatory TDD Review:** When delegating any task that involves modifying code or architecture, explicitly instruct the invoked subagent or skill to read [docs/TDD.md](docs/TDD.md) before making any changes.
 - **Research & Exploration:** For tasks requiring exploration across multiple adapters (`discoveryengine`, `cloudidentity`, `resourcemanager`), delegate investigation to a `research` subagent.
 - **Isolated Adapter Refactoring:** When modifying an individual adapter or adding a new port/adapter implementation, delegate to a `self` subagent in a `branch` or `share` workspace to keep changes isolated and test them cleanly before merging back.
 - **Direct Implementation:** For focused, single-package edits (e.g., updating a sentinel error in `models/errors.go` or modifying a service test), perform the work directly in the main conversation.

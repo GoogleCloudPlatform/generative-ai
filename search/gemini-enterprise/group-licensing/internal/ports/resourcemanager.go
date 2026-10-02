@@ -19,7 +19,7 @@ package ports
 import "context"
 
 // ResourceManagerClient is the port through which the service layer resolves
-// GCP project metadata. Concrete adapter implementations live in
+// Google Cloud project metadata. Concrete adapter implementations live in
 // internal/adapters/resourcemanager and must satisfy this interface.
 type ResourceManagerClient interface {
 	// ResolveProjectNumber returns the numeric project number for the given

@@ -86,6 +86,11 @@ func TestSyncRemoveRequest_Validate(t *testing.T) {
 			req:     SyncRemoveRequest{GCSkipGroupEval: boolPtr(true)},
 			wantErr: false,
 		},
+		{
+			name:    "gc_group_caching_mode true is valid",
+			req:     SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -125,6 +130,7 @@ func TestSyncRemoveResponse_ZeroValue(t *testing.T) {
 	var resp SyncRemoveResponse
 	assert.False(t, resp.DryRun)
 	assert.False(t, resp.GCSkipGroupEval)
+	assert.False(t, resp.GCGroupCachingMode)
 	assert.Equal(t, 0, resp.LicensesRevoked)
 	assert.Equal(t, 0, resp.UsersEvaluated)
 }
