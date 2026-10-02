@@ -1156,11 +1156,11 @@ likelier
 linalg
 linecolor
 linestyle
-lipgloss
 linkedin
 linted
 linters
 linting
+lipgloss
 listdir
 litellm
 livekit
@@ -1821,6 +1821,7 @@ Rupjit
 RVL
 RVR
 RYDE
+Saa
 saaagesh
 saas
 Saboo
@@ -2441,4 +2442,3 @@ Zscaler
 Zuv
 Zvrm
 ZWSP
-Saa
