@@ -32,6 +32,7 @@
 /generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
 /generative-ai/gemini/responsible-ai/gemini_safety_ratings.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
 /generative-ai/gemini/sample-apps/finance-advisor-spanner/                                                                       @GoogleCloudPlatform/generative-ai-devrel @anirbanbagchi1979
+/generative-ai/gemini/sample-apps/gemini-mesop-cloudrun                                                                          @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
 /generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                                                                      @GoogleCloudPlatform/generative-ai-devrel @willisc7
 /generative-ai/gemini/sample-apps/genwealth/                                                                                     @GoogleCloudPlatform/generative-ai-devrel @paulramsey
 /generative-ai/gemini/sample-apps/rosetta-agent-porter                                                            @GoogleCloudPlatform/generative-ai-devrel @lavinigam-gcp

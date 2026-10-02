@@ -12,23 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # pylint: disable=too-many-lines
+# ruff: noqa: INP001
 
-"""
-This is a Mesop application designed to show the use of
-Gemini API in Vertex AI in a UX
-"""
+"""This is a Mesop application designed to show the use of Gemini API in Agent Platform in a UX."""
 
-from dataclasses import field
 import os
-from typing import Any, Generator
+from collections.abc import Generator
+from dataclasses import field
+from typing import Any
 
+import mesop as me
 from dataclasses_json import dataclass_json
 from google import genai
 from google.genai.types import GenerateContentConfig, Part
-import mesop as me
 from shared.nav_menu import nav_menu
 from shared.prompts import VIDEO_GEOLOCATION_PROMPT, VIDEO_TAGS_PROMPT
 from shared.styles import (
+    FANCY_TEXT_GRADIENT,
     _BOX_STYLE,
     _SPINNER_STYLE,
     _STORY_INPUT_STYLE,
@@ -38,28 +38,29 @@ from shared.styles import (
     _STYLE_OTHER_TAB,
     _STYLE_TITLE_BOX,
     _TABBER_STYLE,
-    FANCY_TEXT_GRADIENT,
 )
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
-LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region
+LOCATION = os.environ.get(
+    "GOOGLE_CLOUD_REGION", "global"
+)  # Your Google Cloud Project Region
 client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
-PAGE_TITLE = "Gemini in Vertex AI with Mesop"
+PAGE_TITLE = "Gemini in Agent Platform with Mesop"
 
 
 @dataclass_json
 @me.stateclass
 class State:
-    """Mesop state class"""
+    """Mesop state class."""
 
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-3.8-flash"
     current_page: str = "/"
 
     # pylint: disable=E3701
     # Story
     input: str = ""
-    story_character_name: str
+    story_character_name: str = "Mittens"
     story_character_type: str = "Cat"
     story_character_personality: str = "Mitten is a very friendly cat."
     story_character_location: str = "Andromeda Galaxy"
@@ -145,7 +146,7 @@ class State:
 
 
 def on_input(e: me.InputEvent) -> None:
-    """On input, set key to event value"""
+    """On input, set key to event value."""
     print(f"{e}")
     state = me.state(State)
     setattr(state, e.key, e.value)
@@ -153,7 +154,7 @@ def on_input(e: me.InputEvent) -> None:
 
 # Story events
 def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
-    """Story selection change event"""
+    """Story selection change event."""
     s = me.state(State)
     s.story_selected_premises = e.values
     print(f"selected: {s.story_selected_premises}")
@@ -162,11 +163,11 @@ def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
 def on_click_clear_story(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing story text."""
     state = me.state(State)
-    state.story_output = 0
+    state.story_output = ""
 
 
 def on_story_radio_change(e: me.RadioChangeEvent) -> None:
-    """Story radio button change event"""
+    """Story radio button change event."""
     s = me.state(State)
     setattr(s, e.key, e.value)
 
@@ -174,7 +175,7 @@ def on_story_radio_change(e: me.RadioChangeEvent) -> None:
 def generate_story(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> Generator[Any, Any, Any]:
-    """Generate story"""
+    """Generate story."""
     s = me.state(State)
     s.story_output = ""  # clear any existing story
     s.story_progress = True
@@ -211,14 +212,14 @@ def generate_story(
 
 # Marketing events
 def on_change_marketing_radio_choice(e: me.RadioChangeEvent) -> None:
-    """Sets radio button choice to state key"""
+    """Sets radio button choice to state key."""
     state = me.state(State)
     print(f"{e.key}: {e.value}")
     setattr(state, e.key, e.value)
 
 
 def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> None:
-    """Set marking goals, multiselect"""
+    """Set marking goals, multiselect."""
     s = me.state(State)
     s.marketing_campaign_selected_goals = e.values
     print(f"selected: {s.marketing_campaign_selected_goals}")
@@ -227,7 +228,7 @@ def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> Non
 def generate_marketing_campaign(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate marketing campaign"""
+    """Generate marketing campaign."""
     s = me.state(State)
     s.marketing_campaign_progress = True
     prompt = f"""Generate a marketing campaign for {s.marketing_product}, a {s.marketing_product_category} designed for the age group: {s.marketing_target_audience}.
@@ -279,7 +280,7 @@ def on_click_clear_marketing_campaign(
 ) -> None:
     """Click event for clearing marketing text."""
     state = me.state(State)
-    state.marketing_campaign_output = 0
+    state.marketing_campaign_output = ""
 
 
 # Image Events
@@ -299,7 +300,7 @@ IMAGE_MATH = "https://storage.googleapis.com/github-repo/img/gemini/multimodalit
 def generate_furniture_recommendation(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate furniture recommendation"""
+    """Generate furniture recommendation."""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -328,8 +329,10 @@ def generate_furniture_recommendation(
         "and",
         "chair 4:",
         chair_4_image_part,
-        "\n"
-        "For each chair, explain why it would be suitable or not suitable for the following room:",
+        (
+            "\n"
+            "For each chair, explain why it would be suitable or not suitable for the following room:"
+        ),
         room_image_part,
         "Only recommend for the room provided and not other rooms. Provide your recommendation in a table format with chair name and reason as columns.",
     ]
@@ -353,13 +356,13 @@ def on_click_clear_furniture_recommendation(
 ) -> None:
     """Click event for clearing furniture recommendation text."""
     state = me.state(State)
-    state.furniture_recommendation_output = 0
+    state.furniture_recommendation_output = ""
 
 
 def generate_oven_instructions(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=unused-argument
 ) -> None:
-    """Generate oven instructions"""
+    """Generate oven instructions."""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -388,15 +391,15 @@ If instructions include buttons, also explain where those buttons are physically
 def on_click_clear_oven_instructions(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing oven instructions text."""
     state = me.state(State)
-    state.oven_instructions_output = 0
+    state.oven_instructions_output = ""
 
 
 def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disable=W0613
-    """Generate ER diagram documentation"""
+    """Generate ER diagram documentation."""
     s = me.state(State)
     s.image_progress_spinner = True
 
-    er_image = Part.from_uri(file_uri=IMAGE_ER_DIAGRAM, mime_type="image/jpeg")
+    er_image = Part.from_uri(file_uri=IMAGE_ER_DIAGRAM, mime_type="image/png")
 
     content = [
         er_image,
@@ -420,13 +423,13 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disabl
 def on_click_clear_er_doc(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing er documentation text."""
     state = me.state(State)
-    state.er_doc_output = 0
+    state.er_doc_output = ""
 
 
 def generate_glasses_rec(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate glasses recommendation"""
+    """Generate glasses recommendation."""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -460,25 +463,24 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
 
 
 def on_change_image_glasses(e: me.RadioChangeEvent) -> None:
-    """Sets radio button choice to state key"""
+    """Sets radio button choice to state key."""
     s = me.state(State)
 
     value_name = f"image_{e.key}_radio_value"
     print(f"{e.value} {e.key} {value_name}")
-    # value_object = getattr(s, value_name)
     setattr(s, value_name, e.value)
 
 
 def on_click_clear_glasses_rec(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing glasses documentation text."""
     state = me.state(State)
-    state.glasses_rec_output = 0
+    state.glasses_rec_output = ""
 
 
 def generate_math_answers(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate math answers"""
+    """Generate math answers."""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -515,7 +517,7 @@ INSTRUCTIONS:
 def on_click_clear_math(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing math documentation text."""
     state = me.state(State)
-    state.math_answers_output = 0
+    state.math_answers_output = ""
 
 
 # Video Events
@@ -529,7 +531,7 @@ VIDEO_GEOLOCATION = "https://storage.googleapis.com/github-repo/img/gemini/multi
 def generate_video_description(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate video description info"""
+    """Generate video description info."""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -562,13 +564,13 @@ def generate_video_description(
 def on_click_clear_video_description(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video description text."""
     state = me.state(State)
-    state.video_description_content = 0
+    state.video_description_content = ""
 
 
 def generate_video_tags(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate video tags info"""
+    """Generate video tags info."""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -596,13 +598,13 @@ def generate_video_tags(
 def on_click_clear_video_tags(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video tags text."""
     state = me.state(State)
-    state.video_tags_content = 0
+    state.video_tags_content = ""
 
 
 def generate_video_highlights(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=unused-argument
 ) -> None:
-    """Generate video highlights info"""
+    """Generate video highlights info."""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -614,7 +616,7 @@ def generate_video_highlights(
     model_name = s.model
 
     print(f"using model: {model_name}")
-    print(f"video url: {VIDEO_TAGS}")
+    print(f"video url: {VIDEO_HIGHLIGHTS}")
     print(f"prompt: {prompt}")
 
     contents = [video_part, prompt]
@@ -632,13 +634,13 @@ def generate_video_highlights(
 def on_click_clear_video_highlights(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video highlights text."""
     state = me.state(State)
-    state.video_highlights_content = 0
+    state.video_highlights_content = ""
 
 
 def generate_video_geolocation(
     e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
-    """Generate video geolocation info"""
+    """Generate video geolocation info."""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -649,7 +651,7 @@ def generate_video_geolocation(
     model_name = s.model
 
     print(f"using model: {model_name}")
-    print(f"video url: {VIDEO_TAGS}")
+    print(f"video url: {VIDEO_GEOLOCATION}")
     print(f"prompt: {prompt}")
 
     contents = [video_part, prompt]
@@ -667,32 +669,36 @@ def generate_video_geolocation(
 def on_click_clear_video_geolocation(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video geolocation text."""
     state = me.state(State)
-    state.video_geolocation_content = 0
+    state.video_geolocation_content = ""
 
 
 # Pages
 
 
 def on_load(e: me.LoadEvent) -> None:  # pylint: disable=W0613
-    """On load event"""
+    """On load event."""
     s = me.state(State)
     s.current_page = "/"
 
 
 @me.component
 def vertex_gemini_header() -> None:
-    """Vertex AI Gemini Header component"""
-    with me.box(style=_STYLE_MAIN_HEADER):
-        with me.box(style=_STYLE_TITLE_BOX):
-            with me.box(
-                style=me.Style(
-                    display="flex", flex_direction="row", gap=5, align_content="center"
-                ),
-            ):
-                me.text(
-                    "Gemini in Vertex AI ", type="headline-5", style=FANCY_TEXT_GRADIENT
-                )
-                me.text("with Mesop", type="headline-5")
+    """Agent Platform Gemini Header component."""
+    with (
+        me.box(style=_STYLE_MAIN_HEADER),
+        me.box(style=_STYLE_TITLE_BOX),
+        me.box(
+            style=me.Style(
+                display="flex", flex_direction="row", gap=5, align_content="center"
+            ),
+        ),
+    ):
+        me.text(
+            "Gemini in Agent Platform ",
+            type="headline-5",
+            style=FANCY_TEXT_GRADIENT,
+        )
+        me.text("with Mesop", type="headline-5")
 
 
 # Generate a story page / main
@@ -705,7 +711,7 @@ def vertex_gemini_header() -> None:
     on_load=on_load,
 )
 def app() -> None:
-    """Main Mesop App"""
+    """Main Mesop App."""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -807,7 +813,7 @@ def app() -> None:
                 if state.story_progress:
                     with me.box(style=_SPINNER_STYLE):
                         me.progress_spinner()
-                        me.text("Generating story with Gemini 2.5 ...")
+                        me.text("Generating story with Gemini 3.8 ...")
                 if state.story_output:
                     with me.box(
                         style=me.Style(
@@ -832,7 +838,7 @@ def app() -> None:
     ),
 )
 def marketing_page() -> None:
-    """Marketing page"""
+    """Marketing page."""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -855,11 +861,10 @@ def marketing_page() -> None:
                 )
                 # category
                 me.text("Select your product category")
-                marketing_product_category_options = []
-                for c in state.marketing_product_categories:
-                    marketing_product_category_options.append(
-                        me.RadioOption(label=c.title(), value=c)
-                    )
+                marketing_product_category_options = [
+                    me.RadioOption(label=c.title(), value=c)
+                    for c in state.marketing_product_categories
+                ]
                 me.radio(
                     key="marketing_product_category",
                     on_change=on_change_marketing_radio_choice,
@@ -869,11 +874,10 @@ def marketing_page() -> None:
                 # audience
                 me.text("Select your target audience")
                 me.text("Target age", type="caption")
-                marketing_target_age_options = []
-                for c in state.marketing_target_audiences:
-                    marketing_target_age_options.append(
-                        me.RadioOption(label=c.title(), value=c)
-                    )
+                marketing_target_age_options = [
+                    me.RadioOption(label=c.title(), value=c)
+                    for c in state.marketing_target_audiences
+                ]
 
                 me.radio(
                     key="marketing_target_audience",
@@ -882,11 +886,10 @@ def marketing_page() -> None:
                     value=state.marketing_target_audience,
                 )
                 me.text("Target location", type="caption")
-                marketing_target_location_options = []
-                for c in state.marketing_target_locations:
-                    marketing_target_location_options.append(
-                        me.RadioOption(label=c.title(), value=c)
-                    )
+                marketing_target_location_options = [
+                    me.RadioOption(label=c.title(), value=c)
+                    for c in state.marketing_target_locations
+                ]
                 me.radio(
                     key="marketing_target_location",
                     on_change=on_change_marketing_radio_choice,
@@ -896,11 +899,10 @@ def marketing_page() -> None:
                 # campaign goal
                 me.text("Select your marketing campaign goal")
                 me.text("Campaign goal", type="caption")
-                marketing_campaign_goal_options = []
-                for c in state.marketing_campaign_goals:
-                    marketing_campaign_goal_options.append(
-                        me.SelectOption(label=c.title(), value=c)
-                    )
+                marketing_campaign_goal_options = [
+                    me.SelectOption(label=c.title(), value=c)
+                    for c in state.marketing_campaign_goals
+                ]
                 me.select(
                     style=me.Style(width="50vh"),
                     key="marketing_campaign_goal",
@@ -911,11 +913,10 @@ def marketing_page() -> None:
                     on_selection_change=on_selection_change_marketing_goals,
                 )
                 me.text("Brand voice", type="caption")
-                marketing_brand_voice_options = []
-                for c in state.marketing_brand_voices:
-                    marketing_brand_voice_options.append(
-                        me.RadioOption(label=c.title(), value=c)
-                    )
+                marketing_brand_voice_options = [
+                    me.RadioOption(label=c.title(), value=c)
+                    for c in state.marketing_brand_voices
+                ]
                 me.radio(
                     key="marketing_brand_voice",
                     on_change=on_change_marketing_radio_choice,
@@ -923,11 +924,10 @@ def marketing_page() -> None:
                     value=state.marketing_brand_voice,
                 )
                 me.text("Estimated budget ($)", type="caption")
-                marketing_budget_options = []
-                for c in state.marketing_budgets:
-                    marketing_budget_options.append(
-                        me.RadioOption(label=c.title(), value=c)
-                    )
+                marketing_budget_options = [
+                    me.RadioOption(label=c.title(), value=c)
+                    for c in state.marketing_budgets
+                ]
                 me.radio(
                     key="marketing_budget",
                     on_change=on_change_marketing_radio_choice,
@@ -978,7 +978,7 @@ def marketing_page() -> None:
     ),
 )
 def image_playground_page() -> None:
-    """Image playground page"""
+    """Image playground page."""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1003,29 +1003,30 @@ image_tabs_json = [
 
 
 def image_switch_tab(e: me.ClickEvent) -> None:
-    """Image switch tab event"""
+    """Image switch tab event."""
     s = me.state(State)
     s.image_tab = e.key
 
 
 def image_playground_page_tabber() -> None:
-    """Image playground page tabber"""
+    """Image playground page tabber."""
     state = me.state(State)
 
-    with me.box(style=_TABBER_STYLE):
-        with me.box(style=me.Style(display="flex", flex_direction="row", gap=5)):
-            for tab in image_tabs_json:
-                disabled = False
-                if state.image_tab == tab.get("name"):
-                    disabled = True
-                me.button(
-                    tab.get("display"),
-                    key=f"{tab.get('name')}",
-                    on_click=image_switch_tab,
-                    disabled=disabled,
-                    style=_STYLE_CURRENT_TAB if disabled else _STYLE_OTHER_TAB,
-                    # type="flat" if disabled else "stroked"
-                )
+    with (
+        me.box(style=_TABBER_STYLE),
+        me.box(style=me.Style(display="flex", flex_direction="row", gap=5)),
+    ):
+        for tab in image_tabs_json:
+            disabled = False
+            if state.image_tab == tab.get("name"):
+                disabled = True
+            me.button(
+                tab.get("display"),
+                key=f"{tab.get('name')}",
+                on_click=image_switch_tab,
+                disabled=disabled,
+                style=_STYLE_CURRENT_TAB if disabled else _STYLE_OTHER_TAB,
+            )
 
     match state.image_tab:
         case "furniture":
@@ -1043,39 +1044,43 @@ def image_playground_page_tabber() -> None:
 
 
 def image_math_reasoning_tab() -> None:
-    """Image math reasoning tab"""
+    """Image math reasoning tab."""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Math Reasoning", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 2.5 can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
+        "Gemini 3.8 can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
     )
     me.box(style=me.Style(height=12))
 
-    with me.box(
-        style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
-    ):
-        with me.box(
+    with (
+        me.box(
+            style=me.Style(
+                display="grid", gap=0, grid_template_columns="repeat(4, 1fr)"
+            )
+        ),
+        me.box(
             style=me.Style(
                 display="grid",
                 flex_direction="column",
                 gap=2,
             )
+        ),
+    ):
+        me.image(
+            src=IMAGE_MATH,
+            alt="math equation ",
+            style=me.Style(width="350px"),
+        )
+        with me.box(
+            style=me.Style(align_content="center", flex_grow=1, display="flex")
         ):
-            me.image(
-                src=IMAGE_MATH,
-                alt="math equation ",
-                style=me.Style(width="350px"),
+            me.text(
+                "image of a math equation",
+                style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"),
             )
-            with me.box(
-                style=me.Style(align_content="center", flex_grow=1, display="flex")
-            ):
-                me.text(
-                    "image of a math equation",
-                    style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"),
-                )
     me.box(style=me.Style(height=12))
 
     me.text("Our expectation: Ask questions about the math equation as follows:")
@@ -1112,14 +1117,14 @@ def image_math_reasoning_tab() -> None:
 
 
 def image_glasses_recommendations_tab() -> None:
-    """Image glasses recommendations tab"""
+    """Image glasses recommendations tab."""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Glasses Recommendation", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 2.5 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
+        "Gemini 3.8 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
     )
     me.box(style=me.Style(height=12))
 
@@ -1224,14 +1229,14 @@ def image_glasses_recommendations_tab() -> None:
 
 
 def image_er_diagrams_tab() -> None:
-    """Image ER diagrams tab"""
+    """Image ER diagrams tab."""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("ER Diagrams", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 2.5 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram."
+        "Gemini 3.8 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram."
     )
     me.box(style=me.Style(height=12))
 
@@ -1284,14 +1289,14 @@ def image_er_diagrams_tab() -> None:
 
 
 def image_oven_tab() -> None:
-    """Image oven tab"""
+    """Image oven tab."""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Oven Instructions", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Equipped with the ability to extract information from visual elements on screens, Gemini 2.5 can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
+        "Equipped with the ability to extract information from visual elements on screens, Gemini 3.8 can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
     )
     me.box(style=me.Style(height=12))
 
@@ -1340,14 +1345,14 @@ def image_oven_tab() -> None:
                 )
             ):
                 me.markdown(
-                    key="oven_instrictions_output",
+                    key="oven_instructions_output",
                     text=state.oven_instructions_output,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),
                 )
 
 
 def image_furniture_tab() -> None:
-    """Image furniture tab"""
+    """Image furniture tab."""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Furniture Recommendation", style=me.Style(font_weight="bold"))
@@ -1478,7 +1483,7 @@ def image_furniture_tab() -> None:
     ),
 )
 def video_playground_page() -> None:
-    """Video playground page"""
+    """Video playground page."""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1502,33 +1507,34 @@ video_tabs_json = [
 
 
 def video_switch_tab(e: me.ClickEvent) -> None:
-    """Event to switch video tab"""
+    """Event to switch video tab."""
     s = me.state(State)
     s.video_tab = e.key
 
 
 def video_playground_page_tabber() -> None:
-    """Page tabber for video playground"""
+    """Page tabber for video playground."""
     state = me.state(State)
 
-    with me.box(
-        style=_TABBER_STYLE,
+    with (
+        me.box(
+            style=_TABBER_STYLE,
+        ),
+        me.box(style=me.Style(display="flex", flex_direction="row", gap=5)),
     ):
-        with me.box(style=me.Style(display="flex", flex_direction="row", gap=5)):
-            for tab in video_tabs_json:
-                disabled = False
-                if state.image_tab == tab.get("name"):
-                    disabled = True
-                me.button(
-                    tab.get("display"),
-                    key=f"{tab.get('name')}",
-                    on_click=image_switch_tab,
-                    disabled=disabled,
-                    style=_STYLE_CURRENT_TAB if disabled else _STYLE_OTHER_TAB,
-                    # type="flat" if disabled else "stroked"
-                )
+        for tab in video_tabs_json:
+            disabled = False
+            if state.video_tab == tab.get("name"):
+                disabled = True
+            me.button(
+                tab.get("display"),
+                key=f"{tab.get('name')}",
+                on_click=video_switch_tab,
+                disabled=disabled,
+                style=_STYLE_CURRENT_TAB if disabled else _STYLE_OTHER_TAB,
+            )
 
-    match state.image_tab:
+    match state.video_tab:
         case "desc":
             video_description_tab()
         case "tags":
@@ -1542,17 +1548,14 @@ def video_playground_page_tabber() -> None:
 
 
 def video_description_tab() -> None:
-    """Show the video description tab"""
+    """Show the video description tab."""
     state = me.state(State)
     me.box(style=me.Style(height=24))
     me.text("Gemini can provide a description of what's happening in a video:")
     me.box(style=me.Style(height=12))
 
-    video_desc_url = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
-    state.video_url = video_desc_url
-
     me.video(
-        src=video_desc_url,
+        src=VIDEO_DESCRIPTION,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1589,11 +1592,11 @@ def video_description_tab() -> None:
 
 
 def video_tags_tab() -> None:
-    """Show the video tags tab"""
+    """Show the video tags tab."""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
-    me.text("Gemini 2.5 can also extract tags throughout a video, as shown below:")
+    me.text("Gemini 3.8 can also extract tags throughout a video, as shown below:")
     me.box(style=me.Style(height=12))
 
     me.video(
@@ -1638,12 +1641,12 @@ def video_tags_tab() -> None:
 
 
 def video_highlights_tab() -> None:
-    """Show the video highlights tab"""
+    """Show the video highlights tab."""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Another example of using Gemini 2.5 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
+        "Another example of using Gemini 3.8 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
     )
     me.box(style=me.Style(height=12))
 
@@ -1662,7 +1665,7 @@ def video_highlights_tab() -> None:
             "Clear",
             color="primary",
             type="stroked",
-            on_click=on_click_clear_video_tags,
+            on_click=on_click_clear_video_highlights,
         )
         me.button(
             "Generate highlights",
@@ -1689,12 +1692,12 @@ def video_highlights_tab() -> None:
 
 
 def video_geolocation_tab() -> None:
-    """Show the video geolocation tab"""
+    """Show the video geolocation tab."""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Even in short, detail-packed videos, Gemini 2.5 can identify the locations."
+        "Even in short, detail-packed videos, Gemini 3.8 can identify the locations."
     )
     me.box(style=me.Style(height=12))
 
@@ -1713,7 +1716,7 @@ def video_geolocation_tab() -> None:
             "Clear",
             color="primary",
             type="stroked",
-            on_click=on_click_clear_video_tags,
+            on_click=on_click_clear_video_geolocation,
         )
         me.button(
             "Generate ",
