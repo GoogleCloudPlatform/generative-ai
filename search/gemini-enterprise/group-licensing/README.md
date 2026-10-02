@@ -45,7 +45,7 @@ When a user qualifies for multiple SKUs, the highest-ranked one is assigned:
 
 ## Configuration
 
-Configuration is stored in **GCP Secret Manager** and mounted as a file volume into the job at `/run/secrets/entitlements.json`.
+Configuration is stored in **Google Cloud Secret Manager** and mounted as a file volume into the job at `/run/secrets/entitlements.json`.
 
 ```json
 {
@@ -78,8 +78,8 @@ Configuration is stored in **GCP Secret Manager** and mounted as a file volume i
 
 | Field | Description |
 |---|---|
-| `billing_account_id` | The GCP billing account ID associated with the managed projects. Required. |
-| `projects` | Map of GCP project ID → list of entitlement entries (one per SKU/location combination). |
+| `billing_account_id` | The Google Cloud billing account ID associated with the managed projects. Required. |
+| `projects` | Map of Google Cloud project ID → list of entitlement entries (one per SKU/location combination). |
 | `projects[].subscription_tier` | The Gemini SKU for this entry. See **SKU precedence** below for all valid values. |
 | `projects[].location` | Geographic region for license management. Must be one of: `global`, `us`, `eu`. |
 | `projects[].groups` | List of Google Group email addresses whose members are entitled to this SKU. |
@@ -106,8 +106,8 @@ The job's service account requires the following:
 - `https://www.googleapis.com/auth/admin.directory.group.member.readonly`
 
 **API requirements:**
-- Discovery Engine API (GCP)
-- Resource Manager API (GCP)
+- Discovery Engine API (Google Cloud)
+- Resource Manager API (Google Cloud)
 - Admin SDK API (Cloud Identity / Workspace)
 - Cloud Run Admin API (Optional)
 - Cloud Build API (Optional)

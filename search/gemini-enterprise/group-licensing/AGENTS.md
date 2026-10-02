@@ -76,7 +76,7 @@ Add this to any new adapter you write.
 ```go
 // ports/gemini.go
 type GeminiClient interface {
-    FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error)
+    FetchLicenseConfigIndex(ctx context.Context, billingAccountID string, directLaw bool) (models.LicenseConfigIndex, error)
     ListUserLicenses(ctx context.Context, projectID string, location models.Location, pageToken string) ([]models.UserLicense, string, error)
     BatchUpdateUserLicenses(ctx context.Context, projectID string, location models.Location, updates []models.LicenseUpdate) error
     FetchLicenseUsageStats(ctx context.Context, projectID string, location models.Location) (map[string]int64, error)
@@ -102,7 +102,7 @@ type ResourceManagerClient interface {
 2. `ResolveProjectNumber` — project IDs → numeric project numbers (Discovery Engine paths use numbers).
 3. Per project: page through all group members via `ListMembers` (with `includeDerivedMembership=true`), resolve the highest-precedence SKU per user via `SKU.HasHigherPrecedenceThan`.
 4. Group grant updates by `LicenseConfigKey`, chunk to `MaxBatchSize=100`, call `BatchUpdateUserLicenses`.
-5. On `ErrLicensesExhausted`: call `FetchLicenseUsageStats`, compute available seats, retry trimmed batch, carry remainder to next subscription pool in the slice. After all pools exhausted, soft-fail remaining users (`licenses_soft_failed` in summary log). Exit 0.
+5. On `ErrLicensesExhausted`: call `FetchLicenseUsageStats` for observability, retry remaining users in the batch 1-by-1 so no-op grants do not strand available seats, and carry ungranted remainder to the next subscription pool in the slice. After all pools exhausted, soft-fail remaining users (`licenses_soft_failed` in summary log). Exit 0.
 
 ### Garbage Collection (`JOB_TYPE=garbage_collection`)
 
@@ -121,7 +121,7 @@ type ResourceManagerClient interface {
 
 | Error | Classification | Behavior |
 |---|---|---|
-| `ErrLicensesExhausted` | Soft failure (joiner only) | Fetch usage stats, trim retry, spill to next pool, `WARN` log, exit 0 |
+| `ErrLicensesExhausted` | Soft failure (joiner only) | Fetch usage stats, retry 1-by-1, spill to next pool, `WARN` log, exit 0 |
 | `ErrInvalidMemberKey` | Soft failure (GC only) | Skip user, `WARN` log with `problematic_username`, no revocation |
 | `ErrAPIRateLimited` | Hard failure | Return error, job exits 1 |
 | All other errors | Hard failure | Return error, job exits 1 |
@@ -162,6 +162,9 @@ Environment variables (`internal/config/job_settings.go`):
 |---|---|---|---|
 | `JOB_TYPE` | Yes | — | `joiner` or `garbage_collection` |
 | `DRY_RUN` | No | `false` | Skips all write API calls when `true` |
+| `DIRECT_LAW` | No | `false` | When true, assignments map to admin-specified subscription IDs |
+| `GC_SKIP_GROUP_EVAL` | No | `false` | When true, GC skips group membership checks and revokes based on staleness only |
+| `VERBOSE` | No | `false` | Enables verbose debug logging |
 | `CLOUD_RUN_TASK_INDEX` | No | `0` | Injected by Cloud Run |
 | `CLOUD_RUN_TASK_COUNT` | No | `1` | Injected by Cloud Run |
 
@@ -172,7 +175,7 @@ Environment variables (`internal/config/job_settings.go`):
 - Adapter tests inject testable interfaces via package-private `newWith*` constructors (e.g., `cloudidentity.newWithMembers`, `discoveryengine.newWithClient`). Follow this pattern for any new adapter.
 - Service tests are white-box (same package, `package services`). Use table-driven tests with `t.Run` sub-tests.
 - Config tests write fixture JSON to `t.TempDir()` — never write to the module root.
-- Do not add integration tests or tests that require GCP credentials.
+- Do not add integration tests or tests that require Google Cloud credentials.
 
 ## Known constraints and non-obvious decisions
 

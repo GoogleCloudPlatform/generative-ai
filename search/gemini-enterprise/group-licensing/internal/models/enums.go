@@ -25,8 +25,8 @@ const (
 	SKUEnterprise         SKU = "SUBSCRIPTION_TIER_ENTERPRISE"           // Gemini Enterprise Standard tier.
 	SKUSearch             SKU = "SUBSCRIPTION_TIER_SEARCH"               // Search + NotebookLM tier.
 	SKUNotebookLM         SKU = "SUBSCRIPTION_TIER_NOTEBOOK_LM"          // NotebookLM-only tier.
-	SKUAgentspaceBusiness SKU = "SUBSCRIPTION_TIER_AGENTSPACE_BUSINESS"  // Gemini Business tier.
-	SKUAgentspaceStarter  SKU = "SUBSCRIPTION_TIER_AGENTSPACE_STARTER"   // Gemini Business Starter tier.
+	SKUGeminiBusiness        SKU = "SUBSCRIPTION_TIER_AGENTSPACE_BUSINESS"  // Gemini Business tier.
+	SKUGeminiBusinessStarter SKU = "SUBSCRIPTION_TIER_AGENTSPACE_STARTER"   // Gemini Business Starter tier.
 	SKUFrontlineWorker    SKU = "SUBSCRIPTION_TIER_FRONTLINE_WORKER"     // Gemini Frontline Worker tier.
 	SKUFrontlineStarter   SKU = "SUBSCRIPTION_TIER_FRONTLINE_STARTER"    // Gemini Frontline Starter tier.
 	SKUEnterpriseEmerging SKU = "SUBSCRIPTION_TIER_ENTERPRISE_EMERGING"  // Gemini Enterprise Standard — emerging markets.
@@ -45,8 +45,8 @@ var skuPrecedence = map[SKU]int{
 	SKUEnterprise:         12,
 	SKUSearch:             11,
 	SKUNotebookLM:         10,
-	SKUAgentspaceBusiness: 9,
-	SKUAgentspaceStarter:  8,
+	SKUGeminiBusiness:        9,
+	SKUGeminiBusinessStarter: 8,
 	SKUFrontlineWorker:    7,
 	SKUFrontlineStarter:   6,
 	SKUEnterpriseEmerging: 5,

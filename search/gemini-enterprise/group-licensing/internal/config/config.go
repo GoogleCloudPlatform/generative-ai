@@ -26,7 +26,7 @@ import (
 	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/models"
 )
 
-// validProjectID matches GCP project IDs: 6–30 chars, starts with a lowercase
+// validProjectID matches Google Cloud project IDs: 6–30 chars, starts with a lowercase
 // letter, contains only [a-z0-9-], and ends with a letter or digit.
 var validProjectID = regexp.MustCompile(`^[a-z][a-z0-9\-]{4,28}[a-z0-9]$`)
 
@@ -36,7 +36,7 @@ var validEmail = regexp.MustCompile(`^[^@\s]+@[^@\s]+\.[^@\s]+$`)
 
 // ProjectEntry maps a SKU and location to the list of Google Group email
 // addresses whose members are entitled to that SKU at that location within
-// a given GCP project.
+// a given Google Cloud project.
 type ProjectEntry struct {
 	SubscriptionTier models.SKU      `json:"subscription_tier"`
 	SubscriptionID   *string         `json:"subscription_id"`
@@ -45,7 +45,7 @@ type ProjectEntry struct {
 }
 
 // ProjectConfig is the ordered list of SKU+location+group entries for a
-// single GCP project. Each entry describes one tier of entitlement.
+// single Google Cloud project. Each entry describes one tier of entitlement.
 type ProjectConfig []ProjectEntry
 
 // Settings holds operator-controlled knobs for the batch job behaviour.
@@ -54,7 +54,7 @@ type Settings struct {
 }
 
 // EntitlementConfig is the top-level structure parsed from the mounted JSON
-// file. Projects keys are GCP project IDs.
+// file. Projects keys are Google Cloud project IDs.
 type EntitlementConfig struct {
 	BillingAccountID string                   `json:"billing_account_id"`
 	Projects         map[string]ProjectConfig `json:"projects"`
@@ -100,7 +100,7 @@ func validate(cfg *EntitlementConfig, directLaw bool) error {
 
 	for projectID, projectCfg := range cfg.Projects {
 		if !validProjectID.MatchString(projectID) {
-			return fmt.Errorf("project %q is not a valid GCP project ID: %w", projectID, models.ErrConfigInvalid)
+			return fmt.Errorf("project %q is not a valid Google Cloud project ID: %w", projectID, models.ErrConfigInvalid)
 		}
 
 		if len(projectCfg) == 0 {

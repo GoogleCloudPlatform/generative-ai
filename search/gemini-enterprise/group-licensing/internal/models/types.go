@@ -60,7 +60,7 @@ type LicenseUpdate struct {
 
 // LicenseConfigKey identifies a license configuration by its SKU, project
 // number, and location. It is used as the key in a LicenseConfigIndex.
-// ProjectNumber is the numeric GCP project number (e.g. "415104041262"), not
+// ProjectNumber is the numeric Google Cloud project number (e.g. "415104041262"), not
 // the human-readable project ID — the Discovery Engine API uses numbers in
 // licenseConfig resource paths.
 type LicenseConfigKey struct {

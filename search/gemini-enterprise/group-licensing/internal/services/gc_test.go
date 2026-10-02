@@ -76,7 +76,7 @@ func TestGCService_Run_StaleUser_LicenseRevoked(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -124,7 +124,7 @@ func TestGCService_Run_NeverLoggedIn_RecentAssignment_LicenseKept(t *testing.T) 
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -174,7 +174,7 @@ func TestGCService_Run_NeverLoggedIn_StaleAssignment_LicenseRevoked(t *testing.T
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -222,7 +222,7 @@ func TestGCService_Run_NeverLoggedIn_NoAssignmentTime_LicenseRevoked(t *testing.
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -267,7 +267,7 @@ func TestGCService_Run_EntitledActiveUser_NotRevoked(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -318,7 +318,7 @@ func TestGCService_Run_UnentitledUser_LicenseRevoked(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -361,7 +361,7 @@ func TestGCService_Run_GCSkipGroupEval_Bypass(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -405,7 +405,7 @@ func TestGCService_Run_DryRun_NoAPIWrite(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -433,7 +433,7 @@ func TestGCService_Run_ListUserLicensesError_ReturnsError(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 		},
 	})
 
@@ -487,7 +487,7 @@ func TestGCService_Run_MultiPagePagination_AllUsersEvaluated(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -532,7 +532,7 @@ func TestGCService_Run_HasMemberError_ReturnsError(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -565,7 +565,7 @@ func TestGCService_Run_AlreadyRevokedLicense_Skipped(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 		},
 	})
 
@@ -593,7 +593,7 @@ func TestGCService_Run_ContextCancelled_ReturnsError(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 		},
 	})
 
@@ -633,7 +633,7 @@ func TestGCService_Run_StalenessDisabled_NeverLoggedInUserNotRevoked(t *testing.
 
 	cfg := newGCConfig(0, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -679,7 +679,7 @@ func TestGCService_Run_InvalidUserEmail_NotRevoked(t *testing.T) {
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
-			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
 		},
 	})
 
@@ -723,7 +723,7 @@ func TestGCService_processProject_PageLimitReached(t *testing.T) {
 		Return(nil)
 
 	projectCfg := config.ProjectConfig{
-		{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
+		{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{"grp@example.com"}},
 	}
 
 	svc := NewGCService(idp, gemini)
@@ -761,7 +761,7 @@ func TestGCService_Run_DirectLaw(t *testing.T) {
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
 		projectID: {
 			{
-				SubscriptionTier: models.SKUAgentspaceBusiness,
+				SubscriptionTier: models.SKUGeminiBusiness,
 				SubscriptionID:   func(s string) *string { return &s }("sub-uuid-abc"),
 				Location:         models.LocationGlobal,
 				Groups:           []string{group},

@@ -18,7 +18,7 @@ package models
 
 const (
 	// ConfigFilePath is the filesystem path where the entitlement configuration
-	// is mounted from GCP Secret Manager.
+	// is mounted from Google Cloud Secret Manager.
 	ConfigFilePath = "/run/secrets/entitlements.json"
 
 	// MaxBatchSize is the maximum number of license modifications that may be

@@ -24,7 +24,7 @@ Cloud Run Jobs support a task timeout of up to **168 hours**, which accommodates
 
 ## **3. Data Storage & Configuration**
 
-The utility uses a JSON-based configuration model which is persisted to GCP Secret Manager.
+The utility uses a JSON-based configuration model which is persisted to Google Cloud Secret Manager.
 
 ### **3.1. Entitlement Configuration (Secret Manager)**
 
@@ -66,8 +66,8 @@ Configuration is supplied by administrators as a JSON object stored in **Google 
 
 | Field | Type | Required | Description |
 | ----- | ----- | ----- | ----- |
-| `billing_account_id` | string | Yes | The GCP billing account ID associated with the managed projects. |
-| `projects` | object | Yes | Map of GCP project ID → list of entitlement entries. |
+| `billing_account_id` | string | Yes | The Google Cloud billing account ID associated with the managed projects. |
+| `projects` | object | Yes | Map of Google Cloud project ID → list of entitlement entries. |
 | `settings.staleness_threshold_days` | integer | No | Users inactive beyond this many days are revoked. `0` (default) disables the staleness check. |
 
 **Per-project entry fields:**
