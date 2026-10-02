@@ -34,5 +34,5 @@ const (
 	// warning and stops processing further pages rather than failing the run —
 	// partial results are preferable to a full job failure for a scheduled
 	// reconciliation job.
-	MaxPagesPerGroup = 500
+	MaxPagesPerGroup = 5000
 )

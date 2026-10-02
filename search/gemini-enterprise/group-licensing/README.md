@@ -19,7 +19,9 @@ Two Cloud Run Job definitions are deployed from a single container image, each t
 |---|---|---|
 | `JOB_TYPE` | Selects the workflow to run (`joiner` or `garbage_collection`). Required. | — |
 | `DRY_RUN` | When `true`, the full evaluation runs but no write API calls are made. Can be overridden per execution via the Cloud Scheduler request body. | `false` |
+| `DIRECT_LAW` | When `true`, enables direct_law mode for matching licenses. | `false` |
 | `GC_SKIP_GROUP_EVAL` | When `true`, the Garbage Collection job will skip group membership evaluation for currently licensed users. Users will be revoked solely based on license staleness. Only applicable to the garbage collection job. | `false` |
+| `GC_GROUP_CACHING_MODE` | When `true`, the Garbage Collection job pre-fetches and caches group members in memory, optimizing membership checks at scale. Only applicable to the garbage collection job. | `false` |
 | `CLOUD_RUN_TASK_INDEX` | Injected by Cloud Run. 0-based index of this task instance. | `0` |
 | `CLOUD_RUN_TASK_COUNT` | Injected by Cloud Run. Total number of concurrent task instances. | `1` |
 

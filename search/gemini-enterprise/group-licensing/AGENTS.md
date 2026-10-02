@@ -63,7 +63,7 @@ Add this to any new adapter you write.
 | `internal/models/types.go` | Domain data structures: `Member`, `UserLicense`, `LicenseUpdate`, `LicenseConfigKey`, `LicenseConfigEntry`, `LicenseConfigIndex` |
 | `internal/models/enums.go` | All typed-string enums: `SKU`, `WorkflowType`, `LicenseState`, `LicenseAction`, `Location`, `MemberType` |
 | `internal/models/errors.go` | All sentinel errors — use `errors.Is` against these |
-| `internal/models/constants.go` | `MaxBatchSize=100`, `MembersListPageSize=200`, `MaxPagesPerGroup=500`, `ConfigFilePath` |
+| `internal/models/constants.go` | `MaxBatchSize=100`, `MembersListPageSize=200`, `MaxPagesPerGroup=5000`, `ConfigFilePath` |
 | `internal/models/dto/sync.go` | Request and response DTOs (`SyncAddRequest`/`Response`, `SyncRemoveRequest`/`Response`) |
 | `internal/config/config.go` | JSON config parsing and validation rules for entitlement configuration |
 | `internal/config/job_settings.go` | Parses and validates Cloud Run Job runtime environment variables (`JOB_TYPE`, `DRY_RUN`, etc.) |
@@ -164,6 +164,7 @@ Environment variables (`internal/config/job_settings.go`):
 | `DRY_RUN` | No | `false` | Skips all write API calls when `true` |
 | `DIRECT_LAW` | No | `false` | When true, assignments map to admin-specified subscription IDs |
 | `GC_SKIP_GROUP_EVAL` | No | `false` | When true, GC skips group membership checks and revokes based on staleness only |
+| `GC_GROUP_CACHING_MODE` | No | `false` | When true, GC pre-fetches and caches group members in memory |
 | `VERBOSE` | No | `false` | Enables verbose debug logging |
 | `CLOUD_RUN_TASK_INDEX` | No | `0` | Injected by Cloud Run |
 | `CLOUD_RUN_TASK_COUNT` | No | `1` | Injected by Cloud Run |
@@ -187,7 +188,7 @@ Environment variables (`internal/config/job_settings.go`):
 
 **`LicenseConfigIndex` maps to a slice, not a single entry:** A billing account can have multiple active subscriptions for the same `(SKU, ProjectNumber, Location)`. The slice preserves all pools in order; the joiner iterates them to spill ungranted users from an exhausted pool into the next one. Never collapse this to a single entry.
 
-**`MaxPagesPerGroup=500` is a safety net, not a hard error:** When the limit is hit, a `WARN` is logged and processing continues with partial results. This applies to both `collectGroupMembers` (joiner) and the license listing loop (GC). Partial results are always preferred over a full job failure for a scheduled reconciliation job.
+**`MaxPagesPerGroup=5000` is a safety net, not a hard error:** When the limit is hit, a `WARN` is logged and processing continues with partial results. This applies to both `collectGroupMembers` (joiner) and the license listing loop (GC). Partial results are always preferred over a full job failure for a scheduled reconciliation job.
 
 **DTOs carry vestigial HTTP tags:** `dto.SyncAddRequest` and `dto.SyncRemoveRequest` have `json` struct tags referencing `POST /sync/add` and `POST /sync/remove`. These are from an earlier HTTP server design. The structs are constructed directly in `main.go`; no HTTP deserialization occurs. Do not add an HTTP server without re-evaluating the entire auth model.
 

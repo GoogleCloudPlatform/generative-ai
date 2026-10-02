@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -727,7 +728,7 @@ func TestGCService_processProject_PageLimitReached(t *testing.T) {
 	}
 
 	svc := NewGCService(idp, gemini)
-	_, _, err := svc.processProject(ctx, projectID, projectCfg, 30, false, false)
+	_, _, err := svc.processProject(ctx, projectID, projectCfg, 30, false, false, nil)
 
 	require.NoError(t, err)
 	gemini.AssertNumberOfCalls(t, "ListUserLicenses", models.MaxPagesPerGroup)
@@ -779,4 +780,401 @@ func TestGCService_Run_DirectLaw(t *testing.T) {
 
 	idp.AssertExpectations(t)
 	gemini.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_CacheHit_SkipsHasMember(t *testing.T) {
+	// Under GCGroupCachingMode, group members are pre-fetched into memory.
+	// When an assigned user is found in the cache, HasMember is not called.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-cache-hit"
+		group     = "team@example.com"
+		userEmail = "active@example.com"
+	)
+
+	// ListMembers returns an active user and a nested group entry (which should be ignored).
+	idp.On("ListMembers", mock.Anything, group, "").Return([]models.Member{
+		{Email: userEmail, Type: models.MemberTypeUser},
+		{Email: "nested@example.com", Type: models.MemberTypeGroup},
+	}, "", nil)
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -5),
+			},
+		}, "", nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.True(t, resp.GCGroupCachingMode)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertNotCalled(t, "HasMember")
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	idp.AssertExpectations(t)
+	geminiClient.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_CaseInsensitiveAndWhitespace_CacheHit(t *testing.T) {
+	// Caching lookups and pre-fetching must be case-insensitive and trim whitespace.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-case"
+		cfgGroup  = "  Eng-Team@Example.COM "
+		userEmail = "alice.smith@example.com"
+		rawMember = "  Alice.Smith@Example.COM  "
+	)
+
+	idp.On("ListMembers", mock.Anything, cfgGroup, "").Return([]models.Member{
+		{Email: rawMember, Type: models.MemberTypeUser},
+	}, "", nil)
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -2),
+			},
+		}, "", nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{cfgGroup}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.True(t, resp.GCGroupCachingMode)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertNotCalled(t, "HasMember")
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	idp.AssertExpectations(t)
+	geminiClient.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_CacheMiss_FallsBackToHasMember_TrueKept(t *testing.T) {
+	// On cache miss, HasMember is invoked as a fallback. If HasMember returns true,
+	// the license is kept (not revoked).
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID  = "proj-gc-fallback-kept"
+		group      = "team@example.com"
+		userEmail  = "alias-user@example.com"
+		cachedUser = "other@example.com"
+	)
+
+	idp.On("ListMembers", mock.Anything, group, "").Return([]models.Member{
+		{Email: cachedUser, Type: models.MemberTypeUser},
+	}, "", nil)
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -5),
+			},
+		}, "", nil)
+
+	idp.On("HasMember", mock.Anything, group, userEmail).Return(true, nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertNumberOfCalls(t, "HasMember", 1)
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	idp.AssertExpectations(t)
+	geminiClient.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_CacheMiss_FallsBackToHasMember_FalseRevoked(t *testing.T) {
+	// On cache miss, HasMember is invoked as a fallback. If HasMember returns false,
+	// the license is revoked.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-fallback-revoked"
+		group     = "team@example.com"
+		userEmail = "removed@example.com"
+	)
+
+	idp.On("ListMembers", mock.Anything, group, "").Return([]models.Member{}, "", nil)
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:         userEmail,
+				State:             models.LicenseStateAssigned,
+				LastLoginTime:     time.Now().AddDate(0, 0, -5),
+				LicenseConfigPath: "projects/proj-gc-fallback-revoked/locations/global/licenseConfigs/business",
+			},
+		}, "", nil)
+
+	idp.On("HasMember", mock.Anything, group, userEmail).Return(false, nil)
+
+	geminiClient.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, []models.LicenseUpdate{
+		{
+			UserEmail:         userEmail,
+			LicenseConfigPath: "projects/proj-gc-fallback-revoked/locations/global/licenseConfigs/business",
+			Action:            models.LicenseActionRevoke,
+		},
+	}).Return(nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.Equal(t, 1, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertNumberOfCalls(t, "HasMember", 1)
+	geminiClient.AssertExpectations(t)
+	idp.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_DuplicateGroupAcrossEntriesOrProjects_FetchedOnce(t *testing.T) {
+	// When multiple entries or projects reference the same group (even with different casing),
+	// ListMembers must only be called once for that group across the run.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID1 = "proj-1"
+		projectID2 = "proj-2"
+		group1     = "grp@example.com"
+		group2     = "GRP@EXAMPLE.COM"
+		userEmail  = "member@example.com"
+	)
+
+	idp.On("ListMembers", mock.Anything, mock.MatchedBy(func(g string) bool {
+		return strings.EqualFold(strings.TrimSpace(g), "grp@example.com")
+	}), "").Return([]models.Member{
+		{Email: userEmail, Type: models.MemberTypeUser},
+	}, "", nil).Once()
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID1, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -2),
+			},
+		}, "", nil)
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID2, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -2),
+			},
+		}, "", nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID1: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group1}},
+		},
+		projectID2: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group2}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 2, resp.UsersEvaluated)
+
+	idp.AssertNumberOfCalls(t, "ListMembers", 1)
+	idp.AssertNotCalled(t, "HasMember")
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	idp.AssertExpectations(t)
+	geminiClient.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_MultiPageGroupPrefetch(t *testing.T) {
+	// ListMembers paginates across 2 pages; a user on page 2 hits the cache without calling HasMember.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-multipage"
+		group     = "large-group@example.com"
+		userP1    = "user1@example.com"
+		userP2    = "user2@example.com"
+	)
+
+	// Page 1
+	idp.On("ListMembers", mock.Anything, group, "").Return([]models.Member{
+		{Email: userP1, Type: models.MemberTypeUser},
+	}, "tok-page-2", nil).Once()
+
+	// Page 2
+	idp.On("ListMembers", mock.Anything, group, "tok-page-2").Return([]models.Member{
+		{Email: userP2, Type: models.MemberTypeUser},
+	}, "", nil).Once()
+
+	// ListUserLicenses returns userP2
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userP2,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -3),
+			},
+		}, "", nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertNumberOfCalls(t, "ListMembers", 2)
+	idp.AssertNotCalled(t, "HasMember")
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	idp.AssertExpectations(t)
+	geminiClient.AssertExpectations(t)
+}
+
+func TestGCService_Run_GroupCachingMode_ListMembersError_ReturnsError(t *testing.T) {
+	// When ListMembers fails during prefetch, Run must fail immediately and wrap the error,
+	// without calling ListUserLicenses or BatchUpdateUserLicenses.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-err"
+		group     = "err-group@example.com"
+	)
+
+	idp.On("ListMembers", mock.Anything, group, "").
+		Return([]models.Member(nil), "", models.ErrMemberListFailed)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	_, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{GCGroupCachingMode: boolPtr(true)})
+
+	require.Error(t, err)
+	assert.True(t, errors.Is(err, models.ErrMemberListFailed))
+
+	geminiClient.AssertNotCalled(t, "ListUserLicenses")
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	idp.AssertNotCalled(t, "HasMember")
+}
+
+func TestGCService_Run_GroupCachingMode_WithGCSkipGroupEval_SkipsPrefetchAndHasMember(t *testing.T) {
+	// When both GCGroupCachingMode and GCSkipGroupEval are true, group prefetch and
+	// group evaluations are bypassed entirely; neither ListMembers nor HasMember is called.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	geminiClient := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-gc-skip-group"
+		group     = "skip-group@example.com"
+		userEmail = "user@example.com"
+	)
+
+	geminiClient.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: time.Now().AddDate(0, 0, -5),
+			},
+		}, "", nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUGeminiBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, geminiClient)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{
+		GCGroupCachingMode: boolPtr(true),
+		GCSkipGroupEval:    boolPtr(true),
+	})
+
+	require.NoError(t, err)
+	assert.True(t, resp.GCGroupCachingMode)
+	assert.True(t, resp.GCSkipGroupEval)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertNotCalled(t, "ListMembers")
+	idp.AssertNotCalled(t, "HasMember")
+	geminiClient.AssertNotCalled(t, "BatchUpdateUserLicenses")
+	geminiClient.AssertExpectations(t)
+	idp.AssertExpectations(t)
 }
