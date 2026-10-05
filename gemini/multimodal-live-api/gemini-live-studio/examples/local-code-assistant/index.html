@@ -1,0 +1,1996 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live File Explorer - Gemini Sandbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Manrope:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+          font-family: 'Google Sans Flex', 'Manrope', sans-serif;
+          background-color: #f9f9ff;
+          color: #191b22;
+      }
+      pre.code-block {
+          background-color: #0f172a !important;
+          color: #f8fafc !important;
+          padding: 0.875rem 1rem !important;
+          border-radius: 0.5rem !important;
+          border: 1px solid #1e293b !important;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+          line-height: 1.5 !important;
+          white-space: pre !important;
+      }
+      pre.code-block code {
+          color: #f8fafc !important;
+          background-color: transparent !important;
+          font-family: inherit !important;
+      }
+      .pulse-ring {
+          animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      }
+      @keyframes pulse-ring {
+          0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.7); }
+          70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(66, 133, 244, 0); }
+          100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+  </head>
+  <body
+    class="h-screen overflow-hidden flex flex-col bg-[#f9f9ff] text-[#191b22]"
+  >
+    <!-- Connect Overlay -->
+    <div
+      id="connect-overlay"
+      class="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 text-center max-w-md w-full mx-4"
+      >
+        <div
+          class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center mx-auto mb-5 shadow-md"
+        >
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+            ></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-1">
+          Local Code Assistant
+        </h2>
+        <p class="text-xs text-slate-500 mb-5">
+          Agentic Codebase Explorer with Gemini Live Bidi Streaming
+        </p>
+
+        <div
+          id="preflight-card"
+          class="mb-6 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-left text-slate-600 space-y-2"
+        >
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400 font-medium">Model:</span>
+            <select
+              id="overlay-model-select"
+              class="font-mono text-[11px] text-slate-800 bg-white border border-slate-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+            >
+              <option value="gemini-3.8-live">
+                gemini-3.8-live (Fastest TTFF &amp; Proactive)
+              </option>
+            </select>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Voice:</span>
+            <span id="overlay-voice" class="font-medium text-slate-700"
+              >Loading...</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Avatar:</span>
+            <span id="overlay-avatar" class="font-medium text-slate-700"
+              >Checking...</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Project / Region:</span>
+            <span id="overlay-region" class="font-mono text-slate-700"
+              >Loading...</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Capabilities:</span>
+            <span class="font-medium text-blue-600">FS Tools + Search</span>
+          </div>
+        </div>
+
+        <button
+          id="start-btn"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 px-6 font-semibold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+        >
+          Start Assistant Session
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header
+      class="bg-white border-b border-slate-200 px-6 py-3 shadow-sm flex items-center justify-between z-10 shrink-0"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow-sm"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-slate-900">
+              Local Code Assistant
+            </h1>
+            <span
+              class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200"
+              >Gemini Live Console</span
+            >
+            <span
+              class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200"
+              >v0.3.0</span
+            >
+          </div>
+          <div class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+            <div class="flex items-center gap-1">
+              <label
+                for="header-model-select"
+                class="text-slate-400 text-[11px]"
+                >Model:</label
+              >
+              <select
+                id="header-model-select"
+                class="font-mono text-[11px] text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-blue-500 focus:outline-none cursor-pointer"
+              >
+                <option value="gemini-3.8-live">3.8-live (Default)</option>
+              </select>
+            </div>
+            <span class="text-slate-300">•</span>
+            <span id="header-voice" class="text-slate-500">Voice: Puck</span>
+            <span id="header-avatar-sep" class="text-slate-300 hidden">•</span>
+            <span id="header-avatar" class="text-blue-600 font-medium hidden"
+              >Avatar: Reactive</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Global Playback Mute Button -->
+        <button
+          id="global-mute-btn"
+          type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer select-none"
+          title="Mute/Unmute assistant audio playback"
+        >
+          <span id="global-mute-icon">🔊</span>
+          <span id="global-mute-label">Audio On</span>
+        </button>
+        <!-- Connection Status Badge -->
+        <div
+          id="conn-badge"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 cursor-pointer select-none transition-all"
+          title="Connection status"
+        >
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span> Standby
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main
+      class="flex-1 min-h-0 flex flex-col lg:flex-row p-4 lg:p-6 gap-6 overflow-hidden"
+    >
+      <!-- Left Panel: Visualization Stream -->
+      <div
+        class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-0 h-full"
+      >
+        <div
+          class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center justify-between shrink-0"
+        >
+          <h2
+            class="font-semibold text-slate-800 text-sm flex items-center gap-2"
+          >
+            <svg
+              class="w-4 h-4 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+            Tool Execution & Code Inspection
+          </h2>
+          <div id="tool-status" class="text-xs text-slate-500 font-mono">
+            idle
+          </div>
+        </div>
+
+        <div
+          id="visualization-area"
+          class="flex-1 min-h-0 p-6 overflow-y-auto bg-slate-50/50 space-y-4"
+        >
+          <div
+            id="empty-vis"
+            class="flex flex-col items-center justify-center h-full text-slate-400 gap-3 py-12"
+          >
+            <div
+              class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400"
+            >
+              <svg
+                class="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                ></path>
+              </svg>
+            </div>
+            <div class="text-center">
+              <p class="text-sm font-medium text-slate-600">
+                Waiting for agent to inspect code or files...
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Ask "list files in this directory" or "read main.go and
+                summarize it".
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Console Footer: Controls -->
+        <div class="p-4 bg-white border-t border-slate-200 shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+              <input
+                id="query"
+                type="text"
+                placeholder="Ask the agent to explore files or summarize code..."
+                class="w-full bg-slate-100 border-none rounded-full pl-5 pr-12 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none placeholder-slate-400"
+              />
+              <button
+                id="send-btn"
+                class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+
+            <button
+              id="mic-btn"
+              class="flex-shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm shadow-sm transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                ></path>
+              </svg>
+              <span id="mic-label">Listen</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Avatar & Live Transcript -->
+      <div
+        class="w-full lg:w-96 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col shrink-0 lg:h-full h-80 overflow-hidden"
+      >
+        <!-- Optional Avatar Section (hidden by default unless ENABLE_AVATAR=true) -->
+        <div
+          id="avatar-section"
+          class="hidden flex flex-col border-b border-slate-200 bg-slate-900 shrink-0 select-none"
+        >
+          <div
+            class="bg-slate-900/95 px-3.5 py-2 flex justify-between items-center border-b border-slate-800 text-xs text-slate-300"
+          >
+            <div class="flex items-center gap-2">
+              <span
+                id="avatar-status-dot"
+                class="w-2 h-2 rounded-full bg-slate-500"
+              ></span>
+              <span id="avatar-title" class="font-medium text-slate-200"
+                >Avatar</span
+              >
+              <span
+                id="avatar-mode-badge"
+                class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700"
+                >reactive</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <!-- Playback Mute Button in Avatar Bar -->
+              <button
+                id="avatar-mute-btn"
+                type="button"
+                class="text-[11px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded hover:bg-slate-800 transition flex items-center gap-1"
+                title="Mute/Unmute avatar playback"
+              >
+                <span id="avatar-mute-icon">🔊</span>
+                <span id="avatar-mute-label" class="hidden sm:inline"
+                  >Mute</span
+                >
+              </button>
+              <!-- Fit/Fill Controls (visible in video mode) -->
+              <div
+                id="avatar-fit-controls"
+                class="hidden items-center bg-slate-800/90 rounded-md p-0.5 border border-slate-700/70 text-[10px] font-medium"
+              >
+                <button
+                  id="avatar-fit-contain"
+                  type="button"
+                  class="px-1.5 py-0.5 rounded transition text-slate-300 hover:text-white"
+                  title="Fit (Full 9:16 portrait frame)"
+                >
+                  Fit
+                </button>
+                <button
+                  id="avatar-fit-cover"
+                  type="button"
+                  class="px-1.5 py-0.5 rounded transition text-slate-400 hover:text-white"
+                  title="Fill (Edge-to-edge crop)"
+                >
+                  Fill
+                </button>
+              </div>
+              <!-- Size Preset Controls -->
+              <div
+                class="flex items-center bg-slate-800/90 rounded-md p-0.5 border border-slate-700/70 text-[10px] font-mono font-medium"
+              >
+                <button
+                  id="avatar-size-s"
+                  type="button"
+                  class="px-1.5 py-0.5 rounded transition text-slate-400 hover:text-white"
+                  title="Compact height (220px)"
+                >
+                  S
+                </button>
+                <button
+                  id="avatar-size-m"
+                  type="button"
+                  class="px-1.5 py-0.5 rounded transition text-slate-400 hover:text-white"
+                  title="Standard height (340px)"
+                >
+                  M
+                </button>
+                <button
+                  id="avatar-size-l"
+                  type="button"
+                  class="px-1.5 py-0.5 rounded transition text-slate-400 hover:text-white"
+                  title="Full portrait height (480px)"
+                >
+                  L
+                </button>
+              </div>
+              <button
+                id="avatar-toggle-btn"
+                class="text-[11px] text-slate-400 hover:text-white px-2 py-0.5 rounded hover:bg-slate-800 transition"
+                title="Toggle Avatar View"
+              >
+                Hide
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="avatar-viewport"
+            class="relative w-full bg-gradient-to-b from-slate-900 to-slate-950 flex items-center justify-center overflow-hidden transition-[height] duration-200"
+            style="height: 340px;"
+          >
+            <!-- Loading state for video mode -->
+            <div
+              id="avatar-loading"
+              class="hidden absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/95 text-slate-400 z-20"
+            >
+              <div
+                class="w-7 h-7 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
+              ></div>
+              <span
+                id="avatar-loading-text"
+                class="font-mono text-[11px] text-slate-300"
+                >Connecting avatar stream...</span
+              >
+            </div>
+
+            <!-- Video Mode Element (used when avatar_mode is video) -->
+            <video
+              id="avatar-video"
+              class="hidden w-full h-full object-contain transition-all duration-200"
+              autoplay
+              playsinline
+            ></video>
+
+            <!-- Reactive Mode Element (used when avatar_mode is reactive) -->
+            <div
+              id="avatar-reactive"
+              class="w-full h-full flex flex-col items-center justify-center relative select-none"
+            >
+              <!-- Canvas for ambient waveform/frequency ring -->
+              <canvas
+                id="avatar-canvas"
+                class="absolute inset-0 w-full h-full pointer-events-none"
+                width="384"
+                height="340"
+              ></canvas>
+
+              <!-- Reactive Central Orb -->
+              <div class="relative z-10 flex flex-col items-center gap-2.5">
+                <div
+                  id="avatar-orb-outer"
+                  class="relative flex items-center justify-center"
+                >
+                  <div
+                    id="avatar-orb-halo"
+                    class="absolute w-28 h-28 rounded-full bg-gradient-to-tr from-blue-600/30 to-indigo-500/20 blur-xl transition-all duration-300"
+                  ></div>
+                  <div
+                    id="avatar-orb-ring"
+                    class="w-20 h-20 rounded-full border-2 border-blue-500/40 shadow-lg shadow-blue-500/20 flex items-center justify-center transition-all duration-300"
+                  >
+                    <div
+                      id="avatar-orb-core"
+                      class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all duration-200"
+                    >
+                      <svg
+                        class="w-7 h-7 text-white drop-shadow"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  id="avatar-state-label"
+                  class="text-[11px] font-mono tracking-wide text-cyan-400 uppercase font-semibold"
+                >
+                  Idle • Ready
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Draggable Pull-Down Resize Handle -->
+          <div
+            id="avatar-resize-handle"
+            class="w-full h-3 bg-slate-950 hover:bg-slate-800 active:bg-blue-600/30 cursor-row-resize flex items-center justify-center transition-colors select-none group border-t border-slate-800/80"
+            title="Drag down to resize avatar (double-click to toggle size)"
+          >
+            <div
+              class="w-10 h-1 rounded-full bg-slate-700 group-hover:bg-slate-400 transition-colors pointer-events-none"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Live Transcript Header -->
+        <div
+          class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center shrink-0"
+        >
+          <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <svg
+              class="w-4 h-4 text-slate-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              ></path>
+            </svg>
+            Live Transcript
+          </h3>
+          <span id="transcript-count" class="text-xs text-slate-400 font-mono"
+            >0 messages</span
+          >
+        </div>
+
+        <div
+          id="transcript-area"
+          class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0 bg-slate-50/30"
+        >
+          <!-- Chat bubbles go here -->
+        </div>
+      </div>
+    </main>
+
+    <script>
+      let ws;
+      let audioCtx;
+      let nextStartTime = 0;
+      let activeAudioSources = [];
+      let isRecording = false;
+      let audioWorkletNode = null;
+      let mediaStream = null;
+
+      const transcriptArea = document.getElementById('transcript-area');
+      const visArea = document.getElementById('visualization-area');
+      const emptyVis = document.getElementById('empty-vis');
+      const micBtn = document.getElementById('mic-btn');
+      const micLabel = document.getElementById('mic-label');
+      const queryInput = document.getElementById('query');
+      const sendBtn = document.getElementById('send-btn');
+      const connBadge = document.getElementById('conn-badge');
+      const toolStatus = document.getElementById('tool-status');
+      const transcriptCount = document.getElementById('transcript-count');
+
+      let transcriptData = [];
+      let connectionState = 'standby'; // 'standby' | 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
+      let isSessionActive = false;
+      let isConnecting = false;
+      let reconnectAttempts = 0;
+      let reconnectTimer = null;
+      let countdownInterval = null;
+      let heartbeatInterval = null;
+      let pongWatchdog = null;
+
+      // Avatar configuration & state
+      let serverConfig = {
+          enable_avatar: false,
+          avatar_mode: 'reactive',
+          avatar_preset: 'Ben'
+      };
+      let isAvatarVisible = true;
+      let avatarState = 'idle'; // 'idle' | 'listening' | 'speaking' | 'tool'
+      let currentToolName = '';
+      let speakingUntilTime = 0;
+      let speakingResetTimer = null;
+      let audioAnalyser = null;
+      let audioDataArray = null;
+      let isPlaybackMuted = localStorage.getItem('lca_playback_muted') === 'true';
+      let outputGainNode = null;
+
+      // Video avatar streaming vars
+      let mediaSource = null;
+      let sourceBuffer = null;
+      let videoBufferQueue = [];
+      let configuredCodec = 'avc1.42C020, mp4a.40.2';
+      let reactiveAnimFrame = null;
+
+      // Model Selection & Persistence
+      function getSelectedModel() {
+          const saved = localStorage.getItem('lca_selected_model');
+          const available = (serverConfig && serverConfig.available_models) || [];
+          if (saved && (available.length === 0 || available.includes(saved))) return saved;
+          return (serverConfig && serverConfig.model) || 'gemini-3.8-live';
+      }
+
+      function syncModelSelects(targetModel) {
+          const overlaySelect = document.getElementById('overlay-model-select');
+          const headerSelect = document.getElementById('header-model-select');
+          if (overlaySelect && overlaySelect.value !== targetModel) {
+              overlaySelect.value = targetModel;
+          }
+          if (headerSelect && headerSelect.value !== targetModel) {
+              headerSelect.value = targetModel;
+          }
+      }
+
+      function updateModelSelects(activeModel, availableModels) {
+          const overlaySelect = document.getElementById('overlay-model-select');
+          const headerSelect = document.getElementById('header-model-select');
+
+          if (availableModels && Array.isArray(availableModels) && availableModels.length > 0) {
+              [overlaySelect, headerSelect].forEach(sel => {
+                  if (!sel) return;
+                  sel.innerHTML = '';
+                  availableModels.forEach(m => {
+                      const opt = document.createElement('option');
+                      opt.value = m;
+                      let label = m;
+                      if (m === 'gemini-3.8-live') label = 'gemini-3.8-live (Fastest TTFF & Proactive)';
+                      opt.textContent = label;
+                      sel.appendChild(opt);
+                  });
+                  if (availableModels.includes(activeModel)) {
+                      sel.value = activeModel;
+                  }
+              });
+          } else {
+              syncModelSelects(activeModel);
+          }
+      }
+
+      function onModelSelectChange(newModel) {
+          if (!newModel) return;
+          localStorage.setItem('lca_selected_model', newModel);
+          syncModelSelects(newModel);
+          console.log(`[Model] Selected model updated to: ${newModel}`);
+
+          // If an active session is currently running, reconnect with the newly selected model
+          if (isSessionActive && ws && ws.readyState === WebSocket.OPEN) {
+              console.log('[Model] Active session detected, reconnecting with new model...');
+              updateConnectionBadge('connecting', 'Switching model...');
+              ws.close();
+              setTimeout(() => {
+                  connect();
+              }, 250);
+          }
+      }
+
+      // Fetch preflight server status on mount
+      async function fetchStatus() {
+          try {
+              const res = await fetch('/api/status');
+              if (res.ok) {
+                  const data = await res.json();
+                  serverConfig = data;
+
+                  let savedModel = localStorage.getItem('lca_selected_model');
+                  // Drop a saved model the server no longer offers (e.g. a retired preview).
+                  if (savedModel && Array.isArray(data.available_models) && !data.available_models.includes(savedModel)) {
+                      localStorage.removeItem('lca_selected_model');
+                      savedModel = null;
+                  }
+                  const activeModel = savedModel || data.model || 'gemini-3.8-live';
+                  updateModelSelects(activeModel, data.available_models);
+
+                  const overlayVoice = document.getElementById('overlay-voice');
+                  if (overlayVoice) overlayVoice.innerText = data.voice || 'Puck';
+                  const overlayRegion = document.getElementById('overlay-region');
+                  if (overlayRegion) overlayRegion.innerText = `${data.project || 'gcp'} (${data.location || 'us-central1'})`;
+                  const headerVoice = document.getElementById('header-voice');
+                  if (headerVoice) headerVoice.innerText = `Voice: ${data.voice || 'Puck'}`;
+
+                  const overlayAvatar = document.getElementById('overlay-avatar');
+                  if (overlayAvatar) {
+                      overlayAvatar.innerText = data.enable_avatar
+                          ? (data.avatar_mode === 'video' ? `Video (${data.avatar_preset || 'Ben'})` : 'Reactive Orb')
+                          : 'Disabled';
+                  }
+
+                  if (data.enable_avatar) {
+                      const avatarSection = document.getElementById('avatar-section');
+                      if (avatarSection) avatarSection.classList.remove('hidden');
+
+                      const titleEl = document.getElementById('avatar-title');
+                      if (titleEl) {
+                          titleEl.innerText = data.avatar_mode === 'video'
+                              ? `Avatar (${data.avatar_preset || 'Ben'})`
+                              : 'Agent Orb';
+                      }
+
+                      const badgeEl = document.getElementById('avatar-mode-badge');
+                      if (badgeEl) badgeEl.innerText = data.avatar_mode || 'reactive';
+
+                      const headerAvatarSep = document.getElementById('header-avatar-sep');
+                      const headerAvatar = document.getElementById('header-avatar');
+                      if (headerAvatarSep && headerAvatar) {
+                          headerAvatarSep.classList.remove('hidden');
+                          headerAvatar.classList.remove('hidden');
+                          headerAvatar.innerText = `Avatar: ${data.avatar_mode === 'video' ? (data.avatar_preset || 'Video') : 'Reactive'}`;
+                      }
+
+                      if (data.avatar_mode === 'video') {
+                          document.getElementById('avatar-reactive')?.classList.add('hidden');
+                          document.getElementById('avatar-video')?.classList.remove('hidden');
+                          document.getElementById('avatar-fit-controls')?.classList.remove('hidden');
+                          document.getElementById('avatar-fit-controls')?.classList.add('flex');
+                          setupVideoAvatar();
+                      } else {
+                          document.getElementById('avatar-video')?.classList.add('hidden');
+                          document.getElementById('avatar-reactive')?.classList.remove('hidden');
+                          document.getElementById('avatar-fit-controls')?.classList.add('hidden');
+                          document.getElementById('avatar-fit-controls')?.classList.remove('flex');
+                          startReactiveAnimation();
+                      }
+                  }
+              }
+          } catch (e) {
+              console.warn('Status fetch failed:', e);
+          }
+      }
+      fetchStatus();
+
+      // Avatar Window Sizing & Framing
+      const DEFAULT_AVATAR_HEIGHT = 340;
+      const MIN_AVATAR_HEIGHT = 180;
+      const MAX_AVATAR_HEIGHT = 640;
+
+      let currentAvatarHeight = parseInt(localStorage.getItem('lca_avatar_height')) || DEFAULT_AVATAR_HEIGHT;
+      let currentAvatarFit = localStorage.getItem('lca_avatar_fit') || 'contain';
+
+      function updateAvatarSizeButtons() {
+          const btnS = document.getElementById('avatar-size-s');
+          const btnM = document.getElementById('avatar-size-m');
+          const btnL = document.getElementById('avatar-size-l');
+
+          [btnS, btnM, btnL].forEach(b => {
+              b?.classList.remove('bg-blue-600', 'text-white');
+              b?.classList.add('text-slate-400');
+          });
+
+          if (currentAvatarHeight <= 260 && btnS) {
+              btnS.classList.add('bg-blue-600', 'text-white');
+              btnS.classList.remove('text-slate-400');
+          } else if (currentAvatarHeight >= 420 && btnL) {
+              btnL.classList.add('bg-blue-600', 'text-white');
+              btnL.classList.remove('text-slate-400');
+          } else if (btnM) {
+              btnM.classList.add('bg-blue-600', 'text-white');
+              btnM.classList.remove('text-slate-400');
+          }
+      }
+
+      function setAvatarHeight(h, animated = false) {
+          currentAvatarHeight = Math.max(MIN_AVATAR_HEIGHT, Math.min(MAX_AVATAR_HEIGHT, Math.round(h)));
+          localStorage.setItem('lca_avatar_height', currentAvatarHeight);
+          const vp = document.getElementById('avatar-viewport');
+          if (vp) {
+              if (animated) {
+                  vp.style.transition = 'height 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+              } else {
+                  vp.style.transition = 'none';
+              }
+              vp.style.height = `${currentAvatarHeight}px`;
+          }
+          updateAvatarSizeButtons();
+      }
+
+      function setAvatarFit(fit) {
+          currentAvatarFit = fit;
+          localStorage.setItem('lca_avatar_fit', fit);
+          const video = document.getElementById('avatar-video');
+          const btnContain = document.getElementById('avatar-fit-contain');
+          const btnCover = document.getElementById('avatar-fit-cover');
+          if (video) {
+              if (fit === 'cover') {
+                  video.className = video.className.replace(/object-\w+/g, '').replace(/object-\[center_20%\]/g, '').trim() + ' object-cover object-[center_20%]';
+              } else {
+                  video.className = video.className.replace(/object-\w+/g, '').replace(/object-\[center_20%\]/g, '').trim() + ' object-contain';
+              }
+          }
+          if (btnContain && btnCover) {
+              if (fit === 'cover') {
+                  btnCover.classList.add('bg-blue-600', 'text-white');
+                  btnCover.classList.remove('text-slate-400');
+                  btnContain.classList.remove('bg-blue-600', 'text-white');
+                  btnContain.classList.add('text-slate-400');
+              } else {
+                  btnContain.classList.add('bg-blue-600', 'text-white');
+                  btnContain.classList.remove('text-slate-400');
+                  btnCover.classList.remove('bg-blue-600', 'text-white');
+                  btnCover.classList.add('text-slate-400');
+              }
+          }
+      }
+
+      // Initialize saved size and fit
+      setAvatarHeight(currentAvatarHeight, false);
+      setAvatarFit(currentAvatarFit);
+
+      // Size button event handlers
+      document.getElementById('avatar-size-s')?.addEventListener('click', () => setAvatarHeight(220, true));
+      document.getElementById('avatar-size-m')?.addEventListener('click', () => setAvatarHeight(340, true));
+      document.getElementById('avatar-size-l')?.addEventListener('click', () => setAvatarHeight(480, true));
+
+      // Fit button event handlers
+      document.getElementById('avatar-fit-contain')?.addEventListener('click', () => setAvatarFit('contain'));
+      document.getElementById('avatar-fit-cover')?.addEventListener('click', () => setAvatarFit('cover'));
+
+      // Mute button event handlers
+      document.getElementById('global-mute-btn')?.addEventListener('click', togglePlaybackMute);
+      document.getElementById('avatar-mute-btn')?.addEventListener('click', togglePlaybackMute);
+      updateMuteUI();
+
+      // Model selector event handlers
+      document.getElementById('overlay-model-select')?.addEventListener('change', (e) => {
+          onModelSelectChange(e.target.value);
+      });
+      document.getElementById('header-model-select')?.addEventListener('change', (e) => {
+          onModelSelectChange(e.target.value);
+      });
+
+      // Drag resize handle event listeners
+      const avatarResizeHandle = document.getElementById('avatar-resize-handle');
+      if (avatarResizeHandle) {
+          let isDragging = false;
+          let startY = 0;
+          let startH = 0;
+
+          const onMouseMove = (e) => {
+              if (!isDragging) return;
+              const deltaY = e.clientY - startY;
+              setAvatarHeight(startH + deltaY, false);
+          };
+
+          const onMouseUp = () => {
+              if (!isDragging) return;
+              isDragging = false;
+              document.body.style.cursor = '';
+              document.body.style.userSelect = '';
+              window.removeEventListener('mousemove', onMouseMove);
+              window.removeEventListener('mouseup', onMouseUp);
+          };
+
+          avatarResizeHandle.addEventListener('mousedown', (e) => {
+              isDragging = true;
+              startY = e.clientY;
+              const vp = document.getElementById('avatar-viewport');
+              startH = vp ? vp.offsetHeight : currentAvatarHeight;
+              document.body.style.cursor = 'row-resize';
+              document.body.style.userSelect = 'none';
+              window.addEventListener('mousemove', onMouseMove);
+              window.addEventListener('mouseup', onMouseUp);
+          });
+
+          // Double-click toggle
+          avatarResizeHandle.addEventListener('dblclick', () => {
+              if (currentAvatarHeight < 300) {
+                  setAvatarHeight(480, true);
+              } else {
+                  setAvatarHeight(220, true);
+              }
+          });
+      }
+
+      // Avatar UI Toggle
+      const avatarToggleBtn = document.getElementById('avatar-toggle-btn');
+      const avatarViewport = document.getElementById('avatar-viewport');
+      if (avatarToggleBtn && avatarViewport) {
+          avatarToggleBtn.addEventListener('click', () => {
+              isAvatarVisible = !isAvatarVisible;
+              const handle = document.getElementById('avatar-resize-handle');
+              if (isAvatarVisible) {
+                  avatarViewport.classList.remove('hidden');
+                  if (handle) handle.classList.remove('hidden');
+                  avatarToggleBtn.innerText = 'Hide';
+              } else {
+                  avatarViewport.classList.add('hidden');
+                  if (handle) handle.classList.add('hidden');
+                  avatarToggleBtn.innerText = 'Show';
+              }
+          });
+      }
+
+      function getOutputGainNode() {
+          if (!outputGainNode && audioCtx) {
+              outputGainNode = audioCtx.createGain();
+              outputGainNode.gain.setValueAtTime(isPlaybackMuted ? 0 : 1, audioCtx.currentTime);
+              outputGainNode.connect(audioCtx.destination);
+          }
+          return outputGainNode;
+      }
+
+      // Web Audio Analyser for reactive visuals
+      function getAudioAnalyser() {
+          if (!audioAnalyser && audioCtx) {
+              audioAnalyser = audioCtx.createAnalyser();
+              audioAnalyser.fftSize = 64;
+              audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+              const outGain = getOutputGainNode();
+              if (outGain) {
+                  audioAnalyser.connect(outGain);
+              } else {
+                  audioAnalyser.connect(audioCtx.destination);
+              }
+          }
+          return audioAnalyser;
+      }
+
+      function updateMuteUI() {
+          const globalBtn = document.getElementById('global-mute-btn');
+          const globalIcon = document.getElementById('global-mute-icon');
+          const globalLabel = document.getElementById('global-mute-label');
+          const avatarBtn = document.getElementById('avatar-mute-btn');
+          const avatarIcon = document.getElementById('avatar-mute-icon');
+          const avatarLabel = document.getElementById('avatar-mute-label');
+
+          if (isPlaybackMuted) {
+              if (globalBtn) {
+                  globalBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition cursor-pointer select-none";
+              }
+              if (globalIcon) globalIcon.innerText = '🔇';
+              if (globalLabel) globalLabel.innerText = 'Muted';
+              if (avatarBtn) {
+                  avatarBtn.classList.add('text-amber-400');
+                  avatarBtn.classList.remove('text-slate-400');
+              }
+              if (avatarIcon) avatarIcon.innerText = '🔇';
+              if (avatarLabel) avatarLabel.innerText = 'Unmute';
+          } else {
+              if (globalBtn) {
+                  globalBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer select-none";
+              }
+              if (globalIcon) globalIcon.innerText = '🔊';
+              if (globalLabel) globalLabel.innerText = 'Audio On';
+              if (avatarBtn) {
+                  avatarBtn.classList.remove('text-amber-400');
+                  avatarBtn.classList.add('text-slate-400');
+              }
+              if (avatarIcon) avatarIcon.innerText = '🔊';
+              if (avatarLabel) avatarLabel.innerText = 'Mute';
+          }
+      }
+
+      function setPlaybackMuted(muted) {
+          isPlaybackMuted = muted;
+          localStorage.setItem('lca_playback_muted', isPlaybackMuted ? 'true' : 'false');
+          if (outputGainNode && audioCtx) {
+              outputGainNode.gain.setValueAtTime(isPlaybackMuted ? 0 : 1, audioCtx.currentTime);
+          }
+          const videoEl = document.getElementById('avatar-video');
+          if (videoEl) {
+              videoEl.muted = isPlaybackMuted;
+          }
+          updateMuteUI();
+      }
+
+      function togglePlaybackMute() {
+          setPlaybackMuted(!isPlaybackMuted);
+      }
+
+      // Update Avatar visual states
+      function updateAvatarState(newState) {
+          avatarState = newState;
+          const dot = document.getElementById('avatar-status-dot');
+          const label = document.getElementById('avatar-state-label');
+          const ring = document.getElementById('avatar-orb-ring');
+          const halo = document.getElementById('avatar-orb-halo');
+          const core = document.getElementById('avatar-orb-core');
+
+          if (!label) return;
+
+          if (newState === 'listening') {
+              if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
+              label.innerText = "Listening";
+              label.className = "text-[11px] font-mono tracking-wide text-emerald-400 uppercase font-semibold";
+              if (ring) ring.className = "w-20 h-20 rounded-full border-2 border-emerald-500/80 shadow-lg shadow-emerald-500/20 flex items-center justify-center transition-all duration-300";
+              if (halo) halo.className = "absolute w-32 h-32 rounded-full bg-gradient-to-tr from-emerald-600/40 to-teal-500/30 blur-xl transition-all duration-300";
+              if (core) core.className = "w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 shadow-lg shadow-emerald-500/40 flex items-center justify-center transition-all duration-200";
+          } else if (newState === 'speaking') {
+              if (dot) dot.className = "w-2 h-2 rounded-full bg-cyan-400 animate-pulse";
+              label.innerText = "Speaking";
+              label.className = "text-[11px] font-mono tracking-wide text-cyan-400 uppercase font-semibold";
+              if (ring) ring.className = "w-20 h-20 rounded-full border-2 border-cyan-400/80 shadow-lg shadow-cyan-500/30 flex items-center justify-center transition-all duration-300";
+              if (halo) halo.className = "absolute w-36 h-36 rounded-full bg-gradient-to-tr from-cyan-500/40 to-blue-500/30 blur-2xl transition-all duration-300";
+              if (core) core.className = "w-14 h-14 rounded-full bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-500 shadow-lg shadow-cyan-500/40 flex items-center justify-center transition-all duration-200";
+          } else if (newState === 'tool') {
+              if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+              label.innerText = currentToolName ? `Tool: ${currentToolName}` : "Analyzing Code";
+              label.className = "text-[11px] font-mono tracking-wide text-amber-400 uppercase font-semibold";
+              if (ring) ring.className = "w-20 h-20 rounded-full border-2 border-amber-400/80 shadow-lg shadow-amber-500/30 flex items-center justify-center transition-all duration-300";
+              if (halo) halo.className = "absolute w-32 h-32 rounded-full bg-gradient-to-tr from-amber-500/40 to-orange-500/30 blur-xl transition-all duration-300";
+              if (core) core.className = "w-14 h-14 rounded-full bg-gradient-to-tr from-amber-400 via-orange-500 to-amber-600 shadow-lg shadow-amber-500/40 flex items-center justify-center transition-all duration-200";
+          } else {
+              if (dot) dot.className = "w-2 h-2 rounded-full bg-blue-400";
+              label.innerText = "Idle • Ready";
+              label.className = "text-[11px] font-mono tracking-wide text-slate-400 uppercase";
+              if (ring) ring.className = "w-20 h-20 rounded-full border-2 border-blue-500/40 shadow-sm flex items-center justify-center transition-all duration-300";
+              if (halo) halo.className = "absolute w-28 h-28 rounded-full bg-gradient-to-tr from-blue-600/30 to-indigo-500/20 blur-xl transition-all duration-300";
+              if (core) core.className = "w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 shadow-md shadow-blue-500/20 flex items-center justify-center transition-all duration-200";
+          }
+      }
+
+      // Reactive Canvas & Orb Animation
+      function startReactiveAnimation() {
+          if (reactiveAnimFrame) cancelAnimationFrame(reactiveAnimFrame);
+          const canvas = document.getElementById('avatar-canvas');
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          const halo = document.getElementById('avatar-orb-halo');
+          const core = document.getElementById('avatar-orb-core');
+
+          let tick = 0;
+
+          function render() {
+              tick++;
+              const width = canvas.width = canvas.offsetWidth || 384;
+              const height = canvas.height = canvas.offsetHeight || 208;
+              const centerX = width / 2;
+              const centerY = height / 2 - 12;
+
+              ctx.clearRect(0, 0, width, height);
+
+              const isSpeaking = audioCtx && (audioCtx.currentTime < speakingUntilTime);
+              if (isSpeaking) {
+                  if (avatarState !== 'speaking') updateAvatarState('speaking');
+              } else if (isRecording) {
+                  if (avatarState !== 'listening') updateAvatarState('listening');
+              } else if (currentToolName) {
+                  if (avatarState !== 'tool') updateAvatarState('tool');
+              } else {
+                  if (avatarState !== 'idle') updateAvatarState('idle');
+              }
+
+              let volume = 0;
+              if (isSpeaking && audioAnalyser && audioDataArray) {
+                  audioAnalyser.getByteFrequencyData(audioDataArray);
+                  let sum = 0;
+                  for (let i = 0; i < audioDataArray.length; i++) {
+                      sum += audioDataArray[i];
+                  }
+                  volume = (sum / audioDataArray.length) / 255;
+              }
+
+              if (core && halo) {
+                  if (isSpeaking) {
+                      const scaleCore = 1.0 + volume * 0.45;
+                      const scaleHalo = 1.0 + volume * 0.9;
+                      core.style.transform = `scale(${scaleCore.toFixed(2)})`;
+                      halo.style.transform = `scale(${scaleHalo.toFixed(2)})`;
+                  } else if (isRecording) {
+                      const pulse = 1.0 + 0.08 * Math.sin(tick * 0.1);
+                      core.style.transform = `scale(${pulse.toFixed(2)})`;
+                      halo.style.transform = `scale(${(pulse * 1.15).toFixed(2)})`;
+                  } else {
+                      const breathe = 1.0 + 0.04 * Math.sin(tick * 0.03);
+                      core.style.transform = `scale(${breathe.toFixed(2)})`;
+                      halo.style.transform = `scale(${(breathe * 1.05).toFixed(2)})`;
+                  }
+              }
+
+              if (isSpeaking && volume > 0.04) {
+                  const rippleCount = 3;
+                  for (let r = 1; r <= rippleCount; r++) {
+                      const radius = 46 + r * 20 + (tick * 1.5 + r * 15) % 50;
+                      const alpha = Math.max(0, 0.35 * (1 - (radius - 46) / 70) * (volume * 2));
+                      ctx.beginPath();
+                      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                      ctx.strokeStyle = `rgba(56, 189, 248, ${alpha.toFixed(2)})`;
+                      ctx.lineWidth = 1.5;
+                      ctx.stroke();
+                  }
+              }
+
+              reactiveAnimFrame = requestAnimationFrame(render);
+          }
+          reactiveAnimFrame = requestAnimationFrame(render);
+      }
+
+      // Video Avatar MediaSource handling
+      function setupVideoAvatar() {
+          const videoEl = document.getElementById('avatar-video');
+          if (!videoEl) return;
+          videoEl.muted = isPlaybackMuted;
+
+          const loader = document.getElementById('avatar-loading');
+          if (loader) loader.classList.remove('hidden');
+
+          if ('MediaSource' in window) {
+              mediaSource = new MediaSource();
+              videoEl.src = URL.createObjectURL(mediaSource);
+              mediaSource.addEventListener('sourceopen', () => {
+                  initSourceBuffer();
+              });
+          } else {
+              console.warn('MediaSource not supported in this browser');
+          }
+      }
+
+      function initSourceBuffer() {
+          if (!mediaSource || mediaSource.readyState !== 'open') return;
+          const mimeCodec = `video/mp4; codecs="${configuredCodec}"`;
+          const fallbackCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+          let target = MediaSource.isTypeSupported(mimeCodec) ? mimeCodec : (MediaSource.isTypeSupported(fallbackCodec) ? fallbackCodec : 'video/mp4');
+          try {
+              sourceBuffer = mediaSource.addSourceBuffer(target);
+              sourceBuffer.addEventListener('updateend', onSourceBufferUpdateEnd);
+              processVideoQueue();
+          } catch (e) {
+              console.warn('Failed to addSourceBuffer:', e);
+          }
+      }
+
+      function onSourceBufferUpdateEnd() {
+          // Process any remaining fragments in queue
+          processVideoQueue();
+
+          // Inter-Turn Gap Jumping & Demuxer Underflow Mitigation:
+          // During multi-turn Live avatar conversations, Gemini only sends fMP4 packets during active vocalization turns.
+          // Chrome's media demuxer stalls at the end of turn N (BUFFERING_HAVE_NOTHING). When turn N+1 arrives with a later PTS,
+          // the video element freezes waiting for continuous media unless currentTime is jumped across the unbuffered gap.
+          const videoEl = document.getElementById('avatar-video');
+          if (sourceBuffer && videoEl && sourceBuffer.buffered.length > 0) {
+              const numRanges = sourceBuffer.buffered.length;
+              const latestStart = sourceBuffer.buffered.start(numRanges - 1);
+              const latestEnd = sourceBuffer.buffered.end(numRanges - 1);
+
+              // If video playhead is behind the latest buffered range start (or stalled in a gap between turns)
+              if (videoEl.currentTime < latestStart - 0.1 || (numRanges > 1 && videoEl.currentTime < latestStart)) {
+                  console.log(`[Avatar MSE] Jumping buffer gap: ${videoEl.currentTime.toFixed(3)}s -> ${latestStart.toFixed(3)}s (range [${latestStart.toFixed(2)} - ${latestEnd.toFixed(2)}])`);
+                  videoEl.currentTime = latestStart;
+              }
+
+              if (videoEl.paused && videoBufferQueue.length === 0) {
+                  videoEl.play().catch(e => console.warn('Autoplay wait on updateend:', e));
+              }
+          }
+      }
+
+      function processVideoQueue() {
+          if (sourceBuffer && !sourceBuffer.updating && videoBufferQueue.length > 0) {
+              const chunk = videoBufferQueue.shift();
+              try {
+                  sourceBuffer.appendBuffer(chunk);
+                  const loader = document.getElementById('avatar-loading');
+                  if (loader) loader.classList.add('hidden');
+                  const videoEl = document.getElementById('avatar-video');
+                  if (videoEl && videoEl.paused) {
+                      videoEl.play().catch(e => console.warn('Autoplay wait:', e));
+                  }
+              } catch (e) {
+                  console.error('Failed to append video chunk:', e);
+              }
+          }
+      }
+
+      // Procedural Web Audio Ambient Chime (Warm, low-register harmonic fifth with soft acoustic envelope)
+      function playAmbientCue() {
+          if (!audioCtx) return;
+          const now = audioCtx.currentTime;
+
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const filter = audioCtx.createBiquadFilter();
+          const gain = audioCtx.createGain();
+
+          // Pure sine waves in warm mid-register (C4 + G4 harmonic fifth)
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(261.63, now); // C4 (261.6 Hz)
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(392.00, now); // G4 (392.0 Hz)
+
+          // Warm lowpass filter to remove any high-frequency buzz or click transients
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(700, now);
+          filter.Q.setValueAtTime(0.7, now);
+
+          // Gentle onset (80ms) and mellow acoustic decay (650ms) with lower peak gain
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.035, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+
+          const outNode = getOutputGainNode() || audioCtx.destination;
+          gain.connect(outNode);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.7);
+          osc2.stop(now + 0.7);
+      }
+
+      // Procedural Soft Tone
+      function playSoftTone() {
+          if (!audioCtx) return;
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.08, now + 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+          osc.connect(gain);
+          const outNode = getOutputGainNode() || audioCtx.destination;
+          gain.connect(outNode);
+          osc.start(now);
+          osc.stop(now + 0.6);
+      }
+
+      function updateConnectionBadge(state, detail) {
+          connectionState = state;
+          connBadge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all select-none ";
+
+          if (state === 'standby') {
+              connBadge.className += "bg-slate-100 text-slate-600 border-slate-200";
+              connBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> Standby`;
+              connBadge.title = "Not connected";
+          } else if (state === 'connecting') {
+              connBadge.className += "bg-amber-50 text-amber-700 border-amber-200";
+              connBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Connecting...`;
+              connBadge.title = "Connecting to Gemini Live session...";
+          } else if (state === 'connected') {
+              connBadge.className += "bg-emerald-50 text-emerald-700 border-emerald-200";
+              connBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Connected`;
+              connBadge.title = "Live Bidi session active";
+          } else if (state === 'reconnecting') {
+              connBadge.className += "bg-amber-50 text-amber-800 border-amber-300 cursor-pointer hover:bg-amber-100 shadow-sm";
+              connBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> <span>${detail || 'Reconnecting...'}</span> <span class="ml-1 text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">Retry</span>`;
+              connBadge.title = "Click to reconnect immediately";
+          } else if (state === 'disconnected') {
+              connBadge.className += "bg-rose-50 text-rose-700 border-rose-200 cursor-pointer hover:bg-rose-100 shadow-sm";
+              connBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> Disconnected <span class="ml-1 text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-rose-200 text-rose-900">Reconnect</span>`;
+              connBadge.title = "Connection lost. Click to reconnect.";
+          }
+      }
+
+      connBadge.addEventListener('click', () => {
+          if (connectionState === 'disconnected' || connectionState === 'reconnecting') {
+              reconnectNow();
+          }
+      });
+
+      function startHeartbeat() {
+          stopHeartbeat();
+          heartbeatInterval = setInterval(() => {
+              if (!ws || ws.readyState !== WebSocket.OPEN) return;
+              try {
+                  ws.send(JSON.stringify({ type: 'ping' }));
+              } catch (e) {
+                  handleHeartbeatFailure('Socket send failed');
+                  return;
+              }
+
+              if (pongWatchdog) clearTimeout(pongWatchdog);
+              pongWatchdog = setTimeout(() => {
+                  handleHeartbeatFailure('Ping timeout (no server response)');
+              }, 5000);
+          }, 10000);
+      }
+
+      function handlePongOrProofOfLife() {
+          if (pongWatchdog) {
+              clearTimeout(pongWatchdog);
+              pongWatchdog = null;
+          }
+      }
+
+      function stopHeartbeat() {
+          if (heartbeatInterval) {
+              clearInterval(heartbeatInterval);
+              heartbeatInterval = null;
+          }
+          if (pongWatchdog) {
+              clearTimeout(pongWatchdog);
+              pongWatchdog = null;
+          }
+      }
+
+      function handleHeartbeatFailure(reason) {
+          console.warn(`[Live] Heartbeat failure: ${reason}. Closing socket to trigger auto-reconnect...`);
+          stopHeartbeat();
+          if (ws) {
+              try { ws.close(); } catch (e) {}
+          }
+          scheduleReconnect();
+      }
+
+      function clearReconnectTimers() {
+          if (countdownInterval) {
+              clearInterval(countdownInterval);
+              countdownInterval = null;
+          }
+          if (reconnectTimer) {
+              clearTimeout(reconnectTimer);
+              reconnectTimer = null;
+          }
+      }
+
+      function scheduleReconnect() {
+          if (!isSessionActive || isConnecting) return;
+          stopHeartbeat();
+          clearReconnectTimers();
+
+          reconnectAttempts++;
+          const delayMs = Math.min(1000 * Math.pow(1.5, reconnectAttempts), 10000);
+          let secondsLeft = Math.ceil(delayMs / 1000);
+
+          const updateLabel = () => {
+              updateConnectionBadge('reconnecting', `Reconnecting in ${secondsLeft}s (#${reconnectAttempts})`);
+          };
+          updateLabel();
+
+          countdownInterval = setInterval(() => {
+              secondsLeft--;
+              if (secondsLeft > 0) {
+                  updateLabel();
+              } else {
+                  clearInterval(countdownInterval);
+                  countdownInterval = null;
+              }
+          }, 1000);
+
+          reconnectTimer = setTimeout(() => {
+              clearReconnectTimers();
+              connect(true);
+          }, delayMs);
+      }
+
+      function reconnectNow() {
+          clearReconnectTimers();
+          connect(true);
+      }
+
+      document.getElementById('start-btn').onclick = async () => {
+          document.getElementById('connect-overlay').style.display = 'none';
+          isSessionActive = true;
+          try {
+              await initAudioContext();
+          } catch (err) {
+              console.warn('[Audio] initAudioContext non-blocking error:', err);
+          }
+          const videoEl = document.getElementById('avatar-video');
+          if (videoEl) {
+              videoEl.play().catch(() => {});
+          }
+          // Connect immediately without blocking on video playback
+          connect();
+      };
+
+      async function initAudioContext() {
+          try {
+              if (!audioCtx) {
+                  const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                  if (AudioCtxClass) {
+                      try {
+                          audioCtx = new AudioCtxClass({ sampleRate: 16000 });
+                      } catch (e) {
+                          console.warn('[Audio] 16kHz AudioContext failed, falling back to default:', e);
+                          audioCtx = new AudioCtxClass();
+                      }
+                  }
+              }
+              if (audioCtx && audioCtx.state === 'suspended') {
+                  await audioCtx.resume();
+              }
+              getOutputGainNode();
+          } catch (err) {
+              console.warn('[Audio] AudioContext init error:', err);
+          }
+      }
+
+      function connect(isReconnect = false) {
+          if (isConnecting) return;
+          isConnecting = true;
+          clearReconnectTimers();
+          stopHeartbeat();
+
+          updateConnectionBadge('connecting');
+
+          const selectedModel = getSelectedModel();
+          const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+          const wsUrl = `${wsProtocol}//${window.location.host}/ws?model=${encodeURIComponent(selectedModel)}`;
+          ws = new WebSocket(wsUrl);
+          ws.binaryType = 'arraybuffer';
+
+          ws.onopen = () => {
+              isConnecting = false;
+              reconnectAttempts = 0;
+              startHeartbeat();
+          };
+
+          ws.onmessage = handleWebSocketMessage;
+
+          ws.onclose = (e) => {
+              isConnecting = false;
+              stopHeartbeat();
+              if (isSessionActive) {
+                  scheduleReconnect();
+              } else {
+                  updateConnectionBadge('disconnected');
+              }
+          };
+
+          ws.onerror = (e) => {
+              console.error("WebSocket error:", e);
+              isConnecting = false;
+              updateConnectionBadge('disconnected');
+          };
+      }
+
+      // Inline AudioWorklet
+      const workletCode = `
+          class AudioCaptureProcessor extends AudioWorkletProcessor {
+              constructor() {
+                  super();
+                  this.bufferSize = 2048; // Send chunks roughly every 128ms at 16kHz
+                  this.buffer = new Float32Array(this.bufferSize);
+                  this.bufferIndex = 0;
+              }
+              process(inputs) {
+                  const input = inputs[0];
+                  if (input && input.length > 0) {
+                      const inputChannel = input[0];
+                      for (let i = 0; i < inputChannel.length; i++) {
+                          this.buffer[this.bufferIndex++] = inputChannel[i];
+                          if (this.bufferIndex >= this.bufferSize) {
+                              this.port.postMessage({ type: "audio", data: this.buffer.slice() });
+                              this.bufferIndex = 0;
+                          }
+                      }
+                  }
+                  return true;
+              }
+          }
+          registerProcessor("audio-capture-processor", AudioCaptureProcessor);
+      `;
+      const workletUrl = URL.createObjectURL(new Blob([workletCode], { type: 'application/javascript' }));
+
+      function renderTranscript() {
+          transcriptArea.innerHTML = '';
+          transcriptData.forEach(msg => {
+              const isUser = msg.type === 'user';
+              const wrapper = document.createElement('div');
+              wrapper.className = `flex flex-col ${isUser ? 'items-end' : 'items-start'}`;
+
+              const label = document.createElement('span');
+              label.className = 'text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 pl-1 pr-1';
+              label.innerText = isUser ? 'YOU' : 'AGENT';
+
+              const bubble = document.createElement('div');
+              bubble.className = `max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-xs ${
+                  isUser ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white text-slate-800 border border-slate-200 rounded-tl-sm'
+              }`;
+              bubble.innerText = msg.text;
+
+              wrapper.appendChild(label);
+              wrapper.appendChild(bubble);
+              transcriptArea.appendChild(wrapper);
+          });
+          transcriptArea.scrollTop = transcriptArea.scrollHeight;
+          if (transcriptCount) {
+              transcriptCount.innerText = `${transcriptData.length} messages`;
+          }
+      }
+
+      const visualizationRenderers = {
+          list_directory: (args, result) => {
+              if (!result.output) return null;
+              const list = document.createElement('div');
+              list.className = 'grid grid-cols-1 md:grid-cols-2 gap-1.5 font-mono';
+              result.output.forEach(f => {
+                  const item = document.createElement('div');
+                  item.className = 'flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-100 text-slate-700';
+                  item.innerHTML = `
+                      <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                      <span class="truncate">${f}</span>
+                  `;
+                  list.appendChild(item);
+              });
+              return list;
+          },
+          read_file: (args, result) => {
+              if (!result.output) return null;
+              const container = document.createElement('div');
+              const escaped = result.output.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              const lines = escaped.split('\n').length;
+              container.innerHTML = `
+                  <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1 font-mono">
+                      <span>File Preview</span>
+                      <span>${lines} lines ${result.truncated ? '(truncated)' : ''}</span>
+                  </div>
+                  <pre class="code-block text-xs max-h-80 overflow-y-auto"><code>${escaped}</code></pre>
+              `;
+              return container;
+          },
+          generate_diagram: (args, result) => {
+              const container = document.createElement('div');
+              const title = result.title || args.title || 'Technical Diagram';
+              const escapedDot = (result.dot_code || args.dot_code || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+              let imageHtml = '';
+              if (result.image_base64) {
+                  imageHtml = `
+                      <div class="mt-2 relative group bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center overflow-hidden">
+                          <img src="${result.image_base64}" alt="${title}" class="max-h-96 w-auto max-w-full object-contain rounded-lg cursor-zoom-in shadow-xs transition-transform duration-200 hover:scale-[1.01]" onclick="openDiagramLightbox('${result.image_base64}', '${title.replace(/'/g, "\\'")}')" />
+                          <div class="w-full flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60 text-xs">
+                              <div class="flex items-center gap-3">
+                                  <button type="button" onclick="openDiagramLightbox('${result.image_base64}', '${title.replace(/'/g, "\\'")}')" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
+                                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                      <span>Enlarge</span>
+                                  </button>
+                                  ${result.image_url ? `
+                                  <a href="${result.image_url}" target="_blank" class="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700 font-medium">
+                                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                      <span>Open Tab</span>
+                                  </a>` : ''}
+                              </div>
+                              <a href="${result.image_base64}" download="${result.filename || 'diagram'}.png" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium">
+                                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                  <span>Download PNG</span>
+                              </a>
+                          </div>
+                      </div>
+                  `;
+              }
+
+              let dotDrawer = '';
+              if (escapedDot) {
+                  dotDrawer = `
+                      <details class="mt-2.5 text-xs">
+                          <summary class="cursor-pointer text-slate-500 hover:text-slate-700 py-1 select-none flex items-center gap-1.5 font-medium">
+                              <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                              <span>Graphviz DOT Source</span>
+                              ${result.dot_path ? `<span class="text-[10px] text-slate-400 font-mono">(${result.dot_path})</span>` : ''}
+                          </summary>
+                          <pre class="code-block text-xs max-h-48 overflow-y-auto mt-1"><code>${escapedDot}</code></pre>
+                      </details>
+                  `;
+              }
+
+              container.innerHTML = `
+                  <div class="font-medium text-slate-800 text-sm mb-1">${title}</div>
+                  ${imageHtml}
+                  ${dotDrawer}
+              `;
+              return container;
+          }
+      };
+
+      function renderVisualization(name, args, result) {
+          if (emptyVis) emptyVis.style.display = 'none';
+
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-left transition-all';
+
+          const header = document.createElement('div');
+          header.className = 'flex items-center justify-between mb-3 border-b border-slate-100 pb-2';
+          header.innerHTML = `
+              <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-mono font-semibold rounded-md border border-blue-200">${name}</span>
+                  <span class="text-xs text-slate-500 font-mono truncate max-w-[220px]">args: ${JSON.stringify(args)}</span>
+              </div>
+              <span class="text-[10px] font-semibold uppercase ${result.error && !result.image_base64 ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-emerald-600 bg-emerald-50 border-emerald-200'} px-2 py-0.5 rounded-full border">${result.error && !result.image_base64 ? 'Warning' : 'Executed'}</span>
+          `;
+          card.appendChild(header);
+
+          const content = document.createElement('div');
+          content.className = 'text-slate-700 text-xs mt-2';
+
+          if (result.error && !result.image_base64 && !result.dot_code) {
+              content.innerHTML = `<div class="p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 font-mono">${result.error}</div>`;
+          } else {
+              const renderer = visualizationRenderers[name];
+              let renderedEl = null;
+              if (renderer) {
+                  renderedEl = renderer(args, result);
+              }
+              if (renderedEl) {
+                  if (result.error) {
+                      const errNotice = document.createElement('div');
+                      errNotice.className = 'p-2.5 mb-2 bg-amber-50 text-amber-800 rounded-lg border border-amber-200 font-mono text-xs';
+                      errNotice.innerText = result.error;
+                      content.appendChild(errNotice);
+                  }
+                  content.appendChild(renderedEl);
+              } else {
+                  content.innerHTML = `<pre class="code-block text-xs max-h-72 overflow-y-auto"><code>${JSON.stringify(result.output || result, null, 2)}</code></pre>`;
+              }
+          }
+
+          card.appendChild(content);
+          visArea.appendChild(card);
+          visArea.scrollTop = visArea.scrollHeight;
+      }
+
+      function handleWebSocketMessage(event) {
+          handlePongOrProofOfLife();
+
+          if (event.data instanceof ArrayBuffer) {
+              if (serverConfig.enable_avatar && serverConfig.avatar_mode === 'video') {
+                  const chunk = new Uint8Array(event.data);
+                  videoBufferQueue.push(chunk);
+                  processVideoQueue();
+                  updateAvatarState('speaking');
+                  if (speakingResetTimer) clearTimeout(speakingResetTimer);
+                  speakingResetTimer = setTimeout(() => {
+                      updateAvatarState('idle');
+                  }, 1200);
+              }
+              return;
+          }
+
+          if (typeof event.data === 'string') {
+              try {
+                  const msg = JSON.parse(event.data);
+
+                  if (msg.type === 'pong') {
+                      return;
+                  } else if (msg.type === 'media_config') {
+                      if (msg.codecs && msg.codecs !== configuredCodec) {
+                          configuredCodec = msg.codecs;
+                          if (mediaSource && mediaSource.readyState === 'open') {
+                              if (sourceBuffer) {
+                                  try {
+                                      mediaSource.removeSourceBuffer(sourceBuffer);
+                                  } catch (e) {
+                                      console.warn('removeSourceBuffer error:', e);
+                                  }
+                                  sourceBuffer = null;
+                              }
+                              initSourceBuffer();
+                          }
+                      }
+                  } else if (msg.type === 'connection_state') {
+                      if (msg.state === 'ready') {
+                          updateConnectionBadge('connected');
+                          playAmbientCue();
+                          if (msg.model) {
+                              syncModelSelects(msg.model);
+                          }
+                      } else if (msg.state === 'disconnected') {
+                          updateConnectionBadge('disconnected', msg.reason || 'Disconnected');
+                          scheduleReconnect();
+                      }
+                  } else if (msg.type === 'error') {
+                      console.error('[Live] Server error:', msg.message);
+                      updateConnectionBadge('disconnected', 'Live Error');
+                      if (toolStatus) toolStatus.innerText = 'error';
+                      transcriptData.push({ type: 'avatar', text: `⚠️ Connection Error: ${msg.message || 'Live session error'}`, isPartial: false });
+                      renderTranscript();
+                  } else if (msg.type === 'audio') {
+                      // Decode base64 to binary
+                      const binaryStr = window.atob(msg.data);
+                      const len = binaryStr.length;
+                      const bytes = new Uint8Array(len);
+                      for (let i = 0; i < len; i++) {
+                          bytes[i] = binaryStr.charCodeAt(i);
+                      }
+
+                      // Parse 16-bit 24kHz PCM safely
+                      const sampleCount = Math.floor(len / 2);
+                      if (sampleCount === 0) return;
+                      const int16Data = new Int16Array(bytes.buffer, 0, sampleCount);
+                      const float32Data = new Float32Array(sampleCount);
+                      for (let i = 0; i < sampleCount; i++) {
+                          float32Data[i] = int16Data[i] / 32768.0;
+                      }
+
+                      if (!audioCtx) return;
+                      const buffer = audioCtx.createBuffer(1, float32Data.length, 24000);
+                      buffer.getChannelData(0).set(float32Data);
+
+                      const source = audioCtx.createBufferSource();
+                      source.buffer = buffer;
+
+                      const analyser = getAudioAnalyser();
+                      if (analyser) {
+                          source.connect(analyser);
+                      } else {
+                          const outNode = getOutputGainNode() || audioCtx.destination;
+                          source.connect(outNode);
+                      }
+
+                      const currentTime = audioCtx.currentTime;
+                      if (nextStartTime < currentTime) {
+                          // Buffer underrun or start of turn: add 80ms playout jitter cushion
+                          nextStartTime = currentTime + 0.08;
+                      }
+                      source.start(nextStartTime);
+                      nextStartTime += buffer.duration;
+                      speakingUntilTime = Math.max(speakingUntilTime, nextStartTime);
+
+                      activeAudioSources.push(source);
+                      source.onended = () => {
+                          const idx = activeAudioSources.indexOf(source);
+                          if (idx !== -1) activeAudioSources.splice(idx, 1);
+                      };
+                  } else if (msg.type === 'output_transcript') {
+                      const isFinished = msg.finished === 'true';
+                      const lastIdx = transcriptData.length - 1;
+                      if (lastIdx >= 0 && transcriptData[lastIdx].type === 'avatar' && transcriptData[lastIdx].isPartial) {
+                          transcriptData[lastIdx].text += msg.text;
+                          transcriptData[lastIdx].isPartial = !isFinished;
+                      } else {
+                          transcriptData.push({ type: 'avatar', text: msg.text, isPartial: !isFinished });
+                      }
+                      renderTranscript();
+                  } else if (msg.type === 'input_transcript') {
+                      const isFinished = msg.finished === 'true';
+                      const lastIdx = transcriptData.length - 1;
+                      if (lastIdx >= 0 && transcriptData[lastIdx].type === 'user' && transcriptData[lastIdx].isPartial) {
+                          transcriptData[lastIdx].text = msg.text;
+                          transcriptData[lastIdx].isPartial = !isFinished;
+                      } else {
+                          transcriptData.push({ type: 'user', text: msg.text, isPartial: !isFinished });
+                      }
+                      renderTranscript();
+                  } else if (msg.type === 'interrupted') {
+                      console.log("Live stream interrupted!");
+                      activeAudioSources.forEach(s => {
+                          try { s.stop(); } catch (e) {}
+                      });
+                      activeAudioSources = [];
+                      nextStartTime = audioCtx ? audioCtx.currentTime : 0;
+                      speakingUntilTime = 0;
+                      videoBufferQueue = [];
+                      if (sourceBuffer && sourceBuffer.updating) {
+                          try { sourceBuffer.abort(); } catch (e) {}
+                      }
+                      updateAvatarState('idle');
+                      const lastIdx = transcriptData.length - 1;
+                      if (lastIdx >= 0 && transcriptData[lastIdx].type === 'avatar') {
+                          transcriptData[lastIdx].isPartial = false;
+                      }
+                  } else if (msg.type === 'tool_execution') {
+                      currentToolName = msg.name;
+                      updateAvatarState('tool');
+                      if (toolStatus) {
+                          toolStatus.innerText = `running ${msg.name}`;
+                      }
+                      setTimeout(() => {
+                          if (currentToolName === msg.name) {
+                              currentToolName = '';
+                              updateAvatarState('idle');
+                          }
+                          if (toolStatus) toolStatus.innerText = 'idle';
+                      }, 2500);
+                      renderVisualization(msg.name, msg.args, msg.result);
+                      const lastIdx = transcriptData.length - 1;
+                      if (lastIdx >= 0 && transcriptData[lastIdx].type === 'avatar') {
+                          transcriptData[lastIdx].isPartial = false;
+                      }
+                  }
+              } catch(e) {
+                  console.error("JSON parse error:", e);
+              }
+          }
+      }
+
+      function sendUserText() {
+          const q = queryInput.value.trim();
+          if (!q || !ws || ws.readyState !== WebSocket.OPEN) return;
+          ws.send(JSON.stringify({ type: "text", data: q }));
+          transcriptData.push({ type: 'user', text: q, isPartial: false });
+          renderTranscript();
+          queryInput.value = '';
+      }
+
+      sendBtn.onclick = sendUserText;
+
+      queryInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') sendUserText();
+      });
+
+      // Microphone Logic using AudioWorklet
+      micBtn.onclick = async () => {
+          await initAudioContext();
+          if (!ws || ws.readyState !== WebSocket.OPEN) return;
+          if (isRecording) {
+              stopMic();
+          } else {
+              await startMic();
+          }
+      };
+
+      async function startMic() {
+          await initAudioContext();
+          try {
+              mediaStream = await navigator.mediaDevices.getUserMedia({
+                  audio: {
+                      sampleRate: 16000,
+                      channelCount: 1,
+                      echoCancellation: true,
+                      noiseSuppression: true,
+                      autoGainControl: true
+                  }
+              });
+              const source = audioCtx.createMediaStreamSource(mediaStream);
+
+              await audioCtx.audioWorklet.addModule(workletUrl);
+              audioWorkletNode = new AudioWorkletNode(audioCtx, 'audio-capture-processor');
+
+              audioWorkletNode.port.onmessage = (e) => {
+                  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+                  if (e.data.type === 'audio') {
+                      const inputData = e.data.data;
+                      const pcmData = new Int16Array(inputData.length);
+                      for (let i = 0; i < inputData.length; i++) {
+                          let s = Math.max(-1, Math.min(1, inputData[i]));
+                          pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                      }
+                      const buffer = new Uint8Array(pcmData.buffer);
+                      let binary = '';
+                      for (let i = 0; i < buffer.byteLength; i++) {
+                          binary += String.fromCharCode(buffer[i]);
+                      }
+                      ws.send(JSON.stringify({
+                          type: 'audio',
+                          mimeType: 'audio/pcm;rate=16000',
+                          data: btoa(binary)
+                      }));
+                  }
+              };
+
+              source.connect(audioWorkletNode);
+              // Note: Do NOT connect audioWorkletNode to audioCtx.destination to prevent speaker loopback
+              isRecording = true;
+              updateAvatarState('listening');
+
+              micBtn.className = "flex-shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm shadow-sm transition-all bg-red-500 text-white hover:bg-red-600 border border-red-600";
+              micBtn.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span><span>Mute Mic</span>';
+
+          } catch (err) {
+              console.error('Mic access denied', err);
+          }
+      }
+
+      function stopMic() {
+          if (audioWorkletNode) {
+              audioWorkletNode.disconnect();
+              audioWorkletNode = null;
+          }
+          if (mediaStream) {
+              mediaStream.getTracks().forEach(t => t.stop());
+              mediaStream = null;
+          }
+          isRecording = false;
+          updateAvatarState('idle');
+          micBtn.className = "flex-shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm shadow-sm transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200";
+          micBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg><span>Listen</span>';
+      }
+
+      // Diagram Lightbox Functions
+      function openDiagramLightbox(src, title) {
+          const box = document.getElementById('diagramLightbox');
+          const img = document.getElementById('lightboxImg');
+          const t = document.getElementById('lightboxTitle');
+          if (!box || !img) return;
+          img.src = src;
+          if (t) t.innerText = title || 'Diagram Preview';
+          box.classList.remove('hidden');
+          box.classList.add('flex');
+      }
+
+      function closeDiagramLightbox() {
+          const box = document.getElementById('diagramLightbox');
+          if (!box) return;
+          box.classList.add('hidden');
+          box.classList.remove('flex');
+      }
+
+      document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeDiagramLightbox();
+      });
+    </script>
+
+    <!-- Diagram Lightbox Modal -->
+    <div
+      id="diagramLightbox"
+      class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 transition-all"
+      onclick="if (event.target === this) closeDiagramLightbox()"
+    >
+      <div
+        class="relative bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-slate-200"
+        onclick="event.stopPropagation()"
+      >
+        <div
+          class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50"
+        >
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <span
+              id="lightboxTitle"
+              class="text-sm font-semibold text-slate-800"
+              >Diagram Preview</span
+            >
+          </div>
+          <button
+            type="button"
+            onclick="closeDiagramLightbox()"
+            class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/50 cursor-pointer"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div
+          class="p-6 overflow-auto flex items-center justify-center bg-slate-50/40"
+        >
+          <img
+            id="lightboxImg"
+            src=""
+            alt="Diagram"
+            class="max-w-full max-h-[75vh] object-contain rounded-xl border border-slate-200 shadow-sm bg-white p-3"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

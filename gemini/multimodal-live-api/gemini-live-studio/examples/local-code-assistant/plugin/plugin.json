@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "local-code-assistant",
+  "version": "0.3.0",
+  "description": "Agentic codebase explorer with Gemini Live voice avatar, filesystem inspection, and Graphviz architecture diagramming.",
+  "author": {
+    "name": "ghchinoy",
+    "url": "https://github.com/ghchinoy"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "gemini-live",
+    "avatar",
+    "code-assistant",
+    "graphviz",
+    "voice-agent",
+    "bidi-streaming"
+  ]
+}
