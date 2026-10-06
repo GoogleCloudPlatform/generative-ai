@@ -1,12 +1,12 @@
 ---
 name: ge-demo-video
-description: Records, edits, and delivers automated executive demo videos for agents deployed to Gemini Enterprise. Verifies typography fonts across all languages, connects to live Chrome via CDP (:9222) with automatic display/xvfb adaptation, automatically discovers and applies customer logo & corporate palette (default ON, --no-brand to opt out), enforces strict zero-mock live recording of the deployed agent chat interface, applies modern SaaS video styling in Remotion with dynamic zoom/pan and 4x wait-time acceleration, synthesizes Gemini 3.8 Flash TTS (with Google Cloud TTS Chirp 3: HD fallback) neural narration with synchronized subtitles (pure speech narration, optional ambient BGM), and delivers the rendered MP4 to the demo's Google Drive folder. Also triggered by /ge-demo-video.
+description: "Records, edits, and delivers automated executive demo videos for agents deployed to Gemini Enterprise. Verifies typography fonts across all languages, connects to live Chrome via CDP (:9222) with automatic display/xvfb adaptation, automatically discovers and applies customer logo & corporate palette (default ON, --no-brand to opt out), enforces strict zero-mock live recording of the deployed agent chat interface, applies modern SaaS video styling in Remotion with dynamic zoom/pan and 4x wait-time acceleration, synthesizes Gemini 3.8 Flash TTS (with Google Cloud TTS Chirp 3: HD fallback) neural narration with synchronized subtitles (pure speech narration, optional ambient BGM), and delivers the rendered MP4 to the demo's Google Drive folder. Also triggered by /ge-demo-video."
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.3.0
+  version: 2.3.1
 ---
 
-# GE Demo Video Generator Skill (v2.3.0)
+# GE Demo Video Generator Skill (v2.3.1)
 
 Automates the end-to-end production and delivery of professional **90–120s executive highlight reel demo videos** showcasing autonomous AI agents deployed on **Gemini Enterprise**.
 
