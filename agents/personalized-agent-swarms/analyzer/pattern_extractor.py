@@ -22,6 +22,7 @@ import json
 from dataclasses import dataclass
 
 import config as cfg
+from analyzer.agent_spec import safe_agent_name
 from google import genai
 
 _EXTRACTION_PROMPT = """\
@@ -213,7 +214,8 @@ async def extract_patterns(
     patterns_by_name: dict[str, Pattern] = {}
 
     for raw in all_raw_patterns:
-        name = raw.get("pattern_name", "unknown")
+        # Used as a file name (agents/{name}.py), so keep it a plain identifier
+        name = safe_agent_name(raw.get("pattern_name"), default="unknown")
         # Support both old field name (trigger_signals) and new (trigger_keywords)
         keywords = raw.get("trigger_keywords") or raw.get("trigger_signals", [])
         context_hints = raw.get("trigger_context_hints", [])

@@ -16,7 +16,8 @@
 
 For each pattern, creates:
 1. A trigger definition (attribute-match with structured rules)
-2. A Python agent file with an async execute() function
+2. A data-only agent file (AGENT_META plus ENRICHED_PROMPT or STEPS) that is
+   never imported; execute() comes from analyzer/agent_spec.py
 3. A user_style.json from behavioral patterns (applied to all agents)
 
 Behavioral patterns (how the user communicates) are separated from task
@@ -28,7 +29,6 @@ domain/task_type/keyword rules for programmatic matching at runtime.
 """
 
 import asyncio
-import importlib.util
 import json
 import math
 import re
@@ -37,6 +37,13 @@ from itertools import combinations
 from pathlib import Path
 
 import config as cfg
+from analyzer.agent_spec import (
+    InvalidAgentError,
+    load_agent,
+    parse_agent_source,
+    safe_agent_name,
+    sanitize_agent_source,
+)
 from analyzer.pattern_extractor import Pattern
 from google import genai
 
@@ -1187,29 +1194,19 @@ def _find_best_sessions(
 
 
 def _check_code_validity(agent_path: Path) -> tuple[bool, str | None]:
-    """Check if an agent file compiles and has a valid execute() function.
+    """Check that an agent file holds a usable literal prompt or steps.
+
+    The file is parsed as data and never imported. Its content comes from LLM
+    output that conversation history can steer, so running it would let
+    injected code execute. execute() is supplied by analyzer.agent_spec.
 
     Returns (valid, error_message).
     """
     source = agent_path.read_text(encoding="utf-8")
     try:
-        compile(source, str(agent_path), "exec")
-    except SyntaxError as e:
-        return False, f"SyntaxError: {e}"
-
-    # Check for execute function by loading the module
-    try:
-        spec = importlib.util.spec_from_file_location("_critic_check", agent_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-    except Exception as e:  # noqa: BLE001 — generated agent code can raise anything on import
-        return False, f"Import error: {e}"
-
-    if not hasattr(module, "execute"):
-        return False, "Missing execute() function"
-
-    if not asyncio.iscoroutinefunction(module.execute):
-        return False, "execute() is not async"
+        parse_agent_source(source)
+    except InvalidAgentError as e:
+        return False, f"Invalid agent: {e}"
 
     return True, None
 
@@ -1452,12 +1449,10 @@ async def _critic_pass(
                 else:
                     for exec_attempt in range(2):
                         try:
-                            spec = importlib.util.spec_from_file_location(
-                                f"_critic_{agent_name}_r{critic_round}_s{sc_idx}_a{exec_attempt}",
+                            module = load_agent(
                                 agent_path,
+                                f"_critic_{agent_name}_r{critic_round}_s{sc_idx}_a{exec_attempt}",
                             )
-                            module = importlib.util.module_from_spec(spec)
-                            spec.loader.exec_module(module)
                             agent_output = await module.execute(styled_msg, client)
                             if agent_output is None:
                                 agent_output = "[EMPTY RESPONSE: agent returned None]"
@@ -1676,7 +1671,8 @@ async def _critic_pass(
                 revised_code = "\n".join(lines)
 
             try:
-                compile(revised_code, str(agent_path), "exec")
+                # Keep only the agent's data; generated code is never stored.
+                revised_code = sanitize_agent_source(revised_code)
                 agent_path.write_text(revised_code, encoding="utf-8")
                 if (
                     any_truncation_warning
@@ -1688,7 +1684,7 @@ async def _critic_pass(
                 agents_revised += 1
                 detail["status"] = "revised"
                 final_detail = detail
-            except SyntaxError:
+            except InvalidAgentError:
                 detail["status"] = "revision_failed_syntax"
                 final_detail = detail
                 break
@@ -2568,7 +2564,9 @@ async def _merge_overlapping_agents(
         decision = verdict.get("decision", "keep").lower().strip()
 
         if decision == "merge":
-            merged_name = verdict.get("merged_name", agent_a)
+            merged_name = safe_agent_name(
+                verdict.get("merged_name") or agent_a, default=agent_a
+            )
             merged_desc = verdict.get("merged_description", ti_a.get("description", ""))
             print(
                 f"    MERGE {agent_a} + {agent_b} → {merged_name} "
@@ -2615,6 +2613,14 @@ async def _merge_overlapping_agents(
 
             # Fix common LLM mistakes
             merged_code = _fix_common_llm_mistakes(merged_code)
+
+            # Keep only the agent's data; generated code is never stored.
+            try:
+                merged_code = sanitize_agent_source(merged_code)
+            except InvalidAgentError as e:
+                print(f"    MERGE ABORTED {agent_a} + {agent_b}: invalid agent ({e})")
+                kept += 1
+                continue
 
             # Write merged agent file
             merged_path = agents_dir / f"{merged_name}.py"
@@ -3058,11 +3064,7 @@ async def _execute_agent_for_validation(
 
     for attempt in range(2):
         try:
-            spec = importlib.util.spec_from_file_location(
-                f"_val_{agent_name}_a{attempt}", agent_path
-            )
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+            module = load_agent(agent_path, f"_val_{agent_name}_a{attempt}")
 
             # Pass history if the agent supports it
             import inspect
@@ -3615,6 +3617,7 @@ async def generate_swarm(
 
     triggers = {}
     manifest_agents = []
+    skipped = set()  # patterns with no usable generated agent
     patterns_by_name = {p.pattern_name: p for p in task_patterns}
 
     for idx, pattern in enumerate(task_patterns, 1):
@@ -3681,16 +3684,16 @@ async def generate_swarm(
         cand_a = _clean_agent_code(cand_a)
         cand_b = _clean_agent_code(cand_b)
 
-        # Validate both compile
+        # Validate both hold usable agent data (parsed, never executed)
         a_valid = True
         b_valid = True
         try:
-            compile(cand_a, f"{pattern.pattern_name}_a.py", "exec")
-        except SyntaxError:
+            parse_agent_source(cand_a)
+        except InvalidAgentError:
             a_valid = False
         try:
-            compile(cand_b, f"{pattern.pattern_name}_b.py", "exec")
-        except SyntaxError:
+            parse_agent_source(cand_b)
+        except InvalidAgentError:
             b_valid = False
 
         if a_valid and b_valid:
@@ -3721,10 +3724,23 @@ async def generate_swarm(
         elif b_valid:
             agent_code = cand_b
         else:
-            agent_code = cand_a  # both invalid, let critic catch it
+            print(
+                f"      Skipping {pattern.pattern_name}: neither candidate is a valid agent",
+                flush=True,
+            )
+            triggers.pop(pattern.pattern_name, None)
+            skipped.add(pattern.pattern_name)
+            continue
 
         # Post-generation fact-check: scan ENRICHED_PROMPT for fabricated claims
-        agent_code = await _fact_check_agent(agent_code, pattern, client, model)
+        checked_code = await _fact_check_agent(agent_code, pattern, client, model)
+
+        # Keep only the agent's data; generated code is never stored or run.
+        try:
+            agent_code = sanitize_agent_source(checked_code)
+        except InvalidAgentError:
+            # The fact-check edit broke the prompt literal; use the unchecked one.
+            agent_code = sanitize_agent_source(agent_code)
 
         # Write agent file
         agent_path = agents_dir / f"{pattern.pattern_name}.py"
@@ -3739,6 +3755,10 @@ async def generate_swarm(
                 "trigger_type": trigger.get("trigger_type", "attribute_match"),
             }
         )
+
+    # Later passes only see patterns that got an agent; coverage validation
+    # (which uses the full pattern list) can still absorb skipped ones.
+    task_patterns = [p for p in task_patterns if p.pattern_name not in skipped]
 
     # Generate structured attribute rules for programmatic matching
     triggers = await _generate_attribute_rules(
