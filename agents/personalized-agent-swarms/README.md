@@ -244,7 +244,7 @@ For each user (5) x each scenario (50):
                     +-------+
                     v
             Critic/Revision Pass (optional):
-            1. Compile-check each agent
+            1. Parse each agent file (data only, never run)
             2. Run execute() against matching history session
             3. Compare output vs gold reference from history
             4. LLM critic rewrites agents that fail
@@ -270,7 +270,7 @@ For each user (5) x each scenario (50):
 
 **Generated mini-agent structure:**
 
-Each mini-agent is a standalone Python module with:
+Each mini-agent is a data-only Python file:
 
 ```python
 AGENT_META = {
@@ -285,9 +285,13 @@ STEPS = [                       # for dynamic agents (max 2 steps)
     {"name": "fix", "prompt": "...{previous_output}..."},
 ]
 
-async def execute(user_message: str, llm_client) -> str:
-    # Runs each step sequentially, feeding output forward
+# Static agents have a single ENRICHED_PROMPT string instead of STEPS.
 ```
+
+`execute()` is in `analyzer/agent_spec.py`. It fills in the prompt and runs each step in turn, feeding each output into the next step.
+
+> [!IMPORTANT]
+> Agent files are never imported or run. They're written from LLM output that the user's conversation history can steer, so prompt injection could otherwise put code in them. `analyzer/agent_spec.py` reads only the literal `AGENT_META`, `ENRICHED_PROMPT` and `STEPS` values (with `ast.literal_eval`) and writes agent files that contain only those values. Anything else the LLM generates is dropped. Agent names are reduced to plain identifiers before they're used as file names.
 
 **Behavioral vs task pattern separation:**
 
@@ -308,7 +312,7 @@ Patterns are classified as either **task** (what the user wants done — e.g., "
 
 An optional post-generation validation that runs each agent against actual conversation history to verify output quality:
 
-1. **Code validity** — `compile()` each agent, verify `execute()` is async
+1. **Code validity** — parse each agent file as data (it's never imported) and check that it has a literal `ENRICHED_PROMPT` or `STEPS`
 2. **Output quality** — Run `execute(first_user_turn)` from a matching session, send output + gold reference to a critic LLM (scoring on a 0-10 scale across 7 dimensions: COMPLETENESS, STYLE ALIGNMENT, ANTI-PATTERN AVOIDANCE, CONTENT QUALITY, TRUNCATION, TRIGGER FIT, HALLUCINATION)
 3. **Fabrication hard-ceiling** — If the critic detects >= 2 factual contradictions (fabricated API names, CLI flags, URLs, function signatures), the agent score is capped at 4/10 regardless of other criteria
 4. **Trigger quality** — Critic also validates trigger descriptions against test messages
@@ -326,7 +330,7 @@ After ranking, each surviving agent is validated using the **same multi-turn eva
 
 **Parallel generation with best-pick (V8):**
 
-Each agent is generated in two parallel LLM calls at different temperatures (0.2 and 0.35). Both candidates are compile-checked. If both compile, a Flash LLM selects the more grounded and accurate one. This reduces fabrication by providing diversity in generation and selecting the safer option.
+Each agent is generated in two parallel LLM calls at different temperatures (0.2 and 0.35). Both candidates are checked for a literal prompt (they're parsed, never run). If both pass, a Flash LLM selects the more grounded and accurate one. If neither passes, no agent is created for that pattern. This reduces fabrication by providing diversity in generation and selecting the safer option.
 
 **Post-generation fact-check (V8):**
 
@@ -339,7 +343,7 @@ Before writing each agent to disk, a Flash LLM scans the ENRICHED_PROMPT for spe
 **Components:**
 - `augmented_assistant_agent/agent.py` — ADK agent definition with two tools: `check_and_invoke_swarm` + `baseline_assistant` (AgentTool)
 - `augmented_assistant_agent/tools/active_mem.py` — Trigger matching + mini-agent invocation + hallucination detection
-- `augmented_assistant_agent/tools/swarm_loader.py` — Dynamic Python module loading
+- `augmented_assistant_agent/tools/swarm_loader.py` — Loads a user's swarm; agent files are read as data, never imported
 
 **Architecture:** The augmented agent uses an `AgentTool`-wrapped baseline sub-agent. When `check_and_invoke_swarm` returns `action="none"` (no swarm match), the augmented agent delegates to `baseline_assistant` — an `AgentTool` wrapping an `Agent` with instructions identical to `user_assistant_agent`. This ensures baseline-equivalent behavior on the no-swarm path.
 
@@ -429,7 +433,9 @@ ADK_agents/
 +-- analyzer/                          # Phase 2: Pattern extraction + swarm gen
 |   +-- analyze_history.py             # Main entry point
 |   +-- pattern_extractor.py           # LLM-based pattern clustering
-|   +-- swarm_generator.py             # Generates mini-agent .py files + embeddings
+|   +-- swarm_generator.py             # Generates mini-agent .py files (data only) + embeddings
+|   +-- agent_spec.py                  # Reads/writes agent files as data; the one trusted execute()
+|   +-- test_agent_spec.py             # Unit tests: python -m unittest analyzer.test_agent_spec
 |   +-- trigger_schema.py              # Feature schema, extraction prompts, binary questionnaires, matching logic
 |   +-- trigger_matcher.py             # Shared trigger matching pipeline (used by validation + runtime)
 |   +-- llm_util.py                    # Shared LLM utilities
@@ -451,7 +457,7 @@ ADK_agents/
 |   +-- requirements.txt
 |   +-- tools/
 |       +-- active_mem.py              # Trigger matching + mini-agent invocation + hallucination detection
-|       +-- swarm_loader.py            # Dynamic module loading + caching
+|       +-- swarm_loader.py            # Swarm loading (agents read as data) + caching
 |       +-- search_agent.py            # [UNUSED] Web search sub-agent (kept for future re-enablement)
 |
 +-- eval/                              # Eval pool generation + sampling + shared harness
@@ -1030,7 +1036,7 @@ When a mini-agent fires, the augmented agent delivers a personalized, domain-exp
 | **Mini-eval validation gate (V8)** | Validation uses the same multi-turn eval harness as Phase 4, with scenarios seeded from 50 historic conversations. Ensures validation quality is representative of actual final evaluation (replaces the simpler single-turn `_quick_judge`) |
 | **Semantic trigger evaluation** | Evaluation uses LLM-based semantic matching (with agent name normalization for suffix variations) instead of exact agent name comparison, making results robust to swarm regeneration |
 | **Two invocation modes** | Auto (silent, for high-confidence matches) and Suggest (human-in-the-loop, for lower confidence) |
-| **Swarms as plain Python files** | Mini-agents are `.py` files on disk — easy to inspect, edit, and version control. No database required |
+| **Swarms as plain Python files** | Mini-agents are data-only `.py` files on disk — easy to inspect, edit, and version control. They're read with `ast.literal_eval` and never imported, so code injected into generated output can't run. No database required |
 | **Non-parametric agent selection** | No fixed target count — every agent scoring >= 25/50 on the 5-dimension rubric (VALUE×3, DISTINCTIVENESS×2, TRIGGER_CLARITY×2, QUALITY×2, FREQUENCY×1) is kept. LLM-based ranking (Gemini 3.1 Pro with fallback) evaluates all candidates and can veto redundant/weak agents. Hard safety cap at 30 (cost guardrail only). Falls back to frequency-based filtering (>= 4 sessions, min 3) on LLM failure. Constants: `HARD_CAP_AGENTS=30`, `MIN_QUALITY_SCORE=25` in `swarm_generator.py` |
 | **Fair evaluation parity** | Both agents run without web search or memory tools. The baseline `user_assistant_agent/` uses `tools=[]` and the augmented agent uses `tools=[check_and_invoke_swarm]`. This isolates the swarm's contribution from infrastructure differences |
 | **First-message hallucination guard** | Three-layer defense: (1) empty history injects explicit "This is the FIRST message" note, (2) runtime regex detects fabricated context ("as we discussed", "your message was cut off"), (3) critic pass includes a HALLUCINATION criterion that scores fabricated context as 0 |
