@@ -14,9 +14,10 @@
 
 """Loads a user's mini-agent swarm from the swarms/ directory."""
 
-import importlib.util
 import json
 from pathlib import Path
+
+from analyzer.agent_spec import load_agent
 
 SWARMS_DIR = Path(__file__).parent.parent.parent / "swarms"
 
@@ -28,14 +29,23 @@ def clear_cache():
     _loaded_swarms.clear()
 
 
+def _is_single_path_part(user_id: str) -> bool:
+    """Return True if user_id names one directory inside SWARMS_DIR."""
+    return bool(user_id) and user_id != ".." and Path(user_id).name == user_id
+
+
 def load_swarm(user_id: str) -> dict:
     """Load and cache a user's swarm manifest, triggers, and agent modules.
+
+    Agent files are read as data and never imported (see
+    analyzer/agent_spec.py), because their content comes from LLM output that
+    conversation history can steer.
 
     Returns:
         {
             "manifest": dict | None,
             "triggers": dict,           # agent_name -> trigger_config
-            "agents": dict,             # agent_name -> loaded Python module
+            "agents": dict,             # agent_name -> agent module with execute()
             "user_style": dict | None,  # behavioral style profile
         }
     """
@@ -43,7 +53,7 @@ def load_swarm(user_id: str) -> dict:
         return _loaded_swarms[user_id]
 
     user_dir = SWARMS_DIR / user_id
-    if not user_dir.exists():
+    if not _is_single_path_part(user_id) or not user_dir.exists():
         _loaded_swarms[user_id] = {
             "manifest": None,
             "triggers": {},
@@ -64,20 +74,17 @@ def load_swarm(user_id: str) -> dict:
     style_path = user_dir / "user_style.json"
     user_style = json.loads(style_path.read_text()) if style_path.exists() else None
 
-    # Dynamically load agent modules
+    # Load agents as data (never imported or executed)
     agents = {}
     agents_dir = user_dir / "agents"
     if agents_dir.exists():
         for agent_file in agents_dir.glob("*.py"):
             agent_name = agent_file.stem
             try:
-                spec = importlib.util.spec_from_file_location(
-                    f"swarm_agent_{user_id}_{agent_name}", agent_file
+                agents[agent_name] = load_agent(
+                    agent_file, f"swarm_agent_{user_id}_{agent_name}"
                 )
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                agents[agent_name] = module
-            except Exception as e:  # noqa: BLE001 — generated agent code can raise anything on import
+            except (OSError, ValueError) as e:
                 print(f"Warning: skipping broken agent {agent_name}: {e}")
                 continue
 

@@ -12,7 +12,7 @@ Processes conversational history to extract recurring intent patterns and genera
 6. Behavioral patterns → `user_style.json` (shared style profile)
 7. For each task pattern, generates:
    - A trigger definition (`triggers.json`) with structured attribute rules
-   - A Python mini-agent file (`agents/{pattern_name}.py`)
+   - A data-only mini-agent file (`agents/{pattern_name}.py`) with its metadata and prompt(s)
    - Scope embeddings (768-dim, `text-embedding-005`) for semantic matching
 8. Critic/revision pass validates each agent against history sessions (up to 3 rounds)
 9. Non-parametric quality ranking keeps all agents scoring >= 25/50 (5-dimension rubric, hard cap 30)
@@ -23,6 +23,7 @@ Processes conversational history to extract recurring intent patterns and genera
 - `analyze_history.py` — Main entry point
 - `pattern_extractor.py` — LLM-based pattern clustering
 - `swarm_generator.py` — Generates mini-agent .py files, triggers, embeddings, runs critic/ranking
+- `agent_spec.py` — Reads and writes agent files as data (never imports them) and supplies the one trusted `execute()`. Tests: `test_agent_spec.py`
 - `trigger_schema.py` — Feature schema, extraction prompts, soft penalty matching logic, rule validation
 - `llm_util.py` — Retry + model fallback wrapper for Google Cloud calls
 
@@ -46,6 +47,9 @@ python analyzer/analyze_history.py --user user_1
 
 # Skip critic pass (faster)
 python analyzer/analyze_history.py --user user_1 --skip-critic
+
+# Unit tests (no API calls)
+python -m unittest analyzer.test_agent_spec
 ```
 
 ## Output
@@ -56,6 +60,6 @@ swarms/{user_id}/
 ├── triggers.json          # Trigger rules + scope embeddings (768-dim) + _config
 ├── user_style.json        # Behavioral pattern profile
 └── agents/
-    ├── pattern_name_1.py  # Mini-agent with async execute() function
+    ├── pattern_name_1.py  # Mini-agent data: AGENT_META + ENRICHED_PROMPT or STEPS
     └── pattern_name_2.py  # (quality-based count, typically 5-10)
 ```
