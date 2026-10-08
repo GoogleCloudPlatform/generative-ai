@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4285F4" />
+      <stop offset="100%" stop-color="#1A73E8" />
+    </linearGradient>
+    <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E8EAED" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Material rounded square base -->
+  <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#bg)" />
+  
+  <!-- Avatar head -->
+  <circle cx="12" cy="10" r="3.5" fill="#ffffff" filter="url(#shadow)" />
+  
+  <!-- Avatar body -->
+  <path d="M5 20c0-3.5 4.5-5 7-5s7 1.5 7 5v2H5v-2z" fill="#ffffff" filter="url(#shadow)" />
+  
+  <!-- Gemini-style Sparkle for AI -->
+  <path d="M18 4 l1 2 l2 1 l-2 1 l-1 2 l-1 -2 l-2 -1 l2 -1 z" fill="url(#sparkle)" filter="url(#shadow)"/>
+  <path d="M7 6 l0.5 1 l1 0.5 l-1 0.5 l-0.5 1 l-0.5 -1 l-1 -0.5 l1 -0.5 z" fill="url(#sparkle)" filter="url(#shadow)"/>
+</svg>
