@@ -3,10 +3,10 @@ name: ge-demo-generator
 description: Synthesizes and deploys complete, domain-specific Gemini Enterprise demo environments directly to Google Cloud. Use when the user asks to create an AI agent demo for any customer domain (e.g. 'example.com', 'example.co.jp', 'example.de', 'example.fr' - any company, any industry, any region) or business goal, generate realistic BigQuery/Firestore sample datasets, create external demo files (PDF, Excel, scanned images), stage them in Cloud Storage and upload them to the deploying account's Google Drive, scaffold ADK multi-agent architectures with MCP tools and A2UI cards, deploy to Cloud Run, publish to Gemini Enterprise, and generate 7 structured demo prompts in any language. Confirms the requirements interactively and presents a demo architecture & data model plan (Mermaid ER diagram, external file lineage, target project) for approval before anything is deployed. Also triggered by /ge-demo-generator.
 metadata:
   author: Google Cloud Customer Engineering
-  version: 2.29.1
+  version: 2.30.1
 ---
 
-# GE Demo Generator Skill (v2.29.1)
+# GE Demo Generator Skill (v2.30.1)
 
 Synthesizes production-grade, domain-tailored AI agent demo environments using **Gemini 3.8 Flash** for reasoning and **Gemini 3.1 Flash Image** for visual generation, adhering to a strict **6-step infrastructure dependency graph**, rich **A2UI interactive component streaming**, **Google Workspace OAuth authorization**, **external sample files staged in Cloud Storage and, when the credentials carry the Drive scope, in the deploying account's Google Drive**, **7 structured demo prompts**, **automated browser video recording & Remotion highlight reel delivery to Google Drive**, and **global multilingual localization (i18n/l10n)**.
 
@@ -153,27 +153,48 @@ Re-asking it reads as not having listened.
 Read and verify the target environment before writing the brief, ensuring zero-touch deployment readiness so the brief's section 5 states verified facts rather than unvalidated assumptions:
 
 ```bash
-# 1. Target Project Synchronization: align project if specified by user
+# 1. Target Project Resolution:
+#    - If the user explicitly specified a project ID in their request (TARGET_PROJECT), align gcloud to it.
+#    - If the user did NOT specify a project ID and the internal project provisioner
+#      ($SKILL_DIR/templates/scripts/internal/create_project.sh) is available, default to
+#      proposing automatic creation of a new dedicated project (AUTO_CREATE_PROJECT=true),
+#      while recording any existing gcloud config project (CURRENT_PROJECT) as an alternative.
 TARGET_PROJECT="${TARGET_PROJECT:-}"
 CURRENT_PROJECT=$(gcloud config get-value project 2>/dev/null || echo "")
-if [ -n "$TARGET_PROJECT" ] && [ "$CURRENT_PROJECT" != "$TARGET_PROJECT" ]; then
-  gcloud config set project "$TARGET_PROJECT" >/dev/null 2>&1 || true
-fi
-PROJECT_ID=$(gcloud config get-value project 2>/dev/null || echo "")
+AUTO_CREATE_PROJECT="false"
+PROPOSED_PROJECT_PATTERN=""
 
-# 2. Account Verification & Auto-Discovery: probe project access; auto-switch if active account lacks access
+if [ -n "$TARGET_PROJECT" ]; then
+  if [ "$CURRENT_PROJECT" != "$TARGET_PROJECT" ]; then
+    gcloud config set project "$TARGET_PROJECT" >/dev/null 2>&1 || true
+  fi
+  PROJECT_ID="$TARGET_PROJECT"
+elif [ -f "$SKILL_DIR/templates/scripts/internal/create_project.sh" ] &&
+  PROBE_OUT=$(bash "$SKILL_DIR/templates/scripts/internal/create_project.sh" --probe "${DOMAIN_SLUG:-demo}" 2>/dev/null) &&
+  echo "$PROBE_OUT" | grep -q "^AUTO_PROJECT_AVAILABLE=true$"; then
+  AUTO_CREATE_PROJECT="true"
+  PROPOSED_PROJECT_PATTERN=$(echo "$PROBE_OUT" | sed -n 's/^PROPOSED_PROJECT_PATTERN=//p')
+  PROJECT_ID="${PROPOSED_PROJECT_PATTERN}"
+else
+  PROJECT_ID="$CURRENT_PROJECT"
+fi
+
+# 2. Account Verification & Auto-Discovery: probe project access when using an existing project
 GCP_ACCOUNT=$(gcloud config get-value account 2>/dev/null || echo "Unknown")
-if ! gcloud projects describe "$PROJECT_ID" >/dev/null 2>&1; then
-  for acc in $(gcloud auth list --format="value(account)" 2>/dev/null); do
-    if gcloud projects describe "$PROJECT_ID" --account="$acc" >/dev/null 2>&1; then
-      gcloud config set account "$acc" >/dev/null 2>&1 || true
-      GCP_ACCOUNT="$acc"
-      break
-    fi
-  done
+if [ "$AUTO_CREATE_PROJECT" != "true" ] && [ -n "$PROJECT_ID" ]; then
+  if ! gcloud projects describe "$PROJECT_ID" >/dev/null 2>&1; then
+    for acc in $(gcloud auth list --format="value(account)" 2>/dev/null); do
+      if gcloud projects describe "$PROJECT_ID" --account="$acc" >/dev/null 2>&1; then
+        gcloud config set account "$acc" >/dev/null 2>&1 || true
+        GCP_ACCOUNT="$acc"
+        break
+      fi
+    done
+  fi
+  PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)" 2>/dev/null || echo "")
+else
+  PROJECT_NUMBER="auto-provisioned in Phase 3"
 fi
-
-PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)" 2>/dev/null || echo "")
 REGION=${CLOUD_RUN_REGION:-"asia-northeast1"}
 
 # 3. Google Drive Scope Pre-flight
@@ -348,6 +369,15 @@ Show what the commands above returned, verbatim, in a fenced block:
 📁 Google Drive Copy   : <the DRIVE_OK line, below>
 ```
 
+When `AUTO_CREATE_PROJECT="true"` (because the user did not specify a project in
+their prompt and the internal project provisioner is available), render the `🏢
+Target Project` line as: `Auto-create new project (${PROPOSED_PROJECT_PATTERN})`
+— and if `CURRENT_PROJECT` was non-empty, append `[or reuse existing gcloud
+config project: ${CURRENT_PROJECT}]` so the user can choose to reuse
+`CURRENT_PROJECT` in the approval prompt if they prefer. Do not create the
+project during Phase 2; actual creation runs at the start of Phase 3 after user
+approval.
+
 This is the section users most often stop on, because the answer is frequently "wrong
 project". Do not paraphrase the values and do not print a project the user named unless
 `gcloud` agrees — the deploy will use what `gcloud` says, not what the brief claims.
@@ -453,8 +483,18 @@ user actually said yes to.
 **Entry condition: the Phase 2 brief was presented in full and the user approved it.** If you
 arrive here without that, go back and present it.
 
-1. **Derive the demo's identifiers, concrete name, and description**:
+1. **Provision the Target Project (if `AUTO_CREATE_PROJECT=true`) and Derive Identifiers**:
    ```bash
+   # If the approved Phase 2 brief selected automatic project creation, provision the
+   # new dedicated Google Cloud project now (before any BigQuery/Firestore/Drive steps),
+   # wait for IAM propagation, configure gcloud + ADC quota project, and persist
+   # PROJECT_ID and AUTO_CREATED_PROJECT="true" into .env.
+   if [ "${AUTO_CREATE_PROJECT:-false}" = "true" ] &&
+     [ -f "$SKILL_DIR/templates/scripts/internal/create_project.sh" ]; then
+     . "$SKILL_DIR/templates/scripts/internal/create_project.sh"
+     ge_internal_create_project "$DOMAIN_SLUG" ".env"
+   fi
+
    SUFFIX=$(date +%s | tail -c 5)
    DEMO_ID="${DOMAIN_SLUG}-${SUFFIX}"
    SERVICE_NAME="ge-demo-${DOMAIN_SLUG}-${SUFFIX}"
@@ -1073,12 +1113,18 @@ Sandbox and the Managed Autonomous Agent):
 bash scripts/cleanup.sh
 ```
 
-Read the per-resource lines, not the closing banner. Every job runs under `|| true` so that one
-failure cannot strand the rest, which means the script finishes whatever happened: `✅` deleted,
-`⚠️` already gone or skipped, `❌` still there. A `❌`, or a `⚠️` for something you know existed,
-needs a manual delete — an Agent Engine, a bucket or a Firestore collection left behind keeps
-billing. Run it from the demo directory so it picks up `.env`; without `DOMAIN_SLUG`/`SUFFIX` it
-cannot name the two GCS buckets and says so rather than guessing.
+Read the per-resource lines, not the closing banner. Every job runs under `||
+true` so that one failure cannot strand the rest, which means the script
+finishes whatever happened: `✅` deleted, `⚠️` already gone or skipped, `❌` still
+there. A `❌`, or a `⚠️` for something you know existed, needs a manual delete —
+an Agent Engine, a bucket or a Firestore collection left behind keeps billing.
+Run it from the demo directory so it picks up `.env`; without
+`DOMAIN_SLUG`/`SUFFIX` it cannot name the two GCS buckets and says so rather
+than guessing. When the project itself was auto-created for the demo
+(`AUTO_CREATED_PROJECT="true"` in `.env`), `cleanup.sh` keeps safe
+resource-level teardown by default and prints the `gcloud projects delete`
+command at the end (or pass `bash scripts/cleanup.sh --delete-project -y` to
+delete the project too).
 
 ---
 

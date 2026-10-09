@@ -103,6 +103,19 @@ DEMO_ID=${DEMO_ID:-"$SERVICE_NAME"}
 WORKER_QUEUE=${WORKER_QUEUE:-"${SERVICE_NAME}-worker"}
 WORKER_QUEUE_LOCATION=${WORKER_QUEUE_LOCATION:-"us-central1"}
 
+FORCE_CONFIRM=0
+DELETE_PROJECT=0
+for arg in "$@"; do
+  case "$arg" in
+  -y | --force)
+    FORCE_CONFIRM=1
+    ;;
+  --delete-project)
+    DELETE_PROJECT=1
+    ;;
+  esac
+done
+
 echo "========================================================"
 echo "⚡ Starting High-Speed Parallel Teardown of GE Demo"
 echo "Project:        $PROJECT_ID"
@@ -112,7 +125,7 @@ echo "Dataset:        $BIGQUERY_DATASET"
 echo "Agent Engine:   $AGENT_ENGINE_NAME"
 echo "========================================================"
 
-if [ "$1" != "-y" ] && [ "$1" != "--force" ]; then
+if [ "$FORCE_CONFIRM" != "1" ]; then
   read -r -p "Are you sure you want to delete all provisioned demo resources in parallel? (y/N) " confirm
   if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     echo "Cleanup cancelled."
@@ -593,4 +606,19 @@ echo "========================================================"
 # into a green teardown. The per-resource ✅/⚠️/❌ lines are the actual result.
 echo "⚡ Parallel Cleanup finished - review the lines above."
 echo "   ✅ = deleted   ⚠️  = already gone or skipped   ❌ = still there, delete by hand"
+if [ "$DELETE_PROJECT" = "1" ] && [ -n "$PROJECT_ID" ]; then
+  echo ""
+  echo "🗑️  Deleting Google Cloud project: $PROJECT_ID..."
+  if gcloud projects delete "$PROJECT_ID" --quiet; then
+    echo "   ✅ Project '$PROJECT_ID' scheduled for deletion."
+  else
+    echo "   ⚠️  Failed to delete project '$PROJECT_ID' - delete it manually in the console."
+  fi
+elif [ "${AUTO_CREATED_PROJECT:-}" = "true" ] || [ "${AUTO_CREATED_PROJECT:-}" = "1" ]; then
+  echo ""
+  echo "💡 Note: Project '$PROJECT_ID' was auto-created for this demo."
+  echo "   To delete the entire project as well, run:"
+  echo "     gcloud projects delete \"$PROJECT_ID\" --quiet"
+  echo "   (or re-run: bash scripts/cleanup.sh --delete-project -y)"
+fi
 echo "========================================================"
