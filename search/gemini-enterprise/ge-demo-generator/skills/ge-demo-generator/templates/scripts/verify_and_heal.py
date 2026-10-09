@@ -24,7 +24,7 @@
 # ruff: noqa
 
 # =============================================================================
-# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.29.1)
+# Autonomous Post-Deployment Verification & Self-Healing Engine (v2.30.1)
 # Automatically audits 9 infrastructure layers and heals discrepancies in real time:
 #   1. BigQuery Dataset & Tables (Row counts, _id column for DataStores, schema metadata)
 #   2. Firestore Collection & Seeding (Task queue documents >= 3)
