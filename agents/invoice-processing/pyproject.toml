@@ -1,0 +1,51 @@
+[project]
+name = "invoice-processing"
+version = "1.0.0"
+description = "A unified ADK agent for invoice processing that combines an end-to-end inference pipeline (classification, extraction, 4-phase validation, transformation) with an interactive learning system (ALF correction engine) for continuous improvement -- all in a single self-contained agent."
+requires-python = ">=3.11"
+license = "Apache-2.0"
+keywords = ['agent-catalog', 'adk', 'agent']
+readme = "README.md"
+
+authors = [
+    { name = "Pouya Ghiasnezhad Omran", email = "pgomran@google.com" },
+    { name = "Tanya Dixit", email = "dixittanya@google.com" },
+]
+
+dependencies = [
+    "google-adk>=1.0.0",
+    "google-cloud-aiplatform>=1.38.0",
+    "vertexai>=1.38.0",
+    "pydantic>=2.8.0",
+    "pdfplumber>=0.10.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Repository = "https://github.com/GoogleCloudPlatform/generative-ai"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.9",
+    "agent-starter-pack>=0.14.1",
+    "pytest>=9.1.1",
+]
+
+[tool.agent_packs]
+template = "adk"
+
+[tool.agent-starter-pack]
+example_question = "Process the invoice for case_001."
+
+[tool.agent-starter-pack.settings]
+agent_directory = "invoice_processing"
+
+[[tool.uv.index]]
+name = "default"
+url = "https://pypi.org/simple"
+default = true

@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-02-16T18:12:10.954906",
+  "total_cases": 3,
+  "valid_cases": 2,
+  "invalid_cases": 1,
+  "cases_with_waf": 2,
+  "cases": [
+    {
+      "case_id": "case_001",
+      "expected_decision": "REJECT",
+      "has_waf": true
+    },
+    {
+      "case_id": "case_002",
+      "expected_decision": "ACCEPT",
+      "has_waf": true
+    },
+{
+      "case_id": "case_005",
+      "expected_decision": "ACCEPT",
+      "has_waf": false
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "agent": "phase3_validator",
+  "version": "1.0",
+  "timestamp": "2026-04-02T15:43:33.657758",
+  "input_refs": [
+    "02_extraction.json",
+    "04_phase2_validation.json"
+  ],
+  "phase": 3,
+  "validations": [
+    {
+      "step": "3.2",
+      "rule": "Valid tax ID checksum",
+      "passed": true,
+      "evidence": "Valid checksum",
+      "rejection_template": null
+    },
+    {
+      "step": "3.3",
+      "rule": "Invoice not future dated",
+      "passed": true,
+      "evidence": "Invoice date: 2025-12-27",
+      "rejection_template": null
+    }
+  ],
+  "decision": "CONTINUE",
+  "rejection_template": null
+}

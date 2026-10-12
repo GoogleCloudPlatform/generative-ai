@@ -1,0 +1,28 @@
+{
+  "agent": "transformer",
+  "version": "1.0",
+  "timestamp": "2026-04-08T05:22:36.652852",
+  "input_refs": [
+    "02_extraction.json",
+    "06_phase4_validation.json"
+  ],
+  "currency": "AUD",
+  "tax_rate": 0.1,
+  "line_items_mapped": [
+    {
+      "line_number": 1,
+      "item_code": "LABOUR_AH",
+      "description": "Emergency call-out - overtime rate",
+      "quantity": "5.80",
+      "unit_cost": "110.00",
+      "line_cost": "638.00",
+      "tax": "95.70",
+      "tax_code": "TAX"
+    }
+  ],
+  "totals": {
+    "line_cost_total": 638.0,
+    "tax_total": 95.7,
+    "grand_total": 733.7
+  }
+}

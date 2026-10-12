@@ -1,0 +1,39 @@
+{
+  "case_id": "case_005",
+  "generated_at": "2026-02-16T18:12:10.953904",
+  "scenario": {
+    "work_type": "REPAIRS",
+    "is_valid": true,
+    "expected_decision": "ACCEPT",
+    "rejection_reason": null,
+    "has_waf": false
+  },
+  "invoice": {
+    "invoice_number": "INV-00005",
+    "invoice_date": "2026-02-11",
+    "vendor_name": "QuickFix HVAC Repairs",
+    "vendor_abn": "51824753556",
+    "customer_name": "ACME Corporation",
+    "subtotal": 972.11,
+    "gst": 97.21,
+    "total": 1069.32,
+    "line_items": [
+      {
+        "description": "Gasket and seal kit",
+        "category": "PARTS",
+        "quantity": 3,
+        "unit_price": 219.87
+      },
+      {
+        "description": "Technician labour - standard rate",
+        "category": "LABOUR",
+        "quantity": 2.5,
+        "unit_price": 125
+      }
+    ],
+    "is_valid": true,
+    "expected_decision": "ACCEPT",
+    "rejection_reason": null
+  },
+  "waf": null
+}

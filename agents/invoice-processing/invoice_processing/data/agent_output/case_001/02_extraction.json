@@ -1,0 +1,46 @@
+{
+  "agent": "extractor",
+  "version": "1.0",
+  "timestamp": "2026-04-08T05:22:25.484692",
+  "input_refs": [
+    "01_classification.json"
+  ],
+  "invoice": {
+    "invoice_number": "INV-00001",
+    "invoice_date": "2026-01-07",
+    "invoice_total_inc_tax": 733.7,
+    "invoice_total_ex_tax": 638.0,
+    "tax_amount": 95.7,
+    "vendor_tax_id": "64 560 747 633",
+    "vendor_name": "FastTrack Logistics",
+    "customer_name": "ACME Corporation",
+    "currency": "AUD",
+    "line_items": [
+      {
+        "description": "Emergency call-out - overtime rate",
+        "quantity": 5.8,
+        "unit_price": 110.0,
+        "amount_ex_tax": 638.0,
+        "tax_code": "GST",
+        "tax_amount": 95.7,
+        "amount_inc_tax": null
+      }
+    ],
+    "_tax_id_validation": {
+      "valid": false,
+      "reason": "Invalid checksum (mod 89 = 50)"
+    }
+  },
+  "work_authorization": {
+    "reference_number": "WAF-76948",
+    "site_name": "Site 403",
+    "authorized_hours": 5.7,
+    "work_description": "cleaning services",
+    "technician_name": "Emma Williams",
+    "date": "2026-01-01"
+  },
+  "extraction_failed": false,
+  "extraction_error": null,
+  "invoice_count": 1,
+  "waf_count": 1
+}

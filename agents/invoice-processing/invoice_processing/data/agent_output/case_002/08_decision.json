@@ -1,0 +1,12 @@
+{
+  "agent": "output_generator",
+  "version": "1.0",
+  "timestamp": "2026-04-02T15:43:38.030367",
+  "input_refs": [],
+  "final_decision": "ACCEPT",
+  "decision_class": "ACCEPT",
+  "invoice_status": "Pending Payment",
+  "rejection_template": null,
+  "rejection_reason": null,
+  "rejection_phase": null
+}

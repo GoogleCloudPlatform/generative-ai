@@ -1,0 +1,28 @@
+{
+  "agent": "audit_logger",
+  "version": "1.0",
+  "timestamp": "2026-04-02T15:43:38.032090",
+  "input_refs": [],
+  "case_id": "case_002",
+  "source_folder": "invoice_processing/exemplary_data/case_002",
+  "output_folder": "invoice_processing/data/agent_output/case_002",
+  "processing_summary": {
+    "decision": "ACCEPT",
+    "processing_time_seconds": 61.31,
+    "total_llm_calls": 5,
+    "total_tokens": 4792,
+    "total_cost_usd": 0.009874
+  },
+  "artifacts": [
+    "01_classification.json",
+    "02_extraction.json",
+    "03_phase1_validation.json",
+    "04_phase2_validation.json",
+    "05_phase3_validation.json",
+    "06_phase4_validation.json",
+    "07_transformation.json",
+    "08_decision.json",
+    "09_audit_log.json",
+    "Postprocessing_Data.json"
+  ]
+}

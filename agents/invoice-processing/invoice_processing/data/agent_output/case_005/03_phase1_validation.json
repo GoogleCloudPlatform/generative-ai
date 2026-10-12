@@ -1,0 +1,41 @@
+{
+  "agent": "phase1_validator",
+  "version": "1.0",
+  "timestamp": "2026-04-07T16:33:06.075616",
+  "input_refs": [
+    "02_extraction.json"
+  ],
+  "phase": 1,
+  "validations": [
+    {
+      "step": "1.1",
+      "rule": "Invoice extraction must succeed",
+      "passed": true,
+      "evidence": "Extracted invoice INV-00005"
+    },
+    {
+      "step": "1.2",
+      "rule": "Invoice addressed to organization",
+      "passed": true,
+      "evidence": "Customer: ACME Corporation",
+      "rejection_template": null
+    },
+    {
+      "step": "1.3",
+      "rule": "Tax compliance (tax ID, date, vendor)",
+      "passed": true,
+      "evidence": "Tax ID: True, Date: True, Vendor: True",
+      "rejection_template": null
+    },
+    {
+      "step": "1.5",
+      "rule": "Single invoice per submission",
+      "passed": true,
+      "evidence": "Found 1 invoice(s)",
+      "rejection_template": null
+    }
+  ],
+  "decision": "CONTINUE",
+  "rejection_template": null,
+  "rejection_reason": null
+}
