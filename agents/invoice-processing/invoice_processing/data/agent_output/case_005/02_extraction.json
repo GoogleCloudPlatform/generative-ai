@@ -1,0 +1,48 @@
+{
+  "agent": "extractor",
+  "version": "1.0",
+  "timestamp": "2026-04-07T16:33:06.072983",
+  "input_refs": [
+    "01_classification.json"
+  ],
+  "invoice": {
+    "invoice_number": "INV-00005",
+    "invoice_date": "2026-02-11",
+    "invoice_total_inc_tax": 1069.32,
+    "invoice_total_ex_tax": 972.11,
+    "tax_amount": 97.21,
+    "vendor_tax_id": "51 824 753 556",
+    "vendor_name": "QuickFix HVAC Repairs",
+    "customer_name": "ACME Corporation",
+    "currency": "AUD",
+    "line_items": [
+      {
+        "description": "Gasket and seal kit",
+        "quantity": 3.0,
+        "unit_price": 219.87,
+        "amount_ex_tax": 659.61,
+        "tax_code": "GST",
+        "tax_amount": 65.96,
+        "amount_inc_tax": null
+      },
+      {
+        "description": "Technician labour - standard rate",
+        "quantity": 2.5,
+        "unit_price": 125.0,
+        "amount_ex_tax": 312.5,
+        "tax_code": "GST",
+        "tax_amount": 31.25,
+        "amount_inc_tax": null
+      }
+    ],
+    "_tax_id_validation": {
+      "valid": true,
+      "reason": "Valid checksum"
+    }
+  },
+  "work_authorization": null,
+  "extraction_failed": false,
+  "extraction_error": null,
+  "invoice_count": 1,
+  "waf_count": 0
+}

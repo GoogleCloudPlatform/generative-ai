@@ -1,0 +1,301 @@
+{
+  "rule_groups": [
+    {
+      "group_id": "data_source_rules",
+      "name": "Data Source Priority Rules",
+      "description": "Defines the data fields to be extracted from documents or read from configuration.",
+      "applicable_phases": [
+        "Extraction",
+        "Configuration"
+      ],
+      "source_section": "Section 0, Section 3",
+      "rules": {
+        "invoice_content_fields": [
+          {
+            "field": "invoice_number",
+            "source": "extraction",
+            "description": "Unique invoice identifier"
+          },
+          {
+            "field": "invoice_date",
+            "source": "extraction",
+            "description": "Format: YYYY-MM-DD"
+          },
+          {
+            "field": "invoice_total_inc_tax",
+            "source": "extraction",
+            "description": "Total including tax"
+          },
+          {
+            "field": "invoice_total_ex_tax",
+            "source": "extraction",
+            "description": "Total excluding tax"
+          },
+          {
+            "field": "tax_amount",
+            "source": "extraction",
+            "description": "Tax amount"
+          },
+          {
+            "field": "vendor_name",
+            "source": "extraction",
+            "description": "Vendor business name"
+          },
+          {
+            "field": "vendor_tax_id",
+            "source": "extraction",
+            "description": "Tax ID (ABN, VAT, EIN, etc.)"
+          },
+          {
+            "field": "customer_name",
+            "source": "extraction",
+            "description": "Who invoice is addressed to"
+          },
+          {
+            "field": "currency",
+            "source": "extraction",
+            "description": "ISO currency code"
+          },
+          {
+            "field": "line_items",
+            "source": "extraction",
+            "description": "List of line items"
+          },
+          {
+            "field": "line_item.description",
+            "source": "extraction",
+            "description": "Line item description"
+          },
+          {
+            "field": "line_item.quantity",
+            "source": "extraction",
+            "description": "Line item quantity"
+          },
+          {
+            "field": "line_item.unit_price",
+            "source": "extraction",
+            "description": "Line item unit price"
+          },
+          {
+            "field": "line_item.amount_ex_tax",
+            "source": "extraction",
+            "description": "Line item amount excluding tax"
+          },
+          {
+            "field": "line_item.tax_code",
+            "source": "extraction",
+            "description": "Line item tax code"
+          },
+          {
+            "field": "line_item.tax_amount",
+            "source": "extraction",
+            "description": "Line item tax amount"
+          },
+          {
+            "field": "line_item.amount_inc_tax",
+            "source": "extraction",
+            "description": "Line item amount including tax"
+          },
+          {
+            "field": "waf.reference_number",
+            "source": "extraction",
+            "description": "Work authorization reference number"
+          },
+          {
+            "field": "waf.site_name",
+            "source": "extraction",
+            "description": "Site name from WAF"
+          },
+          {
+            "field": "waf.authorized_hours",
+            "source": "extraction",
+            "description": "Total authorized hours from WAF"
+          },
+          {
+            "field": "waf.work_description",
+            "source": "extraction",
+            "description": "Description of work from WAF"
+          },
+          {
+            "field": "waf.technician_name",
+            "source": "extraction",
+            "description": "Technician name from WAF"
+          },
+          {
+            "field": "waf.date",
+            "source": "extraction",
+            "description": "Date of work authorization"
+          }
+        ],
+        "po_wo_metadata_fields": [
+          {
+            "field": "require_work_authorization",
+            "source": "configuration",
+            "description": "Whether WAF is required"
+          },
+          {
+            "field": "waf_exempt_work_types",
+            "source": "configuration",
+            "description": "Work types that skip WAF requirement"
+          },
+          {
+            "field": "waf_exempt_vendors",
+            "source": "configuration",
+            "description": "Vendors exempt from WAF (not actively checked)"
+          },
+          {
+            "field": "require_purchase_order",
+            "source": "configuration",
+            "description": "Whether PO number is required"
+          },
+          {
+            "field": "valid_po_prefixes",
+            "source": "configuration",
+            "description": "Valid PO number prefixes (not yet implemented)"
+          }
+        ],
+        "forbidden_fields": [
+          {
+            "field": "work_order",
+            "reason": "Replaced by 'reference_number' in WAF extraction fields as per v1.1.1"
+          }
+        ]
+      }
+    },
+    {
+      "group_id": "bypass_exemption_rules",
+      "name": "Bypass & Exemption Rules",
+      "description": "Defines conditions for bypassing validation steps, such as WAF exemptions.",
+      "applicable_phases": [
+        "Phase 1"
+      ],
+      "source_section": "Section 0.3, Section 4.2",
+      "rules": {
+        "waf_exempt_work_types": [
+          "PREVENTATIVE",
+          "CLEANING"
+        ],
+        "waf_exempt_vendors_category_a": [],
+        "waf_exempt_keywords_category_b": [],
+        "bypass_indicators": []
+      }
+    },
+    {
+      "group_id": "tolerance_thresholds",
+      "name": "Tolerance & Threshold Rules",
+      "description": "Numeric thresholds for financial and time-based validation checks.",
+      "applicable_phases": [
+        "Phase 4"
+      ],
+      "source_section": "Section 0.6, Section 7",
+      "rules": [
+        {
+          "step": "4.1",
+          "tolerance_value": 0.02,
+          "unit": "currency",
+          "description": "Tolerance for total balance verification (balance_tolerance)"
+        },
+        {
+          "step": "4.2",
+          "tolerance_value": 1.0,
+          "unit": "currency",
+          "description": "Tolerance for line sum validation (line_sum_tolerance)"
+        },
+        {
+          "step": "4.3",
+          "tolerance_value": 0.5,
+          "unit": "hours",
+          "description": "Tolerance for WAF hours check (hours_tolerance)"
+        }
+      ]
+    },
+    {
+      "group_id": "entity_whitelists",
+      "name": "Entity Whitelists",
+      "description": "Lists of approved entities, such as customer names for verification.",
+      "applicable_phases": [
+        "Phase 1"
+      ],
+      "source_section": "Section 0.1, Section 1.2",
+      "rules": {
+        "organization_entities": [
+          "ACME Corp",
+          "ACME Corporation",
+          "ACME Ltd"
+        ]
+      }
+    },
+    {
+      "group_id": "work_type_classification",
+      "name": "Work Type Classification Rules",
+      "description": "Keywords used to classify the type of work on an invoice, which can affect other rules like WAF exemption.",
+      "applicable_phases": [
+        "Phase 1"
+      ],
+      "source_section": "Section 4.2",
+      "rules": [
+        {
+          "work_type": "PREVENTATIVE",
+          "keywords": [
+            "preventative",
+            "pm",
+            "scheduled",
+            "maintenance"
+          ],
+          "is_default": false
+        },
+        {
+          "work_type": "CLEANING",
+          "keywords": [
+            "cleaning",
+            "clean",
+            "janitorial"
+          ],
+          "is_default": false
+        },
+        {
+          "work_type": "EMERGENCY",
+          "keywords": [
+            "emergency",
+            "urgent",
+            "after hours"
+          ],
+          "is_default": false
+        },
+        {
+          "work_type": "REPAIRS",
+          "keywords": [],
+          "is_default": true
+        }
+      ]
+    },
+    {
+      "group_id": "labour_keywords",
+      "name": "Labour & Service Keywords",
+      "description": "Keywords to identify labour line items for calculating total invoiced hours.",
+      "applicable_phases": [
+        "Phase 4"
+      ],
+      "source_section": "Section 7 (Step 4.3)",
+      "rules": [
+        "labour",
+        "labor",
+        "technician",
+        "hours"
+      ]
+    },
+    {
+      "group_id": "root_cause_categories",
+      "name": "Root Cause Analysis Categories",
+      "description": "Categorization for investigation and reporting (not defined in the provided document).",
+      "applicable_phases": [
+        "Post-Processing"
+      ],
+      "source_section": "N/A",
+      "rules": []
+    }
+  ],
+  "rules_book_hash": "5f5381d2b7ae6fbaa9880a3b4fd662f188e5a4d0f5bee4f383d671209322a0d0",
+  "discovery_timestamp": "2026-02-19T10:54:46.507736",
+  "version": "2.0.0"
+}

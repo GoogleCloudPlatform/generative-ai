@@ -1,0 +1,34 @@
+{
+  "agent": "phase4_validator",
+  "version": "1.0",
+  "timestamp": "2026-04-07T16:33:06.099873",
+  "input_refs": [
+    "02_extraction.json",
+    "05_phase3_validation.json"
+  ],
+  "phase": 4,
+  "validations": [
+    {
+      "step": "4.1",
+      "rule": "Total = Subtotal + Tax",
+      "passed": true,
+      "evidence": "Total: 1069.32, Expected: 1069.32, Diff: 0.00"
+    },
+    {
+      "step": "4.2",
+      "rule": "Sum of lines = Subtotal",
+      "passed": true,
+      "evidence": "Line sum: 972.11, Subtotal: 972.11, Diff: 0.00",
+      "rejection_template": null
+    },
+    {
+      "step": "4.3",
+      "rule": "Labour hours within authorization",
+      "passed": false,
+      "evidence": "Invoice: 2.5h, Work type: REPAIRS (non-exempt), WAF authorized hours: 0 — no authorization for billed labour",
+      "rejection_template": "Invoice does not match work authorization"
+    }
+  ],
+  "decision": "REJECT",
+  "rejection_template": "Invoice does not match work authorization"
+}

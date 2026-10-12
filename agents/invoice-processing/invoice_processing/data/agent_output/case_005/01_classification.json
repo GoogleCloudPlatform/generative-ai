@@ -1,0 +1,33 @@
+{
+  "agent": "classifier",
+  "version": "1.0",
+  "timestamp": "2026-04-07T16:32:47.332024",
+  "input_refs": [],
+  "source_folder": "case_005",
+  "files": {
+    "Postprocessing_Data.json": {
+      "type": "json"
+    },
+    "invoice.pdf": {
+      "type": "pdf",
+      "extraction_method": "gemini",
+      "has_invoice": true,
+      "has_waf": false
+    },
+    "case_metadata.json": {
+      "type": "json"
+    },
+    "invoice_sources": [
+      {
+        "path": "invoice.pdf",
+        "full_path": "invoice_processing/exemplary_data/case_005/invoice.pdf",
+        "content": "QuickFix HVAC Repairs\nΑΒΝ: 51 824 753 556\n123 Business Street, Sydney NSW 2000\nPhone: (02) 9123 4567\nTAX INVOICE\nInvoice Number:\nINV-00005\nInvoice Date:\n11/02/2026\nCustomer:\nACME Corporation\nDescription\nGasket and seal kit\nTechnician labour - standard rate\nPayment Terms: Net 30 days\nPlease make payment to:\nBank: Commonwealth Bank\nBSB: 062-000\nAccount: 1234 5678\nQty\nUnit Price\nGST\nAmount\n3.00\n$219.87\n$65.96\n$725.57\n2.50\n$125.00\n$31.25\n$343.75\nSubtotal:\n$972.11\nGST (10%):\n$97.21\nTOTAL:\n$1,069.32"
+      }
+    ],
+    "waf_sources": []
+  },
+  "summary": {
+    "invoice_count": 1,
+    "waf_count": 0
+  }
+}

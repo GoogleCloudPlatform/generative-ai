@@ -1,0 +1,39 @@
+{
+  "case_id": "case_001",
+  "generated_at": "2026-02-16T18:11:25.838698",
+  "scenario": {
+    "work_type": "CLEANING",
+    "is_valid": false,
+    "expected_decision": "REJECT",
+    "rejection_reason": "Calculation error",
+    "has_waf": true
+  },
+  "invoice": {
+    "invoice_number": "INV-00001",
+    "invoice_date": "2026-01-07",
+    "vendor_name": "FastTrack Logistics",
+    "vendor_abn": "64560747633",
+    "customer_name": "ACME Corporation",
+    "subtotal": 638.0,
+    "gst": 95.7,
+    "total": 733.7,
+    "line_items": [
+      {
+        "description": "Emergency call-out - overtime rate",
+        "category": "LABOUR_AH",
+        "quantity": 5.8,
+        "unit_price": 110
+      }
+    ],
+    "is_valid": false,
+    "expected_decision": "REJECT",
+    "rejection_reason": "Calculation error"
+  },
+  "waf": {
+    "reference_number": "WAF-76948",
+    "date": "2026-01-01",
+    "authorized_hours": 5.7,
+    "technician": "Emma Williams",
+    "work_description": "cleaning services"
+  }
+}

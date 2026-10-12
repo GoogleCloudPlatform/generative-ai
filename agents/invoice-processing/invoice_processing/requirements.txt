@@ -1,0 +1,7 @@
+google-adk>=1.0.0
+google-cloud-aiplatform>=1.38.0
+vertexai>=1.38.0
+pdfplumber>=0.10.0
+pydantic>=2.8.0
+python-dotenv>=1.0.0
+pyyaml>=6.0

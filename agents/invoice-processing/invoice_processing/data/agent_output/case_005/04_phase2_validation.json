@@ -1,0 +1,21 @@
+{
+  "agent": "phase2_validator",
+  "version": "1.0",
+  "timestamp": "2026-04-07T16:33:06.076594",
+  "input_refs": [
+    "02_extraction.json",
+    "03_phase1_validation.json"
+  ],
+  "phase": 2,
+  "validations": [
+    {
+      "step": "2.1",
+      "rule": "Invoice has line items",
+      "passed": true,
+      "evidence": "Found 2 line item(s)",
+      "rejection_template": null
+    }
+  ],
+  "decision": "CONTINUE",
+  "rejection_template": null
+}

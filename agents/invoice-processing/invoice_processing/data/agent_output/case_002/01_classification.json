@@ -1,0 +1,45 @@
+{
+  "agent": "classifier",
+  "version": "1.0",
+  "timestamp": "2026-04-02T15:43:00.357195",
+  "input_refs": [],
+  "source_folder": "case_002",
+  "files": {
+    "waf.pdf": {
+      "type": "pdf",
+      "extraction_method": "gemini",
+      "has_invoice": false,
+      "has_waf": true
+    },
+    "Postprocessing_Data.json": {
+      "type": "json"
+    },
+    "invoice.pdf": {
+      "type": "pdf",
+      "extraction_method": "gemini",
+      "has_invoice": true,
+      "has_waf": false
+    },
+    "case_metadata.json": {
+      "type": "json"
+    },
+    "invoice_sources": [
+      {
+        "path": "invoice.pdf",
+        "full_path": "invoice_processing/exemplary_data/case_002/invoice.pdf",
+        "content": "Precision Tech Co Pty Ltd\nΑΒΝ: 51 824 753 556\n123 Business Street, Sydney NSW 2000\nPhone: (02) 9123 4567\nTAX INVOICE\nInvoice Number:\nINV-00002\nInvoice Date:\n27/12/2025\nCustomer:\nACME Corp\nDescription\nQty\nUnit Price\nGST\nAmount\nTechnician labour (3.0 hrs)\n3.00\n$110.00\n$33.00\n$363.00\nAir filter replacement (x2 units)\n2.00\n$45.00\n$9.00\n$99.00\nSystem calibration & diagnostics\n1.00\n$85.00\n$8.50\n$93.50\nSubtotal:\n$505.00\nGST (10%):\n$50.50\nTOTAL:\n$555.50\nPayment Terms: Net 30 days\nPlease make payment to:\nBank: Commonwealth Bank\nBSB: 062-000\nAccount: 1234 5678"
+      }
+    ],
+    "waf_sources": [
+      {
+        "path": "waf.pdf",
+        "full_path": "invoice_processing/exemplary_data/case_002/waf.pdf",
+        "content": "WORK AUTHORIZATION FORM\nReference: WAF-88462\nDate: 25/12/2025\nVendor: Precision Tech Co Pty Ltd\nSite: Site 843\nTechnician: Emma Williams\nAuthorized Hours: 4.3\n\nWork Description:\nAnnual air conditioning system service and filter replacement.\n\nAuthorization:\nAuthorized By: Date:\nTechnician: Date:"
+      }
+    ]
+  },
+  "summary": {
+    "invoice_count": 1,
+    "waf_count": 1
+  }
+}

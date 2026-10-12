@@ -1,0 +1,38 @@
+{
+  "agent": "transformer",
+  "version": "1.0",
+  "timestamp": "2026-04-07T16:33:09.830668",
+  "input_refs": [
+    "02_extraction.json",
+    "06_phase4_validation.json"
+  ],
+  "currency": "AUD",
+  "tax_rate": 0.1,
+  "line_items_mapped": [
+    {
+      "line_number": 1,
+      "item_code": "PARTS",
+      "description": "Gasket and seal kit",
+      "quantity": "3.00",
+      "unit_cost": "219.87",
+      "line_cost": "659.61",
+      "tax": "65.96",
+      "tax_code": "TAX"
+    },
+    {
+      "line_number": 2,
+      "item_code": "LABOUR",
+      "description": "Technician labour - standard rate",
+      "quantity": "2.50",
+      "unit_cost": "125.00",
+      "line_cost": "312.50",
+      "tax": "31.25",
+      "tax_code": "TAX"
+    }
+  ],
+  "totals": {
+    "line_cost_total": 972.11,
+    "tax_total": 97.21,
+    "grand_total": 1069.32
+  }
+}

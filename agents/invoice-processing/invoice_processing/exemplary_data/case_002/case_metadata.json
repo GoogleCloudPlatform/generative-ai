@@ -1,0 +1,51 @@
+{
+  "case_id": "case_002",
+  "generated_at": "2026-02-16T18:11:43.033618",
+  "scenario": {
+    "work_type": "PREVENTATIVE",
+    "is_valid": true,
+    "expected_decision": "ACCEPT",
+    "rejection_reason": null,
+    "has_waf": true
+  },
+  "invoice": {
+    "invoice_number": "INV-00002",
+    "invoice_date": "2025-12-27",
+    "vendor_name": "Precision Tech Co Pty Ltd",
+    "vendor_abn": "51824753556",
+    "customer_name": "ACME Corp",
+    "subtotal": 505.0,
+    "gst": 50.5,
+    "total": 555.5,
+    "line_items": [
+      {
+        "description": "Technician labour (3.0 hrs)",
+        "category": "LABOUR",
+        "quantity": 3.0,
+        "unit_price": 110.0
+      },
+      {
+        "description": "Air filter replacement (x2 units)",
+        "category": "PARTS",
+        "quantity": 2.0,
+        "unit_price": 45.0
+      },
+      {
+        "description": "System calibration & diagnostics",
+        "category": "LABOUR",
+        "quantity": 1.0,
+        "unit_price": 85.0
+      }
+    ],
+    "is_valid": true,
+    "expected_decision": "ACCEPT",
+    "rejection_reason": null
+  },
+  "waf": {
+    "reference_number": "WAF-88462",
+    "date": "2025-12-25",
+    "authorized_hours": 4.3,
+    "technician": "Emma Williams",
+    "work_description": "Annual air conditioning system service and filter replacement."
+  }
+}

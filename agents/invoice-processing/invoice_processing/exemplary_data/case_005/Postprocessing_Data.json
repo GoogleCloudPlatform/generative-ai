@@ -1,0 +1,23 @@
+{
+  "Invoice Processing": {
+    "Invoice Type": "Normal",
+    "Invoice Status": "Pending Payment",
+    "Invoice Source": "Email"
+  },
+  "Invoice Details": {
+    "Vendor Invoice": "INV-00005",
+    "Invoice Date": "2026-02-11",
+    "Invoice Total": "1,069.32",
+    "Pretax Total": "972.11",
+    "Tax Amount": "97.21",
+    "Currency": "AUD"
+  },
+  "Vendor Information": {
+    "Vendor Name": "QuickFix HVAC Repairs",
+    "Tax ID": "51824753556"
+  },
+  "Line Items": "[{\"line_number\": 1, \"item_code\": \"PARTS\", \"description\": \"Gasket and seal kit\", \"quantity\": \"3.00\", \"unit_cost\": \"219.87\", \"line_cost\": \"659.61\", \"tax\": \"65.96\", \"tax_code\": \"TAX\"}, {\"line_number\": 2, \"item_code\": \"LABOUR\", \"description\": \"Technician labour - standard rate\", \"quantity\": \"2.50\", \"unit_cost\": \"125.00\", \"line_cost\": \"312.50\", \"tax\": \"31.25\", \"tax_code\": \"TAX\"}]",
+  "Outcome Message": {
+    "Outcome Message": "Invoice accepted for payment on 16/02/2026 18:12:10"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "Invoice Processing": {
+    "Invoice Type": "Normal",
+    "Invoice Status": "Rejected",
+    "Invoice Source": "Email"
+  },
+  "Invoice Details": {
+    "Vendor Invoice": "INV-00001",
+    "Invoice Date": "2026-01-07",
+    "Invoice Total": "733.70",
+    "Pretax Total": "638.00",
+    "Tax Amount": "95.70",
+    "Currency": "AUD"
+  },
+  "Vendor Information": {
+    "Vendor Name": "FastTrack Logistics",
+    "Tax ID": "64560747633"
+  },
+  "Line Items": "[{\"line_number\": 1, \"item_code\": \"LABOUR_AH\", \"description\": \"Emergency call-out - overtime rate\", \"quantity\": \"5.80\", \"unit_cost\": \"110.00\", \"line_cost\": \"638.00\", \"tax\": \"63.80\", \"tax_code\": \"TAX\"}]",
+  "Outcome Message": {
+    "Outcome Message": "Invoice rejected on 16/02/2026 18:11:25: Calculation error"
+  }
+}

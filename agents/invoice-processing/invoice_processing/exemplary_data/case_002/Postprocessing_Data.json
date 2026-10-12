@@ -1,0 +1,23 @@
+{
+  "Invoice Processing": {
+    "Invoice Type": "Normal",
+    "Invoice Status": "Pending Payment",
+    "Invoice Source": "Email"
+  },
+  "Invoice Details": {
+    "Vendor Invoice": "INV-00002",
+    "Invoice Date": "2025-12-27",
+    "Invoice Total": "555.50",
+    "Pretax Total": "505.00",
+    "Tax Amount": "50.50",
+    "Currency": "AUD"
+  },
+  "Vendor Information": {
+    "Vendor Name": "Precision Tech Co Pty Ltd",
+    "Tax ID": "51824753556"
+  },
+  "Line Items": "[{\"line_number\": 1, \"item_code\": \"LABOUR\", \"description\": \"Technician labour (3.0 hrs)\", \"quantity\": \"3.00\", \"unit_cost\": \"110.00\", \"line_cost\": \"330.00\", \"tax\": \"33.00\", \"tax_code\": \"TAX\"}, {\"line_number\": 2, \"item_code\": \"PARTS\", \"description\": \"Air filter replacement (x2 units)\", \"quantity\": \"2.00\", \"unit_cost\": \"45.00\", \"line_cost\": \"90.00\", \"tax\": \"9.00\", \"tax_code\": \"TAX\"}, {\"line_number\": 3, \"item_code\": \"LABOUR\", \"description\": \"System calibration & diagnostics\", \"quantity\": \"1.00\", \"unit_cost\": \"85.00\", \"line_cost\": \"85.00\", \"tax\": \"8.50\", \"tax_code\": \"TAX\"}]",
+  "Outcome Message": {
+    "Outcome Message": "Invoice accepted for payment on 16/02/2026 18:11:43"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0.0",
+  "metadata": {
+    "name": "Invoice Processing ALF Rule Base",
+    "description": "Structured Rule Base for the Adaptive Learning Framework. Conditions are deterministic. Actions call Gemini Pro to continue the pipeline from where the acting agent terminated early. Rules derived from AGENT_ISSUES_INVESTIGATION.md.",
+    "version": "2.0.0",
+    "created": "2026-02-10",
+    "author": "Expert-Led (Phase 1)",
+    "acting_agent_version": "general_invoice_agent v1.29.3",
+    "rules_book_version": "reconstructed_rules_book.md v1.29.0",
+    "source_document": "AGENT_ISSUES_INVESTIGATION.md",
+    "total_rules": 0,
+    "action_model": "Hybrid: deterministic conditions + LLM-driven actions (Gemini Pro)",
+    "last_modified": "2026-04-02T18:45:50.653936",
+    "last_modified_by": "Learning Agent (SME-guided)"
+  },
+  "rules": []
+}

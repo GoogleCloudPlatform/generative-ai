@@ -1,0 +1,64 @@
+{
+  "agent": "extractor",
+  "version": "1.0",
+  "timestamp": "2026-04-02T15:43:33.651528",
+  "input_refs": [
+    "01_classification.json"
+  ],
+  "invoice": {
+    "invoice_number": "INV-00002",
+    "invoice_date": "2025-12-27",
+    "invoice_total_inc_tax": 555.5,
+    "invoice_total_ex_tax": 505.0,
+    "tax_amount": 50.5,
+    "vendor_tax_id": "51 824 753 556",
+    "vendor_name": "Precision Tech Co Pty Ltd",
+    "customer_name": "ACME Corp",
+    "currency": "AUD",
+    "line_items": [
+      {
+        "description": "Technician labour (3.0 hrs)",
+        "quantity": 3.0,
+        "unit_price": 110.0,
+        "amount_ex_tax": 330.0,
+        "tax_code": "GST",
+        "tax_amount": 33.0,
+        "amount_inc_tax": null
+      },
+      {
+        "description": "Air filter replacement (x2 units)",
+        "quantity": 2.0,
+        "unit_price": 45.0,
+        "amount_ex_tax": 90.0,
+        "tax_code": "GST",
+        "tax_amount": 9.0,
+        "amount_inc_tax": null
+      },
+      {
+        "description": "System calibration & diagnostics",
+        "quantity": 1.0,
+        "unit_price": 85.0,
+        "amount_ex_tax": 85.0,
+        "tax_code": "GST",
+        "tax_amount": 8.5,
+        "amount_inc_tax": null
+      }
+    ],
+    "_tax_id_validation": {
+      "valid": true,
+      "reason": "Valid checksum"
+    }
+  },
+  "work_authorization": {
+    "reference_number": "WAF-88462",
+    "site_name": "Site 843",
+    "authorized_hours": 4.3,
+    "work_description": "Annual air conditioning system service and filter replacement.",
+    "technician_name": "Emma Williams",
+    "date": "2025-12-25"
+  },
+  "extraction_failed": false,
+  "extraction_error": null,
+  "invoice_count": 1,
+  "waf_count": 1
+}

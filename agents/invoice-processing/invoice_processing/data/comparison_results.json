@@ -1,0 +1,23 @@
+[
+  {
+    "case_id": "case_001",
+    "original_exists": true,
+    "alf_exists": true,
+    "identical": true,
+    "differences": []
+  },
+  {
+    "case_id": "case_002",
+    "original_exists": true,
+    "alf_exists": true,
+    "identical": true,
+    "differences": []
+  },
+{
+    "case_id": "case_005",
+    "original_exists": true,
+    "alf_exists": true,
+    "identical": true,
+    "differences": []
+  }
+]
