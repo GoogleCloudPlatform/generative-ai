@@ -25,7 +25,7 @@ Processes conversational history to extract recurring intent patterns and genera
 - `swarm_generator.py` — Generates mini-agent .py files, triggers, embeddings, runs critic/ranking
 - `agent_spec.py` — Reads and writes agent files as data (never imports them) and supplies the one trusted `execute()`. Tests: `test_agent_spec.py`
 - `trigger_schema.py` — Feature schema, extraction prompts, soft penalty matching logic, rule validation
-- `llm_util.py` — Retry + model fallback wrapper for Google Cloud calls
+- `llm_util.py` — Retry + model fallback wrapper for Google Cloud calls, and `json_for_prompt()`, which puts conversation history into prompts with `<` and `>` escaped. Tests: `test_prompt_data.py`
 
 ## Matching Logic (trigger_schema.py)
 
@@ -49,7 +49,7 @@ python analyzer/analyze_history.py --user user_1
 python analyzer/analyze_history.py --user user_1 --skip-critic
 
 # Unit tests (no API calls)
-python -m unittest analyzer.test_agent_spec
+python -m unittest analyzer.test_agent_spec analyzer.test_prompt_data
 ```
 
 ## Output

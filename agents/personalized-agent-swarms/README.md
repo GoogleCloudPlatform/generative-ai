@@ -291,7 +291,7 @@ STEPS = [                       # for dynamic agents (max 2 steps)
 `execute()` is in `analyzer/agent_spec.py`. It fills in the prompt and runs each step in turn, feeding each output into the next step.
 
 > [!IMPORTANT]
-> Agent files are never imported or run. They're written from LLM output that the user's conversation history can steer, so prompt injection could otherwise put code in them. `analyzer/agent_spec.py` reads only the literal `AGENT_META`, `ENRICHED_PROMPT` and `STEPS` values (with `ast.literal_eval`) and writes agent files that contain only those values. Anything else the LLM generates is dropped. Agent names are reduced to plain identifiers before they're used as file names.
+> Agent files are never imported or run. They're written from LLM output that the user's conversation history can steer, so prompt injection could otherwise put code in them. `analyzer/agent_spec.py` reads only the literal `AGENT_META`, `ENRICHED_PROMPT` and `STEPS` values (with `ast.literal_eval`) and writes agent files that contain only those values. Anything else the LLM generates is dropped. Agent names are reduced to plain identifiers before they're used as file names. Conversation history goes into prompts as JSON with `<` and `>` escaped (`json_for_prompt()` in `analyzer/llm_util.py`), so a message can't close the `<sessions>` block it's placed in.
 
 **Behavioral vs task pattern separation:**
 
@@ -436,6 +436,7 @@ ADK_agents/
 |   +-- swarm_generator.py             # Generates mini-agent .py files (data only) + embeddings
 |   +-- agent_spec.py                  # Reads/writes agent files as data; the one trusted execute()
 |   +-- test_agent_spec.py             # Unit tests: python -m unittest analyzer.test_agent_spec
+|   +-- test_prompt_data.py            # Unit tests: python -m unittest analyzer.test_prompt_data
 |   +-- trigger_schema.py              # Feature schema, extraction prompts, binary questionnaires, matching logic
 |   +-- trigger_matcher.py             # Shared trigger matching pipeline (used by validation + runtime)
 |   +-- llm_util.py                    # Shared LLM utilities
