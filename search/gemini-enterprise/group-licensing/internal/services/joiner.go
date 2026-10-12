@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/generative-ai/search/gemini-enterprise/group-licensing/internal/config"
@@ -100,7 +101,7 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 	var totalGranted, totalSoftFailed, totalGroups int
 
 	for projectID, projectCfg := range cfg.Projects {
-		granted, softFailed, groups, err := s.processProject(ctx, projectID, projectNumbers[projectID], projectCfg, licenseIndex, dryRun, directLaw)
+		granted, softFailed, groups, byTier, err := s.processProject(ctx, projectID, projectNumbers[projectID], projectCfg, licenseIndex, dryRun, directLaw)
 		if err != nil {
 			logger.ErrorContext(ctx, "joiner workflow failed",
 				slog.String("project_id", projectID),
@@ -113,15 +114,20 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 		totalGranted += granted
 		totalSoftFailed += softFailed
 		totalGroups += groups
-		// verbose debug logging: Emitted per-project
-		logger.DebugContext(ctx, "project processed",
+		// Emitted per-project with the grants broken down by tier
+		args := []any{
 			slog.String("project_id", projectID),
 			slog.Int("licenses_granted", granted),
 			slog.Int("licenses_soft_failed", softFailed),
 			slog.Int("groups_processed", groups),
 			slog.Bool("dry_run", dryRun),
 			slog.Bool("direct_law_mode", directLaw),
-		)
+		}
+		for sku, count := range byTier {
+			key := "licenses_granted_" + strings.ToLower(strings.TrimPrefix(string(sku), "SUBSCRIPTION_TIER_"))
+			args = append(args, slog.Int(key, count))
+		}
+		logger.InfoContext(ctx, "project processed", args...)
 	}
 
 	elapsed := time.Since(start).Milliseconds()
@@ -159,11 +165,13 @@ type userEntitlement struct {
 // sequentially across the slice of entries for that key, spilling soft-failed
 // users from an exhausted pool into the next pool's batch.
 // It returns the number of licenses granted, the number of users soft-failed
-// due to license pool exhaustion, and the number of groups processed.
-func (s *JoinerService) processProject(ctx context.Context, projectID, projectNumber string, projectCfg config.ProjectConfig, index models.LicenseConfigIndex, dryRun bool, directLaw bool) (licensesGranted, licensesSoftFailed, groupsProcessed int, err error) {
+// due to license pool exhaustion, the number of groups processed, and the
+// number of licenses granted per SKU.
+func (s *JoinerService) processProject(ctx context.Context, projectID, projectNumber string, projectCfg config.ProjectConfig, index models.LicenseConfigIndex, dryRun bool, directLaw bool) (licensesGranted, licensesSoftFailed, groupsProcessed int, grantedByTier map[models.SKU]int, err error) {
 	// userBestEntitlement maps each user email to the highest-ranked entitlement
 	// (SKU + location) across all groups in this project.
 	userBestEntitlement := make(map[string]userEntitlement)
+	grantedByTier = make(map[models.SKU]int)
 
 	for _, cfgEntry := range projectCfg {
 		for _, groupEmail := range cfgEntry.Groups {
@@ -172,7 +180,7 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 				subID = *cfgEntry.SubscriptionID
 			}
 			if err := s.collectGroupMembers(ctx, groupEmail, cfgEntry.SubscriptionTier, subID, cfgEntry.Location, userBestEntitlement, directLaw); err != nil {
-				return 0, 0, 0, fmt.Errorf("project %q group %q: %w", projectID, groupEmail, err)
+				return 0, 0, 0, nil, fmt.Errorf("project %q group %q: %w", projectID, groupEmail, err)
 			}
 			groupsProcessed++
 		}
@@ -200,9 +208,9 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 		entries, ok := index[key]
 		if !ok || len(entries) == 0 {
 			if directLaw {
-				return 0, 0, 0, fmt.Errorf("project %q: no licenseConfig found for SKU %q Subscription %q location %q", projectID, ent.SKU, ent.SubscriptionID, ent.Location)
+				return 0, 0, 0, nil, fmt.Errorf("project %q: no licenseConfig found for SKU %q Subscription %q location %q", projectID, ent.SKU, ent.SubscriptionID, ent.Location)
 			}
-			return 0, 0, 0, fmt.Errorf("project %q: no licenseConfig found for SKU %q location %q", projectID, ent.SKU, ent.Location)
+			return 0, 0, 0, nil, fmt.Errorf("project %q: no licenseConfig found for SKU %q location %q", projectID, ent.SKU, ent.Location)
 		}
 		// If in direct_law mode, for each user include LicenseConfigPath in the key because {uuid} is unambiguous and should be unique; assume {uuid} unique and defined once in config.json and only create slice of just one LicenseUpdate entry
 		if directLaw {
@@ -252,18 +260,21 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 				}
 				granted, softFailed, err := s.grantBatch(ctx, projectID, projectNumber, entry, chunk)
 				if err != nil {
-					return 0, 0, 0, fmt.Errorf("project %q batch grant: %w", projectID, err)
+					return 0, 0, 0, nil, fmt.Errorf("project %q batch grant: %w", projectID, err)
 				}
 				totalGranted += granted
 				nextRemaining = append(nextRemaining, softFailed...)
 			}
 			licensesGranted += totalGranted
+			// Use the update's SKU: in direct_law mode the key carries the
+			// subscription ID and its SKU is empty.
+			grantedByTier[updates[0].SKU] += totalGranted
 			remaining = nextRemaining
 		}
 		licensesSoftFailed += len(remaining)
 	}
 
-	return licensesGranted, licensesSoftFailed, groupsProcessed, nil
+	return licensesGranted, licensesSoftFailed, groupsProcessed, grantedByTier, nil
 }
 
 // grantBatch issues a BatchUpdateUserLicenses call for a homogeneous batch
