@@ -297,6 +297,14 @@ run_environment_doctor() {
   fi
 }
 
+if { [ -z "$PROJECT_ID" ] || [ "$(bool01 "${AUTO_CREATE_PROJECT:-false}")" = "1" ]; } &&
+  [ "$(bool01 "${AUTO_CREATED_PROJECT:-false}")" != "1" ] &&
+  [ -f "scripts/internal/create_project.sh" ]; then
+  # shellcheck source=/dev/null
+  . scripts/internal/create_project.sh
+  ge_internal_create_project "${DOMAIN_SLUG:-demo}" ".env"
+fi
+
 if [ -z "$PROJECT_ID" ]; then
   echo "❌ Error: No default project found in your environment."
   echo "Please set PROJECT_ID in .env or run 'gcloud config set project [PROJECT_ID]' first."
