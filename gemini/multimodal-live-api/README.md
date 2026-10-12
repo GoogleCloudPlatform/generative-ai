@@ -14,7 +14,7 @@ The following video demonstrating the Multimodal Live API shows an example use c
 
 1. [Multimodal Live API](intro_multimodal_live_api.ipynb): Directly access the Multimodal Live API. This notebook will demonstrate text-to-text generation, as well as text-to-audio generation.
 
-2. [Multimodal Live API via Gen AI SDK](intro_multimodal_live_api_genai_sdk.ipynb): Use this tutorial to access the Multimodal Live API using the Google Gen AI SDK in Vertex AI. You'll see examples of text-to-text generation and text-to-audio generation.
+2. [Multimodal Live API via Gen AI SDK](intro_multimodal_live_api_genai_sdk.ipynb): Use this tutorial to access the Multimodal Live API using the Google Gen AI SDK in Cloud AI. You'll see examples of text-to-text generation and text-to-audio generation.
 
 ### Use Cases
 
@@ -31,6 +31,7 @@ The following video demonstrating the Multimodal Live API shows an example use c
 5. [Real-time Advisor](native-audio-websocket-demo-apps/realtime-advisor-demo-app/): A specialized advisor persona that can switch between silent and outspoken modes.
 6. [Customer Support Agent](native-audio-websocket-demo-apps/customer-support-demo-app/): An advanced agent with emotion detection, multimodal input, and tool execution.
 7. [Gaming Assistant](native-audio-websocket-demo-apps/gaming-assistant-demo-app/): A gaming companion with persona switching and screen sharing capabilities.
+8. [Gemini Live Studio](gemini-live-studio/): A Go server and Lit web app for talking avatars and live voice and vision sessions, with barge-in, transcripts, tool calls and a voice coding assistant example.
 
 ### Tools
 

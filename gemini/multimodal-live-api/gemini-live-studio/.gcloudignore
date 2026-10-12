@@ -1,0 +1,30 @@
+# Build outputs
+frontend/dist/
+frontend/build/
+/server
+/main
+server
+main
+*.out
+*.test
+*.skill
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+vendor/
+
+# Environment variables
+.env
+.env.*
+
+# Git and OS
+.git/
+.gitignore
+.worktrees/
+.DS_Store
+
+# Non-app directories
+examples/
+build/
+docs/

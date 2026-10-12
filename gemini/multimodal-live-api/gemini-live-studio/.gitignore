@@ -1,0 +1,35 @@
+# Node
+node_modules/
+
+# Go
+vendor/
+*.out
+*.test
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build outputs
+build/
+dist/
+frontend/dist/
+frontend/build/
+/server
+main
+/local-code-assistant
+examples/local-code-assistant/local-code-assistant
+examples/local-code-assistant/diagrams/
+
+# Skill binary bundles (generated via make pack-skill, not tracked in git)
+*.skill
+
+
+# Mac
+.DS_Store
+
+# Runtime generated diagrams
+diagrams/
+**/diagrams/
+/gemini-live-studio

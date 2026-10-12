@@ -1,11 +1,13 @@
 aadd
 Aadila
+AAEC
 AALR
 AAVE
 aaxis
 ABG
 Abhishek
 acall
+ACAO
 achat
 Achird
 acked
@@ -355,6 +357,7 @@ colorway
 colurna
 colvis
 colwidth
+CTAs
 Cómo
 Condesa
 Connectez
@@ -450,6 +453,8 @@ Demme
 demoable
 demoed
 demouser
+Demuxer
+demuxer
 denorm
 dente
 Depatmint
@@ -459,6 +464,8 @@ Derpanis
 DERs
 descgen
 deskmates
+desync
+devbox
 devkey
 Dexin
 dflags
@@ -503,6 +510,7 @@ dpi
 dpo
 DPO
 DPR
+dpr
 DQN
 draig
 Dreesen
@@ -646,6 +654,7 @@ fewshot
 fffbeb
 ffi
 ffprobe
+fft
 FHIR
 FIA
 fibonacci
@@ -711,6 +720,8 @@ fsreq
 fsspec
 FTPS
 fts
+Ftyp
+ftyp
 Fudd
 fulltext
 fullurl
@@ -750,6 +761,7 @@ gdk
 gdkx
 GDM
 gdp
+Gdpi
 gdrive
 geboten
 gecos
@@ -777,6 +789,7 @@ gfile
 GFile
 Gfm
 gguf
+ghchinoy
 ghcr
 giallo
 Giallo
@@ -800,8 +813,11 @@ GmbH
 gms
 gmtime
 GObject
+godotenv
 Godzilla
+gofmt
 Gojo
+golangci
 goldmine
 Gombe
 GOODALL
@@ -902,6 +918,7 @@ Hisaki
 historien
 histplot
 HITL
+Hiya
 Hlc
 hline
 Hmmm
@@ -914,6 +931,7 @@ honoured
 Hoodi
 Horamavu
 Hossein
+hostport
 hotpotqa
 hovermode
 hparams
@@ -927,6 +945,7 @@ HTTH
 https
 httpx
 Hubmann
+hvc
 HVDC
 hwnd
 hypercorn
@@ -1001,6 +1020,7 @@ isdir
 isess
 isfile
 Islington
+isom
 itable
 itables
 itb
@@ -1126,6 +1146,7 @@ l'harmonie
 labelleft
 labetalol
 Ladhak
+laggy
 LAION
 lakecolor
 LANCZOS
@@ -1252,6 +1273,7 @@ Mcps
 MCQ
 mdc
 MDD
+mdia
 Meawad
 mec
 MEDIANCUT
@@ -1293,6 +1315,7 @@ middot
 Milito
 millis
 Minato
+minf
 Mirai
 miranda
 Misaki
@@ -1319,6 +1342,7 @@ modelfile
 Molaison
 monty
 Mookie
+moov
 morty
 Mosi
 movflags
@@ -1345,6 +1369,7 @@ MTurk
 multiline
 multitool
 mundo
+muxed
 Mvar
 mvn
 mvnw
@@ -1425,6 +1450,7 @@ NNN
 noaa
 noabe
 nobserved
+nodesep
 nodularis
 nohup
 nokey
@@ -1509,6 +1535,7 @@ ord
 orgpolicy
 ORGPOLICY
 Orus
+osc
 osm
 oss
 osx
@@ -1601,6 +1628,8 @@ pkce
 pkl
 pks
 playlists
+Playout
+playout
 PLLu
 pllum
 plotly
@@ -1720,6 +1749,7 @@ Rajpurkar
 Ramblas
 ramen
 randint
+ranksep
 Ranurte
 rapideval
 raquin
@@ -1927,6 +1957,7 @@ sku
 SKUs
 SLAs
 slf
+slowloris
 Smartbuy
 Smaug
 SMB
@@ -1959,6 +1990,7 @@ sqm
 SRE
 srlimit
 srt
+srv
 ssd
 sse
 ssh
@@ -1972,6 +2004,7 @@ SSZ
 STARTPTS
 Statcast
 staticmethod
+stbl
 stdcall
 stext
 stitle
@@ -1985,6 +2018,7 @@ strdupv
 streamlit
 strfreev
 strptime
+stsd
 stt
 stuffie
 subclip
@@ -2112,6 +2146,7 @@ Topolino
 Toranomon
 toself
 toset
+Tpng
 tpot
 TPOT
 tprogress
@@ -2121,6 +2156,7 @@ tqdm
 traceloop
 Traceloop
 trailcam
+trak
 treeah
 triaging
 Tribbiani
@@ -2147,6 +2183,7 @@ ttext
 ttf
 ttfb
 TTFB
+TTFF
 ttft
 TTFT
 TTH
@@ -2226,6 +2263,7 @@ uvb
 uvicorn
 uvx
 UVX
+vad
 VAEs
 vais
 Valtteri
@@ -2300,6 +2338,7 @@ Wakatipu
 waterjet
 WAU
 Wavenet
+wcag
 wcontext
 wcslen
 wdir

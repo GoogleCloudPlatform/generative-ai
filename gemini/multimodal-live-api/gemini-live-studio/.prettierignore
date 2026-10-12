@@ -1,0 +1,6 @@
+node_modules/
+dist/
+build/
+coverage/
+frontend/package-lock.json
+**/go.sum
