@@ -157,8 +157,10 @@ Ayra
 Ayyappa
 backstory
 backticks
+bacme
 bagchi
 Bahasa
+bak
 Bakkali
 bargap
 barista
@@ -185,6 +187,7 @@ betulus
 Beyonce
 bff
 BFirst
+bfnrtu
 bgm
 Bgm
 BGM
@@ -243,6 +246,7 @@ brl
 Broadoak
 Brusdar
 Brynner
+BSB
 bshot
 bstep
 BTitle
@@ -418,7 +422,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 DALL
 Daniil
 Darabont
@@ -458,6 +461,7 @@ derails
 Derpanis
 DERs
 descgen
+descs
 deskmates
 devkey
 Dexin
@@ -496,6 +500,8 @@ doi
 DOIs
 Donen
 Doogler
+D'orsay
+dotpath
 dotprompt
 Downscale
 dpf
@@ -519,6 +525,7 @@ dsl
 dsn
 dsnap
 DSQ
+dsv
 dtm
 dto
 DTOs
@@ -527,6 +534,7 @@ dtypes
 Duh
 dumfries
 dumpd
+DUNBRAE
 dunia
 Duonebs
 Durafast
@@ -746,6 +754,7 @@ gcp
 gcs
 gcsfs
 gcurl
+gdesc
 gdk
 gdkx
 GDM
@@ -799,6 +808,7 @@ Gmb
 GmbH
 gms
 gmtime
+gname
 GObject
 Godzilla
 Gojo
@@ -831,11 +841,14 @@ gridspec
 groupadd
 groupchat
 grpcio
+grules
 gshoe
 gsm
 GSM
 gsod
 gspread
+gst
+gstat
 gstatic
 GSUITE
 gsutil
@@ -1015,8 +1028,8 @@ ixed
 izakaya
 ize
 ized
-J'aime
 jaccard
+J'aime
 JAISH
 Jaival
 japonicum
@@ -1121,8 +1134,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1135,6 +1146,7 @@ langgraph
 Laomedeia
 lastb
 latte
+L'avenir
 lavfi
 lbl
 LCEL
@@ -1149,6 +1161,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 libmp
 lic
@@ -1200,6 +1213,7 @@ lsof
 LSTATUS
 LSTM
 LSum
+ltd
 LTRB
 luhrmann
 Luhrmann
@@ -1456,6 +1470,7 @@ nvidia
 NVIDIA
 NVL
 NYT
+NZD
 oai
 objc
 ocr
@@ -1626,6 +1641,7 @@ Ponyo
 Popken
 popleft
 Porat
+portapack
 PORTFILE
 Portugu
 postictal
@@ -1737,6 +1753,7 @@ reallocations
 reauth
 Reauth
 REAUTH
+reconst
 recontext
 Recontext
 recrawl
@@ -1779,6 +1796,7 @@ ripgrep
 Rivertown
 Rivia
 Rizzoli
+RLA
 RLHF
 rlines
 rlog
@@ -1931,6 +1949,8 @@ Smartbuy
 Smaug
 SMB
 SMCC
+sme
+SMEs
 Smol
 smolagent
 SMSN
@@ -1987,6 +2007,7 @@ strfreev
 strptime
 stt
 stuffie
+subchecks
 subclip
 SUBLANG
 submodule
@@ -2295,6 +2316,7 @@ vulnz
 vurl
 Wafae
 wafaeb
+WAFs
 WAI
 Wakatipu
 waterjet

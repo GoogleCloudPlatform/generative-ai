@@ -55,7 +55,7 @@ except ImportError:
 
 
 def get_llm_project_id():
-    """Return the GCP project (deferred for Agent Engine compatibility).
+    """Return the Google Cloud project (deferred for Agent Engine compatibility).
 
     Reads GOOGLE_CLOUD_PROJECT, falling back to google.auth.default()
     for Agent Engine containers.

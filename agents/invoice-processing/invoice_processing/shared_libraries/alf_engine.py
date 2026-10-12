@@ -153,7 +153,7 @@ SUPPORTED_ACTION_TYPES = {
 # LLM CONFIGURATION
 # ============================================================================
 
-# GCP / Vertex AI config (mirrors acting_agent settings)
+# Google Cloud / Agent Platform (Vertex AI) config (mirrors acting_agent settings)
 try:
     from dotenv import load_dotenv
 
@@ -905,11 +905,11 @@ class LLMActionExecutor:
     5. Logs the full prompt/response for auditability
     """
 
-    _model = None  # Lazy-initialized Vertex AI model
+    _model = None  # Lazy-initialized Agent Platform (Vertex AI) model
 
     @classmethod
     def _get_model(cls):
-        """Lazy-initialize the Vertex AI GenerativeModel."""
+        """Lazy-initialize the Agent Platform (Vertex AI) GenerativeModel."""
         if cls._model is None:
             try:
                 from google.cloud import aiplatform
@@ -935,7 +935,7 @@ class LLMActionExecutor:
                 )
             except ImportError:
                 raise ImportError(
-                    "Vertex AI SDK required for LLM actions. Install with: "
+                    "Agent Platform (Vertex AI) SDK required for LLM actions. Install with: "
                     "pip install google-cloud-aiplatform"
                 ) from None
         return cls._model

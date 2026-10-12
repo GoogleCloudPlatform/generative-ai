@@ -81,7 +81,7 @@ _ABN_EXPECTED_LENGTH = 11
 
 @dataclass
 class _GCPConfig:
-    """Mutable container for GCP configuration (lazy-initialized).
+    """Mutable container for Google Cloud configuration (lazy-initialized).
 
     Model names and location default from environment variables so they are
     never hardcoded in source; the literals are only last-resort fallbacks.

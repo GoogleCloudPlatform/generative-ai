@@ -293,9 +293,9 @@ invoice-processing/
 
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/) for dependency management
-- Google Cloud project with Vertex AI API enabled
+- Google Cloud project with Agent Platform (Vertex AI) API enabled
 - [Google ADK](https://google.github.io/adk-docs/)
-- GCP authentication configured
+- Google Cloud authentication configured
 
 ### Installation
 
@@ -308,11 +308,11 @@ uv sync
 
 # Copy and configure environment variables
 cp .env.example .env
-# Edit .env with your GCP project details:
+# Edit .env with your Google Cloud project details:
 #   GOOGLE_CLOUD_PROJECT=your-gcp-project-id
 #   GOOGLE_CLOUD_LOCATION=us-central1
 
-# Authenticate with GCP
+# Authenticate with Google Cloud
 gcloud auth application-default login
 ```
 
@@ -322,8 +322,8 @@ See [`.env.example`](.env.example) for the full list. Key variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `GOOGLE_CLOUD_PROJECT` | (required) | GCP project ID |
-| `GOOGLE_CLOUD_LOCATION` | `us-central1` | GCP region |
+| `GOOGLE_CLOUD_PROJECT` | (required) | Google Cloud project ID |
+| `GOOGLE_CLOUD_LOCATION` | `us-central1` | Google Cloud region |
 | `MODEL_NAME` | `gemini-3.5-flash` | Model for the ADK agent |
 | `GEMINI_PRO_MODEL` | `gemini-3.5-pro` | Model for ALF pipeline continuation and investigation |
 | `API_CALL_DELAY_SECONDS` | `1.0` | Rate limiting between API calls |

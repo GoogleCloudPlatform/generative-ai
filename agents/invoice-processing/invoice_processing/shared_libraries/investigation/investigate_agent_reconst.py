@@ -118,7 +118,7 @@ _MAX_LINE_WIDTH = 75
 # Output directory for investigation results (used by batch runner only)
 INVESTIGATION_OUTPUT_DIR = AGENT_PKG_DIR / "data" / "investigation_output"
 
-# GCP Configuration (lazy -- resolved at call time for deployment compatibility)
+# Google Cloud Configuration (lazy -- resolved at call time for deployment compatibility)
 # Stored in a mutable dict so helpers can update without `global` statements.
 _gcp_config: dict[str, Any] = {
     "PROJECT_ID": None,

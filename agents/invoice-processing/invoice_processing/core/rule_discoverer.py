@@ -55,7 +55,7 @@ class ProposedRule:
 
 
 class _LLMClient:
-    """Lazy-initialized Vertex AI Gemini Pro client."""
+    """Lazy-initialized Agent Platform (Vertex AI) Gemini Pro client."""
 
     _model = None
 
