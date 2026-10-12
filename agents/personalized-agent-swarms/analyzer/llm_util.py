@@ -12,9 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Resilient Google Cloud wrapper with retry and model fallback."""
+"""Shared LLM helpers.
+
+- generate_with_fallback(): generate_content with retry and model fallback.
+- json_for_prompt(): JSON that's safe to put between tags in a prompt.
+"""
 
 import asyncio
+import json
+from typing import Any
 
 import config as cfg
 from google import genai
@@ -91,3 +97,24 @@ async def generate_with_fallback(
 
     # All models exhausted
     raise last_error  # type: ignore[misc]
+
+
+def json_for_prompt(value: object, **dumps_kwargs: Any) -> str:
+    r"""Serialize value as JSON that can't close the tag it's placed in.
+
+    Prompts put conversation history between tags such as
+    <sessions>...</sessions>. History is untrusted, so a message containing
+    "</sessions>" would end the block early, and the text after it would read
+    as instructions. JSON lets any character in a string be written as a \u
+    escape, so "<" and ">" are written as \u003c and \u003e. The result
+    decodes to the same value but can't contain a tag.
+
+    Args:
+        value: A JSON-serializable value, such as a list of sessions.
+        **dumps_kwargs: Passed to json.dumps(), for example indent.
+
+    Returns:
+        JSON text with no "<" or ">" characters.
+    """
+    text = json.dumps(value, **dumps_kwargs)
+    return text.replace("<", "\\u003c").replace(">", "\\u003e")
