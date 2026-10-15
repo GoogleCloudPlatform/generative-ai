@@ -354,16 +354,19 @@ async def send_microphone_audio(
       stop sending and rotate or close.
   """
   mime_type = f"audio/pcm;rate={SEND_SAMPLE_RATE}"
+  batch_max_chunks = 10
   try:
     if stream is not None:
-      for bridged_chunk in stream.consume_bridged_audio():
+      bridged_chunks = stream.consume_bridged_audio()
+      for i in range(0, len(bridged_chunks), batch_max_chunks):
         if session_stop_event is not None and session_stop_event.is_set():
           break
-        stream.audio_input.append(bridged_chunk)
+        batch = bridged_chunks[i : i + batch_max_chunks]
+        stream.audio_input.extend(batch)
         await session.send_realtime_input(
-            audio=types.Blob(data=bridged_chunk, mime_type=mime_type)
+            audio=types.Blob(data=b"".join(batch), mime_type=mime_type)
         )
-        await asyncio.sleep(0.01)
+        await asyncio.sleep(0.05)
 
     while True:
       if (
@@ -386,11 +389,32 @@ async def send_microphone_audio(
           session_stop_event.set()
         break
 
+      batch = [audio_chunk]
+      hit_eof = False
+      while len(batch) < batch_max_chunks and not audio_queue.empty():
+        try:
+          extra_chunk = audio_queue.get_nowait()
+        except asyncio.QueueEmpty:
+          break
+        if extra_chunk is None:
+          hit_eof = True
+          break
+        batch.append(extra_chunk)
+
       if stream is not None:
-        stream.audio_input.append(audio_chunk)
+        stream.audio_input.extend(batch)
       await session.send_realtime_input(
-          audio=types.Blob(data=audio_chunk, mime_type=mime_type)
+          audio=types.Blob(data=b"".join(batch), mime_type=mime_type)
       )
+      if len(batch) > 1:
+        await asyncio.sleep(0.05)
+
+      if hit_eof:
+        if stream is not None:
+          stream.closed = True
+        if session_stop_event is not None:
+          session_stop_event.set()
+        break
   except Exception as e:  # pylint: disable=broad-exception-caught
     print(f"\nError streaming audio: {e}")
   finally:
