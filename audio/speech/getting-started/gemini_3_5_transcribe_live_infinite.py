@@ -370,7 +370,6 @@ async def send_microphone_audio(
           stream is not None
           and get_current_time() - stream.start_time > stream.streaming_limit
       ):
-        stream.start_time = get_current_time()
         if session_stop_event is not None:
           session_stop_event.set()
         break
@@ -433,7 +432,6 @@ async def receive_streaming_messages(
             stream is not None
             and get_current_time() - stream.start_time > stream.streaming_limit
         ):
-          stream.start_time = get_current_time()
           if session_stop_event is not None:
             session_stop_event.set()
           break
@@ -555,6 +553,7 @@ async def streaming_main(
           )
           session_stop_event = asyncio.Event()
           stream.session_stop_event = session_stop_event
+          stream.start_time = get_current_time()
           stream.audio_input = []
 
           recv_task = asyncio.create_task(
