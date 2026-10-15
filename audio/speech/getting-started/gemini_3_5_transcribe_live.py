@@ -33,7 +33,7 @@ LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", "global")
 
 client = genai.Client(enterprise=True, project=PROJECT_ID, location=LOCATION)
 
-MODEL_ID_LIVE = "gemini-3.5-transcribe-live-preview"
+MODEL_ID_LIVE = "gemini-3.5-transcribe-live"
 
 SEND_SAMPLE_RATE = 16000
 CHANNELS = 1
