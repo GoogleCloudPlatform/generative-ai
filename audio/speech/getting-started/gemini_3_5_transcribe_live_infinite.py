@@ -7,7 +7,7 @@ starting a new Live session whenever `STREAMING_LIMIT` is reached and replaying
 unfinalized audio chunks across the stream boundary.
 
 Prerequisites:
-    pip install google-genai 
+    pip install google-genai
 
 Authentication (Application Default Credentials):
     gcloud auth application-default login
@@ -28,7 +28,6 @@ import threading
 import time
 from typing import Any
 import wave
-
 import certifi
 from google import genai
 from google.genai import types
@@ -39,15 +38,11 @@ os.environ.setdefault("SSL_CERT_FILE", certifi.where())
 # --- Project / client setup -------------------------------------------------
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "[your-project-id]")
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", "global")
-
 DEFAULT_AUDIO_PATH = "sample_audio.wav"
 AUDIO_PATH = os.environ.get("AUDIO_PATH", DEFAULT_AUDIO_PATH)
-
 client = genai.Client(enterprise=True, project=PROJECT_ID, location=LOCATION)
-
 MODEL_ID_LIVE = "gemini-3.5-transcribe-live"
-
-STREAMING_LIMIT = 540_000  # 9 minutes in milliseconds
+STREAMING_LIMIT = 20_000
 SEND_SAMPLE_RATE = 16_000
 CHANNELS = 1
 BYTES_PER_SAMPLE = 2
@@ -90,10 +85,8 @@ def resolve_audio_path(path: str) -> str:
 
 def read_pcm_without_header(path: str) -> bytes:
   """Reads raw audio bytes from `path`, stripping a WAV header if present.
-
   Args:
     path: Filesystem path to the audio file.
-
   Returns:
     Raw audio payload bytes without a RIFF/WAVE header.
   """
@@ -106,6 +99,23 @@ def read_pcm_without_header(path: str) -> bytes:
     except wave.Error:
       return raw_bytes[_WAV_HEADER_SIZE:]
   return raw_bytes
+
+
+def detect_wav_sample_rate(
+    path: str, default_rate: int = SEND_SAMPLE_RATE
+) -> int:
+  """Detects the sample rate in Hz from a WAV file header, or `default_rate`."""
+  try:
+    with open(path, "rb") as audio_file:
+      header_prefix = audio_file.read(4)
+    if header_prefix == b"RIFF":
+      with wave.open(path, "rb") as wav_reader:
+        framerate = wav_reader.getframerate()
+        if framerate > 0:
+          return framerate
+  except (OSError, wave.Error):
+    pass
+  return default_rate
 
 
 def simulate_microphone_stream(
@@ -195,10 +205,20 @@ class ResumableMicrophoneStream:
         before starting a new stream.
       loop: Optional running asyncio event loop, or None to resolve on enter.
     """
+    resolved_path = resolve_audio_path(audio_path)
+    if audio_stream is None and rate == SEND_SAMPLE_RATE:
+      detected_rate = detect_wav_sample_rate(resolved_path, default_rate=rate)
+      if detected_rate != rate:
+        if chunk_size == DEFAULT_CHUNK_SIZE:
+          chunk_size = int(
+              detected_rate * CHANNELS * BYTES_PER_SAMPLE * BLOCK_DURATION
+          )
+        rate = detected_rate
     self._rate = rate
+    self.rate = rate
     self.chunk_size = chunk_size
     self.streaming_limit = streaming_limit
-    self._audio_path = audio_path
+    self._audio_path = resolved_path
     self._audio_stream = audio_stream
     self._chunk_delay_sec = chunk_delay_sec
     self._loop = loop
@@ -353,21 +373,21 @@ async def send_microphone_audio(
     session_stop_event: Optional event signaling that the current session should
       stop sending and rotate or close.
   """
-  mime_type = f"audio/pcm;rate={SEND_SAMPLE_RATE}"
+  rate = stream.rate if stream is not None else SEND_SAMPLE_RATE
+  mime_type = f"audio/pcm;rate={rate}"
   batch_max_chunks = 10
   try:
     if stream is not None:
       bridged_chunks = stream.consume_bridged_audio()
-      for i in range(0, len(bridged_chunks), batch_max_chunks):
+      for i, chunk in enumerate(bridged_chunks):
         if session_stop_event is not None and session_stop_event.is_set():
           break
-        batch = bridged_chunks[i : i + batch_max_chunks]
-        stream.audio_input.extend(batch)
+        stream.audio_input.append(chunk)
         await session.send_realtime_input(
-            audio=types.Blob(data=b"".join(batch), mime_type=mime_type)
+            audio=types.Blob(data=chunk, mime_type=mime_type)
         )
-        await asyncio.sleep(0.05)
-
+        if (i + 1) % batch_max_chunks == 0:
+          await asyncio.sleep(0.05)
     while True:
       if (
           stream is not None
@@ -388,33 +408,11 @@ async def send_microphone_audio(
         if session_stop_event is not None:
           session_stop_event.set()
         break
-
-      batch = [audio_chunk]
-      hit_eof = False
-      while len(batch) < batch_max_chunks and not audio_queue.empty():
-        try:
-          extra_chunk = audio_queue.get_nowait()
-        except asyncio.QueueEmpty:
-          break
-        if extra_chunk is None:
-          hit_eof = True
-          break
-        batch.append(extra_chunk)
-
       if stream is not None:
-        stream.audio_input.extend(batch)
+        stream.audio_input.append(audio_chunk)
       await session.send_realtime_input(
-          audio=types.Blob(data=b"".join(batch), mime_type=mime_type)
+          audio=types.Blob(data=audio_chunk, mime_type=mime_type)
       )
-      if len(batch) > 1:
-        await asyncio.sleep(0.05)
-
-      if hit_eof:
-        if stream is not None:
-          stream.closed = True
-        if session_stop_event is not None:
-          session_stop_event.set()
-        break
   except Exception as e:  # pylint: disable=broad-exception-caught
     print(f"\nError streaming audio: {e}")
   finally:
@@ -429,7 +427,7 @@ def _resolve_result_end_time_ms(
   offset_ms = _parse_offset_ms(getattr(transcription, "end_offset", None))
   if offset_ms is not None:
     return offset_ms
-  return max(0, get_current_time() - stream.start_time)
+  return stream.bridging_offset + max(0, get_current_time() - stream.start_time)
 
 
 async def receive_streaming_messages(
@@ -449,22 +447,37 @@ async def receive_streaming_messages(
       exceeded so the sender coroutine can rotate to a new stream.
   """
   clear_line = "\r\x1b[2K"
+  last_interim = ""
   try:
-    while session_stop_event is None or not session_stop_event.is_set():
+    while True:
+      turn_completed = False
       async for message in session.receive():
         if (
             stream is not None
-            and get_current_time() - stream.start_time > stream.streaming_limit
+            and getattr(message, "voice_activity", None) is not None
         ):
-          if session_stop_event is not None:
-            session_stop_event.set()
-          break
-
+          voice_activity = message.voice_activity
+          if (
+              voice_activity.voice_activity_type
+              == types.VoiceActivityType.ACTIVITY_END
+          ):
+            activity_offset_ms = _parse_offset_ms(
+                getattr(voice_activity, "audio_offset", None)
+            )
+            if activity_offset_ms is not None:
+              stream.result_end_time = max(
+                  stream.result_end_time, activity_offset_ms
+              )
+              if stream.last_transcript_was_final:
+                stream.is_final_end_time = activity_offset_ms
         if not message.server_content:
           continue
         server_content = message.server_content
+        if server_content.turn_complete or server_content.generation_complete:
+          turn_completed = True
         interim = server_content.interim_input_transcription
         if interim and interim.text:
+          last_interim = interim.text
           if stream is not None:
             stream.result_end_time = _resolve_result_end_time_ms(
                 interim, stream
@@ -479,16 +492,36 @@ async def receive_streaming_messages(
         # Final result: commit it permanently on its own line.
         final = server_content.input_transcription
         if final and final.text:
+          last_interim = ""
           if stream is not None:
             stream.result_end_time = _resolve_result_end_time_ms(final, stream)
             stream.is_final_end_time = stream.result_end_time
             stream.last_transcript_was_final = True
           transcript_buffer.append(final.text)
           print(f"{clear_line}{final.text}", flush=True)
+        if (
+            stream is not None
+            and stream.closed
+            and (
+                server_content.turn_complete
+                or server_content.generation_complete
+            )
+        ):
+          break
+      if (
+          not turn_completed
+          or session_stop_event is None
+          or session_stop_event.is_set()
+      ):
+        break
   except Exception as e:  # pylint: disable=broad-exception-caught
     print(f"\nError transcribing audio: {e}")
-
-
+  finally:
+    if last_interim:
+      transcript_buffer.append(last_interim)
+      if stream is not None:
+        stream.is_final_end_time = stream.result_end_time
+        stream.last_transcript_was_final = True
 async def _watch_stop_event(
     stream: ResumableMicrophoneStream,
     stop_event: asyncio.Event,
@@ -571,15 +604,11 @@ async def streaming_main(
         async with client.aio.live.connect(
             model=MODEL_ID_LIVE, config=config
         ) as session:
-          print(
-              "Setup complete — streaming audio "
-              "(press Ctrl+C to stop)."
-          )
+          print("Setup complete — streaming audio (press Ctrl+C to stop).")
           session_stop_event = asyncio.Event()
           stream.session_stop_event = session_stop_event
           stream.start_time = get_current_time()
           stream.audio_input = []
-
           recv_task = asyncio.create_task(
               receive_streaming_messages(
                   session, transcript_buffer, stream, session_stop_event
@@ -592,7 +621,6 @@ async def streaming_main(
           )
 
           await send_task
-
           try:
             await asyncio.wait_for(recv_task, timeout=5.0)
           except asyncio.TimeoutError:
@@ -600,7 +628,10 @@ async def streaming_main(
 
         if stream.result_end_time > 0:
           stream.final_request_end_time = stream.is_final_end_time
+        else:
+          stream.final_request_end_time = 0
         stream.result_end_time = 0
+        stream.is_final_end_time = 0
         stream.last_audio_input = stream.audio_input
         stream.audio_input = []
         stream.restart_counter += 1
