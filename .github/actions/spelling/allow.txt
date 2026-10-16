@@ -1492,6 +1492,7 @@ ntheory
 NTILE
 ntry
 nunique
+NVFP
 nvidia
 NVIDIA
 NVL
