@@ -214,6 +214,7 @@ Bitcoin
 bjerr
 bjson
 bkey
+BLE
 blindspot
 blogs
 BLR
@@ -328,8 +329,10 @@ clf
 clickable
 CLIs
 CLOEXEC
+cloudkms
 cloudrun
 CLOUDSDK
+cloudsql
 cloudtasks
 cloudtrace
 cloudveil
@@ -543,6 +546,7 @@ Duh
 dumfries
 dumpd
 DUNBRAE
+dunder
 dunia
 Duonebs
 Durafast
@@ -622,6 +626,7 @@ etils
 etype
 euchlora
 eula
+euo
 eur
 evalgen
 evals
@@ -719,6 +724,7 @@ fromarray
 frombytes
 fromiter
 fromkeys
+fromlist
 frontline
 Frontline
 FRONTLINE
@@ -759,6 +765,7 @@ gca
 gcbp
 gce
 gchar
+Gci
 gclb
 gcloud
 gcp
@@ -945,6 +952,9 @@ Hoodi
 Horamavu
 Hossein
 hostport
+hotpatch
+hotpatched
+hotpatches
 hotpotqa
 hovermode
 hparams
@@ -1067,6 +1077,7 @@ jesieni
 Jestem
 jetbrains
 Jhamtani
+Jhb
 JHome
 Jiacheng
 Jianfeng
@@ -1316,6 +1327,7 @@ Meteo
 metricx
 Mewgler
 MFU
+mgf
 mgmt
 Mgmt
 mgrs
@@ -1408,6 +1420,7 @@ Narnia
 nas
 natbib
 Navneet
+Nawalgaria
 nbconvert
 nbfmt
 nbformat
@@ -1682,6 +1695,8 @@ Pranav
 praw
 prcntg
 PRD
+Prehashed
+PRIN
 Pré
 PREBROWSE
 preds
@@ -1696,6 +1711,7 @@ programar
 projectid
 proname
 protobuf
+PSS
 pstep
 pstotext
 pth

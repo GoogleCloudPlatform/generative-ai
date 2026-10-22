@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chrysalis-agent-platform"
+version = "0.2.0"
+description = "Project Chrysalis: Architecting Governed, Self-Evolving AI Agents on Gemini Enterprise Agent Platform"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "google-adk>=2.9.0",
+    "google-genai>=2.20.0",
+    "google-cloud-aiplatform>=1.70.0",
+    "google-cloud-bigquery>=3.20.0",
+    "google-cloud-logging>=3.10.0",
+    "google-cloud-monitoring>=2.20.0",
+    "google-cloud-kms>=3.10.0",
+    "cryptography>=42.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "pydantic>=2.8.0",
+    "numpy>=1.26.0",
+]
+
+[tool.hatch.build.targets.wheel]
+# The project name (chrysalis-agent-platform) does not match the package directory, so tell hatchling what to ship.
+packages = ["app"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "strict"
+filterwarnings = [
+    # Third-party (google-adk / starlette) notices that are not actionable from this codebase
+    "ignore:BaseAgentConfig is deprecated:DeprecationWarning",
+    "ignore:.*JSON_SCHEMA_FOR_FUNC_DECL is enabled:UserWarning",
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]

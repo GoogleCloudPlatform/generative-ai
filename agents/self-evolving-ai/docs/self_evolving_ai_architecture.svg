@@ -1,0 +1,373 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 880" width="1320" height="880" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <!-- Crisp Vector Arrow Markers -->
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1a73e8"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d93025"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1e8e3e"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#e37400"/>
+    </marker>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748b"/>
+    </marker>
+
+    <!-- Background Dot Grid Pattern -->
+    <pattern id="bg-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#e2e8f0"/>
+    </pattern>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1320" height="880" fill="#ffffff"/>
+  <rect width="1320" height="880" fill="url(#bg-grid)" opacity="0.65"/>
+
+  <!-- Top Google Brand 4-Color Bar -->
+  <rect x="0" y="0" width="330" height="6" fill="#4285F4"/>
+  <rect x="330" y="0" width="330" height="6" fill="#EA4335"/>
+  <rect x="660" y="0" width="330" height="6" fill="#FBBC04"/>
+  <rect x="990" y="0" width="330" height="6" fill="#34A853"/>
+
+  <!-- Header Banner -->
+  <rect x="0" y="6" width="1320" height="78" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <!-- Google Cloud Icon Badge -->
+  <g transform="translate(24, 24)">
+    <circle cx="18" cy="18" r="18" fill="#e8f0fe"/>
+    <path d="M22.5 14.5C21.7 11.9 19.3 10 16.5 10C13.4 10 10.8 12.2 10.3 15.2C8.4 15.6 7 17.3 7 19.3C7 21.6 8.9 23.5 11.2 23.5H22C24.8 23.5 27 21.3 27 18.5C27 16.1 25.1 14.7 22.5 14.5Z" fill="#1a73e8"/>
+    <circle cx="16.5" cy="17" r="3" fill="#ffffff"/>
+  </g>
+
+  <text x="72" y="39" font-size="20" font-weight="700" fill="#0f172a" letter-spacing="-0.3">Self-Evolving AI Architecture on Google Cloud Agent Platform</text>
+  <text x="72" y="61" font-size="12.5" font-weight="500" fill="#475569">Synthesizing APEX (Tri-Level Co-Evolution) • AgentEvolver (Shapley Attribution) • Dream-RSI (BigQuery Counterfactual Replay)</text>
+
+  <!-- Phase Legend Pills (Top Right) -->
+  <g transform="translate(755, 20)" font-size="11" font-weight="600">
+    <rect x="0" y="0" width="124" height="24" rx="12" fill="#fce8e6" stroke="#f28b82"/>
+    <circle cx="14" cy="12" r="8" fill="#d93025"/>
+    <text x="14" y="15.5" fill="#ffffff" text-anchor="middle" font-size="10">1</text>
+    <text x="28" y="16" fill="#a50e0e">Outage &amp; Alert</text>
+
+    <rect x="132" y="0" width="134" height="24" rx="12" fill="#e8f0fe" stroke="#8ab4f8"/>
+    <circle cx="146" cy="12" r="8" fill="#1a73e8"/>
+    <text x="146" y="15.5" fill="#ffffff" text-anchor="middle" font-size="10">2</text>
+    <text x="160" y="16" fill="#174ea6">L1 AST Hotpatch</text>
+
+    <rect x="274" y="0" width="138" height="24" rx="12" fill="#f3e8fd" stroke="#c58af9"/>
+    <circle cx="288" cy="12" r="8" fill="#7c3aed"/>
+    <text x="288" y="15.5" fill="#ffffff" text-anchor="middle" font-size="10">3</text>
+    <text x="302" y="16" fill="#5b21b6">HITL DAG Rewire</text>
+
+    <rect x="420" y="0" width="124" height="24" rx="12" fill="#fef7e0" stroke="#fdd663"/>
+    <circle cx="434" cy="12" r="8" fill="#e37400"/>
+    <text x="434" y="15.5" fill="#ffffff" text-anchor="middle" font-size="10">4</text>
+    <text x="448" y="16" fill="#b06000">Dream &amp; Chaos</text>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- ZONE 1: PRODUCTION TARGET ENVIRONMENT (LEFT)                            -->
+  <!-- ======================================================================= -->
+  <rect x="24" y="102" width="310" height="715" rx="12" fill="#fffafa" stroke="#f28b82" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <rect x="24" y="102" width="310" height="38" rx="12" fill="#fce8e6"/>
+  <text x="38" y="126" font-size="11.5" font-weight="700" fill="#a50e0e" letter-spacing="0.3">ZONE 1: PRODUCTION TARGET ENVIRONMENT</text>
+
+  <!-- Node 1A: Ingress Surge -->
+  <g>
+    <rect x="46" y="161" width="270" height="78" rx="8" fill="#e2e8f0" opacity="0.45"/>
+    <rect x="44" y="158" width="270" height="78" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="44" y="158" width="6" height="78" rx="3" fill="#d93025"/>
+    <text x="62" y="182" font-size="13.5" font-weight="700" fill="#0f172a">Ingress Checkout Surge</text>
+    <text x="62" y="201" font-size="11" fill="#334155">• 50 concurrent bursts across 15 cold keys</text>
+    <text x="62" y="219" font-size="11" fill="#d93025" font-weight="700">• Unpatched: 72.7% HTTP 500 | 519.8ms P99</text>
+  </g>
+
+  <!-- Node 1B: Binary Authorization Middleware (APEX Layer 1) -->
+  <g>
+    <rect x="46" y="277" width="270" height="112" rx="8" fill="#bbf7d0" opacity="0.45"/>
+    <rect x="44" y="274" width="270" height="112" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <rect x="56" y="284" width="188" height="19" rx="4" fill="#15803d"/>
+    <text x="150" y="297" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">APEX LAYER 1 • IN-MEMORY PATCH</text>
+    <text x="56" y="320" font-size="13.5" font-weight="700" fill="#14532d">Binary Auth Middleware</text>
+    <text x="56" y="338" font-size="11" fill="#166534" font-family="Menlo, Monaco, Consolas, monospace" font-weight="700">TokenBucketRateLimiter(C=10, R=40)</text>
+    <text x="56" y="356" font-size="11" fill="#1e293b">• Compiled in RAM (Zero disk file edits)</text>
+    <text x="56" y="374" font-size="11" fill="#15803d" font-weight="700">• Post-Patch: 0.0% 500s | 18.2ms P99 | 429 Shed</text>
+  </g>
+
+  <!-- Node 1C: Cloud Memorystore (Redis) -->
+  <g>
+    <rect x="46" y="427" width="270" height="84" rx="8" fill="#e2e8f0" opacity="0.45"/>
+    <rect x="44" y="424" width="270" height="84" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="44" y="424" width="6" height="84" rx="3" fill="#1a73e8"/>
+    <text x="62" y="448" font-size="13.5" font-weight="700" fill="#0f172a">Cloud Memorystore (Redis)</text>
+    <text x="62" y="467" font-size="11" fill="#334155">• Strict LRU Eviction (Capacity: 5 keys)</text>
+    <text x="62" y="485" font-size="11" fill="#475569">• Cold stampede drops hit ratio to 0.0%</text>
+  </g>
+
+  <!-- Node 1D: Cloud SQL (PostgreSQL) -->
+  <g>
+    <rect x="46" y="547" width="270" height="92" rx="8" fill="#e2e8f0" opacity="0.45"/>
+    <rect x="44" y="544" width="270" height="92" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="44" y="544" width="6" height="92" rx="3" fill="#1a73e8"/>
+    <text x="62" y="568" font-size="13.5" font-weight="700" fill="#0f172a">Cloud SQL (PostgreSQL)</text>
+    <text x="62" y="587" font-size="11" fill="#334155">• Bounded Pool (Max 2 active connections)</text>
+    <text x="62" y="605" font-size="11" fill="#d93025" font-weight="600">• Contraindicated: DB Restart (-0.17 score)</text>
+    <text x="62" y="623" font-size="11" fill="#15803d" font-weight="700">• Protected by Rate Limiter (&lt;14% load)</text>
+  </g>
+
+  <!-- Node 1E: Shadow Sandbox Replica -->
+  <g>
+    <rect x="44" y="672" width="270" height="122" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <rect x="56" y="682" width="166" height="19" rx="4" fill="#d97706"/>
+    <text x="139" y="695" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">ISOLATED SHADOW SANDBOX</text>
+    <text x="56" y="719" font-size="13" font-weight="700" fill="#78350f">Shadow Microservice Replica</text>
+    <text x="56" y="738" font-size="11" fill="#78350f">• 100% Cache Purge + 200-Req Chaos Burst</text>
+    <text x="56" y="756" font-size="11" fill="#78350f">• Stress-tests evolved TrafficShapingAgent</text>
+    <text x="56" y="775" font-size="11" fill="#15803d" font-weight="700">✓ Asserted: 0 HTTP 500s (VERIFIED_RESILIENT)</text>
+  </g>
+
+  <!-- Internal Zone 1 Vertical Flow Arrows -->
+  <line x1="179" y1="236" x2="179" y2="268" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-slate)"/>
+  <line x1="179" y1="386" x2="179" y2="418" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-slate)"/>
+  <line x1="179" y1="508" x2="179" y2="538" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-slate)"/>
+
+
+  <!-- ======================================================================= -->
+  <!-- ZONE 2: GOOGLE CLOUD AGENT PLATFORM (CENTER TOP)                        -->
+  <!-- ======================================================================= -->
+  <rect x="366" y="102" width="548" height="365" rx="12" fill="#f8faff" stroke="#8ab4f8" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <rect x="366" y="102" width="548" height="38" rx="12" fill="#e8f0fe"/>
+  <text x="384" y="126" font-size="12" font-weight="700" fill="#174ea6" letter-spacing="0.3">ZONE 2: GOOGLE CLOUD AGENT PLATFORM (ADK 2.0 &amp; GEMINI 4.0 ARGON)</text>
+
+  <!-- Root Node: SupervisorRouterAgent -->
+  <g>
+    <rect x="463" y="159" width="360" height="92" rx="10" fill="#bfdbfe" opacity="0.45"/>
+    <rect x="460" y="156" width="360" height="92" rx="10" fill="#ffffff" stroke="#1a73e8" stroke-width="2"/>
+    <rect x="474" y="166" width="144" height="19" rx="4" fill="#1a73e8"/>
+    <text x="546" y="179" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">ROOT ADK COORDINATOR</text>
+    <text x="628" y="179" font-size="11" font-weight="700" fill="#1a73e8" font-family="Menlo, Monaco, Consolas, monospace">gemini-4-argon</text>
+    <text x="474" y="203" font-size="14.5" font-weight="700" fill="#0f172a" font-family="Menlo, Monaco, Consolas, monospace">SupervisorRouterAgent</text>
+    <text x="474" y="222" font-size="11" fill="#334155">• Ingests sanitized alerts &amp; synthesizes L1 hotpatches</text>
+    <text x="474" y="239" font-size="11" fill="#334155">• Dynamically routes across sub_agents DAG in RAM</text>
+  </g>
+
+  <!-- Fork Connectors from SupervisorRouterAgent to TWO Sibling Sub-Agents -->
+  <!-- Left Branch to DiagnosticAgent -->
+  <path d="M 560 248 L 560 274 L 495 274 L 495 300" fill="none" stroke="#1a73e8" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="454" y="268" font-size="10.5" font-weight="700" fill="#1a73e8" font-family="Menlo, Monaco, Consolas, monospace">sub_agents[0]</text>
+
+  <!-- Right Branch to TrafficShapingAgent (Mutated in RAM) -->
+  <path d="M 720 248 L 720 274 L 770 274 L 770 300" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arrow-purple)"/>
+  <text x="728" y="268" font-size="10.5" font-weight="700" fill="#7c3aed">sub_agents[1] (Appended in RAM)</text>
+
+  <!-- Left Child Node: DiagnosticAgent (Peer Sub-Agent 1) -->
+  <g>
+    <rect x="386" y="309" width="236" height="138" rx="8" fill="#e2e8f0" opacity="0.45"/>
+    <rect x="384" y="306" width="236" height="138" rx="8" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+    <rect x="396" y="316" width="128" height="19" rx="4" fill="#475569"/>
+    <text x="460" y="329" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">BASELINE SUB-AGENT</text>
+    <text x="396" y="353" font-size="13.5" font-weight="700" fill="#0f172a" font-family="Menlo, Monaco, Consolas, monospace">DiagnosticAgent</text>
+    <text x="396" y="372" font-size="11" fill="#334155">• Forensic telemetry triage</text>
+    <text x="396" y="389" font-size="11" fill="#334155">• Queries Vector Search</text>
+    <text x="396" y="406" font-size="11" fill="#334155">  for contraindications</text>
+    <text x="396" y="427" font-size="10.5" fill="#0f766e" font-weight="700">✓ Never modified during rewire</text>
+  </g>
+
+  <!-- Right Child Node: TrafficShapingAgent (Peer Sub-Agent 2 - APEX Layer 3) -->
+  <g>
+    <rect x="642" y="302" width="256" height="146" rx="10" fill="#ede9fe" opacity="0.7"/>
+    <rect x="646" y="306" width="248" height="138" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="2.2"/>
+    <rect x="658" y="316" width="190" height="19" rx="4" fill="#7c3aed"/>
+    <text x="753" y="329" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">APEX LAYER 3 • EVOLVED IN RAM</text>
+    <text x="658" y="353" font-size="13.5" font-weight="700" fill="#4c1d95" font-family="Menlo, Monaco, Consolas, monospace">TrafficShapingAgent</text>
+    <text x="658" y="372" font-size="11" fill="#5b21b6" font-weight="700">• Sibling sub-agent under Supervisor</text>
+    <text x="658" y="389" font-size="11" fill="#334155">• Tools: <tspan font-family="Menlo, Monaco, Consolas, monospace" font-size="10">set_rate_limit</tspan>,</text>
+    <text x="658" y="405" font-size="10" fill="#334155" font-family="Menlo, Monaco, Consolas, monospace">  inspect_queue, adjust_replenish</text>
+    <text x="658" y="427" font-size="10.5" fill="#6d28d9" font-weight="700">⚡ Re-bound to ADK Runner (0 downtime)</text>
+  </g>
+
+
+  <!-- ======================================================================= -->
+  <!-- ZONE 3: RECURSIVE SELF-IMPROVEMENT LOOP (CENTER BOTTOM)                 -->
+  <!-- ======================================================================= -->
+  <rect x="366" y="492" width="548" height="325" rx="12" fill="#fffdf5" stroke="#fdd663" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <rect x="366" y="492" width="548" height="38" rx="12" fill="#fef7e0"/>
+  <text x="382" y="516" font-size="11.5" font-weight="700" fill="#b06000" letter-spacing="0.2">ZONE 3: SELF-EVOLUTION ENGINE (AGENTEVOLVER • APEX L2 • DREAM-RSI)</text>
+
+  <!-- Node 3A: Shapley Credit Attribution Engine -->
+  <g>
+    <rect x="386" y="547" width="246" height="118" rx="8" fill="#fef3c7" opacity="0.5"/>
+    <rect x="384" y="544" width="246" height="118" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="396" y="554" width="176" height="19" rx="4" fill="#b45309"/>
+    <text x="484" y="567" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">AGENTEVOLVER ATTRIBUTION</text>
+    <text x="396" y="590" font-size="13.5" font-weight="700" fill="#0f172a">Shapley Credit Engine</text>
+    <text x="396" y="608" font-size="10.5" fill="#334155" font-family="Menlo, Monaco, Consolas, monospace">C(a) = tanh(α·ΔH - β·Cost)</text>
+    <text x="396" y="626" font-size="11" fill="#dc2626" font-weight="700">• DB Reboot: -0.171 (Penalized)</text>
+    <text x="396" y="644" font-size="11" fill="#15803d" font-weight="700">• Rate Limiter: +0.973 (Rewarded)</text>
+  </g>
+
+  <!-- Node 3B: PrincipleDistillerAgent + Vector Search -->
+  <g>
+    <rect x="652" y="547" width="246" height="118" rx="8" fill="#dbeafe" opacity="0.5"/>
+    <rect x="650" y="544" width="246" height="118" rx="8" fill="#ffffff" stroke="#1a73e8" stroke-width="1.5"/>
+    <rect x="662" y="554" width="168" height="19" rx="4" fill="#1a73e8"/>
+    <text x="746" y="567" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">APEX LAYER 2 • MEMORY</text>
+    <text x="662" y="590" font-size="13.5" font-weight="700" fill="#0f172a">Vector Search</text>
+    <text x="662" y="608" font-size="10.5" fill="#334155" font-family="Menlo, Monaco, Consolas, monospace">• PrincipleDistillerAgent</text>
+    <text x="662" y="626" font-size="10.5" fill="#334155" font-family="Menlo, Monaco, Consolas, monospace">• text-embedding-004 (768-d)</text>
+    <text x="662" y="644" font-size="11" fill="#1e40af" font-weight="700">• Stores KMS-signed invariants</text>
+  </g>
+
+  <!-- Node 3C: Google BigQuery Dream-RSI -->
+  <g>
+    <rect x="386" y="685" width="246" height="116" rx="8" fill="#fef3c7" opacity="0.5"/>
+    <rect x="384" y="682" width="246" height="116" rx="8" fill="#ffffff" stroke="#e37400" stroke-width="1.5"/>
+    <rect x="396" y="692" width="172" height="19" rx="4" fill="#e37400"/>
+    <text x="482" y="705" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">DREAM-RSI • OFFLINE REPLAY</text>
+    <text x="396" y="728" font-size="13.5" font-weight="700" fill="#0f172a">Google BigQuery Engine</text>
+    <text x="396" y="746" font-size="11" fill="#334155">• Vectorized trace replay in RAM</text>
+    <text x="396" y="764" font-size="11" fill="#b45309" font-weight="700">• 400 sweeps in 0.54 milliseconds</text>
+    <text x="396" y="782" font-size="11" fill="#15803d" font-weight="700">• Optimal Policy: C=5, R=5.0 req/s</text>
+  </g>
+
+  <!-- Node 3D: CuriosityChaosAgent -->
+  <g>
+    <rect x="652" y="685" width="246" height="116" rx="8" fill="#fef3c7" opacity="0.5"/>
+    <rect x="650" y="682" width="246" height="116" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="662" y="692" width="184" height="19" rx="4" fill="#d97706"/>
+    <text x="754" y="705" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">SELF-QUESTIONING RED TEAM</text>
+    <text x="662" y="728" font-size="13" font-weight="700" fill="#0f172a" font-family="Menlo, Monaco, Consolas, monospace">CuriosityChaosAgent</text>
+    <text x="662" y="746" font-size="11" fill="#334155">• Formulates stress hypotheses</text>
+    <text x="662" y="764" font-size="11" fill="#334155">• Purges shadow cache &amp; fires</text>
+    <text x="662" y="782" font-size="11" fill="#334155">  200 concurrent burst requests</text>
+  </g>
+
+  <!-- Internal Zone 3 Arrows -->
+  <line x1="630" y1="603" x2="646" y2="603" stroke="#1a73e8" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <line x1="630" y1="740" x2="646" y2="740" stroke="#e37400" stroke-width="2" marker-end="url(#arrow-amber)"/>
+
+
+  <!-- ======================================================================= -->
+  <!-- ZONE 4: ENTERPRISE CLOUD GOVERNANCE (RIGHT)                             -->
+  <!-- ======================================================================= -->
+  <rect x="946" y="102" width="350" height="715" rx="12" fill="#f6fbf8" stroke="#81c995" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <rect x="946" y="102" width="350" height="38" rx="12" fill="#ceead6"/>
+  <text x="964" y="126" font-size="12" font-weight="700" fill="#0d652d" letter-spacing="0.3">ZONE 4: DEFENSE-IN-DEPTH GOVERNANCE</text>
+
+  <!-- Gate 1: Model Armor -->
+  <g>
+    <rect x="970" y="161" width="306" height="104" rx="8" fill="#dcfce7" opacity="0.5"/>
+    <rect x="968" y="158" width="306" height="104" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="992" cy="182" r="11" fill="#e6f4ea" stroke="#1e8e3e" stroke-width="1.5"/>
+    <text x="992" y="186" font-size="10.5" font-weight="700" fill="#137333" text-anchor="middle">G1</text>
+    <text x="1012" y="186" font-size="13.5" font-weight="700" fill="#0f172a">Model Armor</text>
+    <text x="982" y="210" font-size="11" fill="#334155">• Ingress prompt injection &amp; jailbreak shield</text>
+    <text x="982" y="228" font-size="11" fill="#334155">• Redacts sensitive PII &amp; credentials before</text>
+    <text x="982" y="245" font-size="11" fill="#334155">  telemetry enters agent reasoning loop</text>
+  </g>
+
+  <!-- Gate 2: AST Sandbox & OPA Policy Controller -->
+  <g>
+    <rect x="970" y="287" width="306" height="110" rx="8" fill="#dcfce7" opacity="0.5"/>
+    <rect x="968" y="284" width="306" height="110" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="992" cy="308" r="11" fill="#e6f4ea" stroke="#1e8e3e" stroke-width="1.5"/>
+    <text x="992" y="312" font-size="10.5" font-weight="700" fill="#137333" text-anchor="middle">G2</text>
+    <text x="1012" y="312" font-size="13.5" font-weight="700" fill="#0f172a">AST Sandbox &amp; OPA Policy</text>
+    <text x="982" y="336" font-size="11" fill="#334155">• Static AST check blocks <tspan font-family="Menlo, Monaco, Consolas, monospace" font-size="10">os, sys, socket, eval</tspan></text>
+    <text x="982" y="354" font-size="11" fill="#334155">• Open Policy Agent (OPA) enforces non-</text>
+    <text x="982" y="372" font-size="11" fill="#15803d" font-weight="700">  negotiable SLA floor (rate &gt;= 10.0 req/s)</text>
+  </g>
+
+  <!-- Gate 3: Google Cloud KMS -->
+  <g>
+    <rect x="970" y="419" width="306" height="106" rx="8" fill="#dcfce7" opacity="0.5"/>
+    <rect x="968" y="416" width="306" height="106" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="992" cy="440" r="11" fill="#e6f4ea" stroke="#1e8e3e" stroke-width="1.5"/>
+    <text x="992" y="444" font-size="10.5" font-weight="700" fill="#137333" text-anchor="middle">G3</text>
+    <text x="1012" y="444" font-size="13.5" font-weight="700" fill="#0f172a">Google Cloud KMS Signing</text>
+    <text x="982" y="468" font-size="11" fill="#334155">• Hardware-backed SHA-256 digital signatures</text>
+    <text x="982" y="486" font-size="11" fill="#334155">• Signs both L1 Python hotpatches and L2</text>
+    <text x="982" y="504" font-size="11" fill="#334155">  distilled semantic principles</text>
+  </g>
+
+  <!-- Gate 4: Tier-2 Dual-Custody HITL Gate -->
+  <g>
+    <rect x="970" y="547" width="306" height="118" rx="8" fill="#ede9fe" opacity="0.6"/>
+    <rect x="968" y="544" width="306" height="118" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
+    <circle cx="992" cy="568" r="11" fill="#f3e8fd" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="992" y="572" font-size="10.5" font-weight="700" fill="#6d28d9" text-anchor="middle">G4</text>
+    <text x="1012" y="572" font-size="13.5" font-weight="700" fill="#4c1d95">Tier-2 Dual-Custody HITL Gate</text>
+    <text x="982" y="596" font-size="11" fill="#5b21b6" font-weight="700">• Pauses runtime before DAG topology mutation</text>
+    <text x="982" y="614" font-size="11" fill="#334155">• Requires human On-Call SRE sign-off</text>
+    <text x="982" y="632" font-size="10.5" fill="#6d28d9" font-family="Menlo, Monaco, Consolas, monospace" font-weight="700">• Token: SRE-SIG-c0133134d26e46ba</text>
+    <text x="982" y="649" font-size="11" fill="#334155">• Approver: <tspan font-family="Menlo, Monaco, Consolas, monospace" font-size="10.5">oncall-sre@google.com</tspan></text>
+  </g>
+
+  <!-- Gate 5: Google Cloud Logging -->
+  <g>
+    <rect x="970" y="687" width="306" height="110" rx="8" fill="#dcfce7" opacity="0.5"/>
+    <rect x="968" y="684" width="306" height="110" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="992" cy="708" r="11" fill="#e6f4ea" stroke="#1e8e3e" stroke-width="1.5"/>
+    <text x="992" y="712" font-size="10.5" font-weight="700" fill="#137333" text-anchor="middle">G5</text>
+    <text x="1012" y="712" font-size="13.5" font-weight="700" fill="#0f172a">Google Cloud Audit Logging</text>
+    <text x="982" y="736" font-size="11" fill="#334155">• Streams tamper-evident structured records</text>
+    <text x="982" y="754" font-size="10.5" fill="#334155" font-family="Menlo, Monaco, Consolas, monospace">  logName: chimera-security-audit</text>
+    <text x="982" y="772" font-size="11" fill="#15803d" font-weight="700">• Full compliance &amp; non-repudiation</text>
+  </g>
+
+
+  <!-- ======================================================================= -->
+  <!-- CROSS-ZONE FLOW ARROWS & NUMBERED STEP BADGES                           -->
+  <!-- ======================================================================= -->
+
+  <!-- [1] Outage Telemetry Alert: Zone 1 -> Supervisor -->
+  <path d="M 314 195 L 454 195" fill="none" stroke="#d93025" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+  <circle cx="350" cy="195" r="11" fill="#d93025"/>
+  <text x="350" y="199" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">1</text>
+  <rect x="369" y="173" width="76" height="16" rx="3" fill="#ffffff"/>
+  <text x="407" y="184" fill="#d93025" font-size="10" font-weight="700" text-anchor="middle">5xx Alert</text>
+
+  <!-- Supervisor <-> Model Armor / AST / KMS Governance Checks -->
+  <path d="M 820 185 L 962 185" fill="none" stroke="#1e8e3e" stroke-width="1.8" marker-end="url(#arrow-green)"/>
+  <text x="892" y="178" fill="#137333" font-size="10" font-weight="700" text-anchor="middle">Ingress Scan</text>
+
+  <path d="M 820 215 L 930 215 L 930 335 L 962 335" fill="none" stroke="#1e8e3e" stroke-width="1.8" marker-end="url(#arrow-green)"/>
+  <path d="M 930 335 L 930 465 L 962 465" fill="none" stroke="#1e8e3e" stroke-width="1.8" marker-end="url(#arrow-green)"/>
+
+  <!-- [2] Governed L1 Hotpatch Mount: Supervisor -> Binary Auth Middleware -->
+  <path d="M 460 225 L 350 225 L 350 325 L 320 325" fill="none" stroke="#1a73e8" stroke-width="2.4" marker-end="url(#arrow-blue)"/>
+  <circle cx="350" cy="275" r="11" fill="#1a73e8"/>
+  <text x="350" y="279" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">2</text>
+
+  <!-- Vector Memory Contraindication Lookup: Vector Search -> DiagnosticAgent -->
+  <path d="M 730 544 L 730 475 L 502 475 L 502 450" fill="none" stroke="#1a73e8" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-blue)"/>
+  <rect x="526" y="464" width="182" height="16" rx="3" fill="#ffffff"/>
+  <text x="617" y="475" fill="#174ea6" font-size="10" font-weight="700" text-anchor="middle">Blocks DB Restart Contraindication</text>
+
+  <!-- [3] Telemetry Spans -> Shapley Credit Attribution & HITL Gate -> TrafficShapingAgent -->
+  <path d="M 314 590 L 378 590" fill="none" stroke="#b45309" stroke-width="2" marker-end="url(#arrow-amber)"/>
+  <circle cx="348" cy="590" r="11" fill="#7c3aed"/>
+  <text x="348" y="594" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">3</text>
+
+  <!-- HITL Approval Token -> TrafficShapingAgent -->
+  <path d="M 968 600 L 922 600 L 922 375 L 900 375" fill="none" stroke="#7c3aed" stroke-width="2.4" marker-end="url(#arrow-purple)"/>
+  <circle cx="922" cy="488" r="11" fill="#7c3aed"/>
+  <text x="922" y="492" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">3</text>
+
+  <!-- [4] BigQuery Dream-RSI & Curiosity Chaos Agent -> Shadow Sandbox -->
+  <path d="M 384 740 L 320 740" fill="none" stroke="#e37400" stroke-width="2.2" marker-end="url(#arrow-amber)"/>
+  <circle cx="350" cy="740" r="11" fill="#e37400"/>
+  <text x="350" y="744" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">4</text>
+
+  <!-- Footer Attribution Bar -->
+  <rect x="24" y="832" width="1272" height="34" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="42" y="853" font-size="11.5" font-weight="700" fill="#0f172a">Governing Principle:</text>
+  <text x="164" y="853" font-size="11.5" font-style="italic" fill="#334155">An AI agent may autonomously evolve its operational tactics to defend system health, but its authority to execute is cryptographically bounded by Cloud KMS, OPA Policy Controller, and human SRE custody.</text>
+</svg>

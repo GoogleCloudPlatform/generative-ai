@@ -29,3 +29,9 @@ The `gemini_data_analytics` directory contains notebooks that demonstrate how to
 
 - [Intro to Gemini Data Analytics (HTTP)](gemini_data_analytics/intro_gemini_data_analytics_http.ipynb): An introduction to using Gemini for data analytics with the HTTP API.
 - [Intro to Gemini Data Analytics (SDK)](gemini_data_analytics/intro_gemini_data_analytics_sdk.ipynb): An introduction to using Gemini for data analytics with the Python SDK.
+
+### self-evolving-ai
+
+The `self-evolving-ai` directory contains **Project Chrysalis**, a reference architecture for governed, self-evolving AI agents built with ADK and Gemini on Google Cloud. A multi-agent SRE system diagnoses a live outage, synthesizes and mounts its own Cloud KMS-signed mitigation tool, attributes credit to each action, distills operational principles into memory, and rewires its own agent topology behind a Human-in-the-Loop gate.
+
+- [Self-Evolving AI (Project Chrysalis)](self-evolving-ai/README.md): Architecting governed, self-evolving AI agents on Gemini Enterprise Agent Platform.

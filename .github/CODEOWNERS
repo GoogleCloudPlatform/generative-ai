@@ -85,4 +85,5 @@
 /generative-ai/agents/personalized-agent-swarms                                                                  @GoogleCloudPlatform/generative-ai-devrel @tanyagoogle @PouyaOmran @soujanyav @olifei
 /generative-ai/gemini/sample-apps/prism-science-explainer                                                                        @GoogleCloudPlatform/generative-ai-devrel @lavinigam-gcp
 /generative-ai/agents/invoice-processing                                                                                         @GoogleCloudPlatform/generative-ai-devrel @tanyagoogle @PouyaOmran
+/generative-ai/agents/self-evolving-ai                                                                                           @GoogleCloudPlatform/generative-ai-devrel @anantnawal
 
