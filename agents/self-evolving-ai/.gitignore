@@ -1,0 +1,26 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Packaging & build artifacts
+build/
+dist/
+*.egg-info/
+
+# macOS / OS files
+.DS_Store
+Thumbs.db
+
+# Local environment secrets
+.env
+*.pem
+*.key
