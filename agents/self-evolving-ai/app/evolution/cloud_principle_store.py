@@ -13,18 +13,20 @@
 # limitations under the License.
 
 """Google Cloud Agent Platform-backed Semantic Principle Vector Store with KMS Signing."""
+
 import hashlib
 import re
 import time
-from typing import List, Dict, Optional, Tuple
+
 import numpy as np
 from pydantic import BaseModel
 
-from app.config import PROJECT_ID, LOCATION, EMBEDDING_MODEL, VERTEX_AI_AVAILABLE
+from app.config import EMBEDDING_MODEL, LOCATION, PROJECT_ID, VERTEX_AI_AVAILABLE
 from app.governance.kms_signer import CloudKmsSigner, KmsSignatureEnvelope
 
 try:
     from google import genai
+
     GENAI_AVAILABLE = True
 except ImportError:
     GENAI_AVAILABLE = False
@@ -35,13 +37,13 @@ class PrincipleRecord(BaseModel):
 
     principle_id: str
     trigger_pattern: str
-    contraindicated_actions: List[str]
-    recommended_actions: List[str]
+    contraindicated_actions: list[str]
+    recommended_actions: list[str]
     confidence_score: float
     source_incident_id: str
     created_at: str
-    embedding: Optional[List[float]] = None
-    kms_signature: Optional[KmsSignatureEnvelope] = None
+    embedding: list[float] | None = None
+    kms_signature: KmsSignatureEnvelope | None = None
 
 
 class CloudPrincipleStore:
@@ -57,7 +59,7 @@ class CloudPrincipleStore:
         self.location = location
         self.model_name = model_name
         self.kms_signer = CloudKmsSigner(project_id=project_id)
-        self.principles: Dict[str, PrincipleRecord] = {}
+        self.principles: dict[str, PrincipleRecord] = {}
 
         self._genai_client = None
         if GENAI_AVAILABLE and VERTEX_AI_AVAILABLE:
@@ -74,11 +76,15 @@ class CloudPrincipleStore:
         # Snapshot the Day-0 guardrails so a reset can restore them exactly (without re-embedding /
         # re-signing). A learned principle with the same trigger text shares the seed's ID and would
         # otherwise silently replace it.
-        self._baseline_records: Dict[str, PrincipleRecord] = dict(self.principles)
+        self._baseline_records: dict[str, PrincipleRecord] = dict(self.principles)
 
     def reset_to_baseline(self) -> int:
         """Forget principles learned since Day-0 and restore the seeded guardrails. Returns count removed."""
-        learned = sum(1 for pid, rec in self.principles.items() if self._baseline_records.get(pid) is not rec)
+        learned = sum(
+            1
+            for pid, rec in self.principles.items()
+            if self._baseline_records.get(pid) is not rec
+        )
         self.principles.clear()
         self.principles.update(self._baseline_records)
         return learned
@@ -90,7 +96,7 @@ class CloudPrincipleStore:
         else:
             self.principles.pop(principle_id, None)
 
-    def _generate_embedding(self, text: str) -> List[float]:
+    def _generate_embedding(self, text: str) -> list[float]:
         """Generate 768-dim semantic vector embedding using Agent Platform text-embedding-004."""
         if self._genai_client:
             try:
@@ -115,8 +121,8 @@ class CloudPrincipleStore:
     def add_principle(
         self,
         trigger_pattern: str,
-        contraindicated: List[str],
-        recommended: List[str],
+        contraindicated: list[str],
+        recommended: list[str],
         confidence: float,
         incident_id: str = "INC-PLATFORM-001",
     ) -> PrincipleRecord:
@@ -142,7 +148,9 @@ class CloudPrincipleStore:
         self.principles[pid] = record
         return record
 
-    def query_similar_principles(self, incident_description: str, top_k: int = 3) -> List[Tuple[PrincipleRecord, float]]:
+    def query_similar_principles(
+        self, incident_description: str, top_k: int = 3
+    ) -> list[tuple[PrincipleRecord, float]]:
         """Query principles using cosine similarity over Agent Platform vector space."""
         query_emb = np.array(self._generate_embedding(incident_description))
         scored = []
@@ -161,15 +169,30 @@ class CloudPrincipleStore:
         """Seed Self-Navigating historical guardrails into Agent Platform vector memory."""
         self.add_principle(
             trigger_pattern="Cache eviction stampede causing database connection pool saturation under high ingress",
-            contraindicated=["restart_database", "reboot_database", "flush_db_connections", "increase_db_pool_timeout"],
-            recommended=["deploy_token_bucket_rate_limiter", "throttle_ingress_boundary", "shed_non_critical_load"],
+            contraindicated=[
+                "restart_database",
+                "reboot_database",
+                "flush_db_connections",
+                "increase_db_pool_timeout",
+            ],
+            recommended=[
+                "deploy_token_bucket_rate_limiter",
+                "throttle_ingress_boundary",
+                "shed_non_critical_load",
+            ],
             confidence=0.96,
             incident_id="INC-HIST-CLOUD-01",
         )
         self.add_principle(
             trigger_pattern="Transient network partition between microservices causing retry storm",
-            contraindicated=["immediate_retries_without_backoff", "drop_ingress_circuit_breakers"],
-            recommended=["exponential_backoff_with_jitter", "activate_adaptive_concurrency_limits"],
+            contraindicated=[
+                "immediate_retries_without_backoff",
+                "drop_ingress_circuit_breakers",
+            ],
+            recommended=[
+                "exponential_backoff_with_jitter",
+                "activate_adaptive_concurrency_limits",
+            ],
             confidence=0.91,
             incident_id="INC-HIST-CLOUD-02",
         )

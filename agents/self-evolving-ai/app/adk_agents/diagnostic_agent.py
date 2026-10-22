@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Google ADK 2.0 Diagnostic Agent for SRE Triage on Google Cloud."""
+
 from google.adk.agents import LlmAgent
-from app.config import MODEL_NAME
+
 from app.adk_agents.tools_library import DIAGNOSTIC_TOOLS
+from app.config import MODEL_NAME
 
 DIAGNOSTIC_AGENT_INSTRUCTION = """You are the Chrysalis Diagnostic SRE Specialist Agent running on Google Cloud Agent Platform.
 You are built with Gemini 4.0 Argon and equipped with read-only tools to analyze system telemetry, cache health, database saturation, and historical vector principles.

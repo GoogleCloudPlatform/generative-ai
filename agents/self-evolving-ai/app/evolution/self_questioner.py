@@ -13,11 +13,13 @@
 # limitations under the License.
 
 """AgentEvolver: Self-Questioning Shadow Sandbox & Curiosity Fault Injector."""
+
 import threading
 import time
-from typing import Dict, Any
-from app.target_env.memorystore_service import CloudMemorystoreService
+from typing import Any
+
 from app.target_env.cloudsql_service import CloudSqlDatabaseService
+from app.target_env.memorystore_service import CloudMemorystoreService
 
 
 class TokenBucketRateLimiter:
@@ -36,7 +38,9 @@ class TokenBucketRateLimiter:
             now = time.perf_counter()
             elapsed = now - self.last_update
             self.last_update = now
-            self.tokens = min(float(self.capacity), self.tokens + (elapsed * self.replenishment_rate))
+            self.tokens = min(
+                float(self.capacity), self.tokens + (elapsed * self.replenishment_rate)
+            )
             if self.tokens >= tokens:
                 self.tokens -= tokens
                 return True
@@ -49,7 +53,9 @@ class ShadowSandboxEnvironment:
     def __init__(self, tested_capacity: int = 10, tested_rate: float = 40.0):
         self.cache = CloudMemorystoreService(max_keys=5)
         self.db = CloudSqlDatabaseService(max_connections=2, query_latency_ms=25.0)
-        self.rate_limiter = TokenBucketRateLimiter(capacity=tested_capacity, replenishment_rate=tested_rate)
+        self.rate_limiter = TokenBucketRateLimiter(
+            capacity=tested_capacity, replenishment_rate=tested_rate
+        )
         self.total_probes: int = 0
         self.starvation_count: int = 0
         self.throttled_count: int = 0
@@ -58,7 +64,7 @@ class ShadowSandboxEnvironment:
         """Purge shadow cache to test worst-case cold-start stampedes."""
         return self.cache.purge_cache()
 
-    def run_concurrent_probe(self, num_requests: int = 100) -> Dict[str, Any]:
+    def run_concurrent_probe(self, num_requests: int = 100) -> dict[str, Any]:
         """Fire high-concurrency burst through shadow sandbox rate limiter."""
         latencies = []
         errors_500 = 0

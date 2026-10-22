@@ -13,10 +13,11 @@
 # limitations under the License.
 
 """Google Cloud SQL Database Service with Managed Connection Pool."""
+
 import sqlite3
 import threading
 import time
-from typing import Dict, Any
+from typing import Any
 
 
 class CloudSqlDatabaseService:  # pylint: disable=too-many-instance-attributes
@@ -43,7 +44,9 @@ class CloudSqlDatabaseService:  # pylint: disable=too-many-instance-attributes
                 "CREATE TABLE IF NOT EXISTS cart_orders (cart_id TEXT PRIMARY KEY, amount REAL, created_at REAL)"
             )
 
-    def execute_checkout_transaction(self, cart_id: str, timeout_s: float = 1.0) -> Dict[str, Any]:
+    def execute_checkout_transaction(
+        self, cart_id: str, timeout_s: float = 1.0
+    ) -> dict[str, Any]:
         """Execute a transactional DB write under connection pool concurrency controls."""
         with self.lock:
             self.waiting_threads += 1
@@ -60,7 +63,9 @@ class CloudSqlDatabaseService:  # pylint: disable=too-many-instance-attributes
             with self.lock:
                 self.total_timeouts += 1
                 self.window_timeouts += 1
-            raise TimeoutError(f"Cloud SQL connection pool exhausted! Timeout={timeout_s}s")
+            raise TimeoutError(
+                f"Cloud SQL connection pool exhausted! Timeout={timeout_s}s"
+            )
 
         with self.lock:
             self.active_connections += 1
@@ -97,7 +102,7 @@ class CloudSqlDatabaseService:  # pylint: disable=too-many-instance-attributes
             self.window_timeouts = 0
         self.semaphore = threading.Semaphore(self.max_connections)
 
-    def get_pool_stats(self) -> Dict[str, Any]:
+    def get_pool_stats(self) -> dict[str, Any]:
         """Return Cloud SQL connection pool utilization."""
         with self.lock:
             if self.active_connections > 0:

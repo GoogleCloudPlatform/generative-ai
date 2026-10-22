@@ -13,16 +13,18 @@
 # limitations under the License.
 
 """Google ADK 2.0 Principle Distiller Agent with Cloud KMS Signing."""
+
 import asyncio
 import uuid
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools import FunctionTool
 from google.genai import types
 
-from app.config import MODEL_NAME, PROJECT_ID, LLM_MAX_ATTEMPTS
+from app.config import LLM_MAX_ATTEMPTS, MODEL_NAME, PROJECT_ID
 from app.evolution.cloud_principle_store import CloudPrincipleStore, PrincipleRecord
 from app.evolution.credit_attribution import StepCreditAttribution
 from app.governance.audit_logger import CloudAuditLogger
@@ -57,20 +59,20 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
         self,
         model_name: str = MODEL_NAME,
         project_id: str = PROJECT_ID,
-        principle_store: Optional[CloudPrincipleStore] = None,
+        principle_store: CloudPrincipleStore | None = None,
     ):
         self.model_name = model_name
         self.project_id = project_id
         self.principle_store = principle_store or _get_default_store()
-        self.published: List[PrincipleRecord] = []
+        self.published: list[PrincipleRecord] = []
 
         def publish_operational_principle(
             trigger_pattern: str,
-            contraindicated_actions: List[str],
-            recommended_actions: List[str],
+            contraindicated_actions: list[str],
+            recommended_actions: list[str],
             confidence_score: float = 0.95,
             incident_id: str = "INC-PLATFORM-001",
-        ) -> Dict[str, Any]:
+        ) -> dict[str, Any]:
             """Publish a newly distilled operational principle signed with Cloud KMS into Agent Platform vector memory."""
             record = self.principle_store.add_principle(
                 trigger_pattern=trigger_pattern,
@@ -87,7 +89,9 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
                 status="SUCCESS",
                 details={
                     "principle_id": record.principle_id,
-                    "kms_key": record.kms_signature.key_resource_name if record.kms_signature else None,
+                    "kms_key": record.kms_signature.key_resource_name
+                    if record.kms_signature
+                    else None,
                     "contraindicated": contraindicated_actions,
                     "recommended": recommended_actions,
                 },
@@ -99,7 +103,9 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
                 "contraindicated": record.contraindicated_actions,
                 "recommended": record.recommended_actions,
                 "confidence_score": record.confidence_score,
-                "kms_signature": record.kms_signature.signature_base64 if record.kms_signature else None,
+                "kms_signature": record.kms_signature.signature_base64
+                if record.kms_signature
+                else None,
             }
 
         self._publish = publish_operational_principle
@@ -121,8 +127,8 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
     async def distill_from_attributions(  # pylint: disable=too-many-locals
         self,
         incident_id: str,
-        attributions: List[StepCreditAttribution],
-    ) -> Dict[str, Any]:
+        attributions: list[StepCreditAttribution],
+    ) -> dict[str, Any]:
         """Run PrincipleDistillerAgent to extract and publish a principle."""
         attr_summary = [
             f"Span: {a.span_id} | Action: {a.action_name} | Credit: {a.credit_score:+.2f} | Verdict: {a.verdict}"
@@ -130,7 +136,9 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
         ]
         prompt = (
             f"Incident ID: {incident_id}\n"
-            f"AgentEvolver Step Credit Attributions:\n" + "\n".join(attr_summary) + "\n\n"
+            f"AgentEvolver Step Credit Attributions:\n"
+            + "\n".join(attr_summary)
+            + "\n\n"
             "Analyze these results and call `publish_operational_principle` with the distilled rule."
         )
 
@@ -158,10 +166,15 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
                             if hasattr(part, "text") and part.text:
                                 final_text += part.text
                             elif hasattr(part, "function_call") and part.function_call:
-                                executed_tool_calls.append({
-                                    "name": part.function_call.name,
-                                    "args": dict(getattr(part.function_call, "args", None) or {}),
-                                })
+                                executed_tool_calls.append(
+                                    {
+                                        "name": part.function_call.name,
+                                        "args": dict(
+                                            getattr(part.function_call, "args", None)
+                                            or {}
+                                        ),
+                                    }
+                                )
                 if len(self.published) > published_before:
                     break
             except Exception:  # pylint: disable=broad-exception-caught
@@ -172,8 +185,12 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
             # Deterministic tool fallback: Agent Platform unavailable (e.g. fresh clone without
             # credentials) or the model answered without calling the publish tool.
             source = "deterministic_fallback"
-            contraindicated = [a.action_name for a in attributions if a.credit_score < 0] or ["reboot_database_connections"]
-            recommended = [a.action_name for a in attributions if a.credit_score > 0] or ["token_bucket_rate_limiter_patch"]
+            contraindicated = [
+                a.action_name for a in attributions if a.credit_score < 0
+            ] or ["reboot_database_connections"]
+            recommended = [
+                a.action_name for a in attributions if a.credit_score > 0
+            ] or ["token_bucket_rate_limiter_patch"]
             await asyncio.to_thread(
                 self._publish,
                 trigger_pattern="Cache eviction stampede causing database connection pool saturation under high ingress",
@@ -182,11 +199,19 @@ class ChrysalisDistillerAgentRunner:  # pylint: disable=too-many-instance-attrib
                 confidence_score=0.98,
                 incident_id=incident_id,
             )
-            executed_tool_calls.append({
-                "name": "publish_operational_principle",
-                "args": {"incident_id": incident_id, "contraindicated_actions": contraindicated, "recommended_actions": recommended},
-            })
-            final_text = "Distilled operational principle via deterministic ADK tool fallback."
+            executed_tool_calls.append(
+                {
+                    "name": "publish_operational_principle",
+                    "args": {
+                        "incident_id": incident_id,
+                        "contraindicated_actions": contraindicated,
+                        "recommended_actions": recommended,
+                    },
+                }
+            )
+            final_text = (
+                "Distilled operational principle via deterministic ADK tool fallback."
+            )
 
         return {
             "incident_id": incident_id,

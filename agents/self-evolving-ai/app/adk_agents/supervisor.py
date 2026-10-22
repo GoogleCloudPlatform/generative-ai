@@ -13,18 +13,20 @@
 # limitations under the License.
 
 """Root Supervisor Router Agent for Google ADK 2.0 on Google Cloud."""
+
 import asyncio
 import uuid
-from typing import Dict, Any
+from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
-from app.config import MODEL_NAME, PROJECT_ID, LLM_MAX_ATTEMPTS
 from app.adk_agents.diagnostic_agent import create_diagnostic_agent
-from app.governance.model_armor import ModelArmorGuardrail
+from app.config import LLM_MAX_ATTEMPTS, MODEL_NAME, PROJECT_ID
 from app.governance.audit_logger import CloudAuditLogger
+from app.governance.model_armor import ModelArmorGuardrail
 
 SUPERVISOR_INSTRUCTION = """You are the Chrysalis Root Supervisor Router Agent running on Google Cloud Agent Platform.
 You are built with Gemini 4.0 Argon and orchestrate autonomous resiliency under strict Google Cloud Governance and Policy-as-Code guardrails.
@@ -47,7 +49,7 @@ class ChrysalisSupervisorRunner:  # pylint: disable=too-many-instance-attributes
         self.model_armor = ModelArmorGuardrail(project_id=project_id)
         self.audit_logger = CloudAuditLogger(project_id=project_id)
         # Trace of the most recent run_incident_triage() invocation (agents, tool calls, text).
-        self.last_triage_trace: Dict[str, Any] = {"agents": [], "tool_calls": []}
+        self.last_triage_trace: dict[str, Any] = {"agents": [], "tool_calls": []}
 
         self.diagnostic_agent = create_diagnostic_agent(model_name=self.model_name)
         self.supervisor_agent = LlmAgent(
@@ -79,7 +81,9 @@ class ChrysalisSupervisorRunner:  # pylint: disable=too-many-instance-attributes
                 details={"threats": scan_result.detected_threats},
                 severity="CRITICAL",
             )
-            raise PermissionError(f"Model Armor blocked malicious incident payload: {scan_result.detected_threats}")
+            raise PermissionError(
+                f"Model Armor blocked malicious incident payload: {scan_result.detected_threats}"
+            )
 
         sanitized_alert = scan_result.sanitized_text
 
@@ -102,27 +106,39 @@ class ChrysalisSupervisorRunner:  # pylint: disable=too-many-instance-attributes
             actor="SupervisorRouterAgent",
             action="run_incident_triage",
             status="SUCCESS",
-            details={"response_length": len(final_response), "agents": trace["agents"], "tool_calls": [t["name"] for t in trace["tool_calls"]]},
+            details={
+                "response_length": len(final_response),
+                "agents": trace["agents"],
+                "tool_calls": [t["name"] for t in trace["tool_calls"]],
+            },
         )
 
         return final_response
 
-    async def run_directive(self, directive: str) -> Dict[str, Any]:
+    async def run_directive(self, directive: str) -> dict[str, Any]:
         """Send an operational directive through the (possibly evolved) multi-agent graph.
 
         Returns the agents that handled it, the tool calls they executed and their text response.
         """
         scan_result = self.model_armor.inspect_and_sanitize(directive)
         if not scan_result.is_safe:
-            raise PermissionError(f"Model Armor blocked malicious directive: {scan_result.detected_threats}")
-        return await self._run_agent_loop(scan_result.sanitized_text, session_prefix="directive", require_tool_call=True)
+            raise PermissionError(
+                f"Model Armor blocked malicious directive: {scan_result.detected_threats}"
+            )
+        return await self._run_agent_loop(
+            scan_result.sanitized_text,
+            session_prefix="directive",
+            require_tool_call=True,
+        )
 
-    async def _run_agent_loop(self, text: str, session_prefix: str, require_tool_call: bool = False) -> Dict[str, Any]:
+    async def _run_agent_loop(
+        self, text: str, session_prefix: str, require_tool_call: bool = False
+    ) -> dict[str, Any]:
         """Run one ADK invocation (with retries) and collect text, tool calls and participating agents."""
         user_msg = types.Content(role="user", parts=[types.Part.from_text(text=text)])
-        trace: Dict[str, Any] = {"text": "", "tool_calls": [], "agents": []}
+        trace: dict[str, Any] = {"text": "", "tool_calls": [], "agents": []}
         for attempt in range(LLM_MAX_ATTEMPTS):
-            attempt_trace: Dict[str, Any] = {"text": "", "tool_calls": [], "agents": []}
+            attempt_trace: dict[str, Any] = {"text": "", "tool_calls": [], "agents": []}
             try:
                 async for event in self.runner.run_async(
                     user_id="sre_operator",
@@ -130,19 +146,29 @@ class ChrysalisSupervisorRunner:  # pylint: disable=too-many-instance-attributes
                     new_message=user_msg,
                 ):
                     author = getattr(event, "author", None)
-                    if author and author != "user" and author not in attempt_trace["agents"]:
+                    if (
+                        author
+                        and author != "user"
+                        and author not in attempt_trace["agents"]
+                    ):
                         attempt_trace["agents"].append(author)
                     if hasattr(event, "content") and event.content:
                         for part in event.content.parts or []:
                             if hasattr(part, "text") and part.text:
                                 attempt_trace["text"] += part.text
                             elif hasattr(part, "function_call") and part.function_call:
-                                attempt_trace["tool_calls"].append({
-                                    "agent": author,
-                                    "name": part.function_call.name,
-                                    "args": dict(part.function_call.args or {}),
-                                })
-                done = bool(attempt_trace["tool_calls"]) if require_tool_call else bool(attempt_trace["text"])
+                                attempt_trace["tool_calls"].append(
+                                    {
+                                        "agent": author,
+                                        "name": part.function_call.name,
+                                        "args": dict(part.function_call.args or {}),
+                                    }
+                                )
+                done = (
+                    bool(attempt_trace["tool_calls"])
+                    if require_tool_call
+                    else bool(attempt_trace["text"])
+                )
                 trace = attempt_trace
                 if done:
                     break

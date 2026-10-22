@@ -38,3 +38,8 @@ filterwarnings = [
     "ignore:.*JSON_SCHEMA_FOR_FUNC_DECL is enabled:UserWarning",
     "ignore:Using `httpx` with `starlette.testclient` is deprecated",
 ]
+
+[tool.ruff]
+# Inherit the repository-wide Ruff configuration; treat this sample's `app` package as first-party.
+extend = "../../.ruff.toml"
+src = ["."]

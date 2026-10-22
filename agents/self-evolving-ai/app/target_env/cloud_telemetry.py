@@ -13,11 +13,14 @@
 # limitations under the License.
 
 """Google Cloud-integrated Telemetry Collector (Cloud Logging & Cloud Monitoring)."""
+
 import threading
 import time
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional
+from typing import Any
+
 import numpy as np
+
 from app.config import PROJECT_ID, VERTEX_AI_AVAILABLE
 from app.governance.cloud_log_writer import BackgroundCloudLogWriter
 from app.target_env.cloudsql_service import CloudSqlDatabaseService
@@ -25,6 +28,7 @@ from app.target_env.memorystore_service import CloudMemorystoreService
 
 try:
     from google.cloud import logging as gcp_logging
+
     GCP_LOGGING_AVAILABLE = True
 except ImportError:
     GCP_LOGGING_AVAILABLE = False
@@ -40,8 +44,8 @@ class CloudTelemetryCollector:  # pylint: disable=too-many-instance-attributes
 
     def __init__(
         self,
-        cache_service: Optional[CloudMemorystoreService] = None,
-        db_service: Optional[CloudSqlDatabaseService] = None,
+        cache_service: CloudMemorystoreService | None = None,
+        db_service: CloudSqlDatabaseService | None = None,
         project_id: str = PROJECT_ID,
     ):
         self.cache_service = cache_service
@@ -50,7 +54,7 @@ class CloudTelemetryCollector:  # pylint: disable=too-many-instance-attributes
         self._lock = threading.Lock()
 
         # Telemetry metrics
-        self.request_latencies_ms: List[float] = []
+        self.request_latencies_ms: list[float] = []
         self.total_requests: int = 0
         self.status_2xx_count: int = 0
         self.status_5xx_count: int = 0
@@ -58,15 +62,17 @@ class CloudTelemetryCollector:  # pylint: disable=too-many-instance-attributes
         self.window_start_time: float = time.time()
 
         # Detailed request logs for BigQuery ingestion
-        self.request_logs: List[Dict[str, Any]] = []
-        self.action_spans: List[Dict[str, Any]] = []
+        self.request_logs: list[dict[str, Any]] = []
+        self.action_spans: list[dict[str, Any]] = []
 
         # Google Cloud Logging client (writes are batched off the request path)
         self._gcp_writer = None
         if GCP_LOGGING_AVAILABLE and VERTEX_AI_AVAILABLE:
             try:
                 client = gcp_logging.Client(project=project_id)
-                self._gcp_writer = BackgroundCloudLogWriter(client.logger("chimera-spans"))
+                self._gcp_writer = BackgroundCloudLogWriter(
+                    client.logger("chimera-spans")
+                )
             except Exception:  # pylint: disable=broad-exception-caught
                 self._gcp_writer = None
 
@@ -110,26 +116,46 @@ class CloudTelemetryCollector:  # pylint: disable=too-many-instance-attributes
 
         # Stream structured log entry to Google Cloud Logging (non-blocking, batched)
         if self._gcp_writer:
-            severity = "ERROR" if status_code >= 500 else ("WARNING" if status_code == 429 else "INFO")
+            severity = (
+                "ERROR"
+                if status_code >= 500
+                else ("WARNING" if status_code == 429 else "INFO")
+            )
             self._gcp_writer.submit(span_payload, severity=severity)
 
-    def record_action_span(self, span_dict: Dict[str, Any]) -> None:
+    def record_action_span(self, span_dict: dict[str, Any]) -> None:
         """Record an agent action execution span for AgentEvolver credit attribution."""
         with self._lock:
             self.action_spans.append(span_dict)
 
-    def get_current_metrics(self) -> Dict[str, Any]:
+    def get_current_metrics(self) -> dict[str, Any]:
         """Calculate real-time SRE metrics snapshot."""
         with self._lock:
             elapsed = max(time.time() - self.window_start_time, 0.001)
             active_rps = len(self.request_latencies_ms) / elapsed
 
-            p99 = float(np.percentile(self.request_latencies_ms, 99)) if self.request_latencies_ms else 20.0
-            total_reqs = self.status_2xx_count + self.status_5xx_count + self.status_429_count
-            http_5xx_rate = (self.status_5xx_count / total_reqs) if total_reqs > 0 else 0.0
+            p99 = (
+                float(np.percentile(self.request_latencies_ms, 99))
+                if self.request_latencies_ms
+                else 20.0
+            )
+            total_reqs = (
+                self.status_2xx_count + self.status_5xx_count + self.status_429_count
+            )
+            http_5xx_rate = (
+                (self.status_5xx_count / total_reqs) if total_reqs > 0 else 0.0
+            )
 
-            cache_stats = self.cache_service.get_stats() if self.cache_service else {"hit_ratio": 1.0, "eviction_count": 0}
-            db_stats = self.db_service.get_pool_stats() if self.db_service else {"active_connections": 0, "pool_utilization": 0.0}
+            cache_stats = (
+                self.cache_service.get_stats()
+                if self.cache_service
+                else {"hit_ratio": 1.0, "eviction_count": 0}
+            )
+            db_stats = (
+                self.db_service.get_pool_stats()
+                if self.db_service
+                else {"active_connections": 0, "pool_utilization": 0.0}
+            )
 
             return {
                 "p99_latency_ms": round(p99, 1),
@@ -145,12 +171,12 @@ class CloudTelemetryCollector:  # pylint: disable=too-many-instance-attributes
                 "telemetry_sink": "Google Cloud Logging & Monitoring",
             }
 
-    def get_request_logs(self) -> List[Dict[str, Any]]:
+    def get_request_logs(self) -> list[dict[str, Any]]:
         """Return all recorded traces for BigQuery ingestion."""
         with self._lock:
             return list(self.request_logs)
 
-    def get_action_spans(self) -> List[Dict[str, Any]]:
+    def get_action_spans(self) -> list[dict[str, Any]]:
         """Return all agent action execution spans."""
         with self._lock:
             return list(self.action_spans)

@@ -13,17 +13,21 @@
 # limitations under the License.
 
 """Integration tests for ADK Agents on Google Cloud Agent Platform."""
+
 import pytest
-from app.adk_agents.distiller_agent import ChrysalisDistillerAgentRunner
+
 from app.adk_agents.chaos_agent import ChrysalisChaosAgentRunner
-from app.evolution.credit_attribution import StepCreditAttribution
+from app.adk_agents.distiller_agent import ChrysalisDistillerAgentRunner
 from app.config import MODEL_NAME, PROJECT_ID
+from app.evolution.credit_attribution import StepCreditAttribution
 
 
 @pytest.mark.asyncio
 async def test_platform_distiller_agent_execution() -> None:
     """The ADK PrincipleDistillerAgent distills and signs a principle from credit attributions."""
-    distiller = ChrysalisDistillerAgentRunner(model_name=MODEL_NAME, project_id=PROJECT_ID)
+    distiller = ChrysalisDistillerAgentRunner(
+        model_name=MODEL_NAME, project_id=PROJECT_ID
+    )
     sample_attributions = [
         StepCreditAttribution(
             span_id="span_db_reboot",
@@ -62,7 +66,12 @@ async def test_platform_distiller_agent_execution() -> None:
 @pytest.mark.asyncio
 async def test_platform_chaos_agent_execution() -> None:
     """The ADK CuriosityChaosAgent runs the shadow chaos probe and reports a verdict."""
-    chaos = ChrysalisChaosAgentRunner(model_name=MODEL_NAME, project_id=PROJECT_ID, tested_capacity=10, tested_rate=40.0)
+    chaos = ChrysalisChaosAgentRunner(
+        model_name=MODEL_NAME,
+        project_id=PROJECT_ID,
+        tested_capacity=10,
+        tested_rate=40.0,
+    )
     directive = (
         "You are the Red Team Chaos Engineer on Google Cloud Agent Platform. "
         "Execute `inject_shadow_cache_purge`, then `fire_shadow_concurrent_burst` with 100 requests, and finally `assert_shadow_invariant`."
@@ -73,4 +82,7 @@ async def test_platform_chaos_agent_execution() -> None:
     assert result["verdict"] == "VERIFIED_RESILIENT"
     assert len(result["tool_calls"]) >= 2
     executed_names = [tc["name"] for tc in result["tool_calls"]]
-    assert "inject_shadow_cache_purge" in executed_names or "fire_shadow_concurrent_burst" in executed_names
+    assert (
+        "inject_shadow_cache_purge" in executed_names
+        or "fire_shadow_concurrent_burst" in executed_names
+    )

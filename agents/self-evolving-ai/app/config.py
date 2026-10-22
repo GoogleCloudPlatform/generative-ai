@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Configuration for Project Chrysalis: Agent Platform Version on Google Cloud."""
+
 import logging
 import os
 import warnings
@@ -68,7 +69,9 @@ class _DropAdkCacheHint(logging.Filter):
 
 
 logging.getLogger("google_adk.google.adk.runners").addFilter(_DropAdkCacheHint())
-warnings.filterwarnings("ignore", message=r"\[EXPERIMENTAL\] feature FeatureName\.JSON_SCHEMA_FOR_FUNC_DECL")
+warnings.filterwarnings(
+    "ignore", message=r"\[EXPERIMENTAL\] feature FeatureName\.JSON_SCHEMA_FOR_FUNC_DECL"
+)
 
 # Agent Platform Model settings
 MODEL_NAME: str = os.getenv("GEMINI_MODEL", "gemini-4-argon")
@@ -88,8 +91,8 @@ KMS_KEY_RING: str = "chimera-governance-ring"
 KMS_KEY_NAME: str = "chimera-patch-signer"
 
 # Governance & Safety thresholds
-POLICY_MIN_ADMIT_RATE: float = 10.0   # SLA minimum throughput floor (req/s)
-POLICY_MAX_CAPACITY: int = 100        # Maximum token buffer size
+POLICY_MIN_ADMIT_RATE: float = 10.0  # SLA minimum throughput floor (req/s)
+POLICY_MAX_CAPACITY: int = 100  # Maximum token buffer size
 POLICY_CANARY_TRAFFIC_PCT: float = 0.05  # 5% canary split
 MAX_AGENT_HOPS_PER_INCIDENT: int = 4
 MAX_LLM_TOKEN_BUDGET: int = 50_000

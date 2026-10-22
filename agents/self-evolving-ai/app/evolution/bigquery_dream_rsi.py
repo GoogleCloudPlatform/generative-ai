@@ -19,13 +19,21 @@ are loaded into BigQuery with a per-run `run_id`, and the counterfactual policy 
 single SQL query inside BigQuery. Without the dataset / credentials, the identical model runs on the
 local in-memory buffer and results are labelled with the engine actually used.
 """
+
 import time
 import uuid
-from typing import List, Dict, Any, Optional, Tuple
-from app.config import PROJECT_ID, BIGQUERY_DATASET, BIGQUERY_REQUESTS_TABLE, VERTEX_AI_AVAILABLE
+from typing import Any
+
+from app.config import (
+    BIGQUERY_DATASET,
+    BIGQUERY_REQUESTS_TABLE,
+    PROJECT_ID,
+    VERTEX_AI_AVAILABLE,
+)
 
 try:
     from google.cloud import bigquery
+
     BIGQUERY_AVAILABLE = True
 except ImportError:
     BIGQUERY_AVAILABLE = False
@@ -60,9 +68,15 @@ ORDER BY cap, rate
 """
 
 _REQUESTS_SCHEMA = [
-    ("run_id", "STRING"), ("seq_id", "INT64"), ("timestamp", "STRING"), ("request_id", "STRING"),
-    ("endpoint", "STRING"), ("status_code", "INT64"), ("latency_ms", "FLOAT64"),
-    ("cache_miss", "INT64"), ("admitted", "INT64"),
+    ("run_id", "STRING"),
+    ("seq_id", "INT64"),
+    ("timestamp", "STRING"),
+    ("request_id", "STRING"),
+    ("endpoint", "STRING"),
+    ("status_code", "INT64"),
+    ("latency_ms", "FLOAT64"),
+    ("cache_miss", "INT64"),
+    ("admitted", "INT64"),
 ]
 
 
@@ -85,7 +99,7 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
         self.db_acquisition_timeout_s = db_acquisition_timeout_s
         self.headroom_target = headroom_target
         self._client: Any = None
-        self._in_memory_records: List[Dict[str, Any]] = []
+        self._in_memory_records: list[dict[str, Any]] = []
         self.run_id: str = ""
         self.loaded_to_bigquery: bool = False
         self.engine: str = ENGINE_LOCAL
@@ -102,7 +116,7 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
         """Fully-qualified BigQuery table ID for recorded request traces."""
         return f"{self.project_id}.{self.dataset_id}.{BIGQUERY_REQUESTS_TABLE}"
 
-    def load_trajectory_data(self, request_logs: List[Dict[str, Any]]) -> int:
+    def load_trajectory_data(self, request_logs: list[dict[str, Any]]) -> int:
         """Load recorded incident request stream into BigQuery (load job, tagged with a unique run_id)."""
         if not request_logs:
             request_logs = self._generate_synthetic_burst_logs()
@@ -128,11 +142,16 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
             ]
             try:
                 job_config = bigquery.LoadJobConfig(
-                    schema=[bigquery.SchemaField(name, typ) for name, typ in _REQUESTS_SCHEMA],
+                    schema=[
+                        bigquery.SchemaField(name, typ)
+                        for name, typ in _REQUESTS_SCHEMA
+                    ],
                     write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
                     create_disposition=bigquery.CreateDisposition.CREATE_IF_NEEDED,
                 )
-                self._client.load_table_from_json(rows, self.table_id, job_config=job_config).result(timeout=60)
+                self._client.load_table_from_json(
+                    rows, self.table_id, job_config=job_config
+                ).result(timeout=60)
                 self.loaded_to_bigquery = True
             except Exception as e:  # pylint: disable=broad-exception-caught
                 # Dataset not provisioned (run scripts/setup_gcp.sh) or no permission: local fallback
@@ -140,22 +159,24 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
 
         return len(self._in_memory_records)
 
-    def _generate_synthetic_burst_logs(self) -> List[Dict[str, Any]]:
+    def _generate_synthetic_burst_logs(self) -> list[dict[str, Any]]:
         """Generate high-fidelity Black Friday burst traces."""
         logs = []
         for i in range(100):
             cache_miss = 1 if i < 70 else 0
             status = 500 if (cache_miss and i % 3 != 0) else 200
             latency = 3200.0 if status == 500 else (120.0 if cache_miss else 15.0)
-            logs.append({
-                "timestamp": f"2026-10-02T12:00:{i:02d}Z",
-                "request_id": f"burst_req_{i:03d}",
-                "endpoint": "/checkout",
-                "status_code": status,
-                "latency_ms": latency,
-                "cache_miss": cache_miss,
-                "admitted": 1,
-            })
+            logs.append(
+                {
+                    "timestamp": f"2026-10-02T12:00:{i:02d}Z",
+                    "request_id": f"burst_req_{i:03d}",
+                    "endpoint": "/checkout",
+                    "status_code": status,
+                    "latency_ms": latency,
+                    "cache_miss": cache_miss,
+                    "admitted": 1,
+                }
+            )
         return logs
 
     @property
@@ -166,11 +187,20 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
     @property
     def _burst_capacity(self) -> float:
         # Cold-miss burst tolerance = N * (timeout / query_latency) (2 * 5 = 10 concurrent misses)
-        return self.db_max_connections * (self.db_acquisition_timeout_s / self.db_query_latency_s)
+        return self.db_max_connections * (
+            self.db_acquisition_timeout_s / self.db_query_latency_s
+        )
 
     def _result_row(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        self, cap: int, rate: float, pool_load: float, sim_5xx: int, sim_p99: float, feasible: bool, engine: str
-    ) -> Dict[str, Any]:
+        self,
+        cap: int,
+        rate: float,
+        pool_load: float,
+        sim_5xx: int,
+        sim_p99: float,
+        feasible: bool,
+        engine: str,
+    ) -> dict[str, Any]:
         return {
             "policy_parameter_name": "token_replenishment_rate",
             "tested_value": {"capacity": int(cap), "rate_req_sec": float(rate)},
@@ -182,27 +212,49 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
             "engine": engine,
         }
 
-    def _sweep_in_bigquery(self, rates: List[float], caps: List[int]) -> List[Dict[str, Any]]:
+    def _sweep_in_bigquery(
+        self, rates: list[float], caps: list[int]
+    ) -> list[dict[str, Any]]:
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
                 bigquery.ScalarQueryParameter("run_id", "STRING", self.run_id),
                 bigquery.ArrayQueryParameter("caps", "INT64", [int(c) for c in caps]),
-                bigquery.ArrayQueryParameter("rates", "FLOAT64", [float(r) for r in rates]),
-                bigquery.ScalarQueryParameter("sustained", "FLOAT64", self._sustained_capacity),
+                bigquery.ArrayQueryParameter(
+                    "rates", "FLOAT64", [float(r) for r in rates]
+                ),
+                bigquery.ScalarQueryParameter(
+                    "sustained", "FLOAT64", self._sustained_capacity
+                ),
                 bigquery.ScalarQueryParameter("burst", "FLOAT64", self._burst_capacity),
-                bigquery.ScalarQueryParameter("headroom", "FLOAT64", self.headroom_target),
+                bigquery.ScalarQueryParameter(
+                    "headroom", "FLOAT64", self.headroom_target
+                ),
             ],
             use_query_cache=False,
         )
-        rows = self._client.query(_SWEEP_SQL.format(table=self.table_id), job_config=job_config).result(timeout=60)
+        rows = self._client.query(
+            _SWEEP_SQL.format(table=self.table_id), job_config=job_config
+        ).result(timeout=60)
         return [
-            self._result_row(r["cap"], r["rate"], r["sim_pool_load"], r["sim_5xx"], r["sim_p99"], r["feasible"], ENGINE_BIGQUERY)
+            self._result_row(
+                r["cap"],
+                r["rate"],
+                r["sim_pool_load"],
+                r["sim_5xx"],
+                r["sim_p99"],
+                r["feasible"],
+                ENGINE_BIGQUERY,
+            )
             for r in rows
         ]
 
-    def _sweep_locally(self, rates: List[float], caps: List[int]) -> List[Dict[str, Any]]:
+    def _sweep_locally(
+        self, rates: list[float], caps: list[int]
+    ) -> list[dict[str, Any]]:
         total_requests = len(self._in_memory_records)
-        total_misses = sum(1 for r in self._in_memory_records if r.get("cache_miss") == 1)
+        total_misses = sum(
+            1 for r in self._in_memory_records if r.get("cache_miss") == 1
+        )
         miss_ratio = (total_misses / total_requests) if total_requests > 0 else 0.5
 
         results = []
@@ -210,7 +262,10 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
             for rate in rates:
                 # Burst check assumes a cold cache (every admitted request misses); sustained check
                 # uses the observed miss ratio from the recorded trajectory.
-                load = max((rate * miss_ratio) / self._sustained_capacity, cap / self._burst_capacity)
+                load = max(
+                    (rate * miss_ratio) / self._sustained_capacity,
+                    cap / self._burst_capacity,
+                )
                 if load <= 1.0:
                     sim_5xx, sim_p99 = 0, 25.0 + (load * 30.0)
                 else:
@@ -218,17 +273,24 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
                     sim_5xx = int(round(total_requests * excess_ratio * 0.7))
                     sim_p99 = 500.0 + (excess_ratio * 3500.0)
                 # SLO-feasible frontier: zero 5xx with >= 15% pool headroom
-                results.append(self._result_row(
-                    cap, rate, round(min(load, 1.0), 2), sim_5xx, round(sim_p99, 1),
-                    sim_5xx == 0 and load <= self.headroom_target, ENGINE_LOCAL,
-                ))
+                results.append(
+                    self._result_row(
+                        cap,
+                        rate,
+                        round(min(load, 1.0), 2),
+                        sim_5xx,
+                        round(sim_p99, 1),
+                        sim_5xx == 0 and load <= self.headroom_target,
+                        ENGINE_LOCAL,
+                    )
+                )
         return results
 
     def run_counterfactual_sweep(
         self,
-        rates_to_test: Optional[List[float]] = None,
-        capacities_to_test: Optional[List[int]] = None,
-    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any], float]:
+        rates_to_test: list[float] | None = None,
+        capacities_to_test: list[int] | None = None,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any], float]:
         """Run the sweep over token bucket parameters to discover the optimal SLO-feasible policy."""
         if rates_to_test is None:
             rates_to_test = [float(r) for r in range(5, 205, 5)]
@@ -236,7 +298,7 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
             capacities_to_test = [5, 10, 20, 30, 42, 50, 75, 100]
 
         start_time = time.perf_counter()
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
         if self.loaded_to_bigquery:
             try:
                 results = self._sweep_in_bigquery(rates_to_test, capacities_to_test)
@@ -254,9 +316,18 @@ class BigQueryDreamRSIEngine:  # pylint: disable=too-many-instance-attributes
             # Maximize sustained throughput first, then burst tolerance
             optimal_policy = max(
                 pareto_candidates,
-                key=lambda r: (r["tested_value"]["rate_req_sec"], r["tested_value"]["capacity"]),
+                key=lambda r: (
+                    r["tested_value"]["rate_req_sec"],
+                    r["tested_value"]["capacity"],
+                ),
             )
         else:
-            optimal_policy = min(results, key=lambda r: (r["simulated_5xx_count"], r["simulated_database_max_load"]))
+            optimal_policy = min(
+                results,
+                key=lambda r: (
+                    r["simulated_5xx_count"],
+                    r["simulated_database_max_load"],
+                ),
+            )
 
         return results, optimal_policy, elapsed_ms

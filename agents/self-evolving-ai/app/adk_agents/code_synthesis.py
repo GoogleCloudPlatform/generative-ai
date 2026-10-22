@@ -24,6 +24,7 @@ Failures are fed back to Gemini for a bounded number of repair attempts. If Gemi
 unavailable or never passes the gates, a reviewed reference template is used instead and
 the result is labelled as such.
 """
+
 import ast
 import builtins
 import collections
@@ -31,34 +32,82 @@ import math
 import re
 import threading
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from types import ModuleType
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any
 
 ALLOWED_IMPORTS = {"time", "threading", "math", "collections"}
 
 FORBIDDEN_NAMES = {
-    "eval", "exec", "compile", "__import__", "open", "input", "breakpoint", "globals", "locals",
-    "vars", "getattr", "setattr", "delattr", "help", "exit", "quit", "memoryview", "type",
-    "__builtins__", "__loader__", "__spec__",
+    "eval",
+    "exec",
+    "compile",
+    "__import__",
+    "open",
+    "input",
+    "breakpoint",
+    "globals",
+    "locals",
+    "vars",
+    "getattr",
+    "setattr",
+    "delattr",
+    "help",
+    "exit",
+    "quit",
+    "memoryview",
+    "type",
+    "__builtins__",
+    "__loader__",
+    "__spec__",
 }
 
 _SAFE_BUILTIN_NAMES = [
-    "abs", "all", "any", "bool", "classmethod", "dict", "enumerate", "Exception", "float", "int",
-    "isinstance", "len", "list", "max", "min", "object", "property", "range", "round",
-    "RuntimeError", "set", "sorted", "staticmethod", "str", "sum", "super", "tuple", "TypeError",
-    "ValueError", "zip", "None", "True", "False",
+    "abs",
+    "all",
+    "any",
+    "bool",
+    "classmethod",
+    "dict",
+    "enumerate",
+    "Exception",
+    "float",
+    "int",
+    "isinstance",
+    "len",
+    "list",
+    "max",
+    "min",
+    "object",
+    "property",
+    "range",
+    "round",
+    "RuntimeError",
+    "set",
+    "sorted",
+    "staticmethod",
+    "str",
+    "sum",
+    "super",
+    "tuple",
+    "TypeError",
+    "ValueError",
+    "zip",
+    "None",
+    "True",
+    "False",
 ]
 
 
-def sandbox_violations(code_str: str) -> List[str]:
+def sandbox_violations(code_str: str) -> list[str]:
     """Return the list of static sandbox-policy violations for a code string (empty == compliant)."""
     try:
         tree = ast.parse(code_str)
     except SyntaxError as e:
         return [f"Syntax error: {e}"]
 
-    violations: List[str] = []
+    violations: list[str] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
@@ -69,7 +118,11 @@ def sandbox_violations(code_str: str) -> List[str]:
                 violations.append(f"Import not in allow-list: {node.module}")
         elif isinstance(node, ast.Name) and node.id in FORBIDDEN_NAMES:
             violations.append(f"Forbidden builtin/name: {node.id}")
-        elif isinstance(node, ast.Attribute) and node.attr.startswith("__") and node.attr != "__init__":
+        elif (
+            isinstance(node, ast.Attribute)
+            and node.attr.startswith("__")
+            and node.attr != "__init__"
+        ):
             violations.append(f"Dunder attribute access not allowed: {node.attr}")
         elif isinstance(node, (ast.Global, ast.Nonlocal)):
             violations.append("global/nonlocal statements are not allowed")
@@ -78,19 +131,23 @@ def sandbox_violations(code_str: str) -> List[str]:
 
 def _guarded_import(  # pylint: disable=redefined-builtin
     name: str,
-    globals: Optional[Mapping[str, object]] = None,
-    locals: Optional[Mapping[str, object]] = None,
+    globals: Mapping[str, object] | None = None,
+    locals: Mapping[str, object] | None = None,
     fromlist: Sequence[str] = (),
     level: int = 0,
 ) -> ModuleType:
-    if name.split(".")[0] not in ALLOWED_IMPORTS or level != 0:
-        raise ImportError(f"Import of '{name}' is not permitted inside the APEX sandbox")
+    if name.split(".", maxsplit=1)[0] not in ALLOWED_IMPORTS or level != 0:
+        raise ImportError(
+            f"Import of '{name}' is not permitted inside the APEX sandbox"
+        )
     return builtins.__import__(name, globals, locals, fromlist, level)
 
 
-def sandbox_globals() -> Dict[str, Any]:
+def sandbox_globals() -> dict[str, Any]:
     """Restricted execution namespace: curated builtins + guarded import + time/threading."""
-    safe_builtins = {n: getattr(builtins, n) for n in _SAFE_BUILTIN_NAMES if hasattr(builtins, n)}
+    safe_builtins = {
+        n: getattr(builtins, n) for n in _SAFE_BUILTIN_NAMES if hasattr(builtins, n)
+    }
     safe_builtins["__build_class__"] = builtins.__build_class__
     safe_builtins["__import__"] = _guarded_import
     return {
@@ -103,23 +160,27 @@ def sandbox_globals() -> Dict[str, Any]:
     }
 
 
-def compile_in_sandbox(code_str: str, class_name: str = "TokenBucketRateLimiter") -> Any:
+def compile_in_sandbox(
+    code_str: str, class_name: str = "TokenBucketRateLimiter"
+) -> Any:
     """Execute code in the restricted namespace and return the requested class (or None)."""
     namespace = sandbox_globals()
     exec(compile(code_str, "<apex-synthesized>", "exec"), namespace)  # noqa: S102 (gated above)  # pylint: disable=exec-used
     return namespace.get(class_name)
 
 
-def verify_rate_limiter_behavior(limiter_cls: Any, timeout_s: float = 3.0) -> List[str]:
+def verify_rate_limiter_behavior(limiter_cls: Any, timeout_s: float = 3.0) -> list[str]:
     """Run behavioural unit tests against a synthesized limiter class. Returns failures (empty == pass)."""
-    failures: List[str] = []
+    failures: list[str] = []
 
     def _tests() -> None:
         # 1. Burst capacity: exactly `capacity` admits, then throttle (negligible refill)
         lim = limiter_cls(capacity=3, replenishment_rate=0.001)
         results = [lim.acquire(1) for _ in range(4)]
         if results != [True, True, True, False]:
-            failures.append(f"burst capacity check failed: acquire x4 -> {results} (expected [True, True, True, False])")
+            failures.append(
+                f"burst capacity check failed: acquire x4 -> {results} (expected [True, True, True, False])"
+            )
 
         # 2. Refill: drained bucket admits again after tokens replenish
         lim2 = limiter_cls(capacity=2, replenishment_rate=50.0)
@@ -127,7 +188,9 @@ def verify_rate_limiter_behavior(limiter_cls: Any, timeout_s: float = 3.0) -> Li
         lim2.acquire(1)
         time.sleep(0.1)
         if lim2.acquire(1) is not True:
-            failures.append("refill check failed: no token available after replenishment interval")
+            failures.append(
+                "refill check failed: no token available after replenishment interval"
+            )
 
         # 3. Parameters must be mutable at runtime (TrafficShapingAgent retunes them)
         lim2.capacity = 5
@@ -136,7 +199,7 @@ def verify_rate_limiter_behavior(limiter_cls: Any, timeout_s: float = 3.0) -> Li
 
         # 4. Thread safety: 4 threads x 50 acquires on a 100-token bucket admit exactly 100
         lim3 = limiter_cls(capacity=100, replenishment_rate=0.001)
-        admitted: List[int] = []
+        admitted: list[int] = []
         lock = threading.Lock()
 
         def worker() -> None:
@@ -150,11 +213,18 @@ def verify_rate_limiter_behavior(limiter_cls: Any, timeout_s: float = 3.0) -> Li
         for t in threads:
             t.join()
         if sum(admitted) != 100:
-            failures.append(f"thread-safety check failed: admitted {sum(admitted)} of 200 concurrent acquires (expected 100)")
+            failures.append(
+                f"thread-safety check failed: admitted {sum(admitted)} of 200 concurrent acquires (expected 100)"
+            )
 
         # 5. Stats contract
         stats = lim.get_stats()
-        missing = {"capacity", "replenishment_rate", "total_admitted", "total_throttled"} - set(stats or {})
+        missing = {
+            "capacity",
+            "replenishment_rate",
+            "total_admitted",
+            "total_throttled",
+        } - set(stats or {})
         if missing:
             failures.append(f"get_stats() missing keys: {sorted(missing)}")
         elif stats["total_admitted"] != 3 or stats["total_throttled"] != 1:
@@ -164,19 +234,24 @@ def verify_rate_limiter_behavior(limiter_cls: Any, timeout_s: float = 3.0) -> Li
         try:
             _tests()
         except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught
-            failures.append(f"runtime error during verification: {type(e).__name__}: {e}")
+            failures.append(
+                f"runtime error during verification: {type(e).__name__}: {e}"
+            )
 
     t = threading.Thread(target=_runner, daemon=True)
     t.start()
     t.join(timeout_s)
     if t.is_alive():
-        failures.append(f"verification timed out after {timeout_s}s (possible infinite loop / deadlock)")
+        failures.append(
+            f"verification timed out after {timeout_s}s (possible infinite loop / deadlock)"
+        )
     return failures
 
 
 # Reviewed template source; limiter implementations elsewhere intentionally mirror it.
 # pylint: disable=duplicate-code
-REFERENCE_LIMITER_CODE = '''
+REFERENCE_LIMITER_CODE = (
+    '''
 class TokenBucketRateLimiter:
     """APEX Layer 1 reference token bucket rate limiter (reviewed template)."""
 
@@ -211,7 +286,9 @@ class TokenBucketRateLimiter:
                 "total_admitted": self.total_admitted,
                 "total_throttled": self.total_throttled,
             }
-'''.strip() + "\n"
+'''.strip()
+    + "\n"
+)
 # pylint: enable=duplicate-code
 
 _SYNTHESIS_PROMPT = """You are the APEX Layer 1 Harness Patching engine of an autonomous SRE system.
@@ -248,7 +325,7 @@ class SynthesisResult:
     source: str  # "gemini" | "reference_template"
     model: str
     attempts: int
-    gate_log: List[str] = field(default_factory=list)
+    gate_log: list[str] = field(default_factory=list)
 
 
 def _extract_code(text: str) -> str:
@@ -256,14 +333,16 @@ def _extract_code(text: str) -> str:
     return (match.group(1) if match else (text or "")).strip() + "\n"
 
 
-def run_gates(code: str) -> Tuple[Any, List[str]]:
+def run_gates(code: str) -> tuple[Any, list[str]]:
     """Run all sandbox gates; returns (limiter_cls or None, list of failures)."""
     violations = sandbox_violations(code)
     if violations:
         return None, [f"AST sandbox policy: {v}" for v in violations]
     # Static contract: races are rarely observable under the GIL, so require an explicit lock.
     if not re.search(r"threading\.(R?Lock)\(", code):
-        return None, ["thread-safety contract: acquire() must be guarded by threading.Lock()/RLock()"]
+        return None, [
+            "thread-safety contract: acquire() must be guarded by threading.Lock()/RLock()"
+        ]
     try:
         cls = compile_in_sandbox(code)
     except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught
@@ -281,7 +360,7 @@ def synthesize_rate_limiter(  # pylint: disable=too-many-locals
     max_attempts: int = 3,
 ) -> SynthesisResult:
     """Ask Gemini to synthesize the limiter, enforcing all gates; fall back to the reference template."""
-    gate_log: List[str] = []
+    gate_log: list[str] = []
     feedback = ""
     attempts = 0
 
@@ -292,7 +371,9 @@ def synthesize_rate_limiter(  # pylint: disable=too-many-locals
 
             client = genai.Client()
             gen_config = genai_types.GenerateContentConfig(
-                automatic_function_calling=genai_types.AutomaticFunctionCallingConfig(disable=True),
+                automatic_function_calling=genai_types.AutomaticFunctionCallingConfig(
+                    disable=True
+                ),
             )
         except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught
             client = None
@@ -303,18 +384,26 @@ def synthesize_rate_limiter(  # pylint: disable=too-many-locals
             try:
                 resp = client.models.generate_content(
                     model=model_name,
-                    contents=_SYNTHESIS_PROMPT.format(diagnosis=(diagnosis or "n/a")[:4000], feedback=feedback),
+                    contents=_SYNTHESIS_PROMPT.format(
+                        diagnosis=(diagnosis or "n/a")[:4000], feedback=feedback
+                    ),
                     config=gen_config,
                 )
                 code = _extract_code(resp.text)
             except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught
-                gate_log.append(f"attempt {attempt}: Gemini call failed ({type(e).__name__})")
+                gate_log.append(
+                    f"attempt {attempt}: Gemini call failed ({type(e).__name__})"
+                )
                 continue
 
             cls, failures = run_gates(code)
             if cls is not None:
-                gate_log.append(f"attempt {attempt}: all gates PASSED (AST sandbox, restricted compile, 5 behavioural tests)")
-                return SynthesisResult(code, cls, "gemini", model_name, attempt, gate_log)
+                gate_log.append(
+                    f"attempt {attempt}: all gates PASSED (AST sandbox, restricted compile, 5 behavioural tests)"
+                )
+                return SynthesisResult(
+                    code, cls, "gemini", model_name, attempt, gate_log
+                )
 
             gate_log.append(f"attempt {attempt}: REJECTED - " + "; ".join(failures[:3]))
             feedback = (
@@ -325,6 +414,15 @@ def synthesize_rate_limiter(  # pylint: disable=too-many-locals
 
     cls, failures = run_gates(REFERENCE_LIMITER_CODE)
     if cls is None:  # pragma: no cover - the reviewed template must always pass
-        raise RuntimeError(f"Reference limiter template failed verification: {failures}")
+        raise RuntimeError(
+            f"Reference limiter template failed verification: {failures}"
+        )
     gate_log.append("using reviewed reference template (gates PASSED)")
-    return SynthesisResult(REFERENCE_LIMITER_CODE, cls, "reference_template", model_name, attempts, gate_log)
+    return SynthesisResult(
+        REFERENCE_LIMITER_CODE,
+        cls,
+        "reference_template",
+        model_name,
+        attempts,
+        gate_log,
+    )

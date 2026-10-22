@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Unit tests for APEX Layer 1 Gemini code synthesis gates (sandbox policy, restricted compile, behaviour)."""
+
 import pytest
 
 from app.adk_agents.code_synthesis import (
@@ -32,11 +33,16 @@ from app.adk_agents.code_synthesis import (
         ("from socket import socket\n", "Import not in allow-list: socket"),
         ("x = open('/etc/passwd')\n", "Forbidden builtin/name: open"),
         ("x = getattr(object, 'mro')\n", "Forbidden builtin/name: getattr"),
-        ("x = ().__class__.__bases__\n", "Dunder attribute access not allowed: __class__"),
+        (
+            "x = ().__class__.__bases__\n",
+            "Dunder attribute access not allowed: __class__",
+        ),
         ("def f():\n    global y\n", "global/nonlocal statements are not allowed"),
     ],
 )
-def test_sandbox_policy_rejects_dangerous_constructs(snippet: str, expected: str) -> None:
+def test_sandbox_policy_rejects_dangerous_constructs(
+    snippet: str, expected: str
+) -> None:
     """The static sandbox policy flags each dangerous construct with a specific violation."""
     assert expected in sandbox_violations(snippet)
 
@@ -53,7 +59,11 @@ def test_reference_template_passes_all_gates() -> None:
     cls, failures = run_gates(REFERENCE_LIMITER_CODE)
     assert failures == []
     limiter = cls(capacity=2, replenishment_rate=0.001)
-    assert [limiter.acquire(), limiter.acquire(), limiter.acquire()] == [True, True, False]
+    assert [limiter.acquire(), limiter.acquire(), limiter.acquire()] == [
+        True,
+        True,
+        False,
+    ]
 
 
 def test_behavioural_gate_rejects_limiter_that_never_throttles() -> None:
@@ -66,9 +76,9 @@ def test_behavioural_gate_rejects_limiter_that_never_throttles() -> None:
 
 def test_gate_rejects_limiter_without_lock() -> None:
     """The thread-safety gate rejects a limiter without a lock."""
-    unlocked = REFERENCE_LIMITER_CODE.replace("self.lock = threading.Lock()", "self.lock = None").replace(
-        "with self.lock:", "if True:"
-    )
+    unlocked = REFERENCE_LIMITER_CODE.replace(
+        "self.lock = threading.Lock()", "self.lock = None"
+    ).replace("with self.lock:", "if True:")
     cls, failures = run_gates(unlocked)
     assert cls is None
     assert any("thread-safety contract" in f for f in failures)
@@ -76,7 +86,9 @@ def test_gate_rejects_limiter_without_lock() -> None:
 
 def test_synthesis_offline_falls_back_to_verified_reference_template() -> None:
     """Offline synthesis falls back to the verified reference template."""
-    result = synthesize_rate_limiter("cache stampede", "gemini-4-argon", llm_available=False)
+    result = synthesize_rate_limiter(
+        "cache stampede", "gemini-4-argon", llm_available=False
+    )
     assert result.source == "reference_template"
     assert result.code == REFERENCE_LIMITER_CODE
     assert result.limiter_cls is not None

@@ -13,19 +13,21 @@
 # limitations under the License.
 
 """APEX Layer 1 Dynamic Tool Loader with Cloud KMS Signing & Policy Controller Enforcement."""
+
 import ast
 import hashlib
 import threading
 import time
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Any
+
 from google.adk.tools import FunctionTool
 
-from app.config import PROJECT_ID
+from app.adk_agents.code_synthesis import compile_in_sandbox, sandbox_violations
 from app.adk_agents.schemas import DynamicToolDefinition, utc_now
-from app.adk_agents.code_synthesis import sandbox_violations, compile_in_sandbox
+from app.config import PROJECT_ID
+from app.governance.audit_logger import CloudAuditLogger
 from app.governance.kms_signer import CloudKmsSigner
 from app.governance.policy_controller import CloudPolicyController
-from app.governance.audit_logger import CloudAuditLogger
 from app.runtime_registry import get_platform_env
 
 
@@ -33,16 +35,34 @@ class AstSafetyChecker(ast.NodeVisitor):
     """Inspects generated Python AST to enforce strict sandboxing."""
 
     DISALLOWED_MODULES = {
-        "os", "sys", "subprocess", "socket", "http", "urllib", "requests",
-        "shutil", "builtins", "importlib", "ctypes", "pty", "pickle"
+        "os",
+        "sys",
+        "subprocess",
+        "socket",
+        "http",
+        "urllib",
+        "requests",
+        "shutil",
+        "builtins",
+        "importlib",
+        "ctypes",
+        "pty",
+        "pickle",
     }
 
     DISALLOWED_FUNCTIONS = {
-        "eval", "exec", "compile", "__import__", "open", "input", "globals", "locals"
+        "eval",
+        "open",
+        "exec",
+        "input",
+        "compile",
+        "globals",
+        "__import__",
+        "locals",
     }
 
     def __init__(self) -> None:
-        self.violations: List[str] = []
+        self.violations: list[str] = []
 
     def visit_Import(self, node: ast.Import) -> None:  # pylint: disable=invalid-name
         """Flag `import x` statements that target disallowed modules."""
@@ -62,7 +82,10 @@ class AstSafetyChecker(ast.NodeVisitor):
 
     def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=invalid-name
         """Flag direct calls to disallowed built-in functions."""
-        if isinstance(node.func, ast.Name) and node.func.id in self.DISALLOWED_FUNCTIONS:
+        if (
+            isinstance(node.func, ast.Name)
+            and node.func.id in self.DISALLOWED_FUNCTIONS
+        ):
             self.violations.append(f"Disallowed built-in function call: {node.func.id}")
         self.generic_visit(node)
 
@@ -99,7 +122,9 @@ class TokenBucketRateLimiter:
             now = time.perf_counter()
             elapsed = now - self.last_update
             self.last_update = now
-            self.tokens = min(float(self.capacity), self.tokens + (elapsed * self.replenishment_rate))
+            self.tokens = min(
+                float(self.capacity), self.tokens + (elapsed * self.replenishment_rate)
+            )
             if self.tokens >= tokens:
                 self.tokens -= tokens
                 self.total_admitted += 1
@@ -107,7 +132,7 @@ class TokenBucketRateLimiter:
             self.total_throttled += 1
             return False
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Return a snapshot of the limiter configuration and admit/throttle counters."""
         with self.lock:
             return {
@@ -117,6 +142,8 @@ class TokenBucketRateLimiter:
                 "total_admitted": self.total_admitted,
                 "total_throttled": self.total_throttled,
             }
+
+
 # pylint: enable=duplicate-code
 
 
@@ -125,12 +152,12 @@ def register_dynamic_tool_governed(  # pylint: disable=too-many-arguments,too-ma
     code_string: str,
     tool_name: str = "token_bucket_rate_limiter",
     description: str = "Dynamic APEX Layer 1 token bucket rate limiter governed under Cloud KMS and Policy Controller.",
-    target_env: Optional[Any] = None,
+    target_env: Any | None = None,
     project_id: str = PROJECT_ID,
-    policy_controller: Optional[CloudPolicyController] = None,
+    policy_controller: CloudPolicyController | None = None,
     capacity: int = 10,
     replenishment_rate: float = 40.0,
-) -> Tuple[DynamicToolDefinition, FunctionTool]:
+) -> tuple[DynamicToolDefinition, FunctionTool]:
     """Validate AST, evaluate OPA policy, sign with Cloud KMS, attach via Binary Authorization."""
     if target_env is None:
         target_env = get_platform_env()
@@ -143,13 +170,19 @@ def register_dynamic_tool_governed(  # pylint: disable=too-many-arguments,too-ma
     validate_code_safety(code_string)
 
     # 2. Policy-as-Code Evaluation of the parameters actually being deployed
-    policy_decision = policy_controller.evaluate_rate_limiter_policy(capacity=capacity, replenishment_rate=replenishment_rate)
+    policy_decision = policy_controller.evaluate_rate_limiter_policy(
+        capacity=capacity, replenishment_rate=replenishment_rate
+    )
     if not policy_decision.allowed:
-        raise PermissionError(f"Cloud Policy Controller Violation: {policy_decision.violations}")
+        raise PermissionError(
+            f"Cloud Policy Controller Violation: {policy_decision.violations}"
+        )
 
     # 3. Cloud KMS Cryptographic Signing
     code_hash = hashlib.sha256(code_string.encode("utf-8")).hexdigest()
-    signature_envelope = kms_signer.sign_artifact(code_string, artifact_type="DYNAMIC_TOOL")
+    signature_envelope = kms_signer.sign_artifact(
+        code_string, artifact_type="DYNAMIC_TOOL"
+    )
 
     # 4. Compile in the restricted sandbox namespace (curated builtins, guarded imports)
     limiter_cls = compile_in_sandbox(code_string)
@@ -161,13 +194,19 @@ def register_dynamic_tool_governed(  # pylint: disable=too-many-arguments,too-ma
 
     # 5. Binary Authorization: middleware re-verifies the signature against the exact code
     if target_env is not None:
-        target_env.attach_verified_rate_limiter(limiter_instance, signature_envelope, code=code_string)
+        target_env.attach_verified_rate_limiter(
+            limiter_instance, signature_envelope, code=code_string
+        )
 
     # 6. Wrap into Google ADK FunctionTool
-    def configure_rate_limiter(capacity: int = 45, replenishment_rate: float = 40.0) -> Dict[str, Any]:
+    def configure_rate_limiter(
+        capacity: int = 45, replenishment_rate: float = 40.0
+    ) -> dict[str, Any]:
         """Reconfigure active token bucket rate limiter parameters."""
         # Run policy check before runtime re-parameterization
-        p_check = policy_controller.evaluate_rate_limiter_policy(capacity, replenishment_rate)
+        p_check = policy_controller.evaluate_rate_limiter_policy(
+            capacity, replenishment_rate
+        )
         if not p_check.allowed:
             return {"status": "POLICY_REJECTED", "violations": p_check.violations}
 
@@ -203,7 +242,10 @@ def register_dynamic_tool_governed(  # pylint: disable=too-many-arguments,too-ma
         actor="APEX_Layer_1",
         action="register_dynamic_tool_governed",
         status="SUCCESS",
-        details={"tool_name": tool_name, "kms_key": signature_envelope.key_resource_name},
+        details={
+            "tool_name": tool_name,
+            "kms_key": signature_envelope.key_resource_name,
+        },
     )
 
     return definition, dynamic_adk_tool

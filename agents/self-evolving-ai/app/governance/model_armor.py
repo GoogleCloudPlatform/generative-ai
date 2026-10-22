@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Model Armor & Data Loss Prevention (DLP) Guardrail Engine."""
+
 import re
-from typing import List
+
 from pydantic import BaseModel, Field
+
 from app.config import PROJECT_ID
 
 
@@ -24,7 +26,7 @@ class SanitizationResult(BaseModel):
 
     is_safe: bool
     sanitized_text: str
-    detected_threats: List[str] = Field(default_factory=list)
+    detected_threats: list[str] = Field(default_factory=list)
     masked_pii_count: int = 0
     risk_score: float = 0.0  # 0.0 (safe) to 1.0 (critical threat)
 
@@ -40,19 +42,54 @@ class ModelArmorGuardrail:
 
     # Adversarial prompt injection signatures
     INJECTION_PATTERNS = [
-        (re.compile(r"ignore\s+(all\s+)?(previous|prior|above)\s+instructions", re.IGNORECASE), "INSTRUCTION_OVERRIDE_ATTEMPT"),
-        (re.compile(r"you\s+are\s+now\s+in\s+developer\s+mode", re.IGNORECASE), "JAILBREAK_DEVELOPER_MODE"),
-        (re.compile(r"bypass\s+(safety|guardrail|security|policy)", re.IGNORECASE), "SAFETY_BYPASS_ATTEMPT"),
-        (re.compile(r"(sudo|rm\s+-rf|chmod\s+777|drop\s+database|format\s+c:)", re.IGNORECASE), "DESTRUCTIVE_COMMAND_INJECTION"),
-        (re.compile(r"disregard\s+rules\s+and\s+execute", re.IGNORECASE), "RULE_EVASION_EXPLOIT"),
+        (
+            re.compile(
+                r"ignore\s+(all\s+)?(previous|prior|above)\s+instructions",
+                re.IGNORECASE,
+            ),
+            "INSTRUCTION_OVERRIDE_ATTEMPT",
+        ),
+        (
+            re.compile(r"you\s+are\s+now\s+in\s+developer\s+mode", re.IGNORECASE),
+            "JAILBREAK_DEVELOPER_MODE",
+        ),
+        (
+            re.compile(r"bypass\s+(safety|guardrail|security|policy)", re.IGNORECASE),
+            "SAFETY_BYPASS_ATTEMPT",
+        ),
+        (
+            re.compile(
+                r"(sudo|rm\s+-rf|chmod\s+777|drop\s+database|format\s+c:)",
+                re.IGNORECASE,
+            ),
+            "DESTRUCTIVE_COMMAND_INJECTION",
+        ),
+        (
+            re.compile(r"disregard\s+rules\s+and\s+execute", re.IGNORECASE),
+            "RULE_EVASION_EXPLOIT",
+        ),
     ]
 
     # Data Loss Prevention (DLP) PII/Credential scrubbers
     DLP_PATTERNS = [
         (re.compile(r"\b(?:\d{4}[ -]?){3}\d{4}\b"), "[REDACTED_CREDIT_CARD]"),
-        (re.compile(r"Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*"), "Bearer [REDACTED_JWT_TOKEN]"),
-        (re.compile(r"(api[_-]?key|secret[_-]?key)\s*[:=]\s*['\"][A-Za-z0-9-_]{16,}['\"]", re.IGNORECASE), r"\1: '[REDACTED_SECRET]'"),
-        (re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b"), "[REDACTED_EMAIL]"),
+        (
+            re.compile(
+                r"Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*"
+            ),
+            "Bearer [REDACTED_JWT_TOKEN]",
+        ),
+        (
+            re.compile(
+                r"(api[_-]?key|secret[_-]?key)\s*[:=]\s*['\"][A-Za-z0-9-_]{16,}['\"]",
+                re.IGNORECASE,
+            ),
+            r"\1: '[REDACTED_SECRET]'",
+        ),
+        (
+            re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b"),
+            "[REDACTED_EMAIL]",
+        ),
     ]
 
     def __init__(self, project_id: str = PROJECT_ID):
@@ -63,7 +100,7 @@ class ModelArmorGuardrail:
     def inspect_and_sanitize(self, raw_input: str) -> SanitizationResult:
         """Inspect input text, scrub PII, and detect malicious prompt injections."""
         self.total_inspections += 1
-        detected_threats: List[str] = []
+        detected_threats: list[str] = []
         risk_score: float = 0.0
 
         # 1. Prompt Injection Scanning

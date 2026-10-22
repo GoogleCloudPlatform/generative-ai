@@ -13,23 +13,27 @@
 # limitations under the License.
 
 """Google ADK 2.0 Curiosity Chaos Agent for AgentEvolver Boundary Probing."""
+
 import asyncio
-from typing import Dict, Any, Optional
+from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools import FunctionTool
 from google.genai import types
 
-from app.config import MODEL_NAME, PROJECT_ID, LLM_MAX_ATTEMPTS
+from app.config import LLM_MAX_ATTEMPTS, MODEL_NAME, PROJECT_ID
 from app.evolution.self_questioner import ShadowSandboxEnvironment
 from app.governance.audit_logger import CloudAuditLogger
 
-_active_sandbox: Optional[ShadowSandboxEnvironment] = None  # pylint: disable=invalid-name
+_active_sandbox: ShadowSandboxEnvironment | None = None  # pylint: disable=invalid-name
 _audit_logger = CloudAuditLogger()
 
 
-def inject_shadow_cache_purge(reason: str = "Simulate 100% cold-start drop in shadow environment") -> Dict[str, Any]:
+def inject_shadow_cache_purge(
+    reason: str = "Simulate 100% cold-start drop in shadow environment",
+) -> dict[str, Any]:
     """Purge the shadow cache to test worst-case cold-start stampedes."""
     if _active_sandbox is None:
         return {"status": "ERROR", "reason": "No active shadow sandbox initialized"}
@@ -44,7 +48,7 @@ def inject_shadow_cache_purge(reason: str = "Simulate 100% cold-start drop in sh
     return {"status": "SHADOW_CACHE_PURGED", "purged_keys": purged, "reason": reason}
 
 
-def fire_shadow_concurrent_burst(burst_size: int = 150) -> Dict[str, Any]:
+def fire_shadow_concurrent_burst(burst_size: int = 150) -> dict[str, Any]:
     """Execute concurrent request burst against shadow sandbox under evolved rate limiter."""
     if _active_sandbox is None:
         return {"status": "ERROR", "reason": "No active shadow sandbox initialized"}
@@ -67,7 +71,7 @@ def fire_shadow_concurrent_burst(burst_size: int = 150) -> Dict[str, Any]:
     }
 
 
-def assert_shadow_invariant() -> Dict[str, Any]:
+def assert_shadow_invariant() -> dict[str, Any]:
     """Evaluate whether system invariants held during the chaos probe."""
     if _active_sandbox is None:
         return {"status": "ERROR", "reason": "No active shadow sandbox"}
@@ -110,7 +114,9 @@ class ChrysalisChaosAgentRunner:
         global _active_sandbox  # pylint: disable=global-statement
         self.model_name = model_name
         self.project_id = project_id
-        _active_sandbox = ShadowSandboxEnvironment(tested_capacity=tested_capacity, tested_rate=tested_rate)
+        _active_sandbox = ShadowSandboxEnvironment(
+            tested_capacity=tested_capacity, tested_rate=tested_rate
+        )
 
         self.chaos_agent = LlmAgent(
             name="curiosity_chaos_agent",
@@ -128,7 +134,7 @@ class ChrysalisChaosAgentRunner:
             auto_create_session=True,
         )
 
-    async def run_chaos_probe(self, directive: str) -> Dict[str, Any]:
+    async def run_chaos_probe(self, directive: str) -> dict[str, Any]:
         """Execute autonomous multi-turn chaos tool loop."""
         user_msg = types.Content(
             role="user",
@@ -154,10 +160,12 @@ class ChrysalisChaosAgentRunner:
                             if hasattr(part, "text") and part.text:
                                 final_text += part.text
                             elif hasattr(part, "function_call") and part.function_call:
-                                executed_tool_calls.append({
-                                    "name": part.function_call.name,
-                                    "args": getattr(part.function_call, "args", {}),
-                                })
+                                executed_tool_calls.append(
+                                    {
+                                        "name": part.function_call.name,
+                                        "args": getattr(part.function_call, "args", {}),
+                                    }
+                                )
                 if _active_sandbox is not None and _active_sandbox.total_probes > 0:
                     break
             except Exception:  # pylint: disable=broad-exception-caught
@@ -168,14 +176,24 @@ class ChrysalisChaosAgentRunner:
         if _active_sandbox is None or _active_sandbox.total_probes == 0:
             # Deterministic chaos fallback: Agent Platform unavailable (e.g. fresh clone without
             # credentials) or the model never fired the burst, so the invariant would be untested.
-            inject_shadow_cache_purge(reason="Deterministic ADK chaos fallback: 100% shadow cache drop")
+            inject_shadow_cache_purge(
+                reason="Deterministic ADK chaos fallback: 100% shadow cache drop"
+            )
             fire_shadow_concurrent_burst(burst_size=200)
             assert_shadow_invariant()
-            executed_tool_calls.extend([
-                {"name": "inject_shadow_cache_purge", "args": {"reason": "100% shadow cache drop"}},
-                {"name": "fire_shadow_concurrent_burst", "args": {"burst_size": 200}},
-                {"name": "assert_shadow_invariant", "args": {}},
-            ])
+            executed_tool_calls.extend(
+                [
+                    {
+                        "name": "inject_shadow_cache_purge",
+                        "args": {"reason": "100% shadow cache drop"},
+                    },
+                    {
+                        "name": "fire_shadow_concurrent_burst",
+                        "args": {"burst_size": 200},
+                    },
+                    {"name": "assert_shadow_invariant", "args": {}},
+                ]
+            )
             final_text = "Verified shadow sandbox resiliency via deterministic ADK chaos fallback."
 
         invariant = assert_shadow_invariant()

@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Human-in-the-Loop (HITL) Dual-Custody Approval Gate (Cloud Workflows style)."""
+
 import time
 import uuid
-from typing import Dict, Any, Optional, List
+from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -26,19 +28,19 @@ class ApprovalRequest(BaseModel):
     action_type: str
     tier: int  # 0=Read-only, 1=Canary patch, 2=Topology mutation, 3=Destructive
     description: str
-    proposed_payload: Dict[str, Any]
+    proposed_payload: dict[str, Any]
     status: str = "PENDING"  # PENDING, APPROVED, REJECTED, EXPIRED
     requested_at: str
-    approver: Optional[str] = None
-    approval_token: Optional[str] = None
+    approver: str | None = None
+    approval_token: str | None = None
 
 
 class HitlApprovalGate:
     """Enterprise Human-in-the-Loop Dual-Custody Gate for high-blast-radius autonomous actions."""
 
     def __init__(self) -> None:
-        self.pending_requests: Dict[str, ApprovalRequest] = {}
-        self.audit_history: List[ApprovalRequest] = []
+        self.pending_requests: dict[str, ApprovalRequest] = {}
+        self.audit_history: list[ApprovalRequest] = []
 
     def expire_open_requests(self, reason: str = "Environment reset") -> int:
         """Expire every PENDING ticket so it can no longer be approved (history is retained). Returns count."""
@@ -56,7 +58,7 @@ class HitlApprovalGate:
         action_type: str,
         tier: int,
         description: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
     ) -> ApprovalRequest:
         """Create a new HITL approval request."""
         req_id = f"HITL-{uuid.uuid4().hex[:8].upper()}"
@@ -87,27 +89,38 @@ class HitlApprovalGate:
         self.audit_history.append(req)
         return req
 
-    def approve_request(self, request_id: str, approver_email: str = "oncall-sre@example.com") -> ApprovalRequest:
+    def approve_request(
+        self, request_id: str, approver_email: str = "oncall-sre@example.com"
+    ) -> ApprovalRequest:
         """Sign and approve an escalated request (only PENDING tickets can be approved)."""
         if request_id not in self.pending_requests:
             raise KeyError(f"Approval request {request_id} not found")
 
         req = self.pending_requests[request_id]
         if req.status != "PENDING":
-            raise ValueError(f"Approval request {request_id} is {req.status}; only PENDING requests can be approved")
+            raise ValueError(
+                f"Approval request {request_id} is {req.status}; only PENDING requests can be approved"
+            )
         req.status = "APPROVED"
         req.approver = approver_email
         req.approval_token = f"SRE-SIG-{uuid.uuid4().hex[:16]}"
         return req
 
-    def reject_request(self, request_id: str, reason: str, approver_email: str = "oncall-sre@example.com") -> ApprovalRequest:
+    def reject_request(
+        self,
+        request_id: str,
+        reason: str,
+        approver_email: str = "oncall-sre@example.com",
+    ) -> ApprovalRequest:
         """Reject an escalated request (only PENDING tickets can be rejected)."""
         if request_id not in self.pending_requests:
             raise KeyError(f"Approval request {request_id} not found")
 
         req = self.pending_requests[request_id]
         if req.status != "PENDING":
-            raise ValueError(f"Approval request {request_id} is {req.status}; only PENDING requests can be rejected")
+            raise ValueError(
+                f"Approval request {request_id} is {req.status}; only PENDING requests can be rejected"
+            )
         req.status = "REJECTED"
         req.approver = approver_email
         req.description += f" [REJECTED: {reason}]"

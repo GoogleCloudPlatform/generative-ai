@@ -13,18 +13,21 @@
 # limitations under the License.
 
 """Unit and integration tests for Google Cloud Governance & Security Engine."""
+
 from app.config import PROJECT_ID
-from app.governance.model_armor import ModelArmorGuardrail
-from app.governance.kms_signer import CloudKmsSigner
-from app.governance.policy_controller import CloudPolicyController
 from app.governance.hitl_gate import HitlApprovalGate
+from app.governance.kms_signer import CloudKmsSigner
+from app.governance.model_armor import ModelArmorGuardrail
+from app.governance.policy_controller import CloudPolicyController
 
 
 def test_model_armor_detects_prompt_injections() -> None:
     """Ensure Model Armor intercepts malicious instruction overrides."""
     armor = ModelArmorGuardrail()
 
-    safe_text = "System metrics indicate cache hit ratio is 0.12 with elevated P99 latency."
+    safe_text = (
+        "System metrics indicate cache hit ratio is 0.12 with elevated P99 latency."
+    )
     res_safe = armor.inspect_and_sanitize(safe_text)
     assert res_safe.is_safe is True
     assert len(res_safe.detected_threats) == 0
@@ -61,7 +64,9 @@ def test_cloud_kms_signing_and_verification() -> None:
 
     # Tampered code must fail verification
     tampered_code = code + "    # Malicious injection"
-    is_tampered_valid = kms.verify_artifact(tampered_code, sig_envelope, artifact_type="DYNAMIC_TOOL")
+    is_tampered_valid = kms.verify_artifact(
+        tampered_code, sig_envelope, artifact_type="DYNAMIC_TOOL"
+    )
     assert is_tampered_valid is False
 
 
@@ -70,17 +75,23 @@ def test_cloud_policy_controller_enforces_sla_and_blocks_destructions() -> None:
     controller = CloudPolicyController(min_rate=10.0, max_capacity=100)
 
     # Valid policy
-    valid_res = controller.evaluate_rate_limiter_policy(capacity=20, replenishment_rate=40.0)
+    valid_res = controller.evaluate_rate_limiter_policy(
+        capacity=20, replenishment_rate=40.0
+    )
     assert valid_res.allowed is True
     assert len(valid_res.violations) == 0
 
     # Policy violating SLA floor (throttling too aggressively)
-    breach_rate = controller.evaluate_rate_limiter_policy(capacity=20, replenishment_rate=2.0)
+    breach_rate = controller.evaluate_rate_limiter_policy(
+        capacity=20, replenishment_rate=2.0
+    )
     assert breach_rate.allowed is False
     assert any("SLA_FLOOR_BREACH" in v for v in breach_rate.violations)
 
     # Policy exceeding capacity bounds
-    breach_cap = controller.evaluate_rate_limiter_policy(capacity=500, replenishment_rate=40.0)
+    breach_cap = controller.evaluate_rate_limiter_policy(
+        capacity=500, replenishment_rate=40.0
+    )
     assert breach_cap.allowed is False
     assert any("CAPACITY_CEILING_BREACH" in v for v in breach_cap.violations)
 
@@ -115,7 +126,9 @@ def test_hitl_approval_gate_workflow() -> None:
     assert req2.approval_token is None
 
     # Approve request
-    approved = hitl.approve_request(req2.request_id, approver_email="oncall-sre@example.com")
+    approved = hitl.approve_request(
+        req2.request_id, approver_email="oncall-sre@example.com"
+    )
     assert approved.status == "APPROVED"
     assert approved.approver == "oncall-sre@example.com"
     assert approved.approval_token is not None

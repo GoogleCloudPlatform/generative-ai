@@ -19,11 +19,12 @@ on the request path (one call per simulated checkout) serializes a 50-request bu
 network calls. This writer queues entries and ships them in batches from a single daemon thread,
 and flushes any remaining entries at interpreter exit.
 """
+
 import atexit
 import queue
 import threading
 import time
-from typing import Any, Dict
+from typing import Any
 
 
 class BackgroundCloudLogWriter:
@@ -32,13 +33,15 @@ class BackgroundCloudLogWriter:
     def __init__(self, gcp_logger: Any, max_batch: int = 200, max_queue: int = 20_000):
         self._logger = gcp_logger
         self._max_batch = max_batch
-        self._queue: "queue.Queue[tuple]" = queue.Queue(maxsize=max_queue)
+        self._queue: queue.Queue[tuple] = queue.Queue(maxsize=max_queue)
         self.dropped_entries = 0
-        self._thread = threading.Thread(target=self._run, name="cloud-log-writer", daemon=True)
+        self._thread = threading.Thread(
+            target=self._run, name="cloud-log-writer", daemon=True
+        )
         self._thread.start()
         atexit.register(self.flush)
 
-    def submit(self, payload: Dict[str, Any], severity: str = "INFO") -> None:
+    def submit(self, payload: dict[str, Any], severity: str = "INFO") -> None:
         """Enqueue an entry without blocking (drops under extreme backpressure rather than stalling)."""
         try:
             self._queue.put_nowait((payload, severity))

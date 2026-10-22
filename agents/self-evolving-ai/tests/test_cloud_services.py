@@ -13,11 +13,13 @@
 # limitations under the License.
 
 """Unit tests for Google Cloud Target Infrastructure components."""
+
 import pytest
+
 from app.config import PROJECT_ID
-from app.target_env.memorystore_service import CloudMemorystoreService
-from app.target_env.cloudsql_service import CloudSqlDatabaseService
 from app.target_env.cloud_telemetry import CloudTelemetryCollector
+from app.target_env.cloudsql_service import CloudSqlDatabaseService
+from app.target_env.memorystore_service import CloudMemorystoreService
 
 
 def test_memorystore_lru_eviction() -> None:

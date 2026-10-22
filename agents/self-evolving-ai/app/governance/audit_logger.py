@@ -13,13 +13,16 @@
 # limitations under the License.
 
 """Google Cloud Logging Tamper-Evident Audit Trail."""
+
 import time
-from typing import Dict, Any, List
-from app.config import PROJECT_ID, CLOUD_LOG_NAME, VERTEX_AI_AVAILABLE
+from typing import Any
+
+from app.config import CLOUD_LOG_NAME, PROJECT_ID, VERTEX_AI_AVAILABLE
 from app.governance.cloud_log_writer import BackgroundCloudLogWriter
 
 try:
     from google.cloud import logging as gcp_logging
+
     GCP_LOGGING_AVAILABLE = True
 except ImportError:
     GCP_LOGGING_AVAILABLE = False
@@ -32,7 +35,7 @@ class CloudAuditLogger:
         self.project_id = project_id
         self.log_name = log_name
         self._gcp_writer = None
-        self.local_audit_buffer: List[Dict[str, Any]] = []
+        self.local_audit_buffer: list[dict[str, Any]] = []
 
         if GCP_LOGGING_AVAILABLE and VERTEX_AI_AVAILABLE:
             try:
@@ -48,9 +51,9 @@ class CloudAuditLogger:
         actor: str,
         action: str,
         status: str,
-        details: Dict[str, Any],
+        details: dict[str, Any],
         severity: str = "INFO",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Record an immutable security event."""
         payload = {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

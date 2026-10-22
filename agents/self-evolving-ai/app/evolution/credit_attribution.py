@@ -13,8 +13,10 @@
 # limitations under the License.
 
 """AgentEvolver: Fine-Grained Step-Level Credit Attribution Engine (Section 6.2)."""
+
 import math
-from typing import List, Dict, Any
+from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -50,13 +52,19 @@ class CreditAttributionEngine:
         self.alpha = alpha
         self.beta = beta
 
-    def compute_system_health(self, p99_latency_ms: float, http_5xx_rate: float, db_pool_utilization: float) -> float:
+    def compute_system_health(
+        self, p99_latency_ms: float, http_5xx_rate: float, db_pool_utilization: float
+    ) -> float:
         """Compute composite system health score H(S_t) in range [0.0, 1.0]. Lower is healthier."""
         norm_latency = min(p99_latency_ms / (self.target_latency_ms * 4.0), 1.0)
-        h = (self.w1 * norm_latency) + (self.w2 * http_5xx_rate) + (self.w3 * db_pool_utilization)
+        h = (
+            (self.w1 * norm_latency)
+            + (self.w2 * http_5xx_rate)
+            + (self.w3 * db_pool_utilization)
+        )
         return round(float(min(max(h, 0.0), 1.0)), 4)
 
-    def attribute_span_credit(self, span: Dict[str, Any]) -> StepCreditAttribution:
+    def attribute_span_credit(self, span: dict[str, Any]) -> StepCreditAttribution:
         """Compute credit score C(a_t) = tanh(alpha * delta_H - beta * Cost)."""
         pre_m = span.get("pre_state_metrics", {})
         post_m = span.get("post_state_metrics", {})
@@ -91,6 +99,8 @@ class CreditAttributionEngine:
             verdict=verdict,
         )
 
-    def attribute_trajectory_credits(self, spans: List[Dict[str, Any]]) -> List[StepCreditAttribution]:
+    def attribute_trajectory_credits(
+        self, spans: list[dict[str, Any]]
+    ) -> list[StepCreditAttribution]:
         """Process an entire trajectory of action execution spans."""
         return [self.attribute_span_credit(s) for s in spans]

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Unit tests for BigQuery-backed Dream-RSI counterfactual replay engine."""
+
 from app.config import PROJECT_ID
 from app.evolution.bigquery_dream_rsi import BigQueryDreamRSIEngine
 
@@ -21,9 +22,27 @@ def test_bigquery_dream_rsi_ingestion_and_sweep() -> None:
     """Dream-RSI ingests request traces and runs the counterfactual policy sweep."""
     engine = BigQueryDreamRSIEngine(project_id=PROJECT_ID)
     logs = [
-        {"seq_id": 1, "status_code": 200, "latency_ms": 25.0, "cache_miss": 0, "admitted": 1},
-        {"seq_id": 2, "status_code": 500, "latency_ms": 3200.0, "cache_miss": 1, "admitted": 1},
-        {"seq_id": 3, "status_code": 500, "latency_ms": 3200.0, "cache_miss": 1, "admitted": 1},
+        {
+            "seq_id": 1,
+            "status_code": 200,
+            "latency_ms": 25.0,
+            "cache_miss": 0,
+            "admitted": 1,
+        },
+        {
+            "seq_id": 2,
+            "status_code": 500,
+            "latency_ms": 3200.0,
+            "cache_miss": 1,
+            "admitted": 1,
+        },
+        {
+            "seq_id": 3,
+            "status_code": 500,
+            "latency_ms": 3200.0,
+            "cache_miss": 1,
+            "admitted": 1,
+        },
     ]
 
     loaded = engine.load_trajectory_data(logs)

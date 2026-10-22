@@ -19,10 +19,11 @@ ADK tools, the dynamic tool registry and the topology mutator all operate on the
 Resolving the singleton through this registry (instead of importing
 ``app.target_env.server`` directly) keeps the module dependency graph acyclic.
 """
-import importlib
-from typing import Any, Dict
 
-_REGISTRY: Dict[str, Any] = {}
+import importlib
+from typing import Any
+
+_REGISTRY: dict[str, Any] = {}
 
 
 def register_platform_env(env: Any) -> None:

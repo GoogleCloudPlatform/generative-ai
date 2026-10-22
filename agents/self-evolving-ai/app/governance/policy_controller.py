@@ -13,9 +13,12 @@
 # limitations under the License.
 
 """Deterministic Policy-as-Code Controller (Google Cloud Policy Controller / OPA style)."""
-from typing import Dict, Any, List, Optional
+
+from typing import Any
+
 from pydantic import BaseModel, Field
-from app.config import POLICY_MIN_ADMIT_RATE, POLICY_MAX_CAPACITY
+
+from app.config import POLICY_MAX_CAPACITY, POLICY_MIN_ADMIT_RATE
 
 
 class PolicyEvaluationResult(BaseModel):
@@ -23,8 +26,8 @@ class PolicyEvaluationResult(BaseModel):
 
     allowed: bool
     policy_id: str
-    violations: List[str] = Field(default_factory=list)
-    enforced_bounds: Dict[str, Any] = Field(default_factory=dict)
+    violations: list[str] = Field(default_factory=list)
+    enforced_bounds: dict[str, Any] = Field(default_factory=dict)
 
 
 class CloudPolicyController:
@@ -68,7 +71,7 @@ class CloudPolicyController:
         self,
         capacity: int,
         replenishment_rate: float,
-        context: Optional[Dict[str, Any]] = None,  # pylint: disable=unused-argument
+        context: dict[str, Any] | None = None,  # pylint: disable=unused-argument
     ) -> PolicyEvaluationResult:
         """Evaluate whether a rate limiter configuration satisfies enterprise SLA invariants."""
         self.total_evaluations += 1
@@ -87,7 +90,9 @@ class CloudPolicyController:
             )
 
         if capacity <= 0:
-            violations.append("[INVALID_CAPACITY] Burst capacity must be strictly positive")
+            violations.append(
+                "[INVALID_CAPACITY] Burst capacity must be strictly positive"
+            )
 
         is_allowed = len(violations) == 0
         if not is_allowed:

@@ -13,10 +13,11 @@
 # limitations under the License.
 
 """Google Cloud Memorystore (Redis) Service Client with LRU Eviction Monitoring."""
+
 import os
 import threading
 import time
-from typing import Dict, Any, Optional
+from typing import Any
 
 try:
     REDIS_AVAILABLE = True
@@ -29,7 +30,7 @@ class CloudMemorystoreService:  # pylint: disable=too-many-instance-attributes
 
     def __init__(
         self,
-        host: Optional[str] = None,
+        host: str | None = None,
         port: int = 6379,
         max_keys: int = 5,
     ):
@@ -43,10 +44,10 @@ class CloudMemorystoreService:  # pylint: disable=too-many-instance-attributes
         self.miss_count: int = 0
 
         # In-memory cache buffer with strict LRU semantics
-        self._store: Dict[str, Any] = {}
-        self._access_history: Dict[str, float] = {}
+        self._store: dict[str, Any] = {}
+        self._access_history: dict[str, float] = {}
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str) -> str | None:
         """Fetch item with LRU touch."""
         with self.lock:
             if key in self._store:
@@ -56,13 +57,15 @@ class CloudMemorystoreService:  # pylint: disable=too-many-instance-attributes
             self.miss_count += 1
             return None
 
-    def set(self, key: str, value: str, ex: Optional[int] = None) -> bool:  # pylint: disable=unused-argument
+    def set(self, key: str, value: str, ex: int | None = None) -> bool:  # pylint: disable=unused-argument
         """Store item with LRU eviction enforcement when capacity is reached."""
         with self.lock:
             # Check capacity
             if len(self._store) >= self.max_keys and key not in self._store:
                 # Evict Least Recently Used key
-                lru_key = min(self._access_history.keys(), key=lambda k: self._access_history[k])
+                lru_key = min(
+                    self._access_history.keys(), key=lambda k: self._access_history[k]
+                )
                 del self._store[lru_key]
                 del self._access_history[lru_key]
                 self.eviction_count += 1
@@ -89,7 +92,7 @@ class CloudMemorystoreService:  # pylint: disable=too-many-instance-attributes
             self.hit_count = 0
             self.miss_count = 0
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Return real-time Memorystore telemetry."""
         with self.lock:
             total = self.hit_count + self.miss_count
