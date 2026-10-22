@@ -812,6 +812,7 @@ Giallo
 Giancarlo
 gidiyor
 giftable
+GIL
 ginnala
 Gisting
 github
@@ -938,6 +939,7 @@ Hisaki
 historien
 histplot
 HITL
+hitl
 Hiya
 Hlc
 hline
@@ -1104,6 +1106,7 @@ Junzhe
 jupyter
 jvm
 JWST
+JWTs
 Kaelen
 kaggle
 Kaizen
@@ -1383,6 +1386,7 @@ mpld
 mpn
 Mqp
 mrag
+mro
 mrr
 mrtydi
 MSCHF
@@ -1597,6 +1601,7 @@ Paquete
 paracord
 Parag
 parcoords
+pareto
 parfaite
 Parkside
 parseable

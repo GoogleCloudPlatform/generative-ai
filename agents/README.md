@@ -10,11 +10,11 @@ The `adk` directory contains information about the Agent Development Kit (ADK).
 
 ### agent_engine
 
-The `agent_engine` directory contains notebooks that demonstrate how to use the Agent Engine on Vertex AI.
+The `agent_engine` directory contains notebooks that demonstrate how to use Agent Engine on Agent Platform.
 
 **Notebooks:**
 
-- [Get started with Vertex AI Memory Bank](agent_engine/memory_bank/get_started_with_memory_bank.ipynb): Learn how to use Vertex AI Memory Bank to build stateful, context-aware conversational AI agents.
+- [Get started with Agent Platform Memory Bank](agent_engine/memory_bank/get_started_with_memory_bank.ipynb): Learn how to use Agent Platform Memory Bank to build stateful, context-aware conversational AI agents.
 - [A2A on Agent Engine](agent_engine/tutorial_a2a_on_agent_engine.ipynb): A tutorial on how to run a simple agent on Agent Engine.
 - [Claude with ADK on Agent Engine](agent_engine/tutorial_claude_with_adk_on_agent_engine.ipynb): A tutorial on using the Claude model with ADK on Agent Engine.
 - [Get Started with Code Execution](agent_engine/tutorial_get_started_with_code_execution.ipynb): A tutorial on how to get started with code execution on Agent Engine.
