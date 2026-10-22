@@ -14,7 +14,7 @@ Project Chrysalis is a reference implementation of a **governed, self-evolving A
 > 📖 **Read the Full Google Cloud Blog Post:**
 > For an intuitive, end-to-end breakdown of Self-Evolving AI, Recursive Self-Improvement (RSI), the Black Friday SRE use case, cloud architecture, and mathematical attribution formulas, see [Architecting Governed, Self-Evolving AI Agents on Gemini Enterprise Agent Platform](https://developers.googleblog.com/architecting-governed-self-evolving-ai-agents-on-gemini-agent-platform).
 
-![Self-Evolving AI Architecture on Google Cloud & Gemini Agent Platform](docs/self_evolving_ai_architecture.jpeg)
+![Self-Evolving AI Architecture on Google Cloud & Gemini Platform](docs/self_evolving_ai_architecture.jpeg)
 
 ## Agent Details
 
