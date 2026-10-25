@@ -191,6 +191,7 @@ genConfig := &genai.GenerateContentConfig{
 ### Model Architecture & Generation Selection
 | Model Generation | Recommended Use Case | Agentic Video Characteristics |
 | :--- | :--- | :--- |
+| **`gemini-4-argon`** | Frontier multimodal reasoning, deep multi-speaker & visual synthesis | **Frontier reasoning**. Exhaustive multi-step `load_video` exploration and detailed cross-modal synthesis (`LOW`, `MEDIUM`, `HIGH` thinking). |
 | **`gemini-3.8-flash`** | Interactive chat, latency-sensitive triage, short-form clips | **Fastest timeline navigation** (up to 2.1x faster wall-clock speed). Optimized speculative frame fetching and lower reasoning token budgets. |
 | **`gemini-3.7-flash`** | Long-form presentation Q&A, detailed transcript cross-referencing | **Deep reasoning**. Balances thorough internal `load_video` seeks with comprehensive, granular timestamp citations. *(Default)* |
 | **`gemini-3.6-flash`** | Baseline batch workloads, cost-constrained pipelines | **Cost-effective baseline**. Established first-generation agentic navigation tool implementation. |
@@ -334,8 +335,9 @@ func StreamVideoResponse(ctx context.Context, client *genai.Client, videoURI, pr
 
 ### The Dynamic Frame Accounting Shift
 When reading `resp.UsageMetadata`, developers are frequently surprised:
-- **`PromptTokenCount`**: Reflects **only the text prompt** (~100–300 tokens). Video frames are **not** present here.
-- **`ThoughtsTokenCount`**: Contains all video frames dynamically decoded by `load_video` during the timeline exploration loop.
+- **`PromptTokenCount`**: Reflects **only the text prompt** (~100–450 tokens). Video frames are **not** present here.
+- **`ToolUsePromptTokenCount`**: Contains the video frames and transcript segments dynamically fetched by internal `load_video` tool executions.
+- **`ThoughtsTokenCount`**: Contains the model's internal reasoning tokens during the timeline exploration loop.
 - **`CandidatesTokenCount`**: Contains the final output text generated for the user.
 
 ```go
@@ -347,10 +349,11 @@ func LogTelemetry(usage *genai.GenerateContentResponseUsageMetadata, mode genai.
 	fmt.Printf("Total Consumed Tokens:     %d\n", usage.TotalTokenCount)
 	fmt.Printf("Prompt Input Tokens:       %d\n", usage.PromptTokenCount)
 	fmt.Printf("Candidate Output Tokens:   %d\n", usage.CandidatesTokenCount)
+	fmt.Printf("Tool-Use Tokens (Frames):  %d\n", usage.ToolUsePromptTokenCount)
 	fmt.Printf("Reasoning Thoughts Tokens: %d\n", usage.ThoughtsTokenCount)
 
 	if mode == genai.MediaProcessingAgentic {
-		fmt.Printf("Note: Video frame tokens reside in ThoughtsTokenCount (dynamic load_video calls).\n")
+		fmt.Printf("Note: Video frame tokens reside in ToolUsePromptTokenCount & ThoughtsTokenCount (dynamic load_video calls).\n")
 	}
 }
 

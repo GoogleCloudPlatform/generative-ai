@@ -45,18 +45,16 @@ type BenchmarkTracker struct {
 	staticErr    error
 	stopChan     chan struct{}
 	doneChan     chan struct{}
-	thinking     string
 	hasDrawnOnce bool
 }
 
 // NewBenchmarkTracker initializes a concurrent benchmark progress tracker.
-func NewBenchmarkTracker(thinking string) *BenchmarkTracker {
+func NewBenchmarkTracker() *BenchmarkTracker {
 	fd := os.Stdout.Fd()
 	isTerminal := isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)
 
 	return &BenchmarkTracker{
 		isTTY:     isTerminal,
-		thinking:  thinking,
 		stopChan:  make(chan struct{}),
 		doneChan:  make(chan struct{}),
 		startTime: time.Now(),
@@ -382,9 +380,12 @@ func (mt *MultiModelTracker) redraw(isFinal bool) {
 		}
 
 		icon := "🔷"
-		if strings.Contains(m.ModelID, "3.8") {
+		switch {
+		case strings.Contains(m.ModelID, "4") || strings.Contains(m.ModelID, "argon"):
+			icon = "✦"
+		case strings.Contains(m.ModelID, "3.8"):
 			icon = "🚀"
-		} else if strings.Contains(m.ModelID, "3.7") {
+		case strings.Contains(m.ModelID, "3.7"):
 			icon = "⚡"
 		}
 
@@ -393,12 +394,8 @@ func (mt *MultiModelTracker) redraw(isFinal bool) {
 	}
 
 	if mt.hasDrawnOnce {
-		for i, line := range outputLines {
-			if i == 0 {
-				fmt.Print("\033[2K\r" + line + "\n")
-			} else {
-				fmt.Print("\033[2K\r" + line + "\n")
-			}
+		for _, line := range outputLines {
+			fmt.Print("\033[2K\r" + line + "\n")
 		}
 		fmt.Printf("\033[%dA", numLines)
 	} else {

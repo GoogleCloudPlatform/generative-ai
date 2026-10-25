@@ -26,7 +26,7 @@ var (
 	mtThinking string
 )
 
-// multiturnCmd represents the multiturn command
+// multiturnCmd represents the multiturn command.
 var multiturnCmd = &cobra.Command{
 	Use:   "multiturn",
 	Short: "Demonstrate multi-turn conversation with video context preservation",

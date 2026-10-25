@@ -83,15 +83,16 @@ func TestFprintUsage(t *testing.T) {
 	t.Run("agentic_with_thoughts", func(t *testing.T) {
 		var buf bytes.Buffer
 		usage := &genai.GenerateContentResponseUsageMetadata{
-			TotalTokenCount:      8000,
-			PromptTokenCount:     250,
-			CandidatesTokenCount: 500,
-			ThoughtsTokenCount:   7250,
+			TotalTokenCount:         8000,
+			PromptTokenCount:        250,
+			CandidatesTokenCount:    500,
+			ToolUsePromptTokenCount: 2000,
+			ThoughtsTokenCount:      5250,
 		}
 		FprintUsage(&buf, usage, genai.MediaProcessingAgentic, 12*time.Second)
 
 		out := buf.String()
-		for _, want := range []string{"8000", "250", "500", "7250", "dynamic inspection"} {
+		for _, want := range []string{"8000", "250", "500", "2000", "5250", "dynamic inspection", "load_video"} {
 			if !strings.Contains(out, want) {
 				t.Errorf("FprintUsage(...) output = %q, want to contain %q", out, want)
 			}

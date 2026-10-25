@@ -80,9 +80,9 @@ func TestBenchmarkResultStruct(t *testing.T) {
 	}
 
 	if res.AgenticResult.Mode != genai.MediaProcessingAgentic {
-		t.Errorf("res.AgenticResult.Mode = %v, want Agentic", res.AgenticResult.Mode)
+		t.Errorf("BenchmarkResult.AgenticResult.Mode = %q, want %q", res.AgenticResult.Mode, genai.MediaProcessingAgentic)
 	}
 	if res.StaticResult.Mode != genai.MediaProcessingStatic {
-		t.Errorf("res.StaticResult.Mode = %v, want Static", res.StaticResult.Mode)
+		t.Errorf("BenchmarkResult.StaticResult.Mode = %q, want %q", res.StaticResult.Mode, genai.MediaProcessingStatic)
 	}
 }

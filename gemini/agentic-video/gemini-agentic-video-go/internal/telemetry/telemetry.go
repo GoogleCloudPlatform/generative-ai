@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 // Package telemetry provides metrics formatting and benchmark comparison for video processing.
 package telemetry
 
@@ -39,29 +40,33 @@ func PrintUsage(usage *genai.GenerateContentResponseUsageMetadata, mode genai.Me
 // FprintUsage writes a structured breakdown of token consumption to the specified writer.
 func FprintUsage(w io.Writer, usage *genai.GenerateContentResponseUsageMetadata, mode genai.MediaProcessing, duration time.Duration) {
 	if usage == nil {
-		fmt.Fprintf(w, "Processing Duration: %v (token usage telemetry not returned)\n\n", duration.Round(time.Millisecond))
+		_, _ = fmt.Fprintf(w, "Processing Duration: %v (token usage telemetry not returned)\n\n", duration.Round(time.Millisecond))
 		return
 	}
 
-	fmt.Fprintf(w, "Token Telemetry Breakdown:\n")
-	fmt.Fprintf(w, "  • Total Token Count:     %d\n", usage.TotalTokenCount)
-	fmt.Fprintf(w, "  • Prompt Input Tokens:   %d", usage.PromptTokenCount)
-	if mode == genai.MediaProcessingAgentic {
-		fmt.Fprintf(w, " (text-only prompt; video frames dynamically fetched on-demand)")
-	} else if mode == genai.MediaProcessingStatic {
-		fmt.Fprintf(w, " (includes 100%% of video frames statically pre-ingested at 1 FPS)")
+	_, _ = fmt.Fprintf(w, "Token Telemetry Breakdown:\n")
+	_, _ = fmt.Fprintf(w, "  • Total Token Count:     %d\n", usage.TotalTokenCount)
+	_, _ = fmt.Fprintf(w, "  • Prompt Input Tokens:   %d", usage.PromptTokenCount)
+	switch mode {
+	case genai.MediaProcessingAgentic:
+		_, _ = fmt.Fprintf(w, " (text-only prompt; video frames dynamically fetched on-demand)")
+	case genai.MediaProcessingStatic:
+		_, _ = fmt.Fprintf(w, " (includes 100%% of video frames statically pre-ingested at 1 FPS)")
 	}
-	fmt.Fprintln(w)
+	_, _ = fmt.Fprintln(w)
 
-	fmt.Fprintf(w, "  • Candidates Tokens:     %d\n", usage.CandidatesTokenCount)
-	if usage.ThoughtsTokenCount > 0 {
-		fmt.Fprintf(w, "  • Thoughts Tokens:       %d", usage.ThoughtsTokenCount)
-		if mode == genai.MediaProcessingAgentic {
-			fmt.Fprintf(w, " (includes native timeline navigation & dynamic inspection)")
-		}
-		fmt.Fprintln(w)
+	_, _ = fmt.Fprintf(w, "  • Candidates Tokens:     %d\n", usage.CandidatesTokenCount)
+	if usage.ToolUsePromptTokenCount > 0 {
+		_, _ = fmt.Fprintf(w, "  • Tool-Use Tokens:       %d (video frames & captions fetched via load_video)\n", usage.ToolUsePromptTokenCount)
 	}
-	fmt.Fprintf(w, "Processing Duration:       %v\n\n", duration.Round(time.Millisecond))
+	if usage.ThoughtsTokenCount > 0 {
+		_, _ = fmt.Fprintf(w, "  • Thoughts Tokens:       %d", usage.ThoughtsTokenCount)
+		if mode == genai.MediaProcessingAgentic {
+			_, _ = fmt.Fprintf(w, " (includes native timeline navigation & dynamic inspection)")
+		}
+		_, _ = fmt.Fprintln(w)
+	}
+	_, _ = fmt.Fprintf(w, "Processing Duration:       %v\n\n", duration.Round(time.Millisecond))
 }
 
 // PrintComparison displays a side-by-side performance comparison table to os.Stdout.
@@ -71,45 +76,49 @@ func PrintComparison(agenticUsage, staticUsage *genai.GenerateContentResponseUsa
 
 // FprintComparison writes a side-by-side performance comparison table to the specified writer.
 func FprintComparison(w io.Writer, agenticUsage, staticUsage *genai.GenerateContentResponseUsageMetadata, agenticDuration, staticDuration time.Duration) {
-	fmt.Fprintf(w, "=========================================================================================\n")
-	fmt.Fprintf(w, "  PERFORMANCE BENCHMARK: AGENTIC VIDEO vs. STATIC (1 FPS) INGESTION\n")
-	fmt.Fprintf(w, "=========================================================================================\n")
+	_, _ = fmt.Fprintf(w, "=========================================================================================\n")
+	_, _ = fmt.Fprintf(w, "  PERFORMANCE BENCHMARK: AGENTIC VIDEO vs. STATIC (1 FPS) INGESTION\n")
+	_, _ = fmt.Fprintf(w, "=========================================================================================\n")
 
-	agenticTotal := int64(0)
-	staticTotal := int64(0)
-	agenticPrompt := int32(0)
-	staticPrompt := int32(0)
-	agenticCandidates := int32(0)
-	staticCandidates := int32(0)
-	agenticThoughts := int32(0)
-	staticThoughts := int32(0)
+	var agenticTotal, staticTotal int64
+	var (
+		agenticPrompt, staticPrompt         int32
+		agenticCandidates, staticCandidates int32
+		agenticToolUse, staticToolUse       int32
+		agenticThoughts, staticThoughts     int32
+	)
 
 	if agenticUsage != nil {
 		agenticTotal = int64(agenticUsage.TotalTokenCount)
 		agenticPrompt = agenticUsage.PromptTokenCount
 		agenticCandidates = agenticUsage.CandidatesTokenCount
+		agenticToolUse = agenticUsage.ToolUsePromptTokenCount
 		agenticThoughts = agenticUsage.ThoughtsTokenCount
 	}
 	if staticUsage != nil {
 		staticTotal = int64(staticUsage.TotalTokenCount)
 		staticPrompt = staticUsage.PromptTokenCount
 		staticCandidates = staticUsage.CandidatesTokenCount
+		staticToolUse = staticUsage.ToolUsePromptTokenCount
 		staticThoughts = staticUsage.ThoughtsTokenCount
 	}
 
 	tokenDeltaPct := TokenReductionPct(agenticTotal, staticTotal)
 
-	fmt.Fprintf(w, "| Metric                     | Agentic Video        | Static Ingestion     | Observation / Delta       |\n")
-	fmt.Fprintf(w, "|:---------------------------|:---------------------|:---------------------|:--------------------------|\n")
-	fmt.Fprintf(w, "| Total Consumed Tokens      | %-20d | %-20d | %+.1f%% net token spend   |\n", agenticTotal, staticTotal, tokenDeltaPct)
-	fmt.Fprintf(w, "| Prompt Tokens (Input)      | %-20d | %-20d | %-+25s |\n", agenticPrompt, staticPrompt, fmt.Sprintf("%+d input tokens", agenticPrompt-staticPrompt))
-	fmt.Fprintf(w, "| Candidate Output Tokens    | %-20d | %-20d | %-+25s |\n", agenticCandidates, staticCandidates, fmt.Sprintf("%+d output tokens", agenticCandidates-staticCandidates))
-	fmt.Fprintf(w, "| Reasoning Thoughts Tokens  | %-20d | %-20d | %-+25s |\n", agenticThoughts, staticThoughts, "dynamic frame inspection")
-	fmt.Fprintf(w, "| Latency (Duration)         | %-20v | %-20v | %-+25s |\n",
+	_, _ = fmt.Fprintf(w, "| Metric                     | Agentic Video        | Static Ingestion     | Observation / Delta       |\n")
+	_, _ = fmt.Fprintf(w, "|:---------------------------|:---------------------|:---------------------|:--------------------------|\n")
+	_, _ = fmt.Fprintf(w, "| Total Consumed Tokens      | %-20d | %-20d | %+.1f%% net token spend   |\n", agenticTotal, staticTotal, tokenDeltaPct)
+	_, _ = fmt.Fprintf(w, "| Prompt Tokens (Input)      | %-20d | %-20d | %-+25s |\n", agenticPrompt, staticPrompt, fmt.Sprintf("%+d input tokens", agenticPrompt-staticPrompt))
+	_, _ = fmt.Fprintf(w, "| Candidate Output Tokens    | %-20d | %-20d | %-+25s |\n", agenticCandidates, staticCandidates, fmt.Sprintf("%+d output tokens", agenticCandidates-staticCandidates))
+	if agenticToolUse > 0 || staticToolUse > 0 {
+		_, _ = fmt.Fprintf(w, "| Tool-Use Tokens (Frames)   | %-20d | %-20d | %-+25s |\n", agenticToolUse, staticToolUse, "dynamic load_video stream")
+	}
+	_, _ = fmt.Fprintf(w, "| Reasoning Thoughts Tokens  | %-20d | %-20d | %-+25s |\n", agenticThoughts, staticThoughts, "dynamic frame inspection")
+	_, _ = fmt.Fprintf(w, "| Latency (Duration)         | %-20v | %-20v | %-+25s |\n",
 		agenticDuration.Round(time.Millisecond),
 		staticDuration.Round(time.Millisecond),
 		fmt.Sprintf("diff: %v", (agenticDuration-staticDuration).Round(time.Millisecond)))
-	fmt.Fprintf(w, "=========================================================================================\n")
-	fmt.Fprintf(w, "💡 Telemetry Insight: In Agentic mode, initial prompt tokens are minimal because video frames\n")
-	fmt.Fprintf(w, "   are fetched dynamically during the model's Think ➔ Act timeline loop (accounted under thoughts).\n\n")
+	_, _ = fmt.Fprintf(w, "=========================================================================================\n")
+	_, _ = fmt.Fprintf(w, "💡 Telemetry Insight: In Agentic mode, initial prompt tokens are minimal because video frames\n")
+	_, _ = fmt.Fprintf(w, "   are fetched dynamically during the model's Think ➔ Act timeline loop (accounted under tool-use & thoughts).\n\n")
 }

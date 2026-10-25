@@ -291,27 +291,25 @@ func ExecuteMultiModelBenchmark(
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 
-	for i, mID := range modelIDs {
+	for i, modelID := range modelIDs {
 		wg.Add(1)
-		idx := i
-		modelID := mID
 		go func() {
 			defer wg.Done()
 			modelReq := req
 			modelReq.ModelID = modelID
 			mStart := time.Now()
-			res, err := Execute(ctx, client, modelReq)
+			result, err := Execute(ctx, client, modelReq)
 			mDur := time.Since(mStart)
 
 			mu.Lock()
-			results[idx] = ModelBenchmarkResult{
+			results[i] = ModelBenchmarkResult{
 				ModelID:  modelID,
-				Result:   res,
+				Result:   result,
 				Error:    err,
 				Duration: mDur,
 			}
 			if callback != nil {
-				callback(modelID, true, res, err)
+				callback(modelID, true, result, err)
 			}
 			mu.Unlock()
 		}()

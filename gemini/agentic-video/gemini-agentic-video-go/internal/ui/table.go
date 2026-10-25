@@ -64,7 +64,7 @@ func RenderCatalogTable(scenarios []catalog.Scenario) string {
 	for _, sc := range scenarios {
 		isMultiVideo := len(sc.MultiVideos) > 0
 		isMultiTurn := len(sc.MultiTurns) > 0
-		typeBadge := RenderScenarioTypeBadge(sc.Name, sc.Mode, isMultiVideo, isMultiTurn)
+		typeBadge := RenderScenarioTypeBadge(sc.Mode, isMultiVideo, isMultiTurn)
 
 		tbl.Row(
 			strconv.Itoa(sc.ID),
@@ -80,25 +80,26 @@ func RenderCatalogTable(scenarios []catalog.Scenario) string {
 
 // RenderBenchmarkTable renders the side-by-side Agentic vs Static benchmark comparison.
 func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentResponseUsageMetadata, agenticDuration, staticDuration time.Duration) string {
-	agenticTotal := int64(0)
-	staticTotal := int64(0)
-	agenticPrompt := int32(0)
-	staticPrompt := int32(0)
-	agenticCandidates := int32(0)
-	staticCandidates := int32(0)
-	agenticThoughts := int32(0)
-	staticThoughts := int32(0)
+	var agenticTotal, staticTotal int64
+	var (
+		agenticPrompt, staticPrompt         int32
+		agenticCandidates, staticCandidates int32
+		agenticToolUse, staticToolUse       int32
+		agenticThoughts, staticThoughts     int32
+	)
 
 	if agenticUsage != nil {
 		agenticTotal = int64(agenticUsage.TotalTokenCount)
 		agenticPrompt = agenticUsage.PromptTokenCount
 		agenticCandidates = agenticUsage.CandidatesTokenCount
+		agenticToolUse = agenticUsage.ToolUsePromptTokenCount
 		agenticThoughts = agenticUsage.ThoughtsTokenCount
 	}
 	if staticUsage != nil {
 		staticTotal = int64(staticUsage.TotalTokenCount)
 		staticPrompt = staticUsage.PromptTokenCount
 		staticCandidates = staticUsage.CandidatesTokenCount
+		staticToolUse = staticUsage.ToolUsePromptTokenCount
 		staticThoughts = staticUsage.ThoughtsTokenCount
 	}
 
@@ -170,6 +171,14 @@ func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentRespon
 		fmt.Sprintf("%d", staticCandidates),
 		candDeltaStr,
 	)
+	if agenticToolUse > 0 || staticToolUse > 0 {
+		tbl.Row(
+			"Tool-Use Tokens (Frames)",
+			fmt.Sprintf("%d (load_video)", agenticToolUse),
+			fmt.Sprintf("%d", staticToolUse),
+			"dynamic stream fetch",
+		)
+	}
 	tbl.Row(
 		"Reasoning Thoughts Tokens",
 		fmt.Sprintf("%d (dynamic frames)", agenticThoughts),
@@ -184,7 +193,7 @@ func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentRespon
 	)
 
 	title := SectionHeader.Render("⚡ PERFORMANCE BENCHMARK: AGENTIC VIDEO vs. STATIC (1 FPS) INGESTION")
-	footer := MutedStyle.Render("💡 Insight: In Agentic mode, prompt tokens contain 0 video frames upfront. Frames are dynamically fetched\n   during Think ➔ Act timeline navigation and billed under reasoning thoughts.")
+	footer := MutedStyle.Render("💡 Insight: In Agentic mode, prompt tokens contain 0 video frames upfront. Frames are dynamically fetched\n   during Think ➔ Act timeline navigation and billed under tool-use & reasoning thoughts.")
 
 	return lipgloss.JoinVertical(lipgloss.Left, title, tbl.Render(), footer)
 }
@@ -283,11 +292,31 @@ func RenderMultiModelTable(results []runner.ModelBenchmarkResult) string {
 	}
 	tbl.Row(candTokRow...)
 
-	// Row 6: Reasoning Thoughts
+	// Row 6: Tool-Use Tokens (if any model reported > 0)
+	hasToolUse := false
+	for _, r := range results {
+		if r.Result != nil && r.Result.Usage != nil && r.Result.Usage.ToolUsePromptTokenCount > 0 {
+			hasToolUse = true
+			break
+		}
+	}
+	if hasToolUse {
+		toolTokRow := []string{"Tool-Use Tokens (Frames)"}
+		for _, r := range results {
+			if r.Result != nil && r.Result.Usage != nil {
+				toolTokRow = append(toolTokRow, fmt.Sprintf("%d (load_video)", r.Result.Usage.ToolUsePromptTokenCount))
+			} else {
+				toolTokRow = append(toolTokRow, "—")
+			}
+		}
+		tbl.Row(toolTokRow...)
+	}
+
+	// Row 7: Reasoning Thoughts
 	thoughtTokRow := []string{"Reasoning Thoughts Tokens"}
 	for _, r := range results {
 		if r.Result != nil && r.Result.Usage != nil {
-			thoughtTokRow = append(thoughtTokRow, fmt.Sprintf("%d (frames)", r.Result.Usage.ThoughtsTokenCount))
+			thoughtTokRow = append(thoughtTokRow, fmt.Sprintf("%d (reasoning)", r.Result.Usage.ThoughtsTokenCount))
 		} else {
 			thoughtTokRow = append(thoughtTokRow, "—")
 		}

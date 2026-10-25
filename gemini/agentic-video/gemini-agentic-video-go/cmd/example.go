@@ -29,7 +29,7 @@ import (
 	"google.golang.org/genai"
 )
 
-// exampleCmd represents the example command
+// exampleCmd represents the example command.
 var exampleCmd = &cobra.Command{
 	Use:   "example [id|all|list]",
 	Short: "Run or list built-in tutorial scenarios (1-6)",
@@ -119,7 +119,7 @@ func runScenario(ctx context.Context, client *genai.Client, sc catalog.Scenario)
 				Mode: genai.MediaProcessingAgentic,
 			})
 		}
-		res, err := runner.ExecuteMultiVideo(ctx, client, runner.MultiVideoRequest{
+		result, err := runner.ExecuteMultiVideo(ctx, client, runner.MultiVideoRequest{
 			ModelID:       modelFlag,
 			Videos:        vInputs,
 			Prompt:        sc.Prompt,
@@ -129,14 +129,14 @@ func runScenario(ctx context.Context, client *genai.Client, sc catalog.Scenario)
 			return err
 		}
 		fmt.Println("--- Model Response ---")
-		fmt.Println(res.Text)
+		fmt.Println(result.Text)
 		fmt.Println("----------------------")
-		fmt.Println(ui.RenderTelemetryCard(res.Usage, res.Mode, res.Duration))
+		fmt.Println(ui.RenderTelemetryCard(result.Usage, result.Mode, result.Duration))
 		return nil
 	}
 
 	// Single video scenario branch
-	res, err := runner.Execute(ctx, client, runner.Request{
+	result, err := runner.Execute(ctx, client, runner.Request{
 		ModelID:       modelFlag,
 		VideoURI:      sc.VideoURI,
 		Prompt:        sc.Prompt,
@@ -148,8 +148,8 @@ func runScenario(ctx context.Context, client *genai.Client, sc catalog.Scenario)
 	}
 
 	fmt.Println("--- Model Response ---")
-	fmt.Println(res.Text)
+	fmt.Println(result.Text)
 	fmt.Println("----------------------")
-	fmt.Println(ui.RenderTelemetryCard(res.Usage, res.Mode, res.Duration))
+	fmt.Println(ui.RenderTelemetryCard(result.Usage, result.Mode, result.Duration))
 	return nil
 }

@@ -88,10 +88,11 @@ make multiturn
 # or: ./bin/gemini-agentic-video-go multiturn
 ```
 
-Switch models (e.g. `gemini-3.8-flash`, `gemini-3.6-flash`, or `gemini-3.5-flash-lite`):
+Switch models (e.g. `gemini-4-argon`, `gemini-3.8-flash`, `gemini-3.6-flash`, or `gemini-3.5-flash-lite`):
 
 ```bash
 ./bin/gemini-agentic-video-go example 1 --model=gemini-3.8-flash
+./bin/gemini-agentic-video-go example 4 --model=gemini-4-argon
 ```
 
 Execute an ad-hoc query against any custom YouTube URL or Google Cloud Storage URI:
@@ -201,7 +202,7 @@ make run
 
 | Flag | Default | Description |
 | :--- | :--- | :--- |
-| `-m, --model` | `gemini-3.7-flash` | Gemini model ID (`gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash-lite`) |
+| `-m, --model` | `gemini-3.7-flash` | Gemini model ID (`gemini-4-argon`, `gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash-lite`) |
 | `-p, --project` | `""` | Google Cloud Project ID (falls back to `GOOGLE_CLOUD_PROJECT` or `gcloud config`) |
 | `-l, --location` | `"global"` | Google Cloud Location / Region (defaults to `GOOGLE_CLOUD_LOCATION` or `"global"`) |
 | `-b, --backend` | `"enterprise"` | Client backend: `enterprise`, `vertex`, or `gemini` (API key) |

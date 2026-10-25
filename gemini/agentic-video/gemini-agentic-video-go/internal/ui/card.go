@@ -69,6 +69,11 @@ func RenderTelemetryCard(usage *genai.GenerateContentResponseUsageMetadata, mode
 	lines = append(lines, fmt.Sprintf("  • Prompt Tokens:       %s", promptTok))
 	lines = append(lines, fmt.Sprintf("  • Candidate Output:    %s", candTok))
 
+	if usage.ToolUsePromptTokenCount > 0 {
+		toolTokStr := fmt.Sprintf("%d (video frames & captions fetched via load_video)", usage.ToolUsePromptTokenCount)
+		lines = append(lines, fmt.Sprintf("  • Tool-Use Tokens:     %s", CyanStyle.Render(toolTokStr)))
+	}
+
 	if usage.ThoughtsTokenCount > 0 {
 		thoughtTokStr := fmt.Sprintf("%d (dynamic frame inspection via Think ➔ Act)", usage.ThoughtsTokenCount)
 		if mode == genai.MediaProcessingStatic {

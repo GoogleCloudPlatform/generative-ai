@@ -152,6 +152,7 @@ When enabling Agentic Video (`media_processing="agentic"`), token reporting shif
 
 | Model ID | Agentic Video Support | Default Mode | Recommended Scenarios |
 | :--- | :---: | :---: | :--- |
+| `gemini-4-argon` | ✅ Supported | Static (1 FPS) | Frontier multimodal reasoning, exhaustive multi-step timeline exploration, detailed speaker & visual synthesis |
 | `gemini-3.8-flash` | ✅ Supported | Static (1 FPS) | Ultra-fast timeline navigation (up to 2.1x faster), speculative frame exploration, interactive video triage |
 | `gemini-3.7-flash` | ✅ Supported | Static (1 FPS) | Dense visual QA, split-second action analysis, complex multi-step reasoning across 60+ min videos *(Default)* |
 | `gemini-3.6-flash` | ✅ Supported | Static (1 FPS) | General video Q&A, lecture summarization, timestamp indexing |

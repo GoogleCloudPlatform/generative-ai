@@ -31,7 +31,7 @@ var (
 	mvThinking string
 )
 
-// multivideoCmd represents the multivideo command
+// multivideoCmd represents the multivideo command.
 var multivideoCmd = &cobra.Command{
 	Use:   "multivideo",
 	Short: "Compare multiple videos in a single prompt",
@@ -40,7 +40,7 @@ supporting mixed processing modes (e.g. Video 1 Agentic + Video 2 Static)
 while staying comfortably within token limits.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
-		client, err := InitClient(ctx)
+		genaiClient, err := InitClient(ctx)
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,7 @@ while staying comfortably within token limits.`,
 			{URI: mvVideo2, Mode: mode2},
 		}
 
-		res, err := runner.ExecuteMultiVideo(ctx, client, runner.MultiVideoRequest{
+		result, err := runner.ExecuteMultiVideo(ctx, genaiClient, runner.MultiVideoRequest{
 			ModelID:       modelFlag,
 			Videos:        videos,
 			Prompt:        mvPrompt,
@@ -73,9 +73,9 @@ while staying comfortably within token limits.`,
 		}
 
 		fmt.Println("--- Model Response ---")
-		fmt.Println(res.Text)
+		fmt.Println(result.Text)
 		fmt.Println("----------------------")
-		fmt.Println(ui.RenderTelemetryCard(res.Usage, res.Mode, res.Duration))
+		fmt.Println(ui.RenderTelemetryCard(result.Usage, result.Mode, result.Duration))
 		return nil
 	},
 }

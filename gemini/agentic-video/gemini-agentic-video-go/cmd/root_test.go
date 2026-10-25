@@ -36,11 +36,22 @@ func TestSubcommandRegistration(t *testing.T) {
 }
 
 func TestRunCommandRequiredFlags(t *testing.T) {
-	// Execute run command with empty video URI to verify required flag validation
+	cmd, _, err := RootCmd.Find([]string{"run"})
+	if err != nil {
+		t.Fatalf("RootCmd.Find(%q) error = %v, want nil", "run", err)
+	}
+	if err := cmd.ParseFlags([]string{}); err != nil {
+		t.Fatalf("cmd.ParseFlags(nil) error = %v, want nil", err)
+	}
+	if err := cmd.ValidateRequiredFlags(); err == nil {
+		t.Errorf("runCmd.ValidateRequiredFlags() with missing --video = nil, want non-nil error")
+	}
+
+	prevURI := runVideoURI
+	t.Cleanup(func() { runVideoURI = prevURI })
 	runVideoURI = ""
-	err := runCmd.RunE(runCmd, []string{})
-	if err == nil {
-		t.Errorf("runCmd.RunE(runCmd, nil) with empty video URI error = nil, want non-nil")
+	if err := runCmd.RunE(runCmd, nil); err == nil {
+		t.Errorf("runCmd.RunE(runCmd, nil) with empty video URI = nil, want non-nil error")
 	}
 }
 
@@ -54,7 +65,8 @@ func TestResolveModelsList(t *testing.T) {
 		{name: "alias_flash", input: "flash", want: []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash"}},
 		{name: "alias_all", input: "all", want: []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash"}},
 		{name: "short_version_numbers", input: "3.6,3.8", want: []string{"gemini-3.6-flash", "gemini-3.8-flash"}},
-		{name: "full_model_ids", input: "gemini-3.7-flash,gemini-3.8-flash", want: []string{"gemini-3.7-flash", "gemini-3.8-flash"}},
+		{name: "argon_shorthand", input: "3.8,argon", want: []string{"gemini-3.8-flash", "gemini-4-argon"}},
+		{name: "full_model_ids", input: "gemini-3.7-flash,gemini-3.8-flash,gemini-4-argon", want: []string{"gemini-3.7-flash", "gemini-3.8-flash", "gemini-4-argon"}},
 	}
 
 	for _, tt := range tests {
