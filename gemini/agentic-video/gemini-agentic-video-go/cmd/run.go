@@ -30,7 +30,7 @@ var (
 	runMIME     string
 )
 
-// runCmd represents the run command
+// runCmd represents the run command.
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Execute an ad-hoc video understanding query",
@@ -42,7 +42,7 @@ with customizable processing mode ('agentic' or 'static') and thinking level.`,
 		}
 
 		ctx := cmd.Context()
-		client, err := InitClient(ctx)
+		genaiClient, err := InitClient(ctx)
 		if err != nil {
 			return err
 		}
@@ -59,7 +59,7 @@ with customizable processing mode ('agentic' or 'static') and thinking level.`,
 		fmt.Printf("Prompt:      %q\n", runPrompt)
 		fmt.Printf("-----------------------------------------------------------------\n\n")
 
-		res, err := runner.Execute(ctx, client, runner.Request{
+		result, err := runner.Execute(ctx, genaiClient, runner.Request{
 			ModelID:       modelFlag,
 			VideoURI:      runVideoURI,
 			MIMEType:      runMIME,
@@ -72,9 +72,9 @@ with customizable processing mode ('agentic' or 'static') and thinking level.`,
 		}
 
 		fmt.Println("--- Model Response ---")
-		fmt.Println(res.Text)
+		fmt.Println(result.Text)
 		fmt.Println("----------------------")
-		fmt.Println(ui.RenderTelemetryCard(res.Usage, res.Mode, res.Duration))
+		fmt.Println(ui.RenderTelemetryCard(result.Usage, result.Mode, result.Duration))
 		return nil
 	},
 }
@@ -83,6 +83,7 @@ func init() {
 	RootCmd.AddCommand(runCmd)
 
 	runCmd.Flags().StringVarP(&runVideoURI, "video", "v", "", "Video URI (YouTube URL, gs:// or https:// GCS URI) [required]")
+	_ = runCmd.MarkFlagRequired("video")
 	runCmd.Flags().StringVar(&runPrompt, "prompt", "Describe this video in detail with timestamps.", "Prompt question or instruction")
 	runCmd.Flags().StringVar(&runMode, "mode", "agentic", "Processing mode: 'agentic' or 'static'")
 	runCmd.Flags().StringVar(&runThinking, "thinking", "medium", "Thinking level: 'low', 'medium', or 'high'")

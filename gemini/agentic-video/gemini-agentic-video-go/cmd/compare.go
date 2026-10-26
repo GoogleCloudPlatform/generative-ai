@@ -33,19 +33,19 @@ var (
 	compareModels     string
 )
 
-// compareCmd represents the compare command
+// compareCmd represents the compare command.
 var compareCmd = &cobra.Command{
 	Use:   "compare",
-	Short: "Benchmark processing modes (Agentic vs. Static) or models (3.6 vs 3.7 vs 3.8)",
+	Short: "Benchmark processing modes (Agentic vs. Static) or models (3.6 vs 3.7 vs 3.8 vs 4-argon)",
 	Long: `Executes side-by-side performance comparisons on the same video:
 
 1. Mode Comparison (Default): Compares Agentic timeline navigation vs. Static 1 FPS
    frame ingestion on a single model (gemini-3.7-flash by default).
-2. Model Comparison (--models): Compares multiple model generations (e.g. 3.6, 3.7, 3.8)
+2. Model Comparison (--models): Compares multiple model generations (e.g. 3.6, 3.7, 3.8, 4-argon)
    running Agentic video understanding concurrently in parallel goroutines.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
-		client, err := InitClient(ctx)
+		genaiClient, err := InitClient(ctx)
 		if err != nil {
 			return err
 		}
@@ -58,13 +58,13 @@ var compareCmd = &cobra.Command{
 			tracker := ui.NewMultiModelTracker(modelsList)
 			tracker.Start()
 
-			results := runner.ExecuteMultiModelBenchmark(ctx, client, modelsList, runner.Request{
+			results := runner.ExecuteMultiModelBenchmark(ctx, genaiClient, modelsList, runner.Request{
 				VideoURI:      compareVideoURI,
 				Prompt:        comparePrompt,
 				Mode:          genai.MediaProcessingAgentic,
 				ThinkingLevel: thinking,
-			}, func(mID string, done bool, res *runner.Result, err error) {
-				tracker.Update(mID, done, res, err)
+			}, func(mID string, done bool, result *runner.Result, err error) {
+				tracker.Update(mID, done, result, err)
 			})
 			tracker.Stop()
 
@@ -74,40 +74,40 @@ var compareCmd = &cobra.Command{
 
 		// Single Model: Concurrent Mode Benchmark (Agentic vs Static)
 		if compareConcurrent {
-			tracker := ui.NewBenchmarkTracker(compareThinking)
+			tracker := ui.NewBenchmarkTracker()
 			tracker.Start()
 
-			benchRes := runner.ExecuteConcurrentBenchmark(ctx, client, runner.Request{
+			benchResult := runner.ExecuteConcurrentBenchmark(ctx, genaiClient, runner.Request{
 				ModelID:       modelFlag,
 				VideoURI:      compareVideoURI,
 				Prompt:        comparePrompt,
 				ThinkingLevel: thinking,
-			}, func(agenticDone, staticDone bool, aRes, sRes *runner.Result) {
-				tracker.Update(agenticDone, staticDone, aRes, sRes)
+			}, func(agenticDone, staticDone bool, agenticResult, staticResult *runner.Result) {
+				tracker.Update(agenticDone, staticDone, agenticResult, staticResult)
 			})
 
-			tracker.SetErrors(benchRes.AgenticError, benchRes.StaticError)
+			tracker.SetErrors(benchResult.AgenticError, benchResult.StaticError)
 			tracker.Stop()
 
-			if benchRes.AgenticError != nil && benchRes.StaticError != nil {
-				return fmt.Errorf("both benchmarks failed: agentic: %v; static: %v", benchRes.AgenticError, benchRes.StaticError)
+			if benchResult.AgenticError != nil && benchResult.StaticError != nil {
+				return fmt.Errorf("both benchmarks failed: agentic: %v; static: %v", benchResult.AgenticError, benchResult.StaticError)
 			}
-			if benchRes.AgenticError != nil {
-				return fmt.Errorf("agentic benchmark failed: %w", benchRes.AgenticError)
+			if benchResult.AgenticError != nil {
+				return fmt.Errorf("agentic benchmark failed: %w", benchResult.AgenticError)
 			}
-			if benchRes.StaticError != nil {
-				return fmt.Errorf("static benchmark failed: %w", benchRes.StaticError)
+			if benchResult.StaticError != nil {
+				return fmt.Errorf("static benchmark failed: %w", benchResult.StaticError)
 			}
 
-			aUsage := benchRes.AgenticResult.Usage
-			sUsage := benchRes.StaticResult.Usage
-			fmt.Println(ui.RenderBenchmarkTable(aUsage, sUsage, benchRes.AgenticResult.Duration, benchRes.StaticResult.Duration))
+			aUsage := benchResult.AgenticResult.Usage
+			sUsage := benchResult.StaticResult.Usage
+			fmt.Println(ui.RenderBenchmarkTable(aUsage, sUsage, benchResult.AgenticResult.Duration, benchResult.StaticResult.Duration))
 			return nil
 		}
 
 		// Sequential fallback
 		fmt.Println(">>> Step 1/2: Executing with AGENTIC video processing...")
-		aRes, err := runner.Execute(ctx, client, runner.Request{
+		agenticResult, err := runner.Execute(ctx, genaiClient, runner.Request{
 			ModelID:       modelFlag,
 			VideoURI:      compareVideoURI,
 			Prompt:        comparePrompt,
@@ -118,11 +118,11 @@ var compareCmd = &cobra.Command{
 			return fmt.Errorf("agentic run failed: %w", err)
 		}
 		fmt.Printf("    Agentic Run Complete (%v, %d tokens)\n\n",
-			aRes.Duration.Round(time.Millisecond),
-			totalTokens(aRes))
+			agenticResult.Duration.Round(time.Millisecond),
+			totalTokens(agenticResult))
 
 		fmt.Println(">>> Step 2/2: Executing with STATIC 1-FPS frame ingestion...")
-		sRes, err := runner.Execute(ctx, client, runner.Request{
+		staticResult, err := runner.Execute(ctx, genaiClient, runner.Request{
 			ModelID:       modelFlag,
 			VideoURI:      compareVideoURI,
 			Prompt:        comparePrompt,
@@ -133,17 +133,17 @@ var compareCmd = &cobra.Command{
 			return fmt.Errorf("static run failed: %w", err)
 		}
 		fmt.Printf("    Static Run Complete (%v, %d tokens)\n\n",
-			sRes.Duration.Round(time.Millisecond),
-			totalTokens(sRes))
+			staticResult.Duration.Round(time.Millisecond),
+			totalTokens(staticResult))
 
-		fmt.Println(ui.RenderBenchmarkTable(aRes.Usage, sRes.Usage, aRes.Duration, sRes.Duration))
+		fmt.Println(ui.RenderBenchmarkTable(agenticResult.Usage, staticResult.Usage, agenticResult.Duration, staticResult.Duration))
 		return nil
 	},
 }
 
-func totalTokens(res *runner.Result) int32 {
-	if res != nil && res.Usage != nil {
-		return res.Usage.TotalTokenCount
+func totalTokens(result *runner.Result) int32 {
+	if result != nil && result.Usage != nil {
+		return result.Usage.TotalTokenCount
 	}
 	return 0
 }
@@ -168,6 +168,8 @@ func resolveModelsList(flagVal string) []string {
 			resolved = append(resolved, "gemini-3.7-flash")
 		case "3.8", "gemini-3.8":
 			resolved = append(resolved, "gemini-3.8-flash")
+		case "4", "argon", "4-argon", "gemini-4":
+			resolved = append(resolved, "gemini-4-argon")
 		default:
 			resolved = append(resolved, item)
 		}
@@ -182,5 +184,5 @@ func init() {
 	compareCmd.Flags().StringVar(&comparePrompt, "prompt", "What were the key revenue figures mentioned by the presenter, and at what timestamp do they appear?", "Prompt for comparison benchmark")
 	compareCmd.Flags().StringVar(&compareThinking, "thinking", "medium", "Thinking level: 'low', 'medium', or 'high'")
 	compareCmd.Flags().BoolVar(&compareConcurrent, "concurrent", true, "Execute Agentic and Static benchmarks concurrently in parallel goroutines with live telemetry")
-	compareCmd.Flags().StringVar(&compareModels, "models", "", "Compare across multiple models (e.g. 'flash' or 'gemini-3.6-flash,gemini-3.7-flash,gemini-3.8-flash')")
+	compareCmd.Flags().StringVar(&compareModels, "models", "", "Compare across multiple models (e.g. 'flash' or '3.7,3.8,argon')")
 }

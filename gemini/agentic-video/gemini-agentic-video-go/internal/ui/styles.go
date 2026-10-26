@@ -121,7 +121,7 @@ func RenderModeBadge(mode genai.MediaProcessing) string {
 }
 
 // RenderScenarioTypeBadge returns a styled badge describing the scenario category.
-func RenderScenarioTypeBadge(name string, mode genai.MediaProcessing, isMultiVideo, isMultiTurn bool) string {
+func RenderScenarioTypeBadge(mode genai.MediaProcessing, isMultiVideo, isMultiTurn bool) string {
 	if isMultiVideo {
 		return BadgeMultiVideo.Render("MULTI-VIDEO")
 	}

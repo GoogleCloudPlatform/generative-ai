@@ -49,7 +49,7 @@ func Execute() error {
 }
 
 func init() {
-	RootCmd.PersistentFlags().StringVarP(&modelFlag, "model", "m", "gemini-3.7-flash", "Gemini model ID (e.g. gemini-3.7-flash, gemini-3.6-flash, gemini-3.5-flash-lite)")
+	RootCmd.PersistentFlags().StringVarP(&modelFlag, "model", "m", "gemini-3.7-flash", "Gemini model ID (e.g. gemini-4-argon, gemini-3.8-flash, gemini-3.7-flash, gemini-3.6-flash, gemini-3.5-flash-lite)")
 	RootCmd.PersistentFlags().StringVarP(&projectFlag, "project", "p", "", "Google Cloud project ID (defaults to GOOGLE_CLOUD_PROJECT or active gcloud config)")
 	RootCmd.PersistentFlags().StringVarP(&locationFlag, "location", "l", "global", "Google Cloud location / region (defaults to GOOGLE_CLOUD_LOCATION or 'global')")
 	RootCmd.PersistentFlags().StringVarP(&backendFlag, "backend", "b", "enterprise", "Client backend: 'enterprise', 'vertex', or 'gemini'")
@@ -60,7 +60,7 @@ func InitClient(ctx context.Context) (*genai.Client, error) {
 	proj := client.ResolveProject(projectFlag)
 	loc := client.ResolveLocation(locationFlag)
 
-	genaiClient, err := client.NewClient(ctx, client.Config{
+	genaiClient, err := client.New(ctx, client.Config{
 		Backend:  backendFlag,
 		Project:  proj,
 		Location: loc,

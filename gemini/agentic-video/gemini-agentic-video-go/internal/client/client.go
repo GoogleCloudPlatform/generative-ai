@@ -33,8 +33,8 @@ type Config struct {
 	APIKey   string
 }
 
-// NewClient initializes a Google Gen AI Client with the selected backend.
-func NewClient(ctx context.Context, cfg Config) (*genai.Client, error) {
+// New initializes a Google Gen AI Client with the selected backend.
+func New(ctx context.Context, cfg Config) (*genai.Client, error) {
 	clientCfg := &genai.ClientConfig{}
 
 	switch strings.ToLower(cfg.Backend) {
@@ -70,6 +70,11 @@ func NewClient(ctx context.Context, cfg Config) (*genai.Client, error) {
 	}
 
 	return genai.NewClient(ctx, clientCfg)
+}
+
+// NewClient is an alias for New kept for backwards compatibility.
+func NewClient(ctx context.Context, cfg Config) (*genai.Client, error) {
+	return New(ctx, cfg)
 }
 
 // ResolveProject determines the Google Cloud project ID from flag, env, or gcloud CLI.

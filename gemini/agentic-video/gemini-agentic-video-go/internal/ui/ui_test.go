@@ -73,15 +73,18 @@ func TestRenderBenchmarkTable(t *testing.T) {
 
 func TestRenderTelemetryCard(t *testing.T) {
 	usage := &genai.GenerateContentResponseUsageMetadata{
-		TotalTokenCount:      5000,
-		PromptTokenCount:     200,
-		CandidatesTokenCount: 300,
-		ThoughtsTokenCount:   4500,
+		TotalTokenCount:         5000,
+		PromptTokenCount:        200,
+		CandidatesTokenCount:    300,
+		ToolUsePromptTokenCount: 1500,
+		ThoughtsTokenCount:      3000,
 	}
 
 	out := RenderTelemetryCard(usage, genai.MediaProcessingAgentic, 10*time.Second)
-	if !strings.Contains(out, "5000") {
-		t.Errorf("RenderTelemetryCard(...) output missing total token count %q; output:\n%s", "5000", out)
+	for _, want := range []string{"5000", "1500", "3000"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("RenderTelemetryCard(...) output missing token count %q; output:\n%s", want, out)
+		}
 	}
 
 	// Test graceful handling of nil usage

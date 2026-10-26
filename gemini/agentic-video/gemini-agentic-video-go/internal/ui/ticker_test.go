@@ -23,7 +23,7 @@ import (
 )
 
 func TestBenchmarkTrackerLifecycle(t *testing.T) {
-	tracker := NewBenchmarkTracker("medium")
+	tracker := NewBenchmarkTracker()
 	if tracker == nil {
 		t.Fatalf("NewBenchmarkTracker() = nil, want valid tracker")
 	}
@@ -64,10 +64,10 @@ func TestBenchmarkTrackerFormatElapsed(t *testing.T) {
 }
 
 func TestMultiModelTrackerLifecycle(t *testing.T) {
-	models := []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash"}
+	models := []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-4-argon"}
 	tracker := NewMultiModelTracker(models)
 	if tracker == nil {
-		t.Fatalf("NewMultiModelTracker() = nil, want valid tracker")
+		t.Fatalf("NewMultiModelTracker(%v) = nil, want valid tracker", models)
 	}
 
 	tracker.isTTY = false

@@ -131,9 +131,9 @@ func TestNewClient_BackendValidation(t *testing.T) {
 			t.Setenv("GEMINI_API_KEY", "")
 			t.Setenv("GOOGLE_API_KEY", "")
 
-			_, err := NewClient(ctx, tt.cfg)
+			_, err := New(ctx, tt.cfg)
 			if err == nil {
-				t.Errorf("NewClient(ctx, %+v) error = nil, want non-nil error", tt.cfg)
+				t.Errorf("New(ctx, %+v) error = nil, want non-nil error", tt.cfg)
 			}
 		})
 	}
