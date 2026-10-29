@@ -62,7 +62,7 @@ var Scenarios = []Scenario{
 		Name:          "trailcam",
 		Title:         "Detailed Timestamp-Based Descriptions (GCS Video)",
 		Description:   "High-thinking visual analysis on a wildlife trail-cam video stored in Google Cloud Storage.",
-		VideoURI:      "https://storage.googleapis.com/generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4",
+		VideoURI:      "gs://generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4",
 		Prompt:        "Describe what happens in this video in detail, with timestamps.",
 		Mode:          genai.MediaProcessingAgentic,
 		ThinkingLevel: genai.ThinkingLevelHigh,
@@ -86,7 +86,7 @@ var Scenarios = []Scenario{
 		ThinkingLevel: genai.ThinkingLevelMedium,
 		MultiVideos: []string{
 			"https://www.youtube.com/shorts/y-mrGw1wW8E",
-			"https://storage.googleapis.com/generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4",
+			"gs://generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4",
 		},
 	},
 	{

@@ -24,7 +24,7 @@ A comprehensive, code-first guide to building production applications, microserv
 Agentic Video Understanding transforms how multimodal models process video:
 
 - **Static Ingestion (Traditional)**: Decodes all video frames upfront at 1 FPS (~300 tokens per second of video). An hour of video costs ~1,000,000 tokens before reasoning begins.
-- **Agentic Navigation (Native Gemini 3.8 / 3.7 / 3.6)**: The model receives **0 video frames** in the initial prompt. It is equipped with an internal `load_video` tool that dynamically seeks, scrubs, and inspects video timestamps on demand in an autonomous **Think ➔ Act ➔ Observe** loop.
+- **Agentic Navigation (Native Gemini 4 Argon / 3.8 / 3.7 / 3.6)**: The model receives **0 video frames** in the initial prompt. It is equipped with an internal `load_video` tool that dynamically seeks, scrubs, and inspects video timestamps on demand in an autonomous **Think ➔ Act ➔ Observe** loop.
 
 ```mermaid
 sequenceDiagram
@@ -34,11 +34,11 @@ sequenceDiagram
     participant Video as Video Engine
 
     App->>Gemini: GenerateContent(videoPart [MediaProcessingAgentic], textPrompt)
-    Note over Gemini: Step 1: Ingest text prompt<br/>(0 video frames in prompt)
-    loop Dynamic Exploration Loop (Billed under Thoughts/Candidates)
+    Note over Gemini: Step 1: Ingest text prompt<br/>(0 video frames in PromptTokenCount)
+    loop Dynamic Exploration Loop (Billed in ToolUsePromptTokenCount & ThoughtsTokenCount)
         Gemini->>Video: Internal tool call: load_video(start, end, fps)
-        Video-->>Gemini: Decoded frame chunks
-        Gemini->>Gemini: Reason over observations
+        Video-->>Gemini: Decoded frame / transcript chunks (ToolUsePromptTokensDetails)
+        Gemini->>Gemini: Reason over observations (ThoughtsTokenCount)
     end
     Gemini-->>App: Final synthesized answer with timestamps
 ```
@@ -87,8 +87,8 @@ type Config struct {
 	APIKey   string
 }
 
-// NewClient initializes a Google Gen AI Client with the selected backend.
-func NewClient(ctx context.Context, cfg Config) (*genai.Client, error) {
+// New initializes a Google Gen AI Client with the selected backend.
+func New(ctx context.Context, cfg Config) (*genai.Client, error) {
 	clientCfg := &genai.ClientConfig{}
 
 	switch strings.ToLower(cfg.Backend) {
@@ -134,7 +134,7 @@ func NewClient(ctx context.Context, cfg Config) (*genai.Client, error) {
 ### Step 1: Create Video Part from URI
 Videos are referenced by URI rather than transferring raw binary payloads:
 - **YouTube Videos**: `https://www.youtube.com/watch?v=...` or `https://www.youtube.com/shorts/...`
-- **Google Cloud Storage (GCS)**: `gs://bucket-name/path/to/video.mp4` or `https://storage.googleapis.com/bucket-name/...`
+- **Google Cloud Storage (GCS)**: Always prefer `gs://bucket-name/path/to/video.mp4` over `https://storage.googleapis.com/...` so the server-side `load_video` tool uses direct GCS bucket access rather than external web-fetch size limits (`runner.NormalizeVideoURI` converts `https://storage.googleapis.com/...` automatically).
 
 ```go
 videoPart := genai.NewPartFromURI("https://www.youtube.com/watch?v=LzExSq9DU9w", "video/mp4")
@@ -173,7 +173,8 @@ Agentic video requires reasoning to plan and execute internal `load_video` navig
 ```go
 genConfig := &genai.GenerateContentConfig{
 	ThinkingConfig: &genai.ThinkingConfig{
-		ThinkingLevel: genai.ThinkingLevelMedium, // Options: Low, Medium, High
+		ThinkingLevel:   genai.ThinkingLevelMedium, // Options: Low, Medium, High
+		IncludeThoughts: true,                      // Optional: return intermediate Think ➔ Act reasoning hops
 	},
 }
 ```
@@ -186,13 +187,13 @@ genConfig := &genai.GenerateContentConfig{
 | **Low** | `genai.ThinkingLevelLow` | Simple factual retrieval with low reasoning complexity. |
 
 > [!NOTE]
-> `ThinkingLevelMinimal` is not supported on `gemini-3.7-flash` and returns an API validation error.
+> `ThinkingLevelMinimal` is not supported on `gemini-4-argon`, `gemini-3.8-flash`, or `gemini-3.7-flash` and returns an API validation error.
 
 ### Model Architecture & Generation Selection
 | Model Generation | Recommended Use Case | Agentic Video Characteristics |
 | :--- | :--- | :--- |
-| **`gemini-4-argon`** | Frontier multimodal reasoning, deep multi-speaker & visual synthesis | **Frontier reasoning**. Exhaustive multi-step `load_video` exploration and detailed cross-modal synthesis (`LOW`, `MEDIUM`, `HIGH` thinking). |
-| **`gemini-3.8-flash`** | Interactive chat, latency-sensitive triage, short-form clips | **Fastest timeline navigation** (up to 2.1x faster wall-clock speed). Optimized speculative frame fetching and lower reasoning token budgets. |
+| **`gemini-4-argon`** | Frontier multimodal reasoning, complex visual inspection, multi-hop verification | **Highest visual efficiency & multi-hop accuracy**. 2.06x faster and 77% fewer tokens on pure-visual GCS videos; performs multi-hop transcript + slide verification with implicit context caching. |
+| **`gemini-3.8-flash`** | Interactive chat, latency-sensitive triage, short-form clips | **Fastest single-hop timeline navigation**. Optimized speculative frame fetching and lower reasoning token budgets. |
 | **`gemini-3.7-flash`** | Long-form presentation Q&A, detailed transcript cross-referencing | **Deep reasoning**. Balances thorough internal `load_video` seeks with comprehensive, granular timestamp citations. *(Default)* |
 | **`gemini-3.6-flash`** | Baseline batch workloads, cost-constrained pipelines | **Cost-effective baseline**. Established first-generation agentic navigation tool implementation. |
 
@@ -235,7 +236,7 @@ func CompareVideos(ctx context.Context, client *genai.Client, video1URI, video2U
 
 ## 6. Multi-Turn Stateful Video Dialogue
 
-In conversational applications (chatbots, video assistants), **you do not need to re-upload or re-attach the video part** in subsequent turns. The Gemini model preserves its navigated timeline exploration state in the conversation history:
+In conversational applications (chatbots, video assistants), **you do not need to re-upload or re-attach the video part** in subsequent turns. By retaining the non-thought text `Part`s (along with their `ThoughtSignature`) via `runner.ExtractModelTurnContent(resp)`, the model preserves its navigated timeline exploration state in the conversation history and avoids re-running `load_video` on follow-up questions:
 
 ```go
 func RunVideoChat(ctx context.Context, client *genai.Client, videoURI string, questions []string) error {
@@ -272,8 +273,8 @@ func RunVideoChat(ctx context.Context, client *genai.Client, videoURI string, qu
 
 		fmt.Printf("Turn %d Answer:\n%s\n\n", i+1, resp.Text())
 
-		// Append model response to conversation history
-		history = append(history, genai.NewContentFromText(resp.Text(), genai.RoleModel))
+		// Append non-thought text parts (preserving ThoughtSignature for context reuse)
+		history = append(history, runner.ExtractModelTurnContent(resp))
 	}
 
 	return nil
@@ -284,7 +285,7 @@ func RunVideoChat(ctx context.Context, client *genai.Client, videoURI string, qu
 
 ## 7. Streaming Video Exploration
 
-For interactive user experiences, use `GenerateContentStream` to stream the response as it arrives:
+For interactive user experiences, use `GenerateContentStream` (a range-over-func iterator in Go 1.23+) to stream the response as it arrives:
 
 ```go
 func StreamVideoResponse(ctx context.Context, client *genai.Client, videoURI, prompt string) error {
@@ -304,19 +305,14 @@ func StreamVideoResponse(ctx context.Context, client *genai.Client, videoURI, pr
 		},
 	}
 
-	iter, err := client.Models.GenerateContentStream(ctx, "gemini-3.7-flash", contents, config)
-	if err != nil {
-		return fmt.Errorf("initiating stream: %w", err)
-	}
-
-	for chunk, err := range iter {
+	for chunk, err := range client.Models.GenerateContentStream(ctx, "gemini-3.7-flash", contents, config) {
 		if err != nil {
 			return fmt.Errorf("stream chunk: %w", err)
 		}
 		for _, cand := range chunk.Candidates {
 			if cand.Content != nil {
 				for _, part := range cand.Content.Parts {
-					if part.Text != "" {
+					if !part.Thought && part.Text != "" {
 						fmt.Print(part.Text)
 					}
 				}
@@ -334,10 +330,11 @@ func StreamVideoResponse(ctx context.Context, client *genai.Client, videoURI, pr
 ## 8. Token Accounting & Cost Telemetry
 
 ### The Dynamic Frame Accounting Shift
-When reading `resp.UsageMetadata`, developers are frequently surprised:
-- **`PromptTokenCount`**: Reflects **only the text prompt** (~100–450 tokens). Video frames are **not** present here.
-- **`ToolUsePromptTokenCount`**: Contains the video frames and transcript segments dynamically fetched by internal `load_video` tool executions.
-- **`ThoughtsTokenCount`**: Contains the model's internal reasoning tokens during the timeline exploration loop.
+When reading `resp.UsageMetadata` in Agentic mode (`TotalTokenCount = PromptTokenCount + ToolUsePromptTokenCount + ThoughtsTokenCount + CandidatesTokenCount`):
+- **`PromptTokenCount`**: Reflects **only the text prompt and URI metadata** (~70–95 tokens). Video frames are **not** present here.
+- **`ToolUsePromptTokenCount`**: Contains all video frames (`VIDEO`) and audio caption tracks (`TEXT`) dynamically fetched by `load_video` during the timeline exploration loop (detailed in `ToolUsePromptTokensDetails`).
+- **`CachedContentTokenCount`**: Contains context tokens implicitly reused across multi-hop `load_video` turns (`CacheTokensDetails`).
+- **`ThoughtsTokenCount`**: Contains the model's internal Think ➔ Act planning and synthesis reasoning tokens.
 - **`CandidatesTokenCount`**: Contains the final output text generated for the user.
 
 ```go
@@ -348,8 +345,15 @@ func LogTelemetry(usage *genai.GenerateContentResponseUsageMetadata, mode genai.
 
 	fmt.Printf("Total Consumed Tokens:     %d\n", usage.TotalTokenCount)
 	fmt.Printf("Prompt Input Tokens:       %d\n", usage.PromptTokenCount)
+	if usage.ToolUsePromptTokenCount > 0 {
+		fmt.Printf("Tool-Use Tokens:           %d (%s)\n",
+			usage.ToolUsePromptTokenCount,
+			telemetry.FormatModalityDetails(usage.ToolUsePromptTokensDetails))
+	}
+	if usage.CachedContentTokenCount > 0 {
+		fmt.Printf("Cached Context Tokens:     %d\n", usage.CachedContentTokenCount)
+	}
 	fmt.Printf("Candidate Output Tokens:   %d\n", usage.CandidatesTokenCount)
-	fmt.Printf("Tool-Use Tokens (Frames):  %d\n", usage.ToolUsePromptTokenCount)
 	fmt.Printf("Reasoning Thoughts Tokens: %d\n", usage.ThoughtsTokenCount)
 
 	if mode == genai.MediaProcessingAgentic {
@@ -432,7 +436,7 @@ func ExecuteConcurrentBenchmark(
 		res.AgenticResult = agenticResult
 		res.AgenticError = agenticErr
 		if callback != nil {
-			callback(true, res.StaticResult != nil || res.StaticError != nil, agenticResult, res.StaticResult)
+			callback(true, res.StaticResult != nil || res.StaticError != nil, agenticResult, res.StaticResult, agenticErr, res.StaticError)
 		}
 		mu.Unlock()
 	}()
@@ -445,7 +449,7 @@ func ExecuteConcurrentBenchmark(
 		res.StaticResult = staticResult
 		res.StaticError = staticErr
 		if callback != nil {
-			callback(res.AgenticResult != nil || res.AgenticError != nil, true, res.AgenticResult, staticResult)
+			callback(res.AgenticResult != nil || res.AgenticError != nil, true, res.AgenticResult, staticResult, res.AgenticError, staticErr)
 		}
 		mu.Unlock()
 	}()
@@ -461,4 +465,3 @@ func ExecuteConcurrentBenchmark(
 1. **Halves Benchmark Wall Clock**: Instead of waiting 25s + 50s = 75s sequentially, both pipelines execute simultaneously, finishing in ~45-50s max.
 2. **Live Race Visibility**: Because Agentic finishes ~25s before Static, developers can witness the model reach its conclusion in real time while Static is still decoding frames.
 3. **Headless & Composable**: The runner function has zero UI dependencies and can stream status events back to any caller (CLI ticker, HTTP server-sent events, or WebSocket).
-

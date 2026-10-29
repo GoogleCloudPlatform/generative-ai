@@ -85,21 +85,26 @@ func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentRespon
 		agenticPrompt, staticPrompt         int32
 		agenticCandidates, staticCandidates int32
 		agenticToolUse, staticToolUse       int32
+		agenticCached, staticCached         int32
 		agenticThoughts, staticThoughts     int32
+		agenticToolDetails                  string
 	)
 
 	if agenticUsage != nil {
 		agenticTotal = int64(agenticUsage.TotalTokenCount)
 		agenticPrompt = agenticUsage.PromptTokenCount
-		agenticCandidates = agenticUsage.CandidatesTokenCount
 		agenticToolUse = agenticUsage.ToolUsePromptTokenCount
+		agenticCached = agenticUsage.CachedContentTokenCount
+		agenticCandidates = agenticUsage.CandidatesTokenCount
 		agenticThoughts = agenticUsage.ThoughtsTokenCount
+		agenticToolDetails = telemetry.FormatModalityDetails(agenticUsage.ToolUsePromptTokensDetails)
 	}
 	if staticUsage != nil {
 		staticTotal = int64(staticUsage.TotalTokenCount)
 		staticPrompt = staticUsage.PromptTokenCount
-		staticCandidates = staticUsage.CandidatesTokenCount
 		staticToolUse = staticUsage.ToolUsePromptTokenCount
+		staticCached = staticUsage.CachedContentTokenCount
+		staticCandidates = staticUsage.CandidatesTokenCount
 		staticThoughts = staticUsage.ThoughtsTokenCount
 	}
 
@@ -153,6 +158,11 @@ func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentRespon
 	candDeltaStr := fmt.Sprintf("%+d output tokens", agenticCandidates-staticCandidates)
 	latDeltaStr := fmt.Sprintf("%v diff", (agenticDuration - staticDuration).Round(time.Millisecond))
 
+	agenticToolStr := fmt.Sprintf("%d (dynamic frames)", agenticToolUse)
+	if agenticToolDetails != "" {
+		agenticToolStr = fmt.Sprintf("%d (%s)", agenticToolUse, agenticToolDetails)
+	}
+
 	tbl.Row(
 		"Total Consumed Tokens",
 		fmt.Sprintf("%d", agenticTotal),
@@ -166,24 +176,30 @@ func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentRespon
 		promptDeltaStr,
 	)
 	tbl.Row(
+		"Tool-Use Tokens (load_video)",
+		agenticToolStr,
+		fmt.Sprintf("%d", staticToolUse),
+		"targeted chunk loading",
+	)
+	if agenticCached > 0 || staticCached > 0 {
+		tbl.Row(
+			"Cached Tokens (Implicit)",
+			fmt.Sprintf("%d", agenticCached),
+			fmt.Sprintf("%d", staticCached),
+			"multi-hop context reuse",
+		)
+	}
+	tbl.Row(
 		"Candidate Tokens (Output)",
 		fmt.Sprintf("%d", agenticCandidates),
 		fmt.Sprintf("%d", staticCandidates),
 		candDeltaStr,
 	)
-	if agenticToolUse > 0 || staticToolUse > 0 {
-		tbl.Row(
-			"Tool-Use Tokens (Frames)",
-			fmt.Sprintf("%d (load_video)", agenticToolUse),
-			fmt.Sprintf("%d", staticToolUse),
-			"dynamic stream fetch",
-		)
-	}
 	tbl.Row(
 		"Reasoning Thoughts Tokens",
-		fmt.Sprintf("%d (dynamic frames)", agenticThoughts),
+		fmt.Sprintf("%d (planning)", agenticThoughts),
 		fmt.Sprintf("%d", staticThoughts),
-		"on-demand inspection",
+		"Think ➔ Act navigation",
 	)
 	tbl.Row(
 		"Latency (Wall Clock)",
@@ -193,7 +209,7 @@ func RenderBenchmarkTable(agenticUsage, staticUsage *genai.GenerateContentRespon
 	)
 
 	title := SectionHeader.Render("⚡ PERFORMANCE BENCHMARK: AGENTIC VIDEO vs. STATIC (1 FPS) INGESTION")
-	footer := MutedStyle.Render("💡 Insight: In Agentic mode, prompt tokens contain 0 video frames upfront. Frames are dynamically fetched\n   during Think ➔ Act timeline navigation and billed under tool-use & reasoning thoughts.")
+	footer := MutedStyle.Render("💡 Insight: In Agentic mode, prompt tokens contain 0 video frames upfront. Targeted video/transcript chunks\n   are fetched on-demand via load_video (Tool-Use Tokens) guided by Think ➔ Act reasoning.")
 
 	return lipgloss.JoinVertical(lipgloss.Left, title, tbl.Render(), footer)
 }
@@ -281,7 +297,40 @@ func RenderMultiModelTable(results []runner.ModelBenchmarkResult) string {
 	}
 	tbl.Row(promptTokRow...)
 
-	// Row 5: Candidate Tokens
+	// Row 5: Tool-Use Tokens
+	toolTokRow := []string{"Tool-Use Tokens (load_video)"}
+	hasCached := false
+	for _, r := range results {
+		if r.Result != nil && r.Result.Usage != nil {
+			if r.Result.Usage.CachedContentTokenCount > 0 {
+				hasCached = true
+			}
+			details := telemetry.FormatModalityDetails(r.Result.Usage.ToolUsePromptTokensDetails)
+			if details != "" {
+				toolTokRow = append(toolTokRow, fmt.Sprintf("%d (%s)", r.Result.Usage.ToolUsePromptTokenCount, details))
+			} else {
+				toolTokRow = append(toolTokRow, fmt.Sprintf("%d", r.Result.Usage.ToolUsePromptTokenCount))
+			}
+		} else {
+			toolTokRow = append(toolTokRow, "—")
+		}
+	}
+	tbl.Row(toolTokRow...)
+
+	// Optional Row: Cached Tokens
+	if hasCached {
+		cacheTokRow := []string{"Cached Tokens (Implicit)"}
+		for _, r := range results {
+			if r.Result != nil && r.Result.Usage != nil {
+				cacheTokRow = append(cacheTokRow, fmt.Sprintf("%d", r.Result.Usage.CachedContentTokenCount))
+			} else {
+				cacheTokRow = append(cacheTokRow, "—")
+			}
+		}
+		tbl.Row(cacheTokRow...)
+	}
+
+	// Row 6: Candidate Tokens
 	candTokRow := []string{"Candidate Output Tokens"}
 	for _, r := range results {
 		if r.Result != nil && r.Result.Usage != nil {
@@ -292,31 +341,11 @@ func RenderMultiModelTable(results []runner.ModelBenchmarkResult) string {
 	}
 	tbl.Row(candTokRow...)
 
-	// Row 6: Tool-Use Tokens (if any model reported > 0)
-	hasToolUse := false
-	for _, r := range results {
-		if r.Result != nil && r.Result.Usage != nil && r.Result.Usage.ToolUsePromptTokenCount > 0 {
-			hasToolUse = true
-			break
-		}
-	}
-	if hasToolUse {
-		toolTokRow := []string{"Tool-Use Tokens (Frames)"}
-		for _, r := range results {
-			if r.Result != nil && r.Result.Usage != nil {
-				toolTokRow = append(toolTokRow, fmt.Sprintf("%d (load_video)", r.Result.Usage.ToolUsePromptTokenCount))
-			} else {
-				toolTokRow = append(toolTokRow, "—")
-			}
-		}
-		tbl.Row(toolTokRow...)
-	}
-
 	// Row 7: Reasoning Thoughts
 	thoughtTokRow := []string{"Reasoning Thoughts Tokens"}
 	for _, r := range results {
 		if r.Result != nil && r.Result.Usage != nil {
-			thoughtTokRow = append(thoughtTokRow, fmt.Sprintf("%d (reasoning)", r.Result.Usage.ThoughtsTokenCount))
+			thoughtTokRow = append(thoughtTokRow, fmt.Sprintf("%d (planning)", r.Result.Usage.ThoughtsTokenCount))
 		} else {
 			thoughtTokRow = append(thoughtTokRow, "—")
 		}
@@ -324,7 +353,7 @@ func RenderMultiModelTable(results []runner.ModelBenchmarkResult) string {
 	tbl.Row(thoughtTokRow...)
 
 	title := SectionHeader.Render("🏎️  MULTI-MODEL BENCHMARK MATRIX (Agentic Video Understanding)")
-	footer := MutedStyle.Render("💡 Cross-Model Analysis: Newer generations optimize timeline exploration efficiency, reducing\n   both thoughts token budget and wall-clock latency while generating richer candidate answers.")
+	footer := MutedStyle.Render("💡 Cross-Model Analysis: Newer generations (e.g., gemini-3.8-flash, gemini-4-argon) optimize timeline\n   exploration efficiency, reducing tool-use and thoughts token budgets while improving answer accuracy.")
 
 	return lipgloss.JoinVertical(lipgloss.Left, title, tbl.Render(), footer)
 }

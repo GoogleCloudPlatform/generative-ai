@@ -88,38 +88,60 @@ func (bt *BenchmarkTracker) Start() {
 	}()
 }
 
-// Update records pipeline completion and updates the live display state.
-func (bt *BenchmarkTracker) Update(agenticDone, staticDone bool, aRes, sRes *runner.Result) {
+// Update records pipeline completion or failure and updates the live display state.
+func (bt *BenchmarkTracker) Update(agenticDone, staticDone bool, aRes, sRes *runner.Result, aErr, sErr error) {
 	bt.mu.Lock()
 	defer bt.mu.Unlock()
 
 	if agenticDone && !bt.agenticDone {
 		bt.agenticDone = true
 		bt.agenticRes = aRes
+		bt.agenticErr = aErr
 		if !bt.isTTY {
-			tokStr := "0"
-			if aRes != nil && aRes.Usage != nil {
-				tokStr = fmt.Sprintf("%d", aRes.Usage.TotalTokenCount)
+			if aErr != nil {
+				fmt.Printf("[%s] ❌ Agentic Video FAILED: %v\n",
+					bt.formatElapsed(time.Since(bt.startTime)),
+					aErr)
+			} else {
+				tokStr := "0"
+				var dur time.Duration
+				if aRes != nil {
+					dur = aRes.Duration.Round(time.Millisecond)
+					if aRes.Usage != nil {
+						tokStr = fmt.Sprintf("%d", aRes.Usage.TotalTokenCount)
+					}
+				}
+				fmt.Printf("[%s] ⚡ Agentic Video COMPLETED in %v (Tokens: %s)\n",
+					bt.formatElapsed(time.Since(bt.startTime)),
+					dur,
+					tokStr)
 			}
-			fmt.Printf("[%s] ⚡ Agentic Video COMPLETED in %v (Tokens: %s)\n",
-				bt.formatElapsed(time.Since(bt.startTime)),
-				aRes.Duration.Round(time.Millisecond),
-				tokStr)
 		}
 	}
 
 	if staticDone && !bt.staticDone {
 		bt.staticDone = true
 		bt.staticRes = sRes
+		bt.staticErr = sErr
 		if !bt.isTTY {
-			tokStr := "0"
-			if sRes != nil && sRes.Usage != nil {
-				tokStr = fmt.Sprintf("%d", sRes.Usage.TotalTokenCount)
+			if sErr != nil {
+				fmt.Printf("[%s] ❌ Static 1-FPS FAILED: %v\n",
+					bt.formatElapsed(time.Since(bt.startTime)),
+					sErr)
+			} else {
+				tokStr := "0"
+				var dur time.Duration
+				if sRes != nil {
+					dur = sRes.Duration.Round(time.Millisecond)
+					if sRes.Usage != nil {
+						tokStr = fmt.Sprintf("%d", sRes.Usage.TotalTokenCount)
+					}
+				}
+				fmt.Printf("[%s] 🐢 Static 1-FPS COMPLETED in %v (Tokens: %s)\n",
+					bt.formatElapsed(time.Since(bt.startTime)),
+					dur,
+					tokStr)
 			}
-			fmt.Printf("[%s] 🐢 Static 1-FPS COMPLETED in %v (Tokens: %s)\n",
-				bt.formatElapsed(time.Since(bt.startTime)),
-				sRes.Duration.Round(time.Millisecond),
-				tokStr)
 		}
 	}
 }
@@ -318,8 +340,12 @@ func (mt *MultiModelTracker) Update(modelID string, done bool, res *runner.Resul
 
 		if !mt.isTTY {
 			tokStr := "0"
-			if res != nil && res.Usage != nil {
-				tokStr = fmt.Sprintf("%d", res.Usage.TotalTokenCount)
+			var dur time.Duration
+			if res != nil {
+				dur = res.Duration.Round(time.Millisecond)
+				if res.Usage != nil {
+					tokStr = fmt.Sprintf("%d", res.Usage.TotalTokenCount)
+				}
 			}
 			if err != nil {
 				fmt.Printf("[%s] ❌ %s FAILED: %v\n", mt.formatElapsed(time.Since(mt.startTime)), modelID, err)
@@ -327,7 +353,7 @@ func (mt *MultiModelTracker) Update(modelID string, done bool, res *runner.Resul
 				fmt.Printf("[%s] ✅ %s COMPLETED in %v (Tokens: %s)\n",
 					mt.formatElapsed(time.Since(mt.startTime)),
 					modelID,
-					res.Duration.Round(time.Millisecond),
+					dur,
 					tokStr)
 			}
 		}

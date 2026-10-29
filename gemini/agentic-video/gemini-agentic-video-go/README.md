@@ -2,9 +2,9 @@
 
 An idiomatic Go reference implementation and interactive CLI demonstrating [Gemini agentic video understanding](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/video-understanding) with the official Google Gen AI SDK (`google.golang.org/genai`). Provides reusable Go patterns, backend client factories, and production code examples (single-video, multi-video synthesis, multi-turn dialogue, token telemetry) alongside an interactive CLI tool—featuring active Think ➔ Act ➔ Observe dynamic timeline navigation, sub-second precision, and up to 96% token reduction compared to static frame ingestion.
 
-[![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Google Gen AI SDK](https://img.shields.io/badge/Google%20Gen%20AI%20SDK-v1.70.0-4285F4?logo=google)](https://pkg.go.dev/google.golang.org/genai)
+[![Google Gen AI SDK](https://img.shields.io/badge/Google%20Gen%20AI%20SDK-v1.77.0-4285F4?logo=google)](https://pkg.go.dev/google.golang.org/genai)
 [![User Guide](https://img.shields.io/badge/Documentation-User%20Guide-blue?logo=markdown)](docs/user-guide.md)
 [![Developer Guide](https://img.shields.io/badge/Documentation-Developer%20Guide-blueviolet?logo=go)](docs/developers-guide.md)
 
@@ -69,9 +69,10 @@ make compare
 # or: ./bin/gemini-agentic-video-go compare
 # sequential fallback: ./bin/gemini-agentic-video-go compare --concurrent=false
 
-# Compare across model generations (3.6 vs 3.7 vs 3.8) in parallel goroutines:
-./bin/gemini-agentic-video-go compare --models="flash"
-# or: ./bin/gemini-agentic-video-go compare --models="gemini-3.6-flash,gemini-3.7-flash,gemini-3.8-flash"
+# Compare across all supported model generations (3.6, 3.7, 3.8, 4-argon) in parallel goroutines:
+./bin/gemini-agentic-video-go compare --models="all"
+# or Flash-only (3.6, 3.7, 3.8): ./bin/gemini-agentic-video-go compare --models="flash"
+# or custom subset: ./bin/gemini-agentic-video-go compare --models="3.8,argon"
 ```
 
 Compare two videos in a single prompt (multi-video comparative synthesis):
@@ -81,28 +82,31 @@ make multivideo
 # or: ./bin/gemini-agentic-video-go multivideo
 ```
 
-Run a multi-turn conversation maintaining video context across questions:
+Run a multi-turn conversation maintaining video context and `ThoughtSignature` state across questions:
 
 ```bash
 make multiturn
 # or: ./bin/gemini-agentic-video-go multiturn
 ```
 
-Switch models (e.g. `gemini-4-argon`, `gemini-3.8-flash`, `gemini-3.6-flash`, or `gemini-3.5-flash-lite`):
+Switch models (e.g. `gemini-4-argon`, `gemini-3.8-flash`, `gemini-3.6-flash`, or `gemini-3.5-flash-lite`) and inspect intermediate Think ➔ Act reasoning hops (`--show-thoughts`):
 
 ```bash
 ./bin/gemini-agentic-video-go example 1 --model=gemini-3.8-flash
-./bin/gemini-agentic-video-go example 4 --model=gemini-4-argon
+./bin/gemini-agentic-video-go example 3 --model=gemini-4-argon --show-thoughts
 ```
 
-Execute an ad-hoc query against any custom YouTube URL or Google Cloud Storage URI:
+Execute an ad-hoc query against any custom YouTube URL or Google Cloud Storage (`gs://`) URI, with optional real-time streaming (`--stream`) or structured JSON (`--json`):
 
 ```bash
 ./bin/gemini-agentic-video-go run \
+  --model=gemini-4-argon \
   --video="https://www.youtube.com/watch?v=LzExSq9DU9w" \
   --prompt="What were the key cloud milestones mentioned at 02:00?" \
   --mode=agentic \
-  --thinking=high
+  --thinking=high \
+  --show-thoughts \
+  --stream
 ```
 
 ### Programmatic Go SDK Usage
@@ -165,7 +169,7 @@ func main() {
 
 ### Prerequisites
 
-- [Go 1.24+](https://golang.org/dl/)
+- [Go 1.25+](https://golang.org/dl/)
 - A Google Cloud Project with the Agent Platform / Vertex AI / Gemini API enabled
 - Authenticated credentials via Application Default Credentials (`gcloud auth application-default login`)
 
@@ -206,6 +210,10 @@ make run
 | `-p, --project` | `""` | Google Cloud Project ID (falls back to `GOOGLE_CLOUD_PROJECT` or `gcloud config`) |
 | `-l, --location` | `"global"` | Google Cloud Location / Region (defaults to `GOOGLE_CLOUD_LOCATION` or `"global"`) |
 | `-b, --backend` | `"enterprise"` | Client backend: `enterprise`, `vertex`, or `gemini` (API key) |
+| `--json` | `false` | Emit structured JSON output for Agent-to-Agent (A2A) and programmatic pipelines |
+| `--timeout` | `10m` | Per-command context execution timeout (e.g. `2m`, `5m`, `10m`) |
+| `--show-thoughts` | `false` | Display intermediate Think ➔ Act reasoning hops and tool-hop count (`example`, `run`, `multivideo`) |
+| `--stream` | `false` | Stream response tokens in real time via `GenerateContentStream` (`run`) |
 
 ### Cross-Compilation
 
@@ -247,7 +255,7 @@ Code in this repository is licensed under the [Apache 2.0 License](LICENSE).
   - **[Under the Hood: The `load_video` Tool](docs/user-guide.md#2-under-the-hood-the-load_video-tool)**: Parameters and tool calling mechanisms.
   - **[Four Core Execution Patterns](docs/user-guide.md#3-four-core-execution-patterns)**: Transcript triage, coarse-to-fine search, adaptive high-FPS replay, and tool chaining.
   - **[Empirical Benchmarks](docs/user-guide.md#4-empirical-benchmarks--token-spend-reduction)**: Accuracy deltas and up to 95.7% token spend reduction on long-form benchmarks.
-  - **[Token Accounting & Telemetry](docs/user-guide.md#5-critical-developer-pitfall-token-accounting--telemetry)**: Why dynamic video tokens reside in `thoughtsTokenCount` rather than `promptTokenCount`.
+  - **[Token Accounting & Telemetry](docs/user-guide.md#5-critical-developer-pitfall-token-accounting--telemetry)**: How dynamic video frames and transcripts are billed in `toolUsePromptTokenCount` (`ToolUsePromptTokensDetails`), reasoning in `thoughtsTokenCount`, and implicit multi-hop reuse in `cachedContentTokenCount`.
   - **[Multi-Video Synthesis & Multi-Turn State](docs/user-guide.md#8-multi-video-comparative-synthesis)**: Technical patterns for multi-video prompts and stateful conversations.
 
 ## Credits & Acknowledgements
