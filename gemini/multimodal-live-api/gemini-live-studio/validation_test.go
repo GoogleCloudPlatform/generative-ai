@@ -61,7 +61,7 @@ func TestParseImageDataURL(t *testing.T) {
 func TestTruncateRunes_KeepsUTF8Valid(t *testing.T) {
 	s := strings.Repeat("é", 10) // 2 bytes per rune
 	got := truncateRunes(s, 3)
-	if got != strings.Repeat("é", 3) || !utf8.ValidString(got) {
+	if got != "ééé" || !utf8.ValidString(got) {
 		t.Fatalf("truncateRunes = %q", got)
 	}
 	if truncateRunes("abc", 5) != "abc" {
