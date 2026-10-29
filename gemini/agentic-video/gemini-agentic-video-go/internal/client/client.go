@@ -40,14 +40,14 @@ func New(ctx context.Context, cfg Config) (*genai.Client, error) {
 	switch strings.ToLower(cfg.Backend) {
 	case "enterprise":
 		if cfg.Project == "" {
-			return nil, fmt.Errorf("project ID is required for Enterprise Agent Platform backend; set --project or GOOGLE_CLOUD_PROJECT")
+			return nil, fmt.Errorf("project ID is required for Enterprise Agent Platform backend\nHint: pass --project=<id>, export GOOGLE_CLOUD_PROJECT=<id>, or run 'gcloud config set project <id>'")
 		}
 		clientCfg.Backend = genai.BackendEnterprise
 		clientCfg.Project = cfg.Project
 		clientCfg.Location = cfg.Location
 	case "vertex":
 		if cfg.Project == "" {
-			return nil, fmt.Errorf("project ID is required for Vertex AI / Agent Platform backend; set --project or GOOGLE_CLOUD_PROJECT")
+			return nil, fmt.Errorf("project ID is required for Vertex AI / Agent Platform backend\nHint: pass --project=<id>, export GOOGLE_CLOUD_PROJECT=<id>, or run 'gcloud config set project <id>'")
 		}
 		clientCfg.Backend = genai.BackendVertexAI
 		clientCfg.Project = cfg.Project
@@ -62,11 +62,11 @@ func New(ctx context.Context, cfg Config) (*genai.Client, error) {
 			apiKey = os.Getenv("GOOGLE_API_KEY")
 		}
 		if apiKey == "" {
-			return nil, fmt.Errorf("API key required for Gemini API backend; set GEMINI_API_KEY or GOOGLE_API_KEY")
+			return nil, fmt.Errorf("API key required for Gemini API backend\nHint: export GEMINI_API_KEY=<key> or GOOGLE_API_KEY=<key>, or use --backend=enterprise with ADC")
 		}
 		clientCfg.APIKey = apiKey
 	default:
-		return nil, fmt.Errorf("unsupported backend %q; use 'enterprise', 'vertex', or 'gemini'", cfg.Backend)
+		return nil, fmt.Errorf("unsupported backend %q\nHint: use --backend=enterprise, --backend=vertex, or --backend=gemini", cfg.Backend)
 	}
 
 	return genai.NewClient(ctx, clientCfg)

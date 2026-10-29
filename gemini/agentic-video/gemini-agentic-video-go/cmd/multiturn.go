@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/GoogleCloudPlatform/generative-ai/gemini/agentic-video/gemini-agentic-video-go/internal/runner"
+	"github.com/GoogleCloudPlatform/generative-ai/gemini/agentic-video/gemini-agentic-video-go/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -28,18 +29,36 @@ var (
 
 // multiturnCmd represents the multiturn command.
 var multiturnCmd = &cobra.Command{
-	Use:   "multiturn",
-	Short: "Demonstrate multi-turn conversation with video context preservation",
+	Use:     "multiturn",
+	GroupID: groupExecution,
+	Short:   "Demonstrate multi-turn conversation with video context preservation",
 	Long: `Demonstrates sequential conversational question-answering across multiple
-turns while maintaining video timeline navigation state without re-ingesting frames.`,
+turns while maintaining video timeline navigation state and ThoughtSignatures
+without re-ingesting frames.`,
+	Example: `  # Run the default 3-turn dialogue on the 54m Alphabet Earnings Call
+  gemini-agentic-video-go multiturn
+
+  # Run multi-turn dialogue with Gemini 4 Argon
+  gemini-agentic-video-go multiturn --model gemini-4-argon
+
+  # Emit structured JSON array of all turn results
+  gemini-agentic-video-go multiturn --json`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := cmd.Context()
-		client, err := InitClient(ctx)
+		thinking, err := runner.ParseThinkingLevelE(mtThinking)
 		if err != nil {
 			return err
 		}
+		if err := runner.ValidateThinkingLevel(modelFlag, thinking); err != nil {
+			return err
+		}
 
-		thinking := runner.ParseThinkingLevel(mtThinking)
+		ctx, cancel := withCommandTimeout(cmd.Context())
+		defer cancel()
+
+		genaiClient, err := InitClient(ctx)
+		if err != nil {
+			return err
+		}
 
 		turns := []string{
 			"What were the key revenue figures mentioned in the first 5 minutes?",
@@ -47,15 +66,34 @@ turns while maintaining video timeline navigation state without re-ingesting fra
 			"Did they mention anything about AI or Gemini during that timeframe?",
 		}
 
-		fmt.Printf("-----------------------------------------------------------------\n")
-		fmt.Printf("Multi-Turn Video Dialogue\n")
-		fmt.Printf("Video URI:   %s\n", mtVideoURI)
-		fmt.Printf("Thinking:    %s\n", thinking)
-		fmt.Printf("Turns:       %d questions\n", len(turns))
-		fmt.Printf("-----------------------------------------------------------------\n\n")
+		if !jsonFlag {
+			fmt.Printf("-----------------------------------------------------------------\n")
+			fmt.Printf("Multi-Turn Video Dialogue\n")
+			fmt.Printf("Video URI:   %s\n", runner.NormalizeVideoURI(mtVideoURI))
+			fmt.Printf("Thinking:    %s\n", ui.RenderThinkingBadge(thinking))
+			fmt.Printf("Turns:       %d questions\n", len(turns))
+			fmt.Printf("-----------------------------------------------------------------\n\n")
+		}
 
-		_, err = runner.ExecuteMultiTurn(ctx, client, modelFlag, mtVideoURI, turns, thinking)
-		return err
+		var turnCallback runner.MultiTurnCallback
+		if !jsonFlag {
+			turnCallback = func(turnIndex, total int, prompt string, result *runner.Result) {
+				fmt.Printf("\n%s %q\n", ui.RenderTurnBadge(turnIndex, total), prompt)
+				fmt.Println("--- Response ---")
+				fmt.Println(result.Text)
+				fmt.Println("----------------")
+				fmt.Println(ui.RenderTelemetryCard(result.Usage, result.Mode, result.Duration))
+			}
+		}
+
+		results, err := runner.ExecuteMultiTurnWithCallback(ctx, genaiClient, modelFlag, mtVideoURI, turns, thinking, turnCallback)
+		if err != nil {
+			return err
+		}
+		if jsonFlag {
+			return writeJSON(results)
+		}
+		return nil
 	},
 }
 

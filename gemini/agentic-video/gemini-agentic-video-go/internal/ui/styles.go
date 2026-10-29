@@ -25,7 +25,7 @@ import (
 	"google.golang.org/genai"
 )
 
-// Colors used across terminal UI components.
+// Colors used across terminal UI components (including A2A semantic palette tokens).
 var (
 	// ColorGeminiBlue is the Google/Gemini primary blue branding color.
 	ColorGeminiBlue = lipgloss.Color("#4285F4")
@@ -47,6 +47,14 @@ var (
 	ColorWhite = lipgloss.Color("#FFFFFF")
 	// ColorZebraBg is the subtle dark background for alternating table rows.
 	ColorZebraBg = lipgloss.Color("#1A1D24")
+
+	// Semantic A2A color aliases for consistent CLI output.
+	ColorAccent  = ColorGeminiCyan
+	ColorPass    = ColorSuccess
+	ColorWarn    = ColorWarning
+	ColorFail    = ColorDanger
+	ColorID      = ColorAgenticPurple
+	ColorCommand = ColorGeminiBlue
 )
 
 // UI and typography styles used across terminal renderers.
@@ -60,7 +68,7 @@ var (
 
 	// SubtitleStyle formats headers and card titles.
 	SubtitleStyle = lipgloss.NewStyle().
-			Foreground(ColorGeminiCyan).
+			Foreground(ColorAccent).
 			Bold(true)
 
 	// HeaderBox defines the border container for the main banner.
@@ -80,7 +88,7 @@ var (
 	// SectionHeader formats section divider headers.
 	SectionHeader = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(ColorGeminiCyan).
+			Foreground(ColorAccent).
 			MarginTop(1).
 			MarginBottom(0)
 
@@ -88,10 +96,20 @@ var (
 	MutedStyle = lipgloss.NewStyle().Foreground(ColorMuted)
 	// BoldWhite styles highlighted text in bold white.
 	BoldWhite = lipgloss.NewStyle().Bold(true).Foreground(ColorWhite)
-	// GreenStyle styles success messages in bold green.
-	GreenStyle = lipgloss.NewStyle().Foreground(ColorSuccess).Bold(true)
+	// GreenStyle styles success/pass messages in bold green.
+	GreenStyle = lipgloss.NewStyle().Foreground(ColorPass).Bold(true)
 	// CyanStyle styles accents in bold cyan.
-	CyanStyle = lipgloss.NewStyle().Foreground(ColorGeminiCyan).Bold(true)
+	CyanStyle = lipgloss.NewStyle().Foreground(ColorAccent).Bold(true)
+	// PassStyle styles positive completions using the semantic Pass color.
+	PassStyle = GreenStyle
+	// WarnStyle styles warnings using the semantic Warn color.
+	WarnStyle = lipgloss.NewStyle().Foreground(ColorWarn).Bold(true)
+	// FailStyle styles errors using the semantic Fail color.
+	FailStyle = lipgloss.NewStyle().Foreground(ColorFail).Bold(true)
+	// IDStyle styles resource and model identifiers.
+	IDStyle = lipgloss.NewStyle().Foreground(ColorID).Bold(true)
+	// CommandStyle styles CLI command hints.
+	CommandStyle = lipgloss.NewStyle().Foreground(ColorCommand).Bold(true)
 
 	// BadgeAgentic formats the AGENTIC mode badge.
 	BadgeAgentic = lipgloss.NewStyle().Bold(true).Foreground(ColorWhite).Background(ColorAgenticPurple).Padding(0, 1)

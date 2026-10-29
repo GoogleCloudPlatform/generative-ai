@@ -15,6 +15,7 @@
 package ui
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -40,7 +41,7 @@ func TestBenchmarkTrackerLifecycle(t *testing.T) {
 			TotalTokenCount: 8000,
 		},
 	}
-	tracker.Update(true, false, aRes, nil)
+	tracker.Update(true, false, aRes, nil, nil, nil)
 
 	// Simulate Static finish
 	sRes := &runner.Result{
@@ -50,7 +51,17 @@ func TestBenchmarkTrackerLifecycle(t *testing.T) {
 			TotalTokenCount: 180000,
 		},
 	}
-	tracker.Update(true, true, aRes, sRes)
+	tracker.Update(true, true, aRes, sRes, nil, nil)
+	tracker.Stop()
+}
+
+func TestBenchmarkTrackerErrorAndNilResultSafety(t *testing.T) {
+	tracker := NewBenchmarkTracker()
+	tracker.isTTY = false
+	tracker.Start()
+
+	// Passing nil results with errors in non-TTY mode must not panic
+	tracker.Update(true, true, nil, nil, errors.New("agentic failed"), errors.New("static failed"))
 	tracker.Stop()
 }
 
@@ -83,6 +94,15 @@ func TestMultiModelTrackerLifecycle(t *testing.T) {
 	}, nil)
 
 	// Update second model
+	tracker.Update("gemini-4-argon", true, &runner.Result{
+		Title:    "gemini-4-argon",
+		Duration: 16 * time.Second,
+		Usage: &genai.GenerateContentResponseUsageMetadata{
+			TotalTokenCount: 6822,
+		},
+	}, nil)
+
+	// Update third model
 	tracker.Update("gemini-3.7-flash", true, &runner.Result{
 		Title:    "gemini-3.7-flash",
 		Duration: 18 * time.Second,
@@ -91,14 +111,8 @@ func TestMultiModelTrackerLifecycle(t *testing.T) {
 		},
 	}, nil)
 
-	// Update third model
-	tracker.Update("gemini-3.6-flash", true, &runner.Result{
-		Title:    "gemini-3.6-flash",
-		Duration: 22 * time.Second,
-		Usage: &genai.GenerateContentResponseUsageMetadata{
-			TotalTokenCount: 9100,
-		},
-	}, nil)
+	// Update fourth model with nil result & error
+	tracker.Update("gemini-3.6-flash", true, nil, errors.New("deadline exceeded"))
 
 	tracker.Stop()
 }

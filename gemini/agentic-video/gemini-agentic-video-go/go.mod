@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/spf13/cobra v1.10.2
-	google.golang.org/genai v1.70.0
+	google.golang.org/genai v1.77.0
 )
 
 require (

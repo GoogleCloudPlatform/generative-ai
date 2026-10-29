@@ -20,7 +20,17 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestSubcommandRegistration(t *testing.T) {
+func TestSubcommandRegistrationAndA2AMetadata(t *testing.T) {
+	if RootCmd.Example == "" {
+		t.Errorf("RootCmd.Example is empty; want A2A example documentation")
+	}
+	if RootCmd.PersistentFlags().Lookup("json") == nil {
+		t.Errorf("RootCmd missing persistent --json flag")
+	}
+	if RootCmd.PersistentFlags().Lookup("timeout") == nil {
+		t.Errorf("RootCmd missing persistent --timeout flag")
+	}
+
 	subcommands := []string{"example", "run", "compare", "multivideo", "multiturn"}
 
 	for _, sub := range subcommands {
@@ -31,6 +41,13 @@ func TestSubcommandRegistration(t *testing.T) {
 		}
 		if cmd == nil || cmd.Name() != sub {
 			t.Errorf("RootCmd.Find(%q) = %v, want command with name %q", sub, cmd, sub)
+			continue
+		}
+		if cmd.GroupID == "" {
+			t.Errorf("command %q has empty GroupID; want logical command group", sub)
+		}
+		if cmd.Short == "" || cmd.Long == "" || cmd.Example == "" {
+			t.Errorf("command %q missing Short/Long/Example documentation", sub)
 		}
 	}
 }
@@ -63,9 +80,10 @@ func TestResolveModelsList(t *testing.T) {
 	}{
 		{name: "empty", input: "", want: nil},
 		{name: "alias_flash", input: "flash", want: []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash"}},
-		{name: "alias_all", input: "all", want: []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash"}},
-		{name: "short_version_numbers", input: "3.6,3.8", want: []string{"gemini-3.6-flash", "gemini-3.8-flash"}},
+		{name: "alias_all", input: "all", want: []string{"gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-4-argon"}},
+		{name: "short_version_numbers", input: "3.6,3.8,argon", want: []string{"gemini-3.6-flash", "gemini-3.8-flash", "gemini-4-argon"}},
 		{name: "argon_shorthand", input: "3.8,argon", want: []string{"gemini-3.8-flash", "gemini-4-argon"}},
+		{name: "argon_aliases", input: "4,gemini-4", want: []string{"gemini-4-argon", "gemini-4-argon"}},
 		{name: "full_model_ids", input: "gemini-3.7-flash,gemini-3.8-flash,gemini-4-argon", want: []string{"gemini-3.7-flash", "gemini-3.8-flash", "gemini-4-argon"}},
 	}
 

@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/GoogleCloudPlatform/generative-ai/gemini/agentic-video/gemini-agentic-video-go/internal/telemetry"
 	"github.com/charmbracelet/lipgloss"
 	"google.golang.org/genai"
 )
@@ -54,9 +55,14 @@ func RenderTelemetryCard(usage *genai.GenerateContentResponseUsageMetadata, mode
 	}
 
 	totalTok := BoldWhite.Render(fmt.Sprintf("%d", usage.TotalTokenCount))
-	promptTokStr := fmt.Sprintf("%d (text prompt only; 0 video frames)", usage.PromptTokenCount)
+	promptTokStr := fmt.Sprintf("%d (text prompt + URI metadata; 0 video frames)", usage.PromptTokenCount)
 	if mode == genai.MediaProcessingStatic {
-		promptTokStr = fmt.Sprintf("%d (includes 100%% of video frames at 1 FPS)", usage.PromptTokenCount)
+		promptDetails := telemetry.FormatModalityDetails(usage.PromptTokensDetails)
+		if promptDetails != "" {
+			promptTokStr = fmt.Sprintf("%d (%s; 100%% of video frames at 1 FPS)", usage.PromptTokenCount, promptDetails)
+		} else {
+			promptTokStr = fmt.Sprintf("%d (includes 100%% of video frames at 1 FPS)", usage.PromptTokenCount)
+		}
 	}
 	promptTok := MutedStyle.Render(promptTokStr)
 
@@ -67,19 +73,57 @@ func RenderTelemetryCard(usage *genai.GenerateContentResponseUsageMetadata, mode
 	lines = append(lines, durLine)
 	lines = append(lines, fmt.Sprintf("  • Total Consumed:      %s", totalTok))
 	lines = append(lines, fmt.Sprintf("  • Prompt Tokens:       %s", promptTok))
-	lines = append(lines, fmt.Sprintf("  • Candidate Output:    %s", candTok))
 
 	if usage.ToolUsePromptTokenCount > 0 {
-		toolTokStr := fmt.Sprintf("%d (video frames & captions fetched via load_video)", usage.ToolUsePromptTokenCount)
+		toolDetails := telemetry.FormatModalityDetails(usage.ToolUsePromptTokensDetails)
+		toolTokStr := fmt.Sprintf("%d (dynamic load_video chunks)", usage.ToolUsePromptTokenCount)
+		if toolDetails != "" {
+			toolTokStr = fmt.Sprintf("%d (%s via load_video)", usage.ToolUsePromptTokenCount, toolDetails)
+		}
 		lines = append(lines, fmt.Sprintf("  • Tool-Use Tokens:     %s", CyanStyle.Render(toolTokStr)))
 	}
 
+	if usage.CachedContentTokenCount > 0 {
+		cacheDetails := telemetry.FormatModalityDetails(usage.CacheTokensDetails)
+		cacheTokStr := fmt.Sprintf("%d (implicit multi-hop context cache)", usage.CachedContentTokenCount)
+		if cacheDetails != "" {
+			cacheTokStr = fmt.Sprintf("%d (%s cached across hops)", usage.CachedContentTokenCount, cacheDetails)
+		}
+		lines = append(lines, fmt.Sprintf("  • Cached Tokens:       %s", PassStyle.Render(cacheTokStr)))
+	}
+
+	lines = append(lines, fmt.Sprintf("  • Candidate Output:    %s", candTok))
+
 	if usage.ThoughtsTokenCount > 0 {
-		thoughtTokStr := fmt.Sprintf("%d (dynamic frame inspection via Think ➔ Act)", usage.ThoughtsTokenCount)
+		thoughtTokStr := fmt.Sprintf("%d (Think ➔ Act planning & synthesis)", usage.ThoughtsTokenCount)
 		if mode == genai.MediaProcessingStatic {
 			thoughtTokStr = fmt.Sprintf("%d", usage.ThoughtsTokenCount)
 		}
-		lines = append(lines, fmt.Sprintf("  • Reasoning Thoughts:  %s", CyanStyle.Render(thoughtTokStr)))
+		lines = append(lines, fmt.Sprintf("  • Reasoning Thoughts:  %s", IDStyle.Render(thoughtTokStr)))
+	}
+
+	content := lipgloss.JoinVertical(lipgloss.Left, lines...)
+	return CardBox.Render(content)
+}
+
+// RenderThoughtsCard formats intermediate Think -> Act reasoning hops into an X-Ray inspector card.
+func RenderThoughtsCard(thoughts []string, hops int) string {
+	if len(thoughts) == 0 && hops == 0 {
+		return ""
+	}
+	header := SubtitleStyle.Render("🔬 Agentic X-Ray: Think ➔ Act Timeline Navigation Trace")
+	hopBadge := BadgeAgentic.Render(fmt.Sprintf("%d TOOL HOPS", hops))
+
+	var lines []string
+	lines = append(lines, header+" "+hopBadge)
+	if len(thoughts) == 0 {
+		lines = append(lines, MutedStyle.Render("  (No intermediate thought summaries returned by model)"))
+	} else {
+		for i, t := range thoughts {
+			stepLabel := IDStyle.Render(fmt.Sprintf("  [Hop %d]", i+1))
+			trimmed := strings.TrimSpace(t)
+			lines = append(lines, fmt.Sprintf("%s %s", stepLabel, MutedStyle.Render(trimmed)))
+		}
 	}
 
 	content := lipgloss.JoinVertical(lipgloss.Left, lines...)

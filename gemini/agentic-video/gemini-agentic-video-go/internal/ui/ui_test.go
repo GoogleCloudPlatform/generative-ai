@@ -73,17 +73,22 @@ func TestRenderBenchmarkTable(t *testing.T) {
 
 func TestRenderTelemetryCard(t *testing.T) {
 	usage := &genai.GenerateContentResponseUsageMetadata{
-		TotalTokenCount:         5000,
-		PromptTokenCount:        200,
-		CandidatesTokenCount:    300,
-		ToolUsePromptTokenCount: 1500,
-		ThoughtsTokenCount:      3000,
+		TotalTokenCount:         6822,
+		PromptTokenCount:        83,
+		ToolUsePromptTokenCount: 5384,
+		CachedContentTokenCount: 1200,
+		CandidatesTokenCount:    899,
+		ThoughtsTokenCount:      456,
+		ToolUsePromptTokensDetails: []*genai.ModalityTokenCount{
+			{Modality: genai.MediaModalityVideo, TokenCount: 4219},
+			{Modality: genai.MediaModalityText, TokenCount: 1165},
+		},
 	}
 
 	out := RenderTelemetryCard(usage, genai.MediaProcessingAgentic, 10*time.Second)
-	for _, want := range []string{"5000", "1500", "3000"} {
+	for _, want := range []string{"6822", "5384", "VIDEO: 4219", "1200", "456"} {
 		if !strings.Contains(out, want) {
-			t.Errorf("RenderTelemetryCard(...) output missing token count %q; output:\n%s", want, out)
+			t.Errorf("RenderTelemetryCard(...) output missing %q; output:\n%s", want, out)
 		}
 	}
 
@@ -91,6 +96,24 @@ func TestRenderTelemetryCard(t *testing.T) {
 	nilOut := RenderTelemetryCard(nil, genai.MediaProcessingAgentic, 10*time.Second)
 	if nilOut == "" {
 		t.Errorf("RenderTelemetryCard(nil, MediaProcessingAgentic, 10s) = %q, want fallback card", nilOut)
+	}
+}
+
+func TestRenderThoughtsCard(t *testing.T) {
+	empty := RenderThoughtsCard(nil, 0)
+	if empty != "" {
+		t.Errorf("RenderThoughtsCard(nil, 0) = %q, want empty string", empty)
+	}
+
+	thoughts := []string{
+		"Let's inspect the first 30 seconds to locate the product launch.",
+		"Zooming into 00:12 to 00:24 to read the slide title.",
+	}
+	card := RenderThoughtsCard(thoughts, 2)
+	for _, want := range []string{"2 TOOL HOPS", "[Hop 1]", "[Hop 2]", "slide title"} {
+		if !strings.Contains(card, want) {
+			t.Errorf("RenderThoughtsCard(...) output missing %q; output:\n%s", want, card)
+		}
 	}
 }
 

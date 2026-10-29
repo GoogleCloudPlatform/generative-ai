@@ -1,6 +1,6 @@
 # Gemini Agentic Video Understanding: Developer Guide & Architecture
 
-This comprehensive guide details the architecture, technical mechanisms, execution patterns, and operational considerations for building with **Agentic Video Understanding** in Go using the official Google Gen AI SDK (`google.golang.org/genai`) and Gemini 3.8 / 3.7 / 3.6 / 3.5 models.
+This comprehensive guide details the architecture, technical mechanisms, execution patterns, and operational considerations for building with **Agentic Video Understanding** in Go using the official Google Gen AI SDK (`google.golang.org/genai`) and Gemini 4 Argon / 3.8 / 3.7 / 3.6 / 3.5 models.
 
 > [!TIP]
 > Looking for copy-pasteable Go code examples, backend client factories, streaming patterns, and headless microservice architectures? See the companion **[`docs/developers-guide.md`](developers-guide.md)**.
@@ -125,23 +125,29 @@ Standard long-video benchmark evaluations comparing Gemini 3.7 Flash Agentic Vid
 When enabling Agentic Video (`media_processing="agentic"`), token reporting shifts structurally in the API usage metadata:
 
 > [!WARNING]
-> **Do not monitor `promptTokenCount` alone for Agentic Video billing!**
+> **Do not monitor `promptTokenCount` or `thoughtsTokenCount` alone for Agentic Video billing!**
+> In `UsageMetadata`, the exact identity is:
+> `TotalTokenCount = PromptTokenCount + ToolUsePromptTokenCount + ThoughtsTokenCount + CandidatesTokenCount`
 
 ### Static Mode
 - All video frames are pre-decoded upfront when the prompt is sent.
-- `promptTokenCount` includes 100% of the video input tokens (e.g. 7,656 tokens for a 2-minute clip).
+- `promptTokenCount` includes 100% of the video input tokens (e.g. `VIDEO: 5,236, TEXT: 21` in `PromptTokensDetails`).
+- `toolUsePromptTokenCount` is `0`.
 - `candidatesTokenCount` includes only the generated answer text.
 
 ### Agentic Mode
-- The initial request payload only contains text metadata. `promptTokenCount` contains **0 video tokens**.
-- Video streams and visual frames are dynamically retrieved during the model's iterative Think ➔ Act (`load_video`) loop.
-- Dynamically retrieved frames and audio are accounted for under **`candidatesTokenCount` / `thoughtsTokenCount`**.
+- The initial request payload only contains text and URI metadata. `promptTokenCount` contains **0 video frame tokens** (~70–95 tokens).
+- Video frames and audio transcripts are dynamically retrieved during the model's iterative Think ➔ Act (`load_video`) loop and billed in **`toolUsePromptTokenCount`** (with per-modality `VIDEO` vs. `TEXT` breakdowns in **`toolUsePromptTokensDetails`**).
+- When the model executes multiple sequential `load_video` hops (e.g., `gemini-4-argon` verifying transcript findings against visual slides), reused context from earlier hops is reported in **`cachedContentTokenCount`** (`cacheTokensDetails`).
+- **`thoughtsTokenCount`** measures internal Think ➔ Act reasoning and planning tokens.
 
 | Token Metric | Static Mode (`STATIC`) | Agentic Mode (`AGENTIC`) |
 | :--- | :--- | :--- |
-| **Prompt Tokens (`promptTokenCount`)** | High (100% video frames + text) | Minimal (text only; 0 video frames) |
-| **Thinking Tokens (`thoughtsTokenCount`)** | Standard reasoning | Includes dynamic video frames & inspection |
-| **Candidates Tokens (`candidatesTokenCount`)** | Answer text only | Answer text + reasoning tokens |
+| **Prompt Tokens (`promptTokenCount`)** | High (100% video frames + text) | Minimal (text + URI metadata only; 0 video frames) |
+| **Tool-Use Tokens (`toolUsePromptTokenCount`)** | `0` | **Dynamic video frames (`VIDEO`) & audio captions (`TEXT`) fetched via `load_video`** |
+| **Cached Tokens (`cachedContentTokenCount`)** | `0` (unless explicit cache used) | Implicitly cached context across multi-hop `load_video` turns |
+| **Thinking Tokens (`thoughtsTokenCount`)** | Standard reasoning | Think ➔ Act timeline planning & synthesis |
+| **Candidates Tokens (`candidatesTokenCount`)** | Answer text only | Final synthesized answer text |
 | **Total Tokens (`totalTokenCount`)** | High (full video context) | **70%–95% lower on long footage** |
 
 ---
@@ -152,24 +158,39 @@ When enabling Agentic Video (`media_processing="agentic"`), token reporting shif
 
 | Model ID | Agentic Video Support | Default Mode | Recommended Scenarios |
 | :--- | :---: | :---: | :--- |
-| `gemini-4-argon` | ✅ Supported | Static (1 FPS) | Frontier multimodal reasoning, exhaustive multi-step timeline exploration, detailed speaker & visual synthesis |
-| `gemini-3.8-flash` | ✅ Supported | Static (1 FPS) | Ultra-fast timeline navigation (up to 2.1x faster), speculative frame exploration, interactive video triage |
+| `gemini-4-argon` | ✅ Supported | Static (1 FPS) | **Frontier multimodal & multi-hop precision**: 2.06x faster and 77% fewer tokens on pure-visual GCS footage; multi-hop visual + transcript cross-verification |
+| `gemini-3.8-flash` | ✅ Supported | Static (1 FPS) | Ultra-fast timeline navigation, fast single-hop transcript triage, interactive video Q&A |
 | `gemini-3.7-flash` | ✅ Supported | Static (1 FPS) | Dense visual QA, split-second action analysis, complex multi-step reasoning across 60+ min videos *(Default)* |
 | `gemini-3.6-flash` | ✅ Supported | Static (1 FPS) | General video Q&A, lecture summarization, timestamp indexing |
 | `gemini-3.5-flash-lite` | ✅ Supported | Static (1 FPS) | High-throughput, cost-sensitive transcript triage & metadata extraction |
+
+### Empirical Multi-Model Shootout (`3.7-flash` vs `3.8-flash` vs `4-argon`)
+
+| Scenario | Model | Mode | Wall-Clock | Total Tokens | Prompt | Tool-Use (`load_video`) | Thoughts | Output |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **Scenario 4: YouTube Short** (`y-mrGw1wW8E`) | `gemini-3.7-flash` | Agentic (`HIGH`) | `19.4s` | `9,348` | `83` | `7,999` (`VIDEO: 6.8K, TEXT: 1.2K`) | `539` | `727` |
+| **Scenario 4: YouTube Short** (`y-mrGw1wW8E`) | `gemini-3.8-flash` | Agentic (`MEDIUM`) | `18.7s` | `9,376` | `83` | `7,999` (`VIDEO: 6.8K, TEXT: 1.2K`) | `484` | `810` |
+| **Scenario 4: YouTube Short** (`y-mrGw1wW8E`) | **`gemini-4-argon`** | **Agentic (`MEDIUM`)** | **`22.9s`** | **`6,822`** | `83` | **`5,384` (`VIDEO: 4.2K, TEXT: 1.2K`)** | **`456`** | `899` |
+| **Scenario 3: GCS Trailcam** (`gs://...`) | `gemini-3.8-flash` | Agentic (`HIGH`) | `4m 32.6s` | `211,965` | `92` | `203,131` (`VIDEO: 194.5K, TEXT: 8.6K`) | `6,881` | `1,861` |
+| **Scenario 3: GCS Trailcam** (`gs://...`) | **`gemini-4-argon`** | **Agentic (`HIGH`)** | **`2m 12.0s`** | **`48,825`** | `92` | **`42,110` (`VIDEO: 37.2K, TEXT: 4.9K`)** | **`3,980`** | `2,318` |
+| **Scenario 1: 54m Earnings Call** | `gemini-3.8-flash` | Agentic (`MEDIUM`) | `26.2s` | `34,413` | `95` | `13,907` (`TEXT: 13.9K`, 1 hop) | `19,930` | `481` |
+| **Scenario 1: 54m Earnings Call** | **`gemini-4-argon`** | **Agentic (`MEDIUM`)** | `4m 20.3s` | `69,138` | `95` | `49,311` (`VIDEO: 47.0K, TEXT: 2.3K`, 3 hops, `29.4K` cached) | `19,179` | `553` |
 
 ### Processing Modes Comparison
 
 | Mode | Description | Supported Models | Token Efficiency | When to Use |
 | :--- | :--- | :--- | :--- | :--- |
 | **Static**<br>*(default)* | Single-pass ingestion at fixed **1 FPS** and **1 Kbps audio** with 1s timestamps. | All Gemini models | Baseline (~300 tokens/sec). Full ingestion required upfront. | • Clips < 2 min<br>• Requires simultaneous full audio & video<br>• Deterministic sampling<br>• Custom clipping (`start_offset`, `end_offset`) |
-| **Agentic** | Iterative timeline navigation; dynamically loads frames and audio on-demand. | `gemini-3.8-flash`<br>`gemini-3.7-flash`<br>`gemini-3.6-flash`<br>`gemini-3.5-flash-lite` | **70%–95% reduction** on long footage; seconds TTFB for transcript queries. | • Videos > 2 min (lectures, meetings, calls)<br>• Verbal / audio-first queries<br>• Localized visual search<br>• Fast-action clips needing high FPS<br>• Cross-video comparisons |
+| **Agentic** | Iterative timeline navigation; dynamically loads frames and audio on-demand. | `gemini-4-argon`<br>`gemini-3.8-flash`<br>`gemini-3.7-flash`<br>`gemini-3.6-flash`<br>`gemini-3.5-flash-lite` | **70%–95% reduction** on long footage; seconds TTFB for transcript queries. | • Videos > 2 min (lectures, meetings, calls)<br>• Verbal / audio-first queries<br>• Localized visual search<br>• Fast-action clips needing high FPS<br>• Cross-video comparisons |
 
 ### Multi-Model Shootout (`compare --models`)
-Compare cross-generation performance (3.6 vs 3.7 vs 3.8) concurrently on the same video:
+Compare cross-generation performance (3.6 vs 3.7 vs 3.8 vs 4-argon) concurrently on the same video:
 
 ```bash
-# Benchmark all Flash generations in parallel goroutines:
+# Benchmark all supported generations (3.6, 3.7, 3.8, 4-argon) in parallel goroutines:
+./bin/gemini-agentic-video-go compare --models="all"
+
+# Or compare only Flash generations (3.6, 3.7, 3.8):
 ./bin/gemini-agentic-video-go compare --models="flash"
 ```
 
@@ -194,10 +215,14 @@ Agentic video allows you to include multiple long-form videos in a single prompt
 ./bin/gemini-agentic-video-go multivideo \
   --video1="https://www.youtube.com/shorts/y-mrGw1wW8E" \
   --mode1=agentic \
-  --video2="https://storage.googleapis.com/generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4" \
+  --video2="gs://generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4" \
   --mode2=agentic \
   --prompt="Compare the setting, visual tone, and pacing of both clips."
 ```
+
+> [!TIP]
+> **Always prefer `gs://` URIs over `https://storage.googleapis.com/` URLs for Google Cloud Storage videos.**
+> Passing an HTTPS GCS URL triggers external web-fetch size limits on large videos, whereas `gs://` gives the server-side `load_video` tool direct native bucket access. The runner automatically normalizes `https://storage.googleapis.com/...` URLs to `gs://...` via `runner.NormalizeVideoURI`.
 
 In the Go SDK, you construct multiple `*genai.Part` objects and append the user prompt afterwards:
 
@@ -223,9 +248,10 @@ contents := []*genai.Content{
 
 Video context is preserved across multiple conversational turns. The model retains navigated timeline state so subsequent questions do not require re-exploring or re-ingesting the video.
 
-### Stateful vs. Stateless Interaction
-- **Stateful Mode (Recommended)**: Pass `previous_interaction_id` in subsequent requests. The server retains the navigated timeline state automatically.
-- **Stateless Mode**: When echoing conversation history back to the model, responses contain opaque steps encoding video navigation state. You **must echo all steps** back in subsequent requests.
+### Preserving `ThoughtSignature` Across Multi-Turn History
+- When echoing model responses back into `history` for subsequent turns, **preserve the non-thought text `Part`s (including their `ThoughtSignature`)** using `runner.ExtractModelTurnContent(resp)` rather than reconstructing a plain text part (`genai.NewContentFromText(resp.Text(), genai.RoleModel)`).
+- Preserving the final `ThoughtSignature` allows the server to reuse navigated video context from Turn 1, dropping Turn 2+ `toolUsePromptTokenCount` to `0` and reducing follow-up turn tokens by ~69%.
+- Note: Do not echo empty-text intermediate `processing_call` / `processing_result` signature parts back in `GenerateContent` history, as the API validates that echoed signatures are attached to synthesized text parts.
 
 Try the built-in multi-turn demonstration:
 
@@ -252,7 +278,7 @@ Try the built-in multi-turn demonstration:
    - `HIGH`: Dense visual QA, split-second action/sports analysis, or complex multi-step reasoning across 60+ min videos.
    - `MEDIUM` (Default): Optimal balance of latency, cost, and retrieval quality for general video Q&A, meeting summaries, and timestamp indexing.
    - `LOW`: Fast transcript/caption searches and metadata extraction.
-   - *Note: `thinking_level="minimal"` is not supported on `gemini-3.7-flash` and returns an API validation error.*
+   - *Note: `thinking_level="minimal"` is not supported on `gemini-4-argon`, `gemini-3.8-flash`, or `gemini-3.7-flash` and is rejected upfront with an actionable hint.*
 
 ---
 
@@ -280,10 +306,12 @@ gemini-agentic-video-go [command] [flags]
 ```
 
 ### Global Flags
-- `-m, --model string`: Model ID (default `"gemini-3.7-flash"`; supports `"gemini-3.8-flash"`, `"gemini-3.7-flash"`, `"gemini-3.6-flash"`, `"gemini-3.5-flash-lite"`).
+- `-m, --model string`: Model ID (default `"gemini-3.7-flash"`; supports `"gemini-4-argon"`, `"gemini-3.8-flash"`, `"gemini-3.7-flash"`, `"gemini-3.6-flash"`, `"gemini-3.5-flash-lite"`).
 - `-p, --project string`: Google Cloud project ID (defaults to `GOOGLE_CLOUD_PROJECT` or active `gcloud` config).
 - `-l, --location string`: Location / region (defaults to `GOOGLE_CLOUD_LOCATION` or `"global"`).
 - `-b, --backend string`: Backend: `"enterprise"` (default), `"vertex"`, or `"gemini"` (API key).
+- `--json`: Emit structured JSON output for Agent-to-Agent (A2A) and programmatic consumption.
+- `--timeout duration`: Maximum execution timeout per command (default `10m`).
 
 ### Commands
 
@@ -292,25 +320,31 @@ Runs or lists the built-in catalog scenarios:
 ```bash
 gemini-agentic-video-go example list
 gemini-agentic-video-go example 1
-gemini-agentic-video-go example 4 --model=gemini-3.6-flash
+gemini-agentic-video-go example 3 --model=gemini-4-argon --show-thoughts
 ```
 
 #### 2. `run [flags]`
-Executes an ad-hoc query against any video:
+Executes an ad-hoc query against any video (supports `--show-thoughts` and `--stream`):
 ```bash
 gemini-agentic-video-go run \
+  --model=gemini-4-argon \
   --video="https://www.youtube.com/watch?v=LzExSq9DU9w" \
   --prompt="Summarize the main announcements" \
   --mode=agentic \
-  --thinking=high
+  --thinking=high \
+  --show-thoughts \
+  --stream
 ```
 
 #### 3. `compare [flags]`
-Runs an automated side-by-side benchmark comparing Agentic vs. Static processing:
+Runs an automated side-by-side benchmark comparing Agentic vs. Static processing or multiple model generations (`--models=all`, `--models=flash`, or `--models=3.8,argon`):
 ```bash
 gemini-agentic-video-go compare \
   --video="https://www.youtube.com/watch?v=LzExSq9DU9w" \
   --prompt="What were the key revenue figures?"
+
+gemini-agentic-video-go compare --models=all \
+  --video="https://www.youtube.com/shorts/y-mrGw1wW8E"
 ```
 
 #### 4. `multivideo [flags]`
@@ -318,7 +352,7 @@ Performs comparative synthesis across two videos in a single prompt:
 ```bash
 gemini-agentic-video-go multivideo \
   --video1="https://www.youtube.com/shorts/y-mrGw1wW8E" \
-  --video2="https://storage.googleapis.com/generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4" \
+  --video2="gs://generativeai-downloads/videos/Jukin_Trailcam_Videounderstanding.mp4" \
   --prompt="Compare visual pacing and settings."
 ```
 
