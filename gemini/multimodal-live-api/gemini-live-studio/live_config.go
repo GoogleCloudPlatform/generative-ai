@@ -20,6 +20,8 @@ import (
 	"strings"
 
 	"google.golang.org/genai"
+
+	"gemini-live-studio/livebridge"
 )
 
 // fallbackLiveModel is used when GEMINI_LIVE_MODEL is unset.
@@ -38,11 +40,11 @@ func capSystemInstruction(s string) string {
 	return truncateRunes(s, maxSystemInstructionChars)
 }
 
-type liveMode string
+type liveMode = livebridge.Mode
 
 const (
-	liveModeAvatar liveMode = "avatar"
-	liveModeAudio  liveMode = "audio"
+	liveModeAvatar liveMode = livebridge.ModeAvatar
+	liveModeAudio  liveMode = livebridge.ModeAudio
 )
 
 // buildLiveConnectConfig translates the client's InitialConfig into the
@@ -298,10 +300,7 @@ func buildRealtimeInputConfig(initialConfig InitialConfig) *genai.RealtimeInputC
 // supportsProactiveAudio reports whether the target Live model supports
 // ProactivityConfig.ProactiveAudio without rejecting setup with 1007.
 func supportsProactiveAudio(model string) bool {
-	if strings.TrimSpace(model) == "" {
-		model = fallbackLiveModel
-	}
-	return strings.Contains(model, "3.8") || strings.Contains(model, "lite")
+	return livebridge.SupportsProactiveAudio(model, fallbackLiveModel)
 }
 
 // builtInFunctionDeclarations returns the interactive tools available to Gemini
@@ -389,18 +388,5 @@ func greetingPrompt(greeting string) string {
 // parsePCMSampleRate extracts the numeric sample rate from a MIME type such as
 // "audio/pcm;rate=24000", returning 0 when absent or malformed.
 func parsePCMSampleRate(mime string) int {
-	const marker = "rate="
-	idx := strings.Index(mime, marker)
-	if idx == -1 {
-		return 0
-	}
-	rateStr := mime[idx+len(marker):]
-	if end := strings.IndexAny(rateStr, ";, "); end != -1 {
-		rateStr = rateStr[:end]
-	}
-	var rate int
-	if _, err := fmt.Sscanf(rateStr, "%d", &rate); err != nil {
-		return 0
-	}
-	return rate
+	return livebridge.ParsePCMSampleRate(mime)
 }

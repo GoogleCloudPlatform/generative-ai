@@ -26,6 +26,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY *.go ./
+COPY livebridge/ ./livebridge/
 RUN go build -o server .
 
 # Stage 3: Final lightweight production image

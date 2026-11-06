@@ -2,7 +2,7 @@
 
 A real-time, voice-and-avatar codebase exploration assistant built with the **Gemini Live Bidi API** in Go and a modern web console. It autonomously inspects local files, traverses directory trees, and searches external web documentation while verbally explaining its findings.
 
-An example alongside the [Gemini Live Studio](../../README.md) reference app, this application demonstrates how to build production-grade agentic avatars using server-side function calling, dual-channel UI telemetry, and resilient WebSocket streams.
+An example alongside the [Gemini Live Studio](../../README.md) reference app, this standalone Go module builds on [`internal/livebridge`](internal/livebridge/) (synced from [`../../livebridge/`](../../livebridge/) via `make sync-livebridge`) to demonstrate server-side function calling, dual-channel UI telemetry, and resilient WebSocket streams. See [Building Voice & Avatar Agents](../../docs/building-with-livebridge.md) and the [Developer Guide](../../docs/developers_guide.md) for the shared kit architecture.
 
 ---
 
@@ -14,7 +14,7 @@ An example alongside the [Gemini Live Studio](../../README.md) reference app, th
 - **Dual-Mode Avatar Interface**:
   - **Reactive Orb Mode** (Default when avatar enabled): Ultra-low-latency audio-reactive glowing canvas orb driven by Web Audio `AnalyserNode`.
   - **Video Avatar Mode**: High-definition talking video avatar driven by Gemini Live `AvatarConfig` streaming fMP4 chunks into an embedded MSE `<video>` player with automatic inter-turn gap jumping to eliminate playhead stalling during multi-turn conversations.
-- **Thread-Safe Concurrency**: All WebSocket writes are guarded by a `SafeWS` mutex wrapper, and outgoing Live session calls (`SendRealtimeInput`, `SendToolResponse`) are guarded by `sessionMu`.
+- **Shared `livebridge` Concurrency & Teardown**: All browser WebSocket writes go through `livebridge.SafeConn`, upstream Live calls (`SendRealtimeInput`, `SendToolResponse`) are serialized by `livebridge.Bridge`, server-side tools run off the `Receive()` loop via `livebridge.ToolRunner` with barge-in cancellation, and `Bridge.Shutdown()` closes both sockets cleanly on every exit path.
 - **Self-Healing Connection**: 10-second ping/pong heartbeat, 5-second watchdog timer, and exponential backoff auto-reconnection with interactive 5-state UI badges.
 - **AudioWorklet PCM Streaming**: Client-side microphone audio is captured at 16kHz PCM on an isolated background `AudioWorkletNode` (`audio-capture-processor`), eliminating UI stutter.
 
@@ -68,14 +68,14 @@ When Gemini Live decides to call a tool, execution flows across two parallel cha
 
 ```text
 ┌─────────────────┐       WebSocket       ┌──────────────────┐    Gemini Live Bidi    ┌──────────────────┐
-│                 │ <───────────────────> │                  │ <────────────────────> │                  │
-│  Lit/Web Console│                       │    Go Backend    │                        │   Gemini Live    │
-│   (index.html)  │                       │    (main.go)     │                        │       API        │
+│                 │ <───────────────────> │  session.go +    │ <────────────────────> │                  │
+│  Web Console    │                       │  livebridge      │                        │   Gemini Live    │
+│  (index.html)   │                       │  (Bridge/Tools)  │                        │       API        │
 └─────────────────┘                       └──────────────────┘                        └──────────────────┘
          │                                          │                                          │
          │                                          │ <── 1. ToolCall(name, args) ────────────│
          │                                          │                                          │
-         │                                          │ ─── 2. Execute locally (os.ReadFile)     │
+         │                                          │ ─── 2. ToolRunner executes locally       │
          │                                          │                                          │
          │                                          │ ─── 3. SendToolResponse(result) ───────> │
          │ <── 4a. tool_execution JSON (WS) ─────── │                                          │
@@ -85,9 +85,9 @@ When Gemini Live decides to call a tool, execution flows across two parallel cha
 ```
 
 1. **Upstream Turn**: The model pauses its verbal response and sends a `msg.ToolCall`.
-2. **Local Execution**: The Go backend intercepts the call, executes `executeTool()`, and immediately returns the result upstream via `session.SendToolResponse()`.
-3. **Downstream UI Telemetry**: Concurrently, the backend writes a `tool_execution` event over the client WebSocket.
-4. **Synchronized Presentation**: The frontend renders the code preview or file grid in the inspection pane while the assistant verbally summarizes the findings.
+2. **Non-Blocking Local Execution**: `livebridge.ToolRunner` dispatches the call to `FuncRegistry` on its own goroutine (canceling `ctx` automatically if the user barges in) and returns the result upstream via `session.SendToolResponse()`.
+3. **Downstream UI Telemetry**: Concurrently, `ToolRunner` writes a `tool_execution` event over `livebridge.SafeConn`.
+4. **Synchronized Presentation**: The frontend renders the code preview, diagram, or file grid in the inspection pane while the assistant verbally summarizes the findings.
 
 ---
 

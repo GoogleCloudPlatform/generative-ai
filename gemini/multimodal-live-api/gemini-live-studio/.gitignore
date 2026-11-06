@@ -1,5 +1,7 @@
 # Node
 node_modules/
+!frontend/src/lib/
+!frontend/src/lib/**
 
 # Go
 vendor/

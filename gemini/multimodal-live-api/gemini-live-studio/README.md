@@ -55,8 +55,11 @@ Its job, per browser connection:
    before the 10-minute limit, and a single shutdown path that closes both
    sockets on every exit.
 
-The same pattern works for any Live API frontend; the server is about 1,600
-lines of Go (excluding comments and tests), with tests for every exit path.
+The same pattern works for any Live API frontend. All session plumbing is
+packaged into two reusable, framework-agnostic layers—**[`livebridge/`](livebridge/)**
+(Go) and **[`frontend/src/lib/live/`](frontend/src/lib/live/)** (TypeScript)—so
+building a new voice or avatar agent takes ~100 lines of application code. See
+[Building Voice & Avatar Agents](docs/building-with-livebridge.md) for recipes.
 
 ## Features
 
@@ -215,26 +218,28 @@ settings can be saved as profiles in `scripts/profiles/<name>.env`. Run
 ## Project layout
 
 ```text
-main.go               configuration, routes, logging
-live_session.go       WebSocket <-> Live API session (both modes)
-live_config.go        session config -> LiveConnectConfig
-api_handlers.go       /api/config, /api/generate-avatar, /api/describe-image
-client_manager.go     one Gen AI client per location
-http_security.go      origin policy, size limits, timeouts
-validation.go         input validation
-media_sniffer.go      fMP4 codec detection
-models.go             model and location allowlists
-frontend/             Lit + Vite app (see docs/frontend-components.md)
-examples/             additional examples
-scripts/deploy.sh     Cloud Run deployment
+livebridge/             reusable Go switchboard, tool runner, alert bus, codec sniffer
+main.go                 configuration, routes, logging
+live_session.go         /ws and /ws/live session handlers on top of livebridge.Bridge
+live_config.go          InitialConfig -> LiveConnectConfig
+api_handlers.go         /api/config, /api/generate-avatar, /api/describe-image
+models.go               model and location allowlists
+frontend/src/lib/live/  framework-agnostic TS audio, fMP4 MSE, socket, WebMCP kit
+frontend/               Lit + Vite studio UI (see docs/frontend-components.md)
+examples/               standalone reference applications
+scripts/deploy.sh       Cloud Run deployment
 ```
 
 ## Examples
 
-- [`examples/local-code-assistant`](examples/local-code-assistant/): a voice
-  coding assistant that explores a local codebase with server-side function
-  calling (list and read files, draw Graphviz diagrams, Google Search). It also
-  ships as an agent plugin and skill.
+Together with **Gemini Live Studio** at the repository root, this repository
+includes a second complete reference application built on `livebridge`:
+
+- [`examples/local-code-assistant`](examples/local-code-assistant/): a standalone
+  voice-and-avatar coding agent that explores a local codebase with server-side
+  function calling (`list_directory`, `read_file`, `generate_diagram`, plus
+  `GoogleSearch`) and renders live code and Graphviz cards alongside speech. It
+  also packages cleanly as a portable agent plugin and `.skill` bundle.
 
 ## Troubleshooting
 
@@ -253,11 +258,15 @@ scripts/deploy.sh     Cloud Run deployment
 
 ## Documentation
 
-| Doc                                                | Contents                                                  |
-| -------------------------------------------------- | --------------------------------------------------------- |
-| [User Guide](docs/user_guide.md)                   | Running and using the app                                 |
-| [Developer Guide](docs/developers_guide.md)        | Architecture, wire protocol, Live API patterns and quirks |
-| [Frontend components](docs/frontend-components.md) | Lit component tiers, design tokens, accessibility, tests  |
+Organized following [Diataxis](https://diataxis.fr/) (see [docs/README.md](docs/README.md)):
+
+| Doc                                                                | Quadrant    | Contents                                                                                      |
+| ------------------------------------------------------------------ | ----------- | --------------------------------------------------------------------------------------------- |
+| [User Guide](docs/user_guide.md)                                   | Tutorial    | Running and using Avatar Studio and Live Audio & Vision                                       |
+| [Building Voice & Avatar Agents](docs/building-with-livebridge.md) | How-To      | Recipes for voice sessions, avatars, server tools, WebMCP page tools, and proactive alerts    |
+| [Developer Guide](docs/developers_guide.md)                        | Explanation | Why `livebridge` exists, Live API sharp edges solved automatically, and reference app designs |
+| [Live Wire Protocol & Kit Reference](docs/live-wire-protocol.md)   | Reference   | WebSocket JSON/binary framing, close codes, `livebridge` Go API, and `src/lib/live/` TS API   |
+| [Frontend components](docs/frontend-components.md)                 | Reference   | Lit component tiers, design tokens, accessibility, and browser tests                          |
 
 ## Contributing
 
