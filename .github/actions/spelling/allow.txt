@@ -14,6 +14,7 @@ acked
 acking
 acli
 AClient
+acme
 acodec
 acomplete
 acrossfade
@@ -77,6 +78,7 @@ antiword
 anullsrc
 ANZ
 aoa
+Aoede
 AOT
 apac
 APAC
@@ -111,6 +113,7 @@ Artsakh
 arun
 arxiv
 asdf
+asearch
 AServer
 asetpts
 ASF
@@ -156,6 +159,7 @@ AWT
 axs
 axvline
 Ayra
+Ayyagari
 Ayyappa
 backstory
 backticks
@@ -2138,6 +2142,7 @@ Terabytes
 termcolor
 terraform
 Testables
+testid
 Tetsuo
 TEXTCOLOR
 texting
@@ -2168,6 +2173,7 @@ tiktoken
 timechart
 timecoded
 timecodes
+timeoff
 tion
 titlebar
 TLDR
@@ -2238,6 +2244,7 @@ Tuteja
 tval
 twd
 twiml
+twofa
 typehints
 uab
 ubuntu
@@ -2382,6 +2389,7 @@ Wakatipu
 waterjet
 WAU
 Wavenet
+wayfinder
 wcag
 wcontext
 wcslen

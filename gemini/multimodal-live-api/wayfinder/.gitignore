@@ -1,0 +1,27 @@
+# Secrets / local config
+.env
+.env.*
+!.env.example
+api_keys.json
+*.credentials.json
+service-account*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Generated grounding PDFs (build with `make demo-docs`)
+demo/acme-docs/*.pdf
+demo/acme-cloud-docs/*.pdf
+
+# Downloaded by `make install` / the Dockerfile (scripts/fetch_html2canvas.py)
+widget/third_party/html2canvas/html2canvas.min.js
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

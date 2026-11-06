@@ -1,0 +1,446 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wayfinder — Pick a persona</title>
+    <style>
+      :root {
+        --blue: #1a73e8;
+        --blue-d: #174ea6;
+        --ink: #202124;
+        --ink2: #5f6368;
+        --line: #dadce0;
+        --bg: #f8f9fa;
+        --cloud: #1a73e8;
+        --hr: #7c3aed;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Google Sans", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      header {
+        background: linear-gradient(
+          110deg,
+          #0b1f3a 0%,
+          #12305a 55%,
+          #174ea6 100%
+        );
+        color: #fff;
+        padding: 56px 24px 72px;
+        text-align: center;
+        position: relative;
+      }
+      header::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 6px;
+        background: linear-gradient(
+          90deg,
+          #1a73e8 0 25%,
+          #ea4335 25% 50%,
+          #fbbc04 50% 75%,
+          #34a853 75% 100%
+        );
+      }
+      .kicker {
+        font-size: 13px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #8ab4f8;
+        font-weight: 700;
+      }
+      h1 {
+        font-size: 44px;
+        margin: 12px 0 10px;
+        letter-spacing: -0.5px;
+      }
+      h1 span {
+        color: #8ab4f8;
+      }
+      header p {
+        font-size: 18px;
+        color: #dce6f5;
+        max-width: 720px;
+        margin: 0 auto;
+        line-height: 1.5;
+      }
+
+      main {
+        max-width: 1080px;
+        margin: -40px auto 0;
+        padding: 0 24px 48px;
+        position: relative;
+      }
+      .step-label {
+        text-align: center;
+        color: var(--ink2);
+        font-size: 14px;
+        margin: 0 0 16px;
+      }
+      .personas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+      }
+
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 18px rgba(60, 64, 67, 0.12);
+        display: flex;
+        flex-direction: column;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba(60, 64, 67, 0.18);
+      }
+      .card-top {
+        padding: 28px 28px 20px;
+        color: #fff;
+      }
+      .card.cloud .card-top {
+        background: linear-gradient(135deg, #1a73e8, #4285f4);
+      }
+      .card.hr .card-top {
+        background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+      }
+      .avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.18);
+        display: grid;
+        place-items: center;
+        margin-bottom: 14px;
+      }
+      .avatar svg {
+        width: 30px;
+        height: 30px;
+      }
+      .role {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        opacity: 0.85;
+        font-weight: 700;
+      }
+      .card h2 {
+        font-size: 26px;
+        margin: 4px 0 6px;
+      }
+      .card-top p {
+        font-size: 15px;
+        opacity: 0.92;
+        line-height: 1.45;
+      }
+
+      .card-body {
+        padding: 22px 28px 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        flex: 1;
+      }
+      .try {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--ink2);
+        font-weight: 700;
+      }
+      .prompt {
+        text-align: left;
+        width: 100%;
+        border: 1px solid var(--line);
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 14px;
+        color: var(--ink);
+        cursor: pointer;
+        line-height: 1.4;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .prompt:hover {
+        border-color: var(--blue);
+        background: #f1f6fe;
+      }
+      .card.hr .prompt:hover {
+        border-color: var(--hr);
+        background: #f6f1fe;
+      }
+      .prompt .tag {
+        flex: none;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 999px;
+        margin-top: 1px;
+      }
+      .tag.do {
+        background: #e6f4ea;
+        color: #137333;
+      }
+      .tag.ask {
+        background: #e8f0fe;
+        color: #174ea6;
+      }
+      .actions {
+        margin-top: auto;
+        display: flex;
+        gap: 12px;
+        padding-top: 6px;
+      }
+      .btn {
+        flex: 1;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 15px;
+        padding: 13px 18px;
+        border-radius: 12px;
+        color: #fff;
+      }
+      .card.cloud .btn {
+        background: var(--cloud);
+      }
+      .card.hr .btn {
+        background: var(--hr);
+      }
+      .btn:hover {
+        filter: brightness(1.08);
+      }
+
+      .how {
+        margin-top: 28px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+      }
+      .how div {
+        font-size: 14px;
+        color: var(--ink2);
+        line-height: 1.5;
+      }
+      .how b {
+        display: block;
+        color: var(--ink);
+        font-size: 15px;
+        margin-bottom: 2px;
+      }
+      .num {
+        display: inline-grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--blue);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 6px;
+      }
+      footer {
+        text-align: center;
+        color: var(--ink2);
+        font-size: 13px;
+        padding: 8px 24px 32px;
+      }
+      footer a {
+        color: var(--blue);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="kicker">
+        Gemini Live API · Agent Development Kit · Vertex AI Search
+      </div>
+      <h1>Wayfinder: <span>talk to your app, watch it act</span></h1>
+      <p>
+        Pick a persona, then tell the assistant what you need. It answers from
+        the docs, or fills in the page for you while you watch.
+      </p>
+    </header>
+
+    <main>
+      <p class="step-label">Choose who you want to be</p>
+      <div class="personas">
+        <!-- Cloud engineer -->
+        <section class="card cloud" data-testid="persona-cloud">
+          <div class="card-top">
+            <div class="avatar">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <path d="M8 21h8M12 17v4" />
+              </svg>
+            </div>
+            <div class="role">Persona 1 · Cloud engineer</div>
+            <h2>ACME Cloud console</h2>
+            <p>
+              Launch a server in a fictional cloud: plan, image, network access,
+              protection, and cost, across several steps.
+            </p>
+          </div>
+          <div class="card-body">
+            <div class="try">Try saying (click to use)</div>
+            <button
+              class="prompt"
+              data-href="/cloud"
+              data-prompt="Set up a production web server: name it web-prod, region US East, the Standard S4 plan, allow HTTP and HTTPS, and turn on verified boot.">
+              <span class="tag do">DO</span>Set up a production web server: name
+              it web-prod, region US East, the Standard S4 plan, allow HTTP and
+              HTTPS, and turn on verified boot.
+            </button>
+            <button
+              class="prompt"
+              data-href="/cloud"
+              data-prompt="Switch to Flex pricing and pick a smaller plan.">
+              <span class="tag do">DO</span>Switch to Flex pricing and pick a
+              smaller plan.
+            </button>
+            <button
+              class="prompt"
+              data-href="/cloud"
+              data-prompt="What's the difference between Flex and On-demand pricing?">
+              <span class="tag ask">ASK</span>What's the difference between Flex
+              and On-demand pricing?
+            </button>
+            <div class="actions">
+              <a class="btn" href="/cloud">Open the ACME Cloud console →</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- HR / employee -->
+        <section class="card hr" data-testid="persona-hr">
+          <div class="card-top">
+            <div class="avatar">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="8" r="4" />
+                <path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1" />
+                <path d="M17 11l2 2 4-4" />
+              </svg>
+            </div>
+            <div class="role">Persona 2 · Employee / HR</div>
+            <h2>ACME People HR portal</h2>
+            <p>
+              Benefits enrollment, 401(k), direct deposit, W-4, time off, and
+              payroll, in a fictional HR system.
+            </p>
+          </div>
+          <div class="card-body">
+            <div class="try">Try saying (click to use)</div>
+            <button
+              class="prompt"
+              data-href="/hr"
+              data-prompt="Enroll me in the PPO medical plan with dental and vision, set my 401(k) to 10%, and save.">
+              <span class="tag do">DO</span>Enroll me in the PPO medical plan
+              with dental and vision, set my 401(k) to 10%, and save.
+            </button>
+            <button
+              class="prompt"
+              data-href="/hr"
+              data-prompt="Request vacation from 2026-07-20 to 2026-07-24.">
+              <span class="tag do">DO</span>Request vacation from 2026-07-20 to
+              2026-07-24.
+            </button>
+            <button
+              class="prompt"
+              data-href="/hr"
+              data-prompt="What's the difference between the PPO and HDHP plans?">
+              <span class="tag ask">ASK</span>What's the difference between the
+              PPO and HDHP plans?
+            </button>
+            <div class="actions">
+              <a class="btn" href="/hr">Open the HR portal →</a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="how">
+        <div>
+          <b><span class="num">1</span>Pick a persona</b>Click a prompt above to
+          open that app with the prompt ready, or open the app directly.
+        </div>
+        <div>
+          <b><span class="num">2</span>Ask Wayfinder</b>Use the
+          <b style="display: inline">Ask Wayfinder</b> button (bottom right).
+          Type, or tap the mic to talk.
+        </div>
+        <div>
+          <b><span class="num">3</span>Watch it act</b>Questions get answers.
+          Commands fill in the page. You always click the final Create or Save.
+        </div>
+      </div>
+    </main>
+
+    <footer>ACME Cloud and ACME People are fictional demo apps.</footer>
+
+    <script>
+      // Clicking a sample prompt opens the persona app with the prompt pre-filled
+      // in the Wayfinder chat (the widget reads ?wf_prompt=; nothing is sent automatically).
+      document.querySelectorAll(".prompt").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var url =
+            btn.getAttribute("data-href") +
+            "?wf_prompt=" +
+            encodeURIComponent(btn.getAttribute("data-prompt"));
+          window.location.href = url;
+        });
+      });
+    </script>
+  </body>
+</html>
