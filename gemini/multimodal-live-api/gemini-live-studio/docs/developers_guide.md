@@ -267,7 +267,7 @@ These constraints are verified directly against the Gemini Live API on Google Cl
   `mediaChunks` wire field and fails with
   `1007: Mime type 'image/jpeg' is not supported`. Always populate
   `Video: &genai.Blob{MIMEType: "image/jpeg", ...}`.
-- **Proactivity is model-dependent:** `gemini-3.8-live` and `-lite` Live models
+- **Proactivity is model-dependent:** `gemini-3.8-live` and `lite` Live models
   support `ProactivityConfig.ProactiveAudio`; `gemini-3.5-flash-live-preview`
   rejects it with `1007`. Use `livebridge.SupportsProactiveAudio(model, fallback)`
   to gate `ProactivityConfig` safely.
