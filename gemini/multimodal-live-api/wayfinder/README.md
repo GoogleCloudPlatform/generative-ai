@@ -6,7 +6,7 @@
 
 > **Disclaimer:** This is not an officially supported Google product. It is a sample for learning and experimentation.
 
-Wayfinder is a voice and text assistant that you embed in a web app with a single `<script>` tag. Users say what they want ("set up a production web server…"), and an agent built with the [Agent Development Kit (ADK)](https://google.github.io/adk-docs/) on the [Gemini Live API](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/live-api) completes the task **in the page itself**: it fills in fields, picks options, flips toggles, and moves between sections while the conversation continues. "How do I…?" questions are answered from your own documentation through [Vertex AI Search](https://cloud.google.com/enterprise-search).
+Wayfinder is a voice and text assistant that you embed in a web app with a single `<script>` tag. Users say what they want ("set up a production web server…"), and an agent built with the [Agent Development Kit (ADK)](https://google.github.io/adk-docs/) on the [Gemini Live API](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/live-api) completes the task **in the page itself**: it fills in fields, picks options, flips toggles, and moves between sections while the conversation continues. "How do I…?" questions are answered from your own documentation through [Agent Search](https://cloud.google.com/enterprise-search).
 
 Instead of reading pixels, the agent works from the page's own structure (the DOM). It targets exact controls, runs in the user's own signed-in session, can only use the tools you expose, and gets the real result back after every action.
 
@@ -32,22 +32,22 @@ flowchart LR
   T -- "UI tool calls" --> B
   B -- "real result + changed fields" --> V
   B -- "real result + changed fields" --> T
-  V --> R[("Vertex AI Search<br/>per-tenant docs")]
+  V --> R[("Agent Search<br/>per-tenant docs")]
   T --> R
 ```
 
 1. **Page map.** The widget scans the page for interactive controls: selector, label, current value, and options, including controls in hidden tabs (up to 120). The agent is instructed to act only on controls from this list.
 2. **Page snapshots (voice).** While the mic is on, the widget sends a low-resolution snapshot of the page every ~3 seconds and after each action, rendered with [html2canvas](widget/third_party/html2canvas).
 3. **UI actions are ADK tools.** `click_element`, `type_text`, `select_option`, `highlight_element`, and `scroll_to_element` are plain async Python functions. In both voice and text mode each call is sent to the browser, which performs it and reports the real outcome (for example `{"success": false, "error": "Option 'eu-north' not available.", "options": [...]}`) plus the fields that changed. The agent plans, acts, observes, and corrects itself.
-4. **Grounding.** A `search_knowledge_base` tool queries a Vertex AI Search engine per tenant and returns a summary with citations. In voice mode it runs as a `NON_BLOCKING` tool, so the agent keeps talking while it searches.
-5. **Models.** Voice uses **Gemini 3.8 Live** (GA) and typed chat uses **Gemini 3.8 Flash** (GA). Both run in the `us` Vertex AI multi-region. To try **Gemini 3.8 Live Extended Thinking** for multi-step requests, set `GEMINI_MODEL` to its model ID in a project with access. The voice agent switches to async tools and a thinking level automatically, and falls back to Gemini 3.8 Live if the session can't start.
+4. **Grounding.** A `search_knowledge_base` tool queries a Agent Search engine per tenant and returns a summary with citations. In voice mode it runs as a `NON_BLOCKING` tool, so the agent keeps talking while it searches.
+5. **Models.** Voice uses **Gemini 3.8 Live** (GA) and typed chat uses **Gemini 3.8 Flash** (GA). Both run in the `us` multi-region on Gemini Enterprise Agent Platform. To try **Gemini 3.8 Live Extended Thinking** for multi-step requests, set `GEMINI_MODEL` to its model ID in a project with access. The voice agent switches to async tools and a thinking level automatically, and falls back to Gemini 3.8 Live if the session can't start.
 6. **Natural voice.** Users can interrupt the agent (barge-in). The agent session uses proactive audio, context window compression, and session resumption, which are configured through ADK's `RunConfig`. If the model rejects an optional feature, the session retries once without it.
 
 The text transport (`POST /v1/chat/stream` + `POST /v1/chat/tool_result`) uses the same browser-backed UI tools on an ADK text agent and streams events as Server-Sent Events.
 
 ## Quickstart
 
-**Prerequisites:** Python 3.10+, the [gcloud CLI](https://cloud.google.com/sdk/docs/install), and a Google Cloud project with the Vertex AI API enabled (and the Discovery Engine API if you use grounding).
+**Prerequisites:** Python 3.10+, the [gcloud CLI](https://cloud.google.com/sdk/docs/install), and a Google Cloud project with the Agent Platform API enabled (and the Discovery Engine API if you use grounding).
 
 ```bash
 gcloud auth application-default login
@@ -66,7 +66,7 @@ Without grounding, actions work and questions are answered from the page and the
 
 ```bash
 make demo-docs                # renders demo/*-docs/*.html to PDF
-# Upload the PDFs and create a Vertex AI Search engine (prints a .env entry):
+# Upload the PDFs and create a Agent Search engine (prints a .env entry):
 gcloud storage cp demo/acme-cloud-docs/*.pdf gs://YOUR_BUCKET/acme-cloud/
 .venv/bin/python scripts/provision_docs.py --project YOUR_PROJECT \
     --tenant acme-cloud-docs --origin acme-cloud --gcs-uri gs://YOUR_BUCKET/acme-cloud/
@@ -83,34 +83,34 @@ Add the printed `VERTEX_SEARCH_ENGINES` entry to `.env` and restart. The key (`a
   data-tenant="my-app"></script>
 ```
 
-| Attribute               | Purpose                                                |
-| ----------------------- | ------------------------------------------------------ |
-| `data-key`              | API key, required when `AUTH_ENABLED=true`             |
-| `data-tenant`           | Grounding key that selects the Vertex AI Search engine |
-| `data-barge-in="false"` | Mute the mic while the agent speaks (for loud rooms)   |
+| Attribute               | Purpose                                              |
+| ----------------------- | ---------------------------------------------------- |
+| `data-key`              | API key, required when `AUTH_ENABLED=true`           |
+| `data-tenant`           | Grounding key that selects the Agent Search engine   |
+| `data-barge-in="false"` | Mute the mic while the agent speaks (for loud rooms) |
 
 The agent is much more reliable when controls have stable `id` or `data-testid` attributes and real `<label>`s. Sections that use `role="tabpanel"` with matching `data-tab` / `aria-controls` tabs are opened automatically before an action.
 
 ## Configuration
 
-| Variable                     | Default            | Description                                                                                             |
-| ---------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------- |
-| `GOOGLE_CLOUD_PROJECT`       | from gcloud        | Project for Vertex AI                                                                                   |
-| `GOOGLE_CLOUD_LOCATION`      | `us`               | Vertex AI location for model calls (`us` serves both default models)                                    |
-| `GEMINI_MODEL`               | `gemini-3.8-live`  | Voice model (Gemini Live API). Set to Gemini 3.8 Live Extended Thinking to opt in where you have access |
-| `GEMINI_FALLBACK_MODEL`      | `gemini-3.8-live`  | Voice model used automatically if `GEMINI_MODEL` can't start                                            |
-| `GEMINI_TEXT_MODEL`          | `gemini-3.8-flash` | Text model                                                                                              |
-| `LIVE_THINKING_LEVEL`        | `MEDIUM`           | Reasoning level (`LOW`, `MEDIUM`, `HIGH`), used only with Extended Thinking                             |
-| `LIVE_VOICE`                 | `Aoede`            | Prebuilt output voice                                                                                   |
-| `LIVE_PROACTIVE_AUDIO`       | `true`             | Ignore speech not addressed to the agent                                                                |
-| `LIVE_AFFECTIVE_DIALOG`      | `false`            | Adapt tone to the user's emotion                                                                        |
-| `LIVE_CONTEXT_COMPRESSION`   | `true`             | Sliding-window compression for long sessions                                                            |
-| `LIVE_ASYNC_SEARCH`          | `true`             | Knowledge search as a non-blocking tool                                                                 |
-| `VERTEX_SEARCH_ENGINES`      | `{}`               | JSON map of grounding key to engine path                                                                |
-| `ALLOWED_ORIGINS`            | `*`                | CORS allowlist of full origins                                                                          |
-| `AUTH_ENABLED`               | `false`            | Require an API key and an allowed `Origin`                                                              |
-| `API_KEYS` / `API_KEYS_FILE` | —                  | `{"wf_key": {"name": "Acme", "origins": ["acme.com"]}}`                                                 |
-| `SELF_ORIGIN`                | —                  | Service hostname; co-hosted pages skip the key check                                                    |
+| Variable                     | Default            | Description                                                                                                     |
+| ---------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `GOOGLE_CLOUD_PROJECT`       | from gcloud        | Project for Agent Platform                                                                                      |
+| `GOOGLE_CLOUD_LOCATION`      | `us`               | Agent Platform location for model calls (`us` serves both default models)                                       |
+| `GEMINI_MODEL`               | `gemini-3.8-live`  | Voice model (Gemini Live API). Set to the Gemini 3.8 Live Extended Thinking model ID if your project has access |
+| `GEMINI_FALLBACK_MODEL`      | `gemini-3.8-live`  | Voice model used automatically if `GEMINI_MODEL` can't start                                                    |
+| `GEMINI_TEXT_MODEL`          | `gemini-3.8-flash` | Text model                                                                                                      |
+| `LIVE_THINKING_LEVEL`        | `MEDIUM`           | Reasoning level (`LOW`, `MEDIUM`, `HIGH`), used only with Extended Thinking                                     |
+| `LIVE_VOICE`                 | `Aoede`            | Prebuilt output voice                                                                                           |
+| `LIVE_PROACTIVE_AUDIO`       | `true`             | Ignore speech not addressed to the agent                                                                        |
+| `LIVE_AFFECTIVE_DIALOG`      | `false`            | Adapt tone to the user's emotion                                                                                |
+| `LIVE_CONTEXT_COMPRESSION`   | `true`             | Sliding-window compression for long sessions                                                                    |
+| `LIVE_ASYNC_SEARCH`          | `true`             | Knowledge search as a non-blocking tool                                                                         |
+| `VERTEX_SEARCH_ENGINES`      | `{}`               | JSON map of grounding key to engine path                                                                        |
+| `ALLOWED_ORIGINS`            | `*`                | CORS allowlist of full origins                                                                                  |
+| `AUTH_ENABLED`               | `false`            | Require an API key and an allowed `Origin`                                                                      |
+| `API_KEYS` / `API_KEYS_FILE` | —                  | `{"wf_key": {"name": "Acme", "origins": ["acme.com"]}}`                                                         |
+| `SELF_ORIGIN`                | —                  | Service hostname; co-hosted pages skip the key check                                                            |
 
 ## Deploy to Cloud Run
 
@@ -118,7 +118,7 @@ The agent is much more reliable when controls have stable `id` or `data-testid` 
 make deploy                   # wraps ./deploy.sh
 ```
 
-`deploy.sh` turns `AUTH_ENABLED` on by default. The demo pages served by the same service keep working through `SELF_ORIGIN`; other sites need an entry in `API_KEYS`. Set `API_KEYS_SECRET=<secret-name>` to mount keys from Secret Manager. The Cloud Run region comes from `REGION` (default `us-central1`) and is separate from `GOOGLE_CLOUD_LOCATION` (default `us`), the Vertex AI location used for model calls.
+`deploy.sh` turns `AUTH_ENABLED` on by default. The demo pages served by the same service keep working through `SELF_ORIGIN`; other sites need an entry in `API_KEYS`. Set `API_KEYS_SECRET=<secret-name>` to mount keys from Secret Manager. The Cloud Run region comes from `REGION` (default `us-central1`) and is separate from `GOOGLE_CLOUD_LOCATION` (default `us`), the Agent Platform location used for model calls.
 
 ## Safety and limitations
 
@@ -138,11 +138,11 @@ backend/
   agents/text_agent.py   ADK text agent
   page_map.py            Element list formatting and sanitization
   system_instruction.py  Voice agent instructions
-  rag/                   Vertex AI Search pipeline and coordinator
+  rag/                   Agent Search pipeline and coordinator
   gateway/policy.py      API key + origin policy
 widget/wayfinder.js      Embeddable widget (Shadow DOM, mic, snapshots, DOM actions)
 demo/                    Persona picker, ACME Cloud and ACME People demos, grounding docs
-scripts/                 Vertex AI Search provisioning and doc rendering
+scripts/                 Agent Search provisioning and doc rendering
 tests/                   Unit tests (no network)
 ```
 

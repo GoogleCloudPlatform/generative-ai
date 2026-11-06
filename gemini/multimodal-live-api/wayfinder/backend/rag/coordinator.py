@@ -16,8 +16,8 @@
 
 `search()` queries pipelines in order and returns the first non-empty result.
 `asearch_payload()` runs it off the event loop, and `build_adk_tool()` wraps
-it as the `search_knowledge_base` ADK tool. Today the only pipeline is Vertex
-AI Search (`WebsiteSearchPipeline`), which works for website and document
+it as the `search_knowledge_base` ADK tool. Today the only pipeline is Agent
+Search (`WebsiteSearchPipeline`), which works for website and document
 data stores; add more pipelines by implementing `RagPipeline`.
 """
 

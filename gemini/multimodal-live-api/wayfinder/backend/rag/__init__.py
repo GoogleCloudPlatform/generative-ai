@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Grounding for Wayfinder: Vertex AI Search behind a small pipeline interface."""
+"""Grounding for Wayfinder: Agent Search behind a small pipeline interface."""
 
 from .base import RagPipeline, RetrievedDoc
 from .coordinator import RagCoordinator, build_coordinator_for_tenant

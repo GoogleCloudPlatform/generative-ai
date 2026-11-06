@@ -15,7 +15,7 @@
 """Configuration loaded from environment variables.
 
 Grounding lives in `VERTEX_SEARCH_ENGINES`, which maps a grounding key (the
-widget's `data-tenant`, or the page hostname) to a Vertex AI Search engine:
+widget's `data-tenant`, or the page hostname) to a Agent Search engine:
 either the engine resource path as a string, or `{"website_engine": path}`
 (the shape `scripts/provision_engine.py` and `scripts/provision_docs.py`
 print).
@@ -33,7 +33,7 @@ load_dotenv(
 )
 
 # ADK / google-genai default to the Gemini Developer API (API key). Wayfinder
-# runs on Vertex AI with Application Default Credentials, so make that the
+# runs on Agent Platform with Application Default Credentials, so make that the
 # default unless explicitly overridden.
 os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "TRUE")
 
@@ -49,7 +49,7 @@ def _env_flag(name: str, default: bool) -> bool:
 
 
 def get_project_id() -> str:
-    """GCP project from the environment, falling back to gcloud config."""
+    """Google Cloud project from the environment, falling back to gcloud config."""
     project = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
     if project:
         return project
@@ -70,13 +70,13 @@ def get_project_id() -> str:
     except (OSError, subprocess.SubprocessError):
         pass  # gcloud missing or slow; fall through to the error below
     raise RuntimeError(
-        "No GCP project found. Set GOOGLE_CLOUD_PROJECT in .env or run: "
+        "No Google Cloud project found. Set GOOGLE_CLOUD_PROJECT in .env or run: "
         "gcloud config set project YOUR_PROJECT_ID"
     )
 
 
 def get_location() -> str:
-    """Vertex AI location for model calls.
+    """Agent Platform location for model calls.
 
     Defaults to the `us` multi-region, which serves both Gemini 3.8 Live
     (voice) and Gemini 3.8 Flash (text). Gemini 3.8 Flash isn't available in
@@ -151,7 +151,7 @@ def get_live_async_search() -> bool:
     return _env_flag("LIVE_ASYNC_SEARCH", True)
 
 
-# ---- Grounding (Vertex AI Search) ----
+# ---- Grounding (Agent Search) ----
 
 
 def get_vertex_search_engines() -> dict[str, object]:

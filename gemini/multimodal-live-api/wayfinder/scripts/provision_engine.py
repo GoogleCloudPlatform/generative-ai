@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provision a Vertex AI Search engine over a customer's documentation site.
+"""Provision a Agent Search engine over a customer's documentation site.
 
 What this does:
     1. Creates a PUBLIC_WEBSITE data store with advanced indexing enabled.
@@ -227,7 +227,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--project", required=True, help="GCP project id")
+    parser.add_argument("--project", required=True, help="Google Cloud project id")
     parser.add_argument(
         "--tenant", required=True, help="Tenant slug (lowercase, used as id suffix)"
     )
@@ -287,7 +287,7 @@ def main() -> None:
     print()
     print("Reminder: verify domain ownership in Google Search Console for the")
     print("indexed hostnames, or grant the indexing account ownership via an")
-    print("association request — Vertex AI Search will not crawl unverified sites.")
+    print("association request — Agent Search will not crawl unverified sites.")
     print()
     print("Initial crawl typically takes a few hours. Check status in the console")
     print(

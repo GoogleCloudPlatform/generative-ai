@@ -18,7 +18,7 @@ One ADK `LlmAgent` per browser voice connection, run with `Runner.run_live()`.
 
 - UI actions are ADK tools that run in the browser and return the real
   outcome (see `browser_tools.py`).
-- Knowledge search runs on the server through Vertex AI Search.
+- Knowledge search runs on the server through Agent Search.
 - The default model is the GA Gemini 3.8 Live model. If you configure
   Gemini 3.8 Live Extended Thinking, the agent uses asynchronous
   (NON_BLOCKING) function calling, leaves proactive audio to the model, and

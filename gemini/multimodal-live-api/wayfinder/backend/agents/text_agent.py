@@ -15,7 +15,7 @@
 """ADK agent for the text transport.
 
 Tools:
-- `search_knowledge_base` runs on the server (Vertex AI Search).
+- `search_knowledge_base` runs on the server (Agent Search).
 - UI tools (`click_element`, `type_text`, `select_option`,
   `highlight_element`, `scroll_to_element`) run in the user's browser. The
   server streams each call to the widget over SSE, the widget performs it

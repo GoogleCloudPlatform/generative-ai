@@ -22,7 +22,7 @@ set -euo pipefail
 
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
 # Cloud Run region for the service. Separate from GOOGLE_CLOUD_LOCATION (the
-# Vertex AI location for model calls), which can be a multi-region like "us".
+# Agent Platform location for model calls), which can be a multi-region like "us".
 REGION="${REGION:-us-central1}"
 SERVICE_NAME="${SERVICE_NAME:-wayfinder}"
 

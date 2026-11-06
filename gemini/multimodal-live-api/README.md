@@ -32,7 +32,7 @@ The following video demonstrating the Multimodal Live API shows an example use c
 6. [Customer Support Agent](native-audio-websocket-demo-apps/customer-support-demo-app/): An advanced agent with emotion detection, multimodal input, and tool execution.
 7. [Gaming Assistant](native-audio-websocket-demo-apps/gaming-assistant-demo-app/): A gaming companion with persona switching and screen sharing capabilities.
 8. [Gemini Live Studio](gemini-live-studio/): A Go server and Lit web app for talking avatars and live voice and vision sessions, with barge-in, transcripts, tool calls and a voice coding assistant example.
-9. [Wayfinder](wayfinder/): An in-app voice and text agent, built with ADK and the Gemini Live API, that operates a web UI through the DOM (fills fields, picks options, flips toggles) and answers questions from your docs with Vertex AI Search.
+9. [Wayfinder](wayfinder/): An in-app voice and text agent, built with ADK and the Gemini Live API, that operates a web UI through the DOM (fills fields, picks options, flips toggles) and answers questions from your docs with Agent Search.
 
 ### Tools
 

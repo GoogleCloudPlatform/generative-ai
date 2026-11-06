@@ -58,10 +58,10 @@ deploy: ## Deploy to Cloud Run (see deploy.sh)
 demo-docs: ## Render the demo grounding docs (HTML) to PDF
 	bash scripts/build_demo_docs.sh
 
-provision: install ## Help for indexing a docs website in Vertex AI Search
+provision: install ## Help for indexing a docs website in Agent Search
 	$(PY) scripts/provision_engine.py --help
 
-provision-docs: install ## Help for indexing PDFs in Vertex AI Search
+provision-docs: install ## Help for indexing PDFs in Agent Search
 	$(PY) scripts/provision_docs.py --help
 
 clean: ## Remove .venv and caches

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Primary RAG pipeline: Vertex AI Search over a PUBLIC_WEBSITE data store.
+"""Primary RAG pipeline: Agent Search over a PUBLIC_WEBSITE data store.
 
 The recommended setup for an ISV:
     1. Admin runs scripts/provision_engine.py with their docs URL.
@@ -45,7 +45,7 @@ DEFAULT_SEARCH_TIMEOUT_S = 12.0
 
 
 class WebsiteSearchPipeline:
-    """Vertex AI Search (Discovery Engine) over a website data store."""
+    """Agent Search (Discovery Engine) over a website data store."""
 
     name = "website"
 

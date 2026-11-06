@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Render the demo grounding docs (HTML) to PDF for Vertex AI Search.
+# Render the demo grounding docs (HTML) to PDF for Agent Search.
 #
 #   demo/acme-cloud-docs/*.html  -> ACME Cloud console demo (/cloud)
 #   demo/acme-docs/*.html        -> ACME People HR demo (/hr)

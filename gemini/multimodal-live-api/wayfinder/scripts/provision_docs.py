@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provision a Vertex AI Search engine over uploaded documents (PDFs, etc.).
+"""Provision a Agent Search engine over uploaded documents (PDFs, etc.).
 
 Use this when you want to ground Wayfinder in a curated set of files instead of
 a crawled website — e.g. a handful of product PDFs for a demo.
@@ -285,7 +285,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--project", required=True, help="GCP project id")
+    parser.add_argument("--project", required=True, help="Google Cloud project id")
     parser.add_argument(
         "--tenant", required=True, help="Tenant slug (lowercase, used as id suffix)"
     )
