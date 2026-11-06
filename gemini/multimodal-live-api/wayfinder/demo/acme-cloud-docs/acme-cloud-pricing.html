@@ -1,0 +1,98 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ACME Cloud: pricing models</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 24px;
+        color: #0f172a;
+        line-height: 1.55;
+      }
+      h1 {
+        color: #0f766e;
+      }
+      h2 {
+        margin-top: 28px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #e2e8f0;
+        padding: 8px 10px;
+        text-align: left;
+      }
+      th {
+        background: #f0fdfa;
+      }
+      .note {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 10px 14px;
+        margin: 16px 0;
+      }
+      .fine {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ACME Cloud: pricing models</h1>
+
+    <h2>On-demand</h2>
+    <p>
+      Pay per hour with no commitment. On-demand servers are never interrupted.
+      Use on-demand for production workloads.
+    </p>
+    <h2>Flex</h2>
+    <p>
+      Flex servers cost about <b>60% less</b> than on-demand, but ACME Cloud can
+      reclaim them with <b>30 seconds' notice</b> when capacity is needed. Use
+      Flex for batch jobs, CI runners, and other work that can restart.
+    </p>
+    <h2>Other costs</h2>
+    <ul>
+      <li>
+        Boot volumes are billed per GB per month: Standard SSD $0.10, Fast SSD
+        $0.17, Hard disk $0.04.
+      </li>
+      <li>
+        Daily snapshots cost about half the volume price; weekly snapshots about
+        a quarter.
+      </li>
+      <li>
+        A static (reserved) public IP costs $3.50 per month. Ephemeral IPs are
+        free.
+      </li>
+    </ul>
+
+    <p class="fine">ACME Cloud is a fictional product used for demos.</p>
+  </body>
+</html>

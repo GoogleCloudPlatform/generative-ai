@@ -1,0 +1,1807 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACME People — AI HR, handled</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+      :root {
+        --brand: #6d4aff; /* ACME violet */
+        --brand-dark: #5a36e0;
+        --brand-soft: #efeaff;
+        --accent: #12b886; /* emerald — positive/paid */
+        --amber: #f59f00; /* pending */
+        --ink: #1d1b29;
+        --ink-2: #6b6880;
+        --line: #e7e5ee;
+        --bg: #f6f6fb;
+        --side: #1c1830; /* dark sidebar */
+        --side-2: #272140;
+        --side-ink: #c9c4e0;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .material-icons,
+      .material-symbols-rounded {
+        vertical-align: middle;
+      }
+      .material-symbols-rounded {
+        font-variation-settings:
+          "wght" 400,
+          "opsz" 22;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 248px 1fr;
+        min-height: 100vh;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .side {
+        background: var(--side);
+        color: var(--side-ink);
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 20px 20px 18px;
+      }
+      .brand .logo {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #7c5cff, #12b886);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 18px;
+      }
+      .brand .name {
+        font-weight: 700;
+        font-size: 17px;
+        color: #fff;
+        letter-spacing: -0.2px;
+      }
+      .brand .name small {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        color: #8f88b5;
+        letter-spacing: 0.3px;
+      }
+      .nav {
+        padding: 6px 12px;
+        flex: 1;
+        overflow-y: auto;
+      }
+      .nav-section {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #6f6a92;
+        padding: 14px 12px 6px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--side-ink);
+        font-weight: 500;
+        user-select: none;
+      }
+      .nav-item .material-symbols-rounded {
+        font-size: 21px;
+        color: #9a93c0;
+      }
+      .nav-item:hover {
+        background: var(--side-2);
+        color: #fff;
+      }
+      .nav-item.active {
+        background: linear-gradient(
+          135deg,
+          rgba(124, 92, 255, 0.3),
+          rgba(18, 184, 134, 0.18)
+        );
+        color: #fff;
+      }
+      .nav-item.active .material-symbols-rounded {
+        color: #b9a9ff;
+      }
+      .side-user {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 14px 18px;
+        border-top: 1px solid #322b4f;
+      }
+      .side-user .av {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c5cff, #12b886);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .side-user .who {
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .side-user .who small {
+        display: block;
+        font-weight: 400;
+        color: #8f88b5;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 28px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+      }
+      .topbar h1 {
+        font-size: 19px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      .topbar .crumb {
+        color: var(--ink-2);
+        font-size: 12px;
+      }
+      .topbar .search {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 12px;
+        width: 280px;
+        color: var(--ink-2);
+      }
+      .topbar .search input {
+        border: none;
+        background: transparent;
+        outline: none;
+        flex: 1;
+        font: inherit;
+        color: var(--ink);
+      }
+      .ic-btn {
+        color: var(--ink-2);
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .ic-btn:hover {
+        background: var(--bg);
+      }
+
+      /* ---------- Main ---------- */
+      .main {
+        min-width: 0;
+      }
+      .content {
+        padding: 24px 28px 80px;
+      }
+      .tab-pane {
+        animation: fade 0.16s ease;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .page-head {
+        margin-bottom: 18px;
+      }
+      .page-head h2 {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      .page-head p {
+        color: var(--ink-2);
+        margin-top: 3px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 18px;
+      }
+      .grid.cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .grid.cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+      }
+      .card h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .card .sub {
+        color: var(--ink-2);
+        font-size: 12.5px;
+        margin-bottom: 16px;
+      }
+      .card-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .stat {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px;
+      }
+      .stat .k {
+        font-size: 12px;
+        color: var(--ink-2);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .stat .v {
+        font-size: 26px;
+        font-weight: 700;
+        margin-top: 8px;
+        letter-spacing: -0.5px;
+      }
+      .stat .d {
+        font-size: 12px;
+        color: var(--ink-2);
+        margin-top: 4px;
+      }
+      .stat .material-symbols-rounded {
+        color: var(--brand);
+        font-size: 19px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+      }
+      .badge.ok {
+        background: #e6f7f1;
+        color: #0c8f6a;
+      }
+      .badge.pend {
+        background: #fff4e0;
+        color: #b06f00;
+      }
+      .badge.info {
+        background: var(--brand-soft);
+        color: var(--brand-dark);
+      }
+
+      /* Fields */
+      .field {
+        margin-bottom: 16px;
+      }
+      .field.inline {
+        display: inline-block;
+        width: calc(50% - 8px);
+        vertical-align: top;
+      }
+      .field.inline + .field.inline {
+        margin-left: 14px;
+      }
+      .flabel {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-2);
+        margin-bottom: 6px;
+      }
+      .req {
+        color: #e03131;
+      }
+      .ctrl {
+        width: 100%;
+        height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0 13px;
+        font: inherit;
+        color: var(--ink);
+        background: #fff;
+        outline: none;
+      }
+      .ctrl:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(109, 74, 255, 0.15);
+      }
+      .ctrl[readonly] {
+        background: var(--bg);
+        color: var(--ink-2);
+        cursor: not-allowed;
+      }
+      select.ctrl {
+        appearance: none;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%236b6880'><path d='M7 10l5 5 5-5z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 34px;
+      }
+      textarea.ctrl {
+        height: auto;
+        padding: 11px 13px;
+        resize: vertical;
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--ink-2);
+        margin-top: 6px;
+      }
+
+      /* Toggle */
+      .setting-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 14px 0;
+        border-bottom: 1px solid #f0eff5;
+      }
+      .setting-row:last-child {
+        border-bottom: none;
+      }
+      .setting-label {
+        font-weight: 600;
+      }
+      .setting-desc {
+        font-size: 12.5px;
+        color: var(--ink-2);
+        margin-top: 2px;
+        max-width: 460px;
+      }
+      .switch {
+        position: relative;
+        width: 40px;
+        height: 22px;
+        flex-shrink: 0;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .switch .slider {
+        position: absolute;
+        inset: 0;
+        background: #cfcbe0;
+        border-radius: 20px;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+      .switch .slider:before {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 2px;
+        top: 2px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.2s;
+      }
+      .switch input:checked + .slider {
+        background: var(--brand);
+      }
+      .switch input:checked + .slider:before {
+        transform: translateX(18px);
+      }
+
+      .check-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 9px 0;
+      }
+      .check-row input[type="checkbox"],
+      .check-row input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        accent-color: var(--brand);
+        cursor: pointer;
+      }
+      .ck-label {
+        font-weight: 500;
+      }
+      .ck-desc {
+        font-size: 12px;
+        color: var(--ink-2);
+        margin-top: 2px;
+      }
+
+      .btn {
+        height: 42px;
+        padding: 0 22px;
+        border-radius: 10px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-primary {
+        background: var(--brand);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--brand-dark);
+      }
+      .btn-ghost {
+        background: #fff;
+        color: var(--brand);
+        border: 1px solid var(--line);
+      }
+      .btn-ghost:hover {
+        background: var(--brand-soft);
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .summary {
+        background: linear-gradient(135deg, #f3efff, #eafaf4);
+        border: 1px solid #e3dcff;
+        border-radius: 14px;
+        padding: 16px 18px;
+      }
+      .summary .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+      .summary .row b {
+        color: var(--ink);
+      }
+      .summary .total {
+        border-top: 1px dashed #c9bdf3;
+        margin-top: 8px;
+        padding-top: 10px;
+        font-size: 15px;
+      }
+
+      table.list {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table.list th {
+        text-align: left;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--ink-2);
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      table.list td {
+        padding: 11px 10px;
+        border-bottom: 1px solid #f2f1f7;
+        font-size: 13.5px;
+      }
+      table.list tr:last-child td {
+        border-bottom: none;
+      }
+      .doc-link {
+        color: var(--brand);
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        background: var(--ink);
+        color: #fff;
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-size: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        z-index: 60;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: 0.25s;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: none;
+      }
+      .toast .material-symbols-rounded {
+        color: #4be3a8;
+      }
+      .section-label {
+        font-size: 13px;
+        font-weight: 700;
+        margin: 22px 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- ===================== SIDEBAR ===================== -->
+      <aside class="side">
+        <div class="brand">
+          <div class="logo">A</div>
+          <div class="name">ACME People<small>AI HR, handled</small></div>
+        </div>
+        <nav class="nav" role="tablist" aria-label="Sections">
+          <div class="nav-section">Home</div>
+          <div
+            class="nav-item active"
+            role="tab"
+            data-tab="dashboard"
+            aria-controls="tab-dashboard"
+            data-testid="nav-dashboard">
+            <span class="material-symbols-rounded">grid_view</span> Dashboard
+          </div>
+          <div class="nav-section">Me</div>
+          <div
+            class="nav-item"
+            role="tab"
+            data-tab="personal"
+            aria-controls="tab-personal"
+            data-testid="nav-personal">
+            <span class="material-symbols-rounded">person</span> Personal
+            Information
+          </div>
+          <div
+            class="nav-item"
+            role="tab"
+            data-tab="payroll"
+            aria-controls="tab-payroll"
+            data-testid="nav-payroll">
+            <span class="material-symbols-rounded">payments</span> Payroll &amp;
+            Pay
+          </div>
+          <div
+            class="nav-item"
+            role="tab"
+            data-tab="benefits"
+            aria-controls="tab-benefits"
+            data-testid="nav-benefits">
+            <span class="material-symbols-rounded">health_and_safety</span>
+            Benefits
+          </div>
+          <div
+            class="nav-item"
+            role="tab"
+            data-tab="timeoff"
+            aria-controls="tab-timeoff"
+            data-testid="nav-timeoff">
+            <span class="material-symbols-rounded">beach_access</span> Time Off
+          </div>
+          <div class="nav-section">Workspace</div>
+          <div
+            class="nav-item"
+            role="tab"
+            data-tab="documents"
+            aria-controls="tab-documents"
+            data-testid="nav-documents">
+            <span class="material-symbols-rounded">folder</span> Documents
+          </div>
+          <div
+            class="nav-item"
+            role="tab"
+            data-tab="settings"
+            aria-controls="tab-settings"
+            data-testid="nav-settings">
+            <span class="material-symbols-rounded">settings</span> Settings
+          </div>
+        </nav>
+        <div class="side-user">
+          <div class="av">DM</div>
+          <div class="who">Dana Morgan<small>Software Engineer</small></div>
+        </div>
+      </aside>
+
+      <!-- ===================== MAIN ===================== -->
+      <div class="main">
+        <div class="topbar">
+          <div>
+            <div class="crumb">ACME People</div>
+            <h1 id="page-title">Dashboard</h1>
+          </div>
+          <div class="search">
+            <span class="material-icons" style="font-size: 20px">search</span>
+            <input
+              type="text"
+              placeholder="Search people, pay, benefits…"
+              aria-label="Search" />
+          </div>
+          <span class="material-icons ic-btn" title="Help">help_outline</span>
+          <span class="material-icons ic-btn" title="Notifications"
+            >notifications</span
+          >
+        </div>
+
+        <div class="content">
+          <!-- ===== Dashboard ===== -->
+          <section class="tab-pane active" id="tab-dashboard" role="tabpanel">
+            <div class="page-head">
+              <h2>Welcome back, Dana 👋</h2>
+              <p>
+                Here's what's happening with your pay, benefits, and time off.
+              </p>
+            </div>
+            <div class="grid cols-4" style="margin-bottom: 18px">
+              <div class="stat">
+                <div class="k">
+                  <span class="material-symbols-rounded">payments</span> Next
+                  payday
+                </div>
+                <div class="v">Jun 20</div>
+                <div class="d">Est. net $3,488</div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="material-symbols-rounded">beach_access</span> PTO
+                  balance
+                </div>
+                <div class="v">14.5</div>
+                <div class="d">days available</div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="material-symbols-rounded"
+                    >health_and_safety</span
+                  >
+                  Benefits
+                </div>
+                <div class="v">Active</div>
+                <div class="d"><span class="badge ok">Enrolled</span></div>
+              </div>
+              <div class="stat">
+                <div class="k">
+                  <span class="material-symbols-rounded">savings</span> 401(k)
+                </div>
+                <div class="v">6%</div>
+                <div class="d">+3% employer match</div>
+              </div>
+            </div>
+            <div class="grid cols-2">
+              <div class="card">
+                <h3>Open tasks</h3>
+                <div class="sub">Items that need your attention</div>
+                <table class="list">
+                  <tr>
+                    <td>Open enrollment ends Jun 30</td>
+                    <td style="text-align: right">
+                      <span class="badge pend">Action needed</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Verify direct deposit details</td>
+                    <td style="text-align: right">
+                      <span class="badge info">Review</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Acknowledge updated handbook</td>
+                    <td style="text-align: right">
+                      <span class="badge info">Review</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="card">
+                <h3>Quick actions</h3>
+                <div class="sub">Jump to a common task</div>
+                <div class="actions" style="flex-wrap: wrap">
+                  <button
+                    class="btn btn-ghost"
+                    data-testid="quick-timeoff"
+                    data-goto="timeoff">
+                    Request time off
+                  </button>
+                  <button
+                    class="btn btn-ghost"
+                    data-testid="quick-benefits"
+                    data-goto="benefits">
+                    Review benefits
+                  </button>
+                  <button
+                    class="btn btn-ghost"
+                    data-testid="quick-paystub"
+                    data-goto="payroll">
+                    View pay statement
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Personal Information ===== -->
+          <section class="tab-pane" id="tab-personal" role="tabpanel" hidden>
+            <div class="page-head">
+              <h2>Personal Information</h2>
+              <p>Keep your contact and personal details up to date.</p>
+            </div>
+
+            <div class="grid cols-2">
+              <div class="card">
+                <h3>Profile</h3>
+                <div class="sub">Managed by HR — read only</div>
+                <div class="field inline">
+                  <label class="flabel" for="employee-id">Employee ID</label
+                  ><input
+                    class="ctrl"
+                    id="employee-id"
+                    data-testid="employee-id"
+                    value="ACME-04821"
+                    readonly />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="hire-date">Hire date</label
+                  ><input
+                    class="ctrl"
+                    id="hire-date"
+                    data-testid="hire-date"
+                    value="2022-03-14"
+                    readonly />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="department">Department</label
+                  ><input
+                    class="ctrl"
+                    id="department"
+                    data-testid="department"
+                    value="Engineering"
+                    readonly />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="manager">Manager</label
+                  ><input
+                    class="ctrl"
+                    id="manager"
+                    data-testid="manager"
+                    value="Priya Raman"
+                    readonly />
+                </div>
+              </div>
+
+              <div class="card">
+                <h3>Contact details</h3>
+                <div class="sub">Editable</div>
+                <div class="field inline">
+                  <label class="flabel" for="first-name"
+                    >Legal first name <span class="req">*</span></label
+                  ><input
+                    class="ctrl"
+                    id="first-name"
+                    data-testid="first-name"
+                    value="Dana" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="last-name"
+                    >Legal last name <span class="req">*</span></label
+                  ><input
+                    class="ctrl"
+                    id="last-name"
+                    data-testid="last-name"
+                    value="Morgan" />
+                </div>
+                <div class="field">
+                  <label class="flabel" for="preferred-name"
+                    >Preferred name</label
+                  ><input
+                    class="ctrl"
+                    id="preferred-name"
+                    data-testid="preferred-name"
+                    value="Dana" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="work-email">Work email</label
+                  ><input
+                    class="ctrl"
+                    id="work-email"
+                    data-testid="work-email"
+                    value="dana.morgan@acme.com"
+                    readonly />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="phone">Mobile phone</label
+                  ><input
+                    class="ctrl"
+                    id="phone"
+                    data-testid="phone"
+                    value="(555) 014-2280" />
+                </div>
+                <div class="field">
+                  <label class="flabel" for="marital-status"
+                    >Marital status</label
+                  >
+                  <select
+                    class="ctrl"
+                    id="marital-status"
+                    data-testid="marital-status">
+                    <option value="single" selected>Single</option>
+                    <option value="married">Married</option>
+                    <option value="domestic-partner">Domestic partner</option>
+                    <option value="divorced">Divorced</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 18px">
+              <h3>Home address</h3>
+              <div class="sub">Used for tax and benefits eligibility</div>
+              <div class="field">
+                <label class="flabel" for="street">Street address</label
+                ><input
+                  class="ctrl"
+                  id="street"
+                  data-testid="street"
+                  value="120 Market St, Apt 4B" />
+              </div>
+              <div class="field inline">
+                <label class="flabel" for="city">City</label
+                ><input
+                  class="ctrl"
+                  id="city"
+                  data-testid="city"
+                  value="San Francisco" />
+              </div>
+              <div class="field inline">
+                <label class="flabel" for="state">State</label>
+                <select class="ctrl" id="state" data-testid="state">
+                  <option value="CA" selected>California</option>
+                  <option value="NY">New York</option>
+                  <option value="TX">Texas</option>
+                  <option value="WA">Washington</option>
+                  <option value="IL">Illinois</option>
+                </select>
+              </div>
+              <div class="field inline">
+                <label class="flabel" for="zip">ZIP code</label
+                ><input class="ctrl" id="zip" data-testid="zip" value="94105" />
+              </div>
+              <div class="section-label">Emergency contact</div>
+              <div class="field inline">
+                <label class="flabel" for="emergency-name">Contact name</label
+                ><input
+                  class="ctrl"
+                  id="emergency-name"
+                  data-testid="emergency-name"
+                  value="Jordan Lee" />
+              </div>
+              <div class="field inline">
+                <label class="flabel" for="emergency-phone">Contact phone</label
+                ><input
+                  class="ctrl"
+                  id="emergency-phone"
+                  data-testid="emergency-phone"
+                  value="(555) 220-9931" />
+              </div>
+              <div class="actions">
+                <button
+                  class="btn btn-primary"
+                  id="save-personal"
+                  data-testid="save-personal">
+                  Save changes</button
+                ><button class="btn btn-ghost">Cancel</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Payroll ===== -->
+          <section class="tab-pane" id="tab-payroll" role="tabpanel" hidden>
+            <div class="page-head">
+              <h2>Payroll &amp; Pay</h2>
+              <p>Direct deposit, tax withholding, and pay statements.</p>
+            </div>
+
+            <div class="grid cols-3" style="margin-bottom: 18px">
+              <div class="stat">
+                <div class="k">Annual salary</div>
+                <div class="v">$120,000</div>
+                <div class="d">Bi-weekly schedule</div>
+              </div>
+              <div class="stat">
+                <div class="k">Last net pay</div>
+                <div class="v">$3,488.12</div>
+                <div class="d">Jun 6, 2026</div>
+              </div>
+              <div class="stat">
+                <div class="k">YTD gross</div>
+                <div class="v">$55,384</div>
+                <div class="d">11 of 26 periods</div>
+              </div>
+            </div>
+
+            <div class="grid cols-2">
+              <div class="card">
+                <h3>Direct deposit</h3>
+                <div class="sub">Where your pay is deposited</div>
+                <div class="field">
+                  <label class="flabel" for="bank-name">Bank name</label
+                  ><input
+                    class="ctrl"
+                    id="bank-name"
+                    data-testid="bank-name"
+                    value="Pinnacle Bank" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="routing">Routing number</label
+                  ><input
+                    class="ctrl"
+                    id="routing"
+                    data-testid="routing"
+                    value="011000015" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="account">Account number</label
+                  ><input
+                    class="ctrl"
+                    id="account"
+                    data-testid="account"
+                    value="••••6642" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="account-type">Account type</label>
+                  <select
+                    class="ctrl"
+                    id="account-type"
+                    data-testid="account-type">
+                    <option value="checking" selected>Checking</option>
+                    <option value="savings">Savings</option>
+                  </select>
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="deposit-amount">Deposit</label>
+                  <select
+                    class="ctrl"
+                    id="deposit-amount"
+                    data-testid="deposit-amount">
+                    <option value="full" selected>Entire net pay</option>
+                    <option value="partial">Partial amount</option>
+                  </select>
+                </div>
+                <div class="actions">
+                  <button
+                    class="btn btn-primary"
+                    id="save-deposit"
+                    data-testid="save-deposit">
+                    Save direct deposit
+                  </button>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3>Tax withholding (Form W-4)</h3>
+                <div class="sub">Federal income tax elections</div>
+                <div class="field">
+                  <label class="flabel" for="filing-status"
+                    >Filing status</label
+                  >
+                  <select
+                    class="ctrl"
+                    id="filing-status"
+                    data-testid="filing-status">
+                    <option value="single" selected>
+                      Single or Married filing separately
+                    </option>
+                    <option value="married-jointly">
+                      Married filing jointly
+                    </option>
+                    <option value="head">Head of household</option>
+                  </select>
+                </div>
+                <div class="check-row">
+                  <input
+                    type="checkbox"
+                    id="multiple-jobs"
+                    data-testid="multiple-jobs" />
+                  <div>
+                    <div class="ck-label">Multiple jobs or spouse works</div>
+                    <div class="ck-desc">
+                      Check if step 2 of the W-4 applies to you.
+                    </div>
+                  </div>
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="dependents-amt"
+                    >Dependents amount</label
+                  ><input
+                    class="ctrl"
+                    type="number"
+                    id="dependents-amt"
+                    data-testid="dependents-amt"
+                    value="0" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="extra-withholding"
+                    >Extra withholding ($)</label
+                  ><input
+                    class="ctrl"
+                    type="number"
+                    id="extra-withholding"
+                    data-testid="extra-withholding"
+                    value="0" />
+                </div>
+                <div class="actions">
+                  <button
+                    class="btn btn-primary"
+                    id="save-tax"
+                    data-testid="save-tax">
+                    Save W-4
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 18px">
+              <div class="card-row" style="margin-bottom: 14px">
+                <div>
+                  <h3 style="margin: 0">Run payroll</h3>
+                  <div class="sub" style="margin: 2px 0 0">
+                    Admin · process the upcoming pay run
+                  </div>
+                </div>
+                <span class="badge pend">1 run pending</span>
+              </div>
+              <div class="field inline" style="width: calc(60% - 8px)">
+                <label class="flabel" for="pay-period">Pay period</label>
+                <select class="ctrl" id="pay-period" data-testid="pay-period">
+                  <option value="2026-06-07_2026-06-20" selected>
+                    Jun 7 – Jun 20, 2026 (pay date Jun 26)
+                  </option>
+                  <option value="2026-06-21_2026-07-04">
+                    Jun 21 – Jul 4, 2026 (pay date Jul 10)
+                  </option>
+                </select>
+              </div>
+              <div class="field inline" style="width: calc(40% - 8px)">
+                <label class="flabel" for="pay-group">Pay group</label>
+                <select class="ctrl" id="pay-group" data-testid="pay-group">
+                  <option value="us-salaried" selected>
+                    US — Salaried (142)
+                  </option>
+                  <option value="us-hourly">US — Hourly (38)</option>
+                </select>
+              </div>
+              <div class="actions">
+                <button
+                  class="btn btn-primary"
+                  id="run-payroll"
+                  data-testid="run-payroll">
+                  Run payroll</button
+                ><button
+                  class="btn btn-ghost"
+                  id="preview-payroll"
+                  data-testid="preview-payroll">
+                  Preview
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Benefits ===== -->
+          <section class="tab-pane" id="tab-benefits" role="tabpanel" hidden>
+            <div class="page-head">
+              <h2>Benefits</h2>
+              <p>
+                Open enrollment ends Jun 30. Review and update your elections.
+              </p>
+            </div>
+
+            <div class="grid cols-2">
+              <div class="card">
+                <h3>Health coverage</h3>
+                <div class="sub">Medical, dental, and vision</div>
+                <div class="field">
+                  <label class="flabel" for="medical-plan">Medical plan</label>
+                  <select
+                    class="ctrl"
+                    id="medical-plan"
+                    data-testid="medical-plan">
+                    <option value="ppo" selected>
+                      ACME PPO Plus — $180 / paycheck
+                    </option>
+                    <option value="hmo">ACME HMO — $120 / paycheck</option>
+                    <option value="hdhp">
+                      ACME HDHP + HSA — $70 / paycheck
+                    </option>
+                    <option value="waive">Waive medical — $0</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="flabel" for="coverage-tier"
+                    >Coverage tier</label
+                  >
+                  <select
+                    class="ctrl"
+                    id="coverage-tier"
+                    data-testid="coverage-tier">
+                    <option value="employee" selected>Employee only</option>
+                    <option value="employee-spouse">Employee + spouse</option>
+                    <option value="employee-children">
+                      Employee + children
+                    </option>
+                    <option value="family">Family</option>
+                  </select>
+                </div>
+                <div class="setting-row">
+                  <div>
+                    <div class="setting-label">Dental — ACME Dental PPO</div>
+                    <div class="setting-desc">$14 / paycheck</div>
+                  </div>
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="dental"
+                      data-testid="dental"
+                      checked /><span class="slider"></span
+                  ></label>
+                </div>
+                <div class="setting-row">
+                  <div>
+                    <div class="setting-label">Vision — ACME Vision</div>
+                    <div class="setting-desc">$6 / paycheck</div>
+                  </div>
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="vision"
+                      data-testid="vision" /><span class="slider"></span
+                  ></label>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3>Savings &amp; protection</h3>
+                <div class="sub">401(k), HSA/FSA, and life insurance</div>
+                <div class="field">
+                  <label class="flabel" for="contribution-401k"
+                    >401(k) contribution (%)</label
+                  ><input
+                    class="ctrl"
+                    type="number"
+                    id="contribution-401k"
+                    data-testid="contribution-401k"
+                    value="6"
+                    min="0"
+                    max="50" />
+                  <div class="hint" id="match-hint">
+                    ACME matches 50% of your contributions up to 6% of pay.
+                  </div>
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="hsa-contribution"
+                    >HSA / FSA annual ($)</label
+                  ><input
+                    class="ctrl"
+                    type="number"
+                    id="hsa-contribution"
+                    data-testid="hsa-contribution"
+                    value="0" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="life-insurance"
+                    >Life insurance</label
+                  >
+                  <select
+                    class="ctrl"
+                    id="life-insurance"
+                    data-testid="life-insurance">
+                    <option value="1x" selected>1× salary (free)</option>
+                    <option value="2x">2× salary (+$8 / paycheck)</option>
+                    <option value="3x">3× salary (+$16 / paycheck)</option>
+                  </select>
+                </div>
+
+                <div class="summary" style="margin-top: 14px">
+                  <div class="row">
+                    <span>Medical</span><b id="sum-medical">$180.00</b>
+                  </div>
+                  <div class="row">
+                    <span>Dental + vision</span><b id="sum-dentvis">$14.00</b>
+                  </div>
+                  <div class="row">
+                    <span>401(k) contribution</span><b id="sum-401k">$276.92</b>
+                  </div>
+                  <div class="row">
+                    <span>HSA / FSA</span><b id="sum-hsa">$0.00</b>
+                  </div>
+                  <div class="row total">
+                    <span><b>Estimated per paycheck</b></span
+                    ><b id="sum-total">$470.92</b>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button
+                    class="btn btn-primary"
+                    id="save-benefits"
+                    data-testid="save-benefits">
+                    Save elections
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Time Off ===== -->
+          <section class="tab-pane" id="tab-timeoff" role="tabpanel" hidden>
+            <div class="page-head">
+              <h2>Time Off</h2>
+              <p>Check balances and request time away.</p>
+            </div>
+            <div class="grid cols-3" style="margin-bottom: 18px">
+              <div class="stat">
+                <div class="k">Vacation (PTO)</div>
+                <div class="v">14.5</div>
+                <div class="d">days available</div>
+              </div>
+              <div class="stat">
+                <div class="k">Sick</div>
+                <div class="v">8.0</div>
+                <div class="d">days available</div>
+              </div>
+              <div class="stat">
+                <div class="k">Personal</div>
+                <div class="v">2.0</div>
+                <div class="d">days available</div>
+              </div>
+            </div>
+            <div class="grid cols-2">
+              <div class="card">
+                <h3>Request time off</h3>
+                <div class="sub">Submit a new request to your manager</div>
+                <div class="field">
+                  <label class="flabel" for="timeoff-type">Type</label>
+                  <select
+                    class="ctrl"
+                    id="timeoff-type"
+                    data-testid="timeoff-type">
+                    <option value="vacation" selected>Vacation (PTO)</option>
+                    <option value="sick">Sick</option>
+                    <option value="personal">Personal</option>
+                    <option value="unpaid">Unpaid leave</option>
+                  </select>
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="timeoff-start">Start date</label
+                  ><input
+                    class="ctrl"
+                    type="date"
+                    id="timeoff-start"
+                    data-testid="timeoff-start"
+                    value="2026-07-06" />
+                </div>
+                <div class="field inline">
+                  <label class="flabel" for="timeoff-end">End date</label
+                  ><input
+                    class="ctrl"
+                    type="date"
+                    id="timeoff-end"
+                    data-testid="timeoff-end"
+                    value="2026-07-08" />
+                </div>
+                <div class="field">
+                  <label class="flabel" for="timeoff-note"
+                    >Note (optional)</label
+                  ><textarea
+                    class="ctrl"
+                    id="timeoff-note"
+                    data-testid="timeoff-note"
+                    rows="2"
+                    placeholder="Add a note for your manager"></textarea>
+                </div>
+                <div class="actions">
+                  <button
+                    class="btn btn-primary"
+                    id="submit-timeoff"
+                    data-testid="submit-timeoff">
+                    Submit request
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Recent requests</h3>
+                <div class="sub">Your last few submissions</div>
+                <table class="list" id="timeoff-list">
+                  <tr>
+                    <td>May 26 – May 27</td>
+                    <td>Vacation</td>
+                    <td style="text-align: right">
+                      <span class="badge ok">Approved</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Apr 11</td>
+                    <td>Sick</td>
+                    <td style="text-align: right">
+                      <span class="badge ok">Approved</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Mar 3 – Mar 4</td>
+                    <td>Personal</td>
+                    <td style="text-align: right">
+                      <span class="badge ok">Approved</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Documents ===== -->
+          <section class="tab-pane" id="tab-documents" role="tabpanel" hidden>
+            <div class="page-head">
+              <h2>Documents</h2>
+              <p>Tax forms, pay statements, and company documents.</p>
+            </div>
+            <div class="card">
+              <table class="list">
+                <tr>
+                  <th>Document</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <td>W-2 Wage and Tax Statement (2025)</td>
+                  <td>Tax</td>
+                  <td>Jan 31, 2026</td>
+                  <td style="text-align: right">
+                    <span class="doc-link" data-testid="doc-w2"
+                      ><span
+                        class="material-symbols-rounded"
+                        style="font-size: 18px"
+                        >download</span
+                      >
+                      Download</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pay statement — Jun 6, 2026</td>
+                  <td>Payroll</td>
+                  <td>Jun 6, 2026</td>
+                  <td style="text-align: right">
+                    <span class="doc-link" data-testid="doc-paystub"
+                      ><span
+                        class="material-symbols-rounded"
+                        style="font-size: 18px"
+                        >download</span
+                      >
+                      Download</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>2026 Benefits Guide</td>
+                  <td>Benefits</td>
+                  <td>May 1, 2026</td>
+                  <td style="text-align: right">
+                    <span class="doc-link" data-testid="doc-benefits-guide"
+                      ><span
+                        class="material-symbols-rounded"
+                        style="font-size: 18px"
+                        >download</span
+                      >
+                      Download</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Employee Handbook (v7)</td>
+                  <td>Policy</td>
+                  <td>Apr 18, 2026</td>
+                  <td style="text-align: right">
+                    <span class="doc-link" data-testid="doc-handbook"
+                      ><span
+                        class="material-symbols-rounded"
+                        style="font-size: 18px"
+                        >download</span
+                      >
+                      Download</span
+                    >
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </section>
+
+          <!-- ===== Settings ===== -->
+          <section class="tab-pane" id="tab-settings" role="tabpanel" hidden>
+            <div class="page-head">
+              <h2>Settings</h2>
+              <p>Notifications, security, and preferences.</p>
+            </div>
+            <div class="grid cols-2">
+              <div class="card">
+                <h3>Notifications</h3>
+                <div class="sub">How ACME People reaches you</div>
+                <div class="setting-row">
+                  <div>
+                    <div class="setting-label">Payday reminders</div>
+                    <div class="setting-desc">
+                      Email me before each pay date.
+                    </div>
+                  </div>
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="notify-payday"
+                      data-testid="notify-payday"
+                      checked /><span class="slider"></span
+                  ></label>
+                </div>
+                <div class="setting-row">
+                  <div>
+                    <div class="setting-label">Benefits &amp; enrollment</div>
+                    <div class="setting-desc">
+                      Open enrollment and deadline alerts.
+                    </div>
+                  </div>
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="notify-benefits"
+                      data-testid="notify-benefits"
+                      checked /><span class="slider"></span
+                  ></label>
+                </div>
+                <div class="setting-row">
+                  <div>
+                    <div class="setting-label">Time-off updates</div>
+                    <div class="setting-desc">
+                      When a request is approved or denied.
+                    </div>
+                  </div>
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="notify-timeoff"
+                      data-testid="notify-timeoff" /><span class="slider"></span
+                  ></label>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Security &amp; preferences</h3>
+                <div class="sub">Account protection</div>
+                <div class="setting-row">
+                  <div>
+                    <div class="setting-label">Two-factor authentication</div>
+                    <div class="setting-desc">Require a code at sign-in.</div>
+                  </div>
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="twofa"
+                      data-testid="twofa"
+                      checked /><span class="slider"></span
+                  ></label>
+                </div>
+                <div class="field" style="margin-top: 14px">
+                  <label class="flabel" for="language">Language</label>
+                  <select class="ctrl" id="language" data-testid="language">
+                    <option value="en" selected>English (US)</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                  </select>
+                </div>
+                <div class="actions">
+                  <button
+                    class="btn btn-primary"
+                    id="save-settings"
+                    data-testid="save-settings">
+                    Save settings
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <span class="material-symbols-rounded">check_circle</span
+      ><span id="toast-msg"></span>
+    </div>
+
+    <!-- ===================== DEMO LOGIC ===================== -->
+    <script>
+      (function () {
+        var navItems = document.querySelectorAll(".nav-item");
+        var panes = document.querySelectorAll(".tab-pane");
+        var titles = {
+          dashboard: "Dashboard",
+          personal: "Personal Information",
+          payroll: "Payroll & Pay",
+          benefits: "Benefits",
+          timeoff: "Time Off",
+          documents: "Documents",
+          settings: "Settings",
+        };
+        function showTab(key) {
+          navItems.forEach(function (n) {
+            n.classList.toggle("active", n.getAttribute("data-tab") === key);
+          });
+          panes.forEach(function (p) {
+            var on = p.id === "tab-" + key;
+            p.classList.toggle("active", on);
+            if (on) p.removeAttribute("hidden");
+            else p.setAttribute("hidden", "");
+          });
+          var t = document.getElementById("page-title");
+          if (titles[key]) t.textContent = titles[key];
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        navItems.forEach(function (n) {
+          n.addEventListener("click", function () {
+            showTab(n.getAttribute("data-tab"));
+          });
+        });
+        // Dashboard quick-action buttons jump to a section
+        document.querySelectorAll("[data-goto]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            showTab(b.getAttribute("data-goto"));
+          });
+        });
+
+        // ----- Toast -----
+        var toast = document.getElementById("toast"),
+          toastMsg = document.getElementById("toast-msg"),
+          tt = null;
+        function showToast(msg) {
+          toastMsg.textContent = msg;
+          toast.classList.add("show");
+          clearTimeout(tt);
+          tt = setTimeout(function () {
+            toast.classList.remove("show");
+          }, 3400);
+        }
+
+        // ----- Benefits cost summary -----
+        var SALARY = 120000,
+          PERIODS = 26;
+        var MED = { ppo: 180, hmo: 120, hdhp: 70, waive: 0 };
+        var LIFE = { "1x": 0, "2x": 8, "3x": 16 };
+        function money(n) {
+          return (
+            "$" +
+            n.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          );
+        }
+        function recalcBenefits() {
+          var med = MED[document.getElementById("medical-plan").value] || 0;
+          var dent = document.getElementById("dental").checked ? 14 : 0;
+          var vis = document.getElementById("vision").checked ? 6 : 0;
+          var life = LIFE[document.getElementById("life-insurance").value] || 0;
+          var pct = parseFloat(
+            document.getElementById("contribution-401k").value || "0",
+          );
+          var grossPerCheck = SALARY / PERIODS;
+          var k401 = grossPerCheck * (pct / 100);
+          var hsa =
+            parseFloat(
+              document.getElementById("hsa-contribution").value || "0",
+            ) / PERIODS;
+          document.getElementById("sum-medical").textContent = money(med);
+          document.getElementById("sum-dentvis").textContent = money(
+            dent + vis + life,
+          );
+          document.getElementById("sum-401k").textContent = money(k401);
+          document.getElementById("sum-hsa").textContent = money(hsa);
+          document.getElementById("sum-total").textContent = money(
+            med + dent + vis + life + k401 + hsa,
+          );
+          var matched = Math.min(pct, 6) * 0.5;
+          document.getElementById("match-hint").textContent =
+            "ACME matches 50% up to 6%. You contribute " +
+            pct +
+            "% (" +
+            money(k401) +
+            "/paycheck); employer adds " +
+            matched.toFixed(1) +
+            "%.";
+        }
+        [
+          "medical-plan",
+          "coverage-tier",
+          "dental",
+          "vision",
+          "life-insurance",
+          "contribution-401k",
+          "hsa-contribution",
+        ].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.addEventListener("change", recalcBenefits);
+            el.addEventListener("input", recalcBenefits);
+          }
+        });
+
+        // ----- Action buttons -> toasts -----
+        function on(id, fn) {
+          var el = document.getElementById(id);
+          if (el) el.addEventListener("click", fn);
+        }
+        on("save-personal", function () {
+          showToast("Personal information updated.");
+        });
+        on("save-deposit", function () {
+          showToast(
+            "Direct deposit saved to " +
+              document.getElementById("bank-name").value +
+              ".",
+          );
+        });
+        on("save-tax", function () {
+          showToast("W-4 withholding updated.");
+        });
+        on("save-benefits", function () {
+          showToast(
+            "Benefit elections saved — total " +
+              document.getElementById("sum-total").textContent +
+              "/paycheck.",
+          );
+        });
+        on("save-settings", function () {
+          showToast("Settings saved.");
+        });
+        on("preview-payroll", function () {
+          showToast(
+            "Payroll preview ready for " +
+              document.getElementById("pay-group").value +
+              ".",
+          );
+        });
+        on("run-payroll", function () {
+          var grp =
+            document.getElementById("pay-group").options[
+              document.getElementById("pay-group").selectedIndex
+            ].text;
+          showToast("Payroll submitted for " + grp + ". Pay date posted.");
+        });
+        on("submit-timeoff", function () {
+          var type =
+            document.getElementById("timeoff-type").options[
+              document.getElementById("timeoff-type").selectedIndex
+            ].text;
+          var s = document.getElementById("timeoff-start").value,
+            e = document.getElementById("timeoff-end").value;
+          var list = document.getElementById("timeoff-list");
+          var row = list.insertRow(1);
+          row.innerHTML =
+            "<td>" +
+            s +
+            (e && e !== s ? " – " + e : "") +
+            "</td><td>" +
+            type +
+            "</td><td style='text-align:right;'><span class='badge pend'>Pending</span></td>";
+          showToast(
+            type +
+              " request submitted (" +
+              s +
+              (e && e !== s ? " – " + e : "") +
+              ").",
+          );
+        });
+
+        document.querySelectorAll(".doc-link").forEach(function (d) {
+          d.addEventListener("click", function () {
+            showToast("Downloading " + d.textContent.trim() + "…");
+          });
+        });
+
+        recalcBenefits();
+      })();
+    </script>
+
+    <!-- ===================== WAYFINDER WIDGET ===================== -->
+    <!-- Floating "Ask Wayfinder" button. Loaded from the same origin that serves this page. -->
+    <script
+      src="/wayfinder.js"
+      data-key="wf_demo"
+      data-tenant="acme-hr"></script>
+  </body>
+</html>

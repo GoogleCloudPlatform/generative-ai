@@ -15,6 +15,7 @@ acked
 acking
 acli
 AClient
+acme
 acodec
 acomplete
 acrossfade
@@ -78,6 +79,7 @@ antiword
 anullsrc
 ANZ
 aoa
+Aoede
 AOT
 apac
 APAC
@@ -112,6 +114,7 @@ Artsakh
 arun
 arxiv
 asdf
+asearch
 AServer
 asetpts
 ASF
@@ -157,6 +160,7 @@ AWT
 axs
 axvline
 Ayra
+Ayyagari
 Ayyappa
 backstory
 backticks
@@ -445,6 +449,7 @@ DCR
 ddata
 ddbb
 ddl
+debian
 declaratively
 decord
 dedup
@@ -453,6 +458,7 @@ deepeval
 DeepEval
 deepseek
 defn
+delenv
 DELET
 deliv
 Demis
@@ -757,6 +763,7 @@ gapic
 Gatace
 gauff
 Gaussians
+gax
 gbif
 gboolean
 gbp
@@ -912,9 +919,11 @@ hazmat
 Hbf
 HBox
 hclient
+hdd
 HDFC
 hdfs
 HDFS
+hdhp
 hdlr
 hdmi
 HDMI
@@ -946,6 +955,7 @@ Hlc
 hline
 Hmmm
 HMO
+hmo
 HMR
 hnsw
 Hogwarts
@@ -964,6 +974,7 @@ hparams
 HREDRAW
 Hritik
 HSA
+hsa
 HTH
 HTMX
 HTT
@@ -1626,6 +1637,7 @@ PDFs
 PEFT
 PEGI
 Pengyu
+peopleops
 pepe
 Persero
 persistable
@@ -1697,6 +1709,7 @@ Portugu
 postictal
 powerups
 PPO
+ppo
 prag
 Pranav
 praw
@@ -2140,6 +2153,7 @@ Terabytes
 termcolor
 terraform
 Testables
+testid
 Tetsuo
 TEXTCOLOR
 texting
@@ -2170,6 +2184,7 @@ tiktoken
 timechart
 timecoded
 timecodes
+timeoff
 tion
 titlebar
 TLDR
@@ -2240,6 +2255,7 @@ Tuteja
 tval
 twd
 twiml
+twofa
 typehints
 uab
 ubuntu
@@ -2384,6 +2400,7 @@ Wakatipu
 waterjet
 WAU
 Wavenet
+wayfinder
 wcag
 wcontext
 wcslen
