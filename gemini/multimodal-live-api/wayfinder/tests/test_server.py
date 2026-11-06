@@ -20,6 +20,7 @@
 import json
 import re
 from types import SimpleNamespace
+from urllib.parse import quote
 
 import httpx
 import pytest
@@ -295,7 +296,8 @@ def test_client_error_hides_details():
 
 
 def test_site_path_traversal_blocked(client):
-    assert client.get("/site/..%2F..%2Fbackend%2Fconfig.py").status_code == 404
+    encoded = quote("../../backend/config.py", safe="")
+    assert client.get(f"/site/{encoded}").status_code == 404
     assert client.get("/site/%2e%2e/backend/config.py").status_code == 404
     assert client.get("/site/.gitkeep").status_code == 200
 

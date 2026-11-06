@@ -449,6 +449,7 @@ DCR
 ddata
 ddbb
 ddl
+debian
 declaratively
 decord
 dedup
@@ -761,6 +762,7 @@ gapic
 Gatace
 gauff
 Gaussians
+gax
 gbif
 gboolean
 gbp
@@ -916,9 +918,11 @@ hazmat
 Hbf
 HBox
 hclient
+hdd
 HDFC
 hdfs
 HDFS
+hdhp
 hdlr
 hdmi
 HDMI
@@ -950,6 +954,7 @@ Hlc
 hline
 Hmmm
 HMO
+hmo
 HMR
 hnsw
 Hogwarts
@@ -968,6 +973,7 @@ hparams
 HREDRAW
 Hritik
 HSA
+hsa
 HTH
 HTMX
 HTT
@@ -1630,6 +1636,7 @@ PDFs
 PEFT
 PEGI
 Pengyu
+peopleops
 pepe
 Persero
 persistable
@@ -1701,6 +1708,7 @@ Portugu
 postictal
 powerups
 PPO
+ppo
 prag
 Pranav
 praw
