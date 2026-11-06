@@ -20,6 +20,22 @@ Instead of reading pixels, the agent works from the page's own structure (the DO
 
 ACME Cloud and ACME People are fictional apps created for this sample.
 
+## Screenshots
+
+These are real text-mode sessions captured from a local run with Agent Search grounding turned on.
+
+**Persona picker.** Pick a fictional app. Each sample prompt opens it with the request typed into Wayfinder.
+
+![Persona picker with the ACME Cloud and ACME People demos and sample prompts](docs/persona-picker.png)
+
+**ACME Cloud console.** One request fills the launch form: server name, environment, region, plan, firewall rules, and verified boot. When the agent asked for an option that didn't exist ("production"), the page reported the failure, and the agent picked the matching option ("Production") and moved on. The form is left ready to review; the agent doesn't click **Launch server**.
+
+![ACME Cloud launch form filled in by Wayfinder, with each UI action listed in the chat panel](docs/acme-cloud-agent.png)
+
+**ACME People HR portal.** The agent enrolls the user in the PPO plan with dental and vision, sets the 401(k) contribution to 10%, and saves. A follow-up question is answered from the benefits guide through Agent Search, without touching the page.
+
+![ACME People benefits page after enrollment, with a grounded answer comparing the PPO and HDHP plans](docs/acme-hr-agent.png)
+
 ## How it works
 
 ```mermaid
@@ -144,6 +160,7 @@ widget/wayfinder.js      Embeddable widget (Shadow DOM, mic, snapshots, DOM acti
 demo/                    Persona picker, ACME Cloud and ACME People demos, grounding docs
 scripts/                 Agent Search provisioning and doc rendering
 tests/                   Unit tests (no network)
+docs/                    README screenshots
 ```
 
 ## License
