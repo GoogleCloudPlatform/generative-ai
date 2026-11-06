@@ -63,8 +63,8 @@ func main() {
 
 	origins := newOriginPolicyFromEnv()
 	wsOriginPolicy = origins
-	if len(origins.allowed) > 0 {
-		slog.Info("extra allowed origins configured", "count", len(origins.allowed))
+	if origins.AllowedCount() > 0 {
+		slog.Info("extra allowed origins configured", "count", origins.AllowedCount())
 	}
 
 	mux := newMux(cfg, newClientManager(cfg.projectID, cfg.baseURL), origins)

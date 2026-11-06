@@ -1,8 +1,10 @@
 # User Guide
 
 How to run and use Gemini Live Studio. For setup and installation see the
-[main guide](../README.md); for internals see the
-[Developer Guide](developers_guide.md).
+[main guide](../README.md); to build your own voice or avatar agent see
+[Building Voice & Avatar Agents](building-with-livebridge.md), the
+[Developer Guide](developers_guide.md), and the
+[Live Wire Protocol & Kit Reference](live-wire-protocol.md).
 
 ## Contents
 

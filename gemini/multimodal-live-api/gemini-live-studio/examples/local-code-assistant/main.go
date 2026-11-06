@@ -4,13 +4,14 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//	http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 // Command local-code-assistant is a voice coding assistant: a Gemini Live
 // session with local filesystem, Graphviz and Google Search tools.
 package main
@@ -22,12 +23,12 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"slices"
 	"strings"
 
 	"github.com/joho/godotenv"
 	"google.golang.org/genai"
 
+	"local-code-assistant/internal/livebridge"
 	"local-code-assistant/tools"
 )
 
@@ -37,7 +38,7 @@ var content embed.FS
 const (
 	defaultModel      = "gemini-3.8-live"
 	defaultVoice      = "Puck"
-	defaultLocation   = "us-central1"
+	defaultLocation   = livebridge.DefaultLocation
 	defaultAddr       = ":8081"
 	defaultAvatarMode = "reactive"
 	defaultPreset     = "Ben"
@@ -66,6 +67,14 @@ type appConfig struct {
 // videoAvatar reports whether sessions request Live avatar video.
 func (c appConfig) videoAvatar() bool {
 	return c.enableAvatar && c.avatarMode == "video"
+}
+
+type genaiDialer struct {
+	client *genai.Client
+}
+
+func (d genaiDialer) Connect(ctx context.Context, model string, cfg *genai.LiveConnectConfig) (livebridge.Session, error) {
+	return d.client.Live.Connect(ctx, model, cfg)
 }
 
 func main() {
@@ -99,13 +108,13 @@ func main() {
 	)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/status", statusHandler(cfg))
-	mux.HandleFunc("/ws", sessionHandler(cfg, client, registry))
+	mux.HandleFunc("/api/status", localOriginPolicy.WithCORS(statusHandler(cfg)))
+	mux.HandleFunc("/ws", sessionHandler(cfg, genaiDialer{client: client}, registry))
 	mux.Handle("/diagrams/", http.StripPrefix("/diagrams/", http.FileServer(http.Dir(diagramsDir))))
 	mux.HandleFunc("/", indexHandler)
 
 	slog.Info("listening", "url", localURL(cfg.listenAddr))
-	if err := http.ListenAndServe(cfg.listenAddr, mux); err != nil {
+	if err := livebridge.NewHTTPServer(cfg.listenAddr, mux).ListenAndServe(); err != nil {
 		slog.Error("server stopped", "err", err)
 		os.Exit(1)
 	}
@@ -179,31 +188,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(page)
 }
 
-// allowedValues returns the registry with the server default prepended when
-// it is not already listed.
 func allowedValues(def string, registry []string) []string {
-	if def == "" || slices.Contains(registry, def) {
-		return slices.Clone(registry)
-	}
-	return append([]string{def}, registry...)
+	return livebridge.AllowedValues(def, registry)
 }
 
-// resolveAllowed returns the client-requested value if it is the server
-// default or in the registry, and the server default otherwise. Client input
-// must never reach the Vertex API unchecked.
 func resolveAllowed(kind, requested, def string, registry []string) string {
-	requested = strings.TrimSpace(requested)
-	if requested == "" || requested == def {
-		return def
-	}
-	if slices.Contains(registry, requested) {
-		return requested
-	}
-	slog.Warn("rejected client-requested value not in allowlist; using default", "kind", kind, "requested", requested, "default", def)
-	return def
+	return livebridge.ResolveAllowed(kind, requested, def, registry)
 }
 
-// localURL turns a listen address (":8081" or "127.0.0.1:8081") into a URL to open.
 func localURL(addr string) string {
 	if strings.HasPrefix(addr, ":") {
 		return "http://localhost" + addr

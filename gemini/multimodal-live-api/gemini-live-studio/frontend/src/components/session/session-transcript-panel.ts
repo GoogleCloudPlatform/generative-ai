@@ -14,67 +14,21 @@
 
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import {
+  parseToolCallItem,
+  type TranscriptItem,
+  type TranscriptToolCard,
+} from '../../lib/live/transcript-assembler';
 import { renderIcon } from '../ui/icons';
 import '../ui/ga-badge';
 
-export interface ToolCallCardData {
-  id?: string;
-  name: string;
-  title: string;
-  summary: string;
-  category?: string;
-  items?: string[];
-  cancelled?: boolean;
-}
-
-export interface TranscriptEntry {
-  type: 'user' | 'assistant' | 'tool';
-  text: string;
-  isPartial?: boolean;
-  toolCard?: ToolCallCardData;
-}
+export type ToolCallCardData = TranscriptToolCard;
+export type TranscriptEntry = TranscriptItem;
 
 export function parseToolCallEntry(
   msg: Record<string, unknown>,
 ): TranscriptEntry {
-  const name = typeof msg.name === 'string' ? msg.name : 'tool';
-  const id = typeof msg.id === 'string' ? msg.id : undefined;
-  const args =
-    msg.args && typeof msg.args === 'object'
-      ? (msg.args as Record<string, unknown>)
-      : {};
-  const title =
-    typeof args.title === 'string' && args.title.trim()
-      ? args.title.trim()
-      : name;
-  const summary =
-    typeof args.summary === 'string' && args.summary.trim()
-      ? args.summary.trim()
-      : JSON.stringify(args);
-  const category =
-    typeof args.category === 'string' && args.category.trim()
-      ? args.category.trim()
-      : undefined;
-  const items = Array.isArray(args.items)
-    ? args.items
-        .filter(
-          (it): it is string => typeof it === 'string' && it.trim() !== '',
-        )
-        .map((it) => it.trim())
-    : undefined;
-
-  return {
-    type: 'tool',
-    text: `${title}: ${summary}`,
-    toolCard: {
-      id,
-      name,
-      title,
-      summary,
-      category,
-      items,
-    },
-  };
+  return parseToolCallItem(msg);
 }
 
 /**
