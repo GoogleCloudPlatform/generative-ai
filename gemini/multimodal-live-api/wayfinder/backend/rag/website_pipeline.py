@@ -115,13 +115,15 @@ class WebsiteSearchPipeline:
             )
             resp.raise_for_status()
             data = resp.json()
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught  # search failures return no docs
             logger.error("WebsiteSearchPipeline query failed: %s", e)
             return []
 
         return self._parse_response(data, top_k)
 
-    def _parse_response(self, data: dict, top_k: int) -> list[RetrievedDoc]:
+    def _parse_response(  # pylint: disable=too-many-locals
+        self, data: dict, top_k: int
+    ) -> list[RetrievedDoc]:
         docs: list[RetrievedDoc] = []
 
         # First: include the LLM-generated summary as its own doc so the

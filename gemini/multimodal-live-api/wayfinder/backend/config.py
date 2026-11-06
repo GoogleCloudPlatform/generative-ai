@@ -59,6 +59,7 @@ def get_project_id() -> str:
             capture_output=True,
             text=True,
             timeout=5,
+            check=False,
         )
         project = result.stdout.strip()
         if project and project != "(unset)":
@@ -66,8 +67,8 @@ def get_project_id() -> str:
                 "GOOGLE_CLOUD_PROJECT", project
             )  # for ADK's Vertex client
             return project
-    except Exception:
-        pass
+    except (OSError, subprocess.SubprocessError):
+        pass  # gcloud missing or slow; fall through to the error below
     raise RuntimeError(
         "No GCP project found. Set GOOGLE_CLOUD_PROJECT in .env or run: "
         "gcloud config set project YOUR_PROJECT_ID"

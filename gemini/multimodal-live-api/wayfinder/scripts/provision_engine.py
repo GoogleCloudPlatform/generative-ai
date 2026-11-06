@@ -43,6 +43,11 @@ Idempotency:
     skip creates and just print the resulting paths.
 """
 
+# Google Cloud client libraries are imported inside functions so `--help` works
+# without them. The two provisioning scripts are intentionally standalone, so
+# some setup code is repeated.
+# pylint: disable=import-outside-toplevel,duplicate-code
+
 from __future__ import annotations
 
 import argparse
@@ -51,10 +56,11 @@ import sys
 from collections.abc import Iterable
 
 
-def _client_or_die():
+def _client_or_die() -> None:
+    """Exits with install instructions if the client library is missing."""
     try:
-        from google.api_core import exceptions as gax_exc  # noqa: F401
-        from google.cloud import discoveryengine_v1 as de  # noqa: F401
+        from google.api_core import exceptions as gax_exc  # noqa: F401  # pylint: disable=unused-import
+        from google.cloud import discoveryengine_v1 as de  # noqa: F401  # pylint: disable=unused-import
     except ImportError:
         print(
             "Missing google-cloud-discoveryengine. Install with:\n"
@@ -69,7 +75,8 @@ def create_website_data_store(
     tenant: str,
     display_name: str,
     reuse: bool,
-):
+) -> str:
+    """Creates (or reuses) a website data store; returns its resource path."""
     from google.api_core import exceptions as gax_exc
     from google.cloud import discoveryengine_v1 as de
 
@@ -107,7 +114,8 @@ def add_target_sites(
     project: str,
     data_store_id: str,
     patterns: Iterable[str],
-):
+) -> list[str]:
+    """Adds URL patterns as target sites; returns the patterns now present."""
     from google.api_core import exceptions as gax_exc
     from google.cloud import discoveryengine_v1 as de
 
@@ -116,9 +124,9 @@ def add_target_sites(
         f"projects/{project}/locations/global/collections/default_collection"
         f"/dataStores/{data_store_id}/siteSearchEngine"
     )
-    created = []
+    created: list[str] = []
     for pattern in patterns:
-        clean = pattern.strip().lstrip("https://").lstrip("http://")
+        clean = pattern.strip().removeprefix("https://").removeprefix("http://")
         if not clean:
             continue
         req = de.CreateTargetSiteRequest(
@@ -140,7 +148,8 @@ def add_target_sites(
     return created
 
 
-def add_sitemap(project: str, data_store_id: str, sitemap_uri: str):
+def add_sitemap(project: str, data_store_id: str, sitemap_uri: str) -> None:
+    """Submits a sitemap so the data store can discover pages."""
     from google.api_core import exceptions as gax_exc
     from google.cloud import discoveryengine_v1 as de
 
@@ -174,7 +183,8 @@ def create_engine(
     display_name: str,
     data_store_path: str,
     reuse: bool,
-):
+) -> str:
+    """Creates (or reuses) a search engine over the data store; returns its path."""
     from google.api_core import exceptions as gax_exc
     from google.cloud import discoveryengine_v1 as de
 
@@ -212,7 +222,8 @@ def create_engine(
     return full_path
 
 
-def main():
+def main() -> None:
+    """Parses arguments and provisions the website engine."""
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )

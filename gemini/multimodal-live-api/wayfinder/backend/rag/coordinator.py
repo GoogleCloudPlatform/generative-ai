@@ -43,6 +43,7 @@ class RagCoordinator:
 
     @property
     def pipeline_names(self) -> list[str]:
+        """Names of the configured pipelines, in query order."""
         return [p.name for p in self.pipelines]
 
     def search(self, query: str, top_k: int = 5) -> list[RetrievedDoc]:
@@ -50,7 +51,7 @@ class RagCoordinator:
         for pipeline in self.pipelines:
             try:
                 results = pipeline.search(query, top_k=top_k)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught  # fall through to the next pipeline
                 logger.error("Pipeline %s raised: %s", pipeline.name, e)
                 continue
             if results:
@@ -86,13 +87,15 @@ class RagCoordinator:
         """
         return await asyncio.to_thread(self.search_payload, query, top_k)
 
-    def build_adk_tool(self):
+    def build_adk_tool(self) -> object:
         """Return an ADK FunctionTool wrapping `search`.
 
         Imported lazily so the ADK dependency is only required by paths
         that actually use it (text/HTTP runner).
         """
-        from google.adk.tools import FunctionTool
+        from google.adk.tools import (  # pylint: disable=import-outside-toplevel
+            FunctionTool,
+        )
 
         async def search_knowledge_base(query: str) -> dict:
             """Search the customer's documentation for an answer to the query."""

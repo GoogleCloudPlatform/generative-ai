@@ -14,6 +14,8 @@
 
 """Test setup: hermetic environment and project root on sys.path."""
 
+# pylint: disable=wrong-import-position
+
 import os
 import sys
 

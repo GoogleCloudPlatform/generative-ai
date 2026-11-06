@@ -14,6 +14,9 @@
 
 """Access policy (API key + origin allowlist) and page-map formatting."""
 
+# mypy: allow-untyped-defs
+# pylint: disable=missing-function-docstring
+
 import json
 
 from backend import page_map

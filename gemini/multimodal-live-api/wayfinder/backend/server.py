@@ -427,7 +427,9 @@ async def chat_tool_result(request: Request) -> JSONResponse:
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket):
+async def websocket_endpoint(  # pylint: disable=too-many-locals,too-many-branches
+    ws: WebSocket,
+) -> None:
     """Voice: an ADK agent on the Gemini Live API, one per connection.
 
     Protocol (JSON messages):
@@ -440,7 +442,7 @@ async def websocket_endpoint(ws: WebSocket):
     run_task: asyncio.Task | None = None
     send_lock = asyncio.Lock()
 
-    async def send(msg: dict):
+    async def send(msg: dict) -> None:
         async with send_lock:
             await ws.send_text(json.dumps(msg))
 
@@ -466,7 +468,7 @@ async def websocket_endpoint(ws: WebSocket):
             await ws.close(code=4003, reason=decision.reason)
             return
 
-        page_elements = []
+        page_elements: list = []
         if msg.get("type") == "page_manifest":
             page_elements = (msg.get("elements") or [])[:MAX_MANIFEST_ELEMENTS]
 
@@ -526,10 +528,10 @@ async def websocket_endpoint(ws: WebSocket):
                 )
     except WebSocketDisconnect:
         logger.info("Voice WebSocket disconnected.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught  # report to client
         try:
             await send({"type": "error", **client_error(e, "WebSocket")})
-        except Exception:
+        except Exception:  # noqa: BLE001, S110  # pylint: disable=broad-exception-caught  # socket already gone
             pass
     finally:
         if voice:
@@ -540,7 +542,7 @@ async def websocket_endpoint(ws: WebSocket):
                     user_id=voice.user_id,
                     session_id=voice.session_id,
                 )
-            except Exception:
+            except Exception:  # noqa: BLE001, S110  # pylint: disable=broad-exception-caught  # best-effort cleanup
                 pass
         if run_task:
             run_task.cancel()
@@ -552,7 +554,8 @@ if os.path.isdir(SITE_DIR):
     _SITE_ROOT = os.path.realpath(SITE_DIR)
 
     @app.get("/site/{path:path}")
-    async def serve_site_file(path: str):
+    async def serve_site_file(path: str) -> Response:
+        """Serves a file from site/, blocking path traversal."""
         file_path = os.path.realpath(os.path.join(_SITE_ROOT, path))
         if (
             os.path.commonpath([_SITE_ROOT, file_path]) != _SITE_ROOT

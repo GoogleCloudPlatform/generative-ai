@@ -14,10 +14,14 @@
 
 """HTTP-level tests for backend/server.py (no model or network calls)."""
 
+# mypy: allow-untyped-defs
+# pylint: disable=missing-function-docstring,redefined-outer-name,protected-access,unused-argument,import-outside-toplevel
+
 import json
 import re
 from types import SimpleNamespace
 
+import httpx
 import pytest
 from backend import server
 from fastapi.testclient import TestClient
@@ -77,7 +81,7 @@ def _events(text: str) -> list[dict]:
     for raw in re.split(r"\r?\n\r?\n", text):
         if not raw.strip():
             continue
-        ev = {"event": "message", "data": []}
+        ev: dict = {"event": "message", "data": []}
         for line in re.split(r"\r?\n", raw):
             if line.startswith("event:"):
                 ev["event"] = line[6:].strip()
@@ -88,8 +92,8 @@ def _events(text: str) -> list[dict]:
     return events
 
 
-def _session_id(resp) -> str:
-    done = [e for e in _events(resp.text) if e["event"] == "done"][0]
+def _session_id(resp: httpx.Response) -> str:
+    done = next(e for e in _events(resp.text) if e["event"] == "done")
     return json.loads(done["data"])["session_id"]
 
 

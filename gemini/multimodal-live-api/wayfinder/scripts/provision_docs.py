@@ -64,6 +64,11 @@ Idempotency:
     create calls entirely and just (optionally) import + print paths.
 """
 
+# Google Cloud client libraries are imported inside functions so `--help` and
+# the unit tests work without them. The two provisioning scripts are
+# intentionally standalone, so some setup code is repeated.
+# pylint: disable=import-outside-toplevel,duplicate-code
+
 from __future__ import annotations
 
 import argparse
@@ -84,10 +89,11 @@ def matches_include(filename: str, patterns: Iterable[str]) -> bool:
     return any(fnmatch.fnmatch(name, p.strip().lower()) for p in patterns if p.strip())
 
 
-def _client_or_die(need_storage: bool):
+def _client_or_die(need_storage: bool) -> None:
+    """Exits with install instructions if a required client library is missing."""
     try:
-        from google.api_core import exceptions as gax_exc  # noqa: F401
-        from google.cloud import discoveryengine_v1 as de  # noqa: F401
+        from google.api_core import exceptions as gax_exc  # noqa: F401  # pylint: disable=unused-import
+        from google.cloud import discoveryengine_v1 as de  # noqa: F401  # pylint: disable=unused-import
     except ImportError:
         print(
             "Missing google-cloud-discoveryengine. Install with:\n"
@@ -97,7 +103,7 @@ def _client_or_die(need_storage: bool):
         sys.exit(2)
     if need_storage:
         try:
-            from google.cloud import storage  # noqa: F401
+            from google.cloud import storage  # noqa: F401  # pylint: disable=unused-import
         except ImportError:
             print(
                 "--local-dir needs google-cloud-storage. Install with:\n"
@@ -117,7 +123,7 @@ def _parse_gcs_uri(gcs_uri: str) -> tuple[str, str]:
     return bucket, prefix
 
 
-def upload_local_dir(
+def upload_local_dir(  # pylint: disable=too-many-locals
     local_dir: str, gcs_uri: str, include: Iterable[str] = (DEFAULT_INCLUDE,)
 ) -> None:
     """Upload files in local_dir that match `include` to the gs://bucket/prefix location."""
@@ -163,6 +169,7 @@ def upload_local_dir(
 def create_docs_data_store(
     project: str, tenant: str, display_name: str, reuse: bool
 ) -> str:
+    """Creates (or reuses) an unstructured data store; returns its resource path."""
     from google.api_core import exceptions as gax_exc
     from google.cloud import discoveryengine_v1 as de
 
@@ -200,6 +207,7 @@ def create_docs_data_store(
 def import_documents(
     project: str, data_store_id: str, input_uris: Iterable[str], wait: bool
 ) -> None:
+    """Imports documents from GCS into the data store, optionally waiting."""
     from google.cloud import discoveryengine_v1 as de
 
     client = de.DocumentServiceClient()
@@ -226,7 +234,7 @@ def import_documents(
         print(
             f"  import finished (error samples: {failed}). Indexing may continue for a few minutes."
         )
-    except Exception as e:  # noqa: BLE001 — surface timeout/errors but don't abort the run
+    except Exception as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught  # report, don't abort
         print(f"  import still running or errored: {e}")
         print("  You can re-run with --reuse once it completes, or check the console.")
 
@@ -234,6 +242,7 @@ def import_documents(
 def create_engine(
     project: str, tenant: str, display_name: str, data_store_path: str, reuse: bool
 ) -> str:
+    """Creates (or reuses) a search engine over the data store; returns its path."""
     from google.api_core import exceptions as gax_exc
     from google.cloud import discoveryengine_v1 as de
 
@@ -271,7 +280,8 @@ def create_engine(
     return full_path
 
 
-def main():
+def main() -> None:
+    """Parses arguments and provisions the documents engine."""
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )

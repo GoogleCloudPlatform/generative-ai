@@ -14,6 +14,9 @@
 
 """scripts/provision_docs.py: which local files get uploaded (no network)."""
 
+# mypy: allow-untyped-defs
+# pylint: disable=missing-function-docstring,missing-class-docstring,unused-argument,import-outside-toplevel
+
 import importlib.util
 import os
 import sys
@@ -23,6 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _spec = importlib.util.spec_from_file_location(
     "provision_docs", os.path.join(ROOT, "scripts", "provision_docs.py")
 )
+assert _spec is not None and _spec.loader is not None
 provision_docs = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(provision_docs)
 

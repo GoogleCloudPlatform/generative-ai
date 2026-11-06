@@ -14,15 +14,21 @@
 
 """Voice agent: browser bridge, agent/tool wiring, run config, /ws routing."""
 
+# mypy: allow-untyped-defs
+# pylint: disable=missing-function-docstring,missing-class-docstring,unused-argument,protected-access,import-outside-toplevel
+
+from __future__ import annotations
+
 import asyncio
 import json
+from typing import ClassVar
 
 from backend import server, voice_agent
 from backend.rag import build_coordinator_for_tenant
 from fastapi.testclient import TestClient
 from google.genai import types
 
-ELEMENTS = [
+ELEMENTS: list[dict] = [
     {"tag": "input", "selector": "#server-name", "label": "Server name", "value": ""},
     {
         "tag": "select",
@@ -38,8 +44,8 @@ ELEMENTS = [
 
 def _bridge_with_browser(reply):
     """Bridge whose 'browser' answers every tool_call via `reply(call)`."""
-    sent = []
-    holder = {}
+    sent: list[dict] = []
+    holder: dict = {}
 
     async def send(msg):
         sent.append(msg)
@@ -90,10 +96,13 @@ def test_bridge_surfaces_failures_for_self_correction():
 
 
 def test_bridge_dedupes_within_a_turn_and_resets():
-    calls = []
-    bridge, _ = _bridge_with_browser(
-        lambda c: calls.append(c) or ({"success": True}, None)
-    )
+    calls: list[dict] = []
+
+    def reply(call: dict) -> tuple[dict, None]:
+        calls.append(call)
+        return {"success": True}, None
+
+    bridge, _ = _bridge_with_browser(reply)
 
     async def run():
         a = await bridge.call("click_element", {"selector": "#allow-http"})
@@ -102,7 +111,7 @@ def test_bridge_dedupes_within_a_turn_and_resets():
         c = await bridge.call("click_element", {"selector": "#allow-http"})
         return a, b, c
 
-    a, b, c = asyncio.run(run())
+    _, b, _ = asyncio.run(run())
     assert len(calls) == 2
     assert "Already done" in b["note"]
 
@@ -120,7 +129,11 @@ def test_voice_agent_tools_and_async_search():
     coord = build_coordinator_for_tenant(
         website_engine_path="projects/1/locations/global/collections/c/engines/e"
     )
-    bridge = voice_agent.BrowserBridge(lambda m: None, ELEMENTS)
+
+    async def no_browser(msg: dict) -> None:
+        pass
+
+    bridge = voice_agent.BrowserBridge(no_browser, ELEMENTS)
     # Default model is GA Gemini 3.8 Live: WHEN_IDLE search, blocking UI tools, no thinking config.
     agent = voice_agent.build_voice_agent(
         coord, bridge, grounded=True, async_search=True
@@ -202,7 +215,7 @@ def test_event_to_messages():
 
 
 class FakeVoice:
-    instances = []
+    instances: ClassVar[list[FakeVoice]] = []
 
     def __init__(self, **kw):
         self.kw, self.calls = kw, []

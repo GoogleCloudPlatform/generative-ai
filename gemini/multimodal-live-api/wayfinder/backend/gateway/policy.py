@@ -27,21 +27,27 @@ from ..config import get_api_keys, get_auth_enabled, get_self_origin
 
 @dataclass
 class PolicyDecision:
+    """Outcome of a policy check, with the resolved tenant when allowed."""
+
     allowed: bool
     reason: str
     tenant_id: str = ""
     metadata: dict = field(default_factory=dict)
 
     @classmethod
-    def allow(cls, reason: str, tenant_id: str = "", **meta) -> PolicyDecision:
+    def allow(cls, reason: str, tenant_id: str = "", **meta: object) -> PolicyDecision:
+        """Builds an allowing decision for `tenant_id`."""
         return cls(allowed=True, reason=reason, tenant_id=tenant_id, metadata=meta)
 
     @classmethod
-    def deny(cls, reason: str, **meta) -> PolicyDecision:
+    def deny(cls, reason: str, **meta: object) -> PolicyDecision:
+        """Builds a denying decision with a reason."""
         return cls(allowed=False, reason=reason, metadata=meta)
 
 
-def evaluate(origin: str, api_key: str | None) -> PolicyDecision:
+def evaluate(  # pylint: disable=too-many-return-statements  # one early return per rule
+    origin: str, api_key: str | None
+) -> PolicyDecision:
     """Decide whether an inbound request from `origin` is allowed.
 
     `origin` must be the hostname from the browser's `Origin` header (see

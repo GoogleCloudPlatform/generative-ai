@@ -35,6 +35,7 @@ import base64
 import logging
 import uuid
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from google.adk.agents import LlmAgent
 from google.adk.agents.live_request_queue import LiveRequestQueue
@@ -79,6 +80,8 @@ def is_async_only_model(model: str) -> bool:
 def build_search_tool(
     coordinator: RagCoordinator, model: str, async_search: bool = True
 ) -> FunctionTool:
+    """Builds the knowledge-base search tool for the voice agent."""
+
     async def search_knowledge_base(query: str) -> dict:
         """Search the product documentation for how-to, best-practice, or
         troubleshooting guidance. Cite the source title in your answer.
@@ -105,6 +108,7 @@ def build_voice_agent(
     model: str | None = None,
     async_search: bool | None = None,
 ) -> LlmAgent:
+    """Builds the live voice agent with browser UI tools and optional search."""
     model = model or get_model()
     base = SYSTEM_INSTRUCTION_GROUNDED if grounded else SYSTEM_INSTRUCTION_VISION_ONLY
     element_list = format_element_list(bridge.elements)
@@ -142,7 +146,8 @@ def build_voice_agent(
 
 
 def build_run_config(model: str, optional_features: bool = True) -> RunConfig:
-    kwargs: dict = dict(
+    """Builds the ADK RunConfig for a live voice session."""
+    kwargs: dict = dict(  # noqa: C408  # pylint: disable=use-dict-literal
         streaming_mode=StreamingMode.BIDI,
         response_modalities=[types.Modality.AUDIO],
         speech_config=types.SpeechConfig(
@@ -170,7 +175,7 @@ def build_run_config(model: str, optional_features: bool = True) -> RunConfig:
     return RunConfig(**kwargs)
 
 
-def event_to_messages(event) -> list[dict]:
+def event_to_messages(event: Any) -> list[dict]:
     """Translate an ADK live Event into widget messages."""
     out: list[dict] = []
     if getattr(event, "interrupted", False):
@@ -211,7 +216,7 @@ def event_to_messages(event) -> list[dict]:
     return out
 
 
-def is_idle(event) -> bool:
+def is_idle(event: Any) -> bool:
     """True when the model has finished all work for the current request.
 
     With asynchronous reasoning, turn_complete no longer means idle; use
@@ -223,19 +228,19 @@ def is_idle(event) -> bool:
     return bool(getattr(event, "turn_complete", False))
 
 
-class VoiceSession:
+class VoiceSession:  # pylint: disable=too-many-instance-attributes
     """One browser voice connection running an ADK agent in live mode."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments  # keyword-only
         self,
         *,
-        session_service,
+        session_service: Any,
         coordinator: RagCoordinator,
         grounded: bool,
         send: SendFn,
         elements: list,
         user_id: str,
-    ):
+    ) -> None:
         get_project_id()  # ADK's Vertex client reads project/location from env
         get_location()
         self._session_service = session_service
@@ -253,7 +258,7 @@ class VoiceSession:
         self._started = False
         self._early_turns: list[types.Content] = []
 
-    def _build(self, async_search: bool | None):
+    def _build(self, async_search: bool | None) -> None:
         self.agent = build_voice_agent(
             self._coordinator,
             self.bridge,
@@ -265,7 +270,7 @@ class VoiceSession:
             agent=self.agent, app_name=APP_NAME, session_service=self._session_service
         )
 
-    async def run(self, on_ready: Callable[[], Awaitable[None]] | None = None):
+    async def run(self, on_ready: Callable[[], Awaitable[None]] | None = None) -> None:
         """Stream agent events to the browser until closed.
 
         If the session fails before producing any output, retries without
@@ -311,9 +316,9 @@ class VoiceSession:
                     for msg in event_to_messages(event):
                         await self._send(msg)
                 return
-            except asyncio.CancelledError:
+            except asyncio.CancelledError:  # pylint: disable=try-except-raise  # never retry a cancel
                 raise
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught  # retry with fallbacks
                 if got_event or self._closed or not fallbacks:
                     raise
                 label, opts = fallbacks.pop(0)
@@ -332,25 +337,31 @@ class VoiceSession:
 
     # ---- Browser -> agent ----
 
-    def send_text(self, text: str):
+    def send_text(self, text: str) -> None:
+        """Sends a typed user turn to the agent."""
         self.bridge.new_turn()
         content = types.Content(role="user", parts=[types.Part(text=text)])
         if not self._started:
             self._early_turns.append(content)
         self.queue.send_content(content)
 
-    def send_audio(self, data: bytes, mime_type: str = "audio/pcm;rate=16000"):
+    def send_audio(self, data: bytes, mime_type: str = "audio/pcm;rate=16000") -> None:
+        """Streams a chunk of microphone audio to the agent."""
         self.queue.send_realtime(types.Blob(data=data, mime_type=mime_type))
 
-    def send_image(self, data: bytes):
+    def send_image(self, data: bytes) -> None:
+        """Streams a JPEG page snapshot to the agent."""
         self.queue.send_realtime(types.Blob(data=data, mime_type="image/jpeg"))
 
-    def tool_result(self, call_id: str, result: dict, elements: list | None):
+    def tool_result(self, call_id: str, result: dict, elements: list | None) -> None:
+        """Delivers a browser tool result to the waiting tool call."""
         self.bridge.resolve(call_id, result, elements)
 
-    def update_elements(self, elements: list):
+    def update_elements(self, elements: list) -> None:
+        """Replaces the current page element map."""
         self.bridge.update_elements(elements)
 
-    def close(self):
+    def close(self) -> None:
+        """Stops the session and closes the request queue."""
         self._closed = True
         self.queue.close()

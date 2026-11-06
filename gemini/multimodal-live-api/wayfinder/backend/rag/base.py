@@ -32,6 +32,7 @@ class RetrievedDoc:
     citations: list[str] = field(default_factory=list)
 
     def to_payload(self) -> dict:
+        """Returns the document as a JSON-serializable dict."""
         return {
             "title": self.title,
             "content": self.content,
@@ -47,7 +48,9 @@ class RagPipeline(Protocol):
 
     name: str
 
-    def search(self, query: str, top_k: int = 5) -> list[RetrievedDoc]: ...
+    def search(self, query: str, top_k: int = 5) -> list[RetrievedDoc]:
+        """Returns up to `top_k` documents relevant to `query`."""
+        ...
 
 
 class NullPipeline:
@@ -55,5 +58,8 @@ class NullPipeline:
 
     name = "null"
 
-    def search(self, query: str, top_k: int = 5) -> list[RetrievedDoc]:
+    def search(  # pylint: disable=unused-argument  # matches RagPipeline
+        self, query: str, top_k: int = 5
+    ) -> list[RetrievedDoc]:
+        """Returns no documents."""
         return []
