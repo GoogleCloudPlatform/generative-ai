@@ -20,6 +20,7 @@ The `agent_engine` directory contains notebooks that demonstrate how to use Agen
 - [Get Started with Code Execution](agent_engine/tutorial_get_started_with_code_execution.ipynb): A tutorial on how to get started with code execution on Agent Engine.
 - [Get Started with Live API on Agent Engine](agent_engine/tutorial_get_started_with_live_api_on_agent_engine.ipynb): A tutorial on how to get started with a live API on Agent Engine.
 - [MCP on Agent Engine](agent_engine/tutorial_mcp_on_agent_engine.ipynb): A tutorial on how to use the Multi-turn Conversation Platform (MCP) on Agent Engine.
+- [Detect anomalous agent behavior with Agent Anomaly Detection](agent_engine/tutorial_agent_anomaly_detection.ipynb): Deploy an ADK agent with an over-permissive tool, simulate an attack, and read the anomaly findings.
 
 ### gemini_data_analytics
 
