@@ -1,0 +1,100 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ACME Cloud: protecting a server</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 24px;
+        color: #0f172a;
+        line-height: 1.55;
+      }
+      h1 {
+        color: #0f766e;
+      }
+      h2 {
+        margin-top: 28px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #e2e8f0;
+        padding: 8px 10px;
+        text-align: left;
+      }
+      th {
+        background: #f0fdfa;
+      }
+      .note {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 10px 14px;
+        margin: 16px 0;
+      }
+      .fine {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ACME Cloud: protecting a server</h1>
+
+    <h2>Verified boot</h2>
+    <p>
+      <b>Verified boot</b> only lets boot software signed by a trusted key run,
+      which protects against boot-level malware. Turn it on for every
+      internet-facing server. It's in the <b>Protection</b> step when you launch
+      a server.
+    </p>
+    <h2>Integrity alerts</h2>
+    <p>
+      Integrity alerts warn you if the boot sequence changes unexpectedly. They
+      are on by default.
+    </p>
+    <h2>Encryption</h2>
+    <p>
+      All volumes are encrypted. Turn on
+      <b>Encrypt volumes with your own key</b> if your policies require
+      customer-managed keys.
+    </p>
+    <h2>Network access</h2>
+    <p>
+      Only open the ports you need. Public web servers need <b>HTTP (80)</b> and
+      <b>HTTPS (443)</b>. Avoid <b>SSH from anywhere</b> in production; use a
+      private network or a bastion instead.
+    </p>
+    <div class="note">
+      Turn on <b>Deletion lock</b> for production servers so they can't be
+      deleted by mistake.
+    </div>
+
+    <p class="fine">ACME Cloud is a fictional product used for demos.</p>
+  </body>
+</html>
