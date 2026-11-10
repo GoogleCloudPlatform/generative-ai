@@ -497,6 +497,7 @@ dino
 dioicus
 direnv
 dirnames
+discoveryengine
 distichum
 Disturbia
 diy
@@ -1845,6 +1846,7 @@ REPOURL
 repreve
 reprompt
 requestz
+rerank
 reranked
 reranker
 reranking
@@ -2098,6 +2100,7 @@ subviews
 subword
 sudo
 suis
+Sundar
 sunner
 supima
 suptitle
