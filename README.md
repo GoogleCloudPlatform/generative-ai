@@ -1,6 +1,6 @@
 # Generative AI on Google Cloud
 
-> The latest Gemini models are available! Try out [Gemini 4 Argon](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_4_argon.ipynb).
+> The latest Gemini models are available! Try out [Gemini 4 Carbon](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_4_carbon.ipynb).
 
 <!-- markdownlint-disable MD033 -->
 

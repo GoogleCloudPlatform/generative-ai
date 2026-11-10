@@ -1,0 +1,1075 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Launch a server — ACME Cloud (fictional demo)</title>
+    <style>
+      :root {
+        --brand: #0f766e;
+        --brand-2: #14b8a6;
+        --accent: #f59e0b;
+        --ink: #0f172a;
+        --ink2: #475569;
+        --line: #e2e8f0;
+        --bg: #f1f5f9;
+        --side: #0b1220;
+        --side-2: #111a2e;
+        --ok: #16a34a;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Ubuntu,
+          sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        font-size: 14px;
+        display: grid;
+        grid-template-columns: 232px 1fr;
+        min-height: 100vh;
+      }
+
+      /* ---- Sidebar ---- */
+      aside {
+        background: var(--side);
+        color: #cbd5e1;
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 8px 18px;
+        color: #fff;
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: 0.2px;
+      }
+      .logo .mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--brand-2), var(--accent));
+        display: grid;
+        place-items: center;
+        color: #0b1220;
+        font-weight: 900;
+      }
+      .side-h {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: #64748b;
+        padding: 12px 10px 4px;
+      }
+      .side-a {
+        padding: 9px 10px;
+        border-radius: 8px;
+        color: #cbd5e1;
+        text-decoration: none;
+        display: block;
+      }
+      .side-a.on {
+        background: var(--side-2);
+        color: #fff;
+        box-shadow: inset 3px 0 0 var(--brand-2);
+      }
+      .side-foot {
+        margin-top: auto;
+        font-size: 12px;
+        color: #64748b;
+        padding: 10px;
+      }
+
+      /* ---- Main ---- */
+      header.top {
+        height: 56px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 24px;
+      }
+      .crumbs {
+        color: var(--ink2);
+        font-size: 13px;
+      }
+      .crumbs b {
+        color: var(--ink);
+      }
+      .org {
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: var(--ink2);
+        font-size: 13px;
+      }
+      .org .pill {
+        background: #ecfeff;
+        color: var(--brand);
+        border: 1px solid #99f6e4;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-weight: 600;
+      }
+      .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+      main {
+        padding: 22px 28px 96px;
+      }
+      h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      .lead {
+        color: var(--ink2);
+        margin-bottom: 18px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 22px;
+        align-items: start;
+      }
+
+      /* Stepper (section navigation) */
+      .steps {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .step {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink2);
+        font-weight: 600;
+        font: inherit;
+        font-weight: 600;
+      }
+      .step .n {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--bg);
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+      }
+      .step.active {
+        border-color: var(--brand);
+        color: var(--brand);
+        background: #f0fdfa;
+      }
+      .step.active .n {
+        background: var(--brand);
+        color: #fff;
+      }
+
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px 24px;
+      }
+      .card h2 {
+        font-size: 17px;
+        margin-bottom: 4px;
+      }
+      .card .sub {
+        color: var(--ink2);
+        margin-bottom: 18px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 20px;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ink2);
+        margin-bottom: 6px;
+      }
+      .field input[type="text"],
+      .field input[type="number"],
+      .field select {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 0 12px;
+        font: inherit;
+        background: #fff;
+        color: var(--ink);
+      }
+      .field input:focus,
+      .field select:focus {
+        outline: 2px solid var(--brand-2);
+        border-color: transparent;
+      }
+      .hint {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 5px;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 4px 0 16px;
+      }
+      .tile {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        cursor: pointer;
+        background: #fff;
+        text-align: left;
+        font: inherit;
+      }
+      .tile b {
+        display: block;
+      }
+      .tile span {
+        color: #64748b;
+        font-size: 12px;
+      }
+      .tile.on {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 2px #99f6e4;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+      }
+      .row:first-of-type {
+        border-top: none;
+      }
+      .row b {
+        display: block;
+      }
+      .row span {
+        color: #64748b;
+        font-size: 12.5px;
+      }
+      .switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        flex: none;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .knob {
+        position: absolute;
+        inset: 0;
+        background: #cbd5e1;
+        border-radius: 999px;
+        transition: 0.15s;
+        cursor: pointer;
+      }
+      .knob::before {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 3px;
+        top: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.15s;
+      }
+      .switch input:checked + .knob {
+        background: var(--brand);
+      }
+      .switch input:checked + .knob::before {
+        transform: translateX(20px);
+      }
+      .radio-row {
+        display: flex;
+        gap: 10px;
+      }
+      .radio {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        cursor: pointer;
+      }
+      .radio input {
+        margin-top: 3px;
+        accent-color: var(--brand);
+      }
+      .radio span {
+        color: #64748b;
+        font-size: 12.5px;
+        display: block;
+      }
+
+      /* Summary */
+      .summary {
+        background: var(--side);
+        color: #e2e8f0;
+        border-radius: 14px;
+        padding: 20px;
+        position: sticky;
+        top: 16px;
+      }
+      .summary h3 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #94a3b8;
+      }
+      .price {
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        margin: 6px 0 2px;
+      }
+      .price small {
+        font-size: 14px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+      .lines {
+        margin-top: 14px;
+        border-top: 1px solid #1e293b;
+      }
+      .lines div {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #1e293b;
+        font-size: 13px;
+      }
+      .lines div span:last-child {
+        color: #fff;
+      }
+      .tag {
+        display: inline-block;
+        margin-top: 12px;
+        background: #422006;
+        color: #fbbf24;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .tag[hidden] {
+        display: none;
+      }
+
+      footer.bar {
+        position: fixed;
+        left: 232px;
+        right: 0;
+        bottom: 0;
+        background: #fff;
+        border-top: 1px solid var(--line);
+        padding: 14px 28px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 11px 18px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .btn.primary {
+        background: var(--brand);
+        color: #fff;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--ink2);
+      }
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 84px;
+        transform: translateX(-50%);
+        background: var(--ink);
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 10px;
+        display: none;
+      }
+      .demo-note {
+        margin-left: auto;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <div class="logo">
+        <div class="mark">A</div>
+        ACME Cloud
+      </div>
+      <div class="side-h">Compute</div>
+      <a class="side-a on" href="#">Servers</a>
+      <a class="side-a" href="#">Server templates</a>
+      <a class="side-a" href="#">Autoscaling groups</a>
+      <div class="side-h">Data</div>
+      <a class="side-a" href="#">Databases</a>
+      <a class="side-a" href="#">Object storage</a>
+      <div class="side-h">Network</div>
+      <a class="side-a" href="#">Private networks</a>
+      <a class="side-a" href="#">Load balancers</a>
+      <div class="side-foot">ACME Cloud is a fictional product for demos.</div>
+    </aside>
+
+    <div>
+      <header class="top">
+        <div class="crumbs">Servers / <b>Launch a server</b></div>
+        <div class="org">
+          <span class="pill">Workspace: acme-prod</span>
+          <div class="avatar">J</div>
+        </div>
+      </header>
+
+      <main>
+        <h1>Launch a server</h1>
+        <p class="lead">
+          Pick a plan, an image, network access, and protections. You can review
+          everything before launch.
+        </p>
+
+        <div class="layout">
+          <div>
+            <nav class="steps" role="tablist">
+              <button
+                class="step active"
+                role="tab"
+                data-tab="basics"
+                aria-controls="tab-basics"
+                data-testid="step-basics">
+                <span class="n">1</span>Basics
+              </button>
+              <button
+                class="step"
+                role="tab"
+                data-tab="image"
+                aria-controls="tab-image"
+                data-testid="step-image">
+                <span class="n">2</span>Image &amp; storage
+              </button>
+              <button
+                class="step"
+                role="tab"
+                data-tab="network"
+                aria-controls="tab-network"
+                data-testid="step-network">
+                <span class="n">3</span>Network access
+              </button>
+              <button
+                class="step"
+                role="tab"
+                data-tab="protection"
+                aria-controls="tab-protection"
+                data-testid="step-protection">
+                <span class="n">4</span>Protection
+              </button>
+              <button
+                class="step"
+                role="tab"
+                data-tab="billing"
+                aria-controls="tab-billing"
+                data-testid="step-billing">
+                <span class="n">5</span>Backups &amp; billing
+              </button>
+            </nav>
+
+            <!-- 1. Basics -->
+            <section
+              class="card tab-pane active"
+              id="tab-basics"
+              role="tabpanel">
+              <h2>Basics</h2>
+              <p class="sub">Name your server and choose where it runs.</p>
+              <div class="grid2">
+                <div class="field">
+                  <label for="server-name">Server name</label>
+                  <input
+                    type="text"
+                    id="server-name"
+                    data-testid="server-name"
+                    value="server-1" />
+                  <div class="hint">
+                    Lowercase letters, numbers, and dashes.
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="environment">Environment</label>
+                  <select id="environment" data-testid="environment">
+                    <option value="dev">Development</option>
+                    <option value="staging">Staging</option>
+                    <option value="prod">Production</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="region">Region</label>
+                  <select id="region" data-testid="region">
+                    <option value="us-east" selected>US East</option>
+                    <option value="us-west">US West</option>
+                    <option value="eu-central">EU Central</option>
+                    <option value="ap-south">Asia Pacific South</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="datacenter">Datacenter</label>
+                  <select id="datacenter" data-testid="datacenter"></select>
+                </div>
+              </div>
+              <div class="field" style="margin-top: 18px">
+                <label>Plan family</label>
+              </div>
+              <div class="tiles" role="radiogroup">
+                <button
+                  class="tile on"
+                  data-family="standard"
+                  id="family-standard"
+                  data-testid="family-standard">
+                  <b>Standard</b><span>Balanced CPU and memory</span>
+                </button>
+                <button
+                  class="tile"
+                  data-family="compute"
+                  id="family-compute"
+                  data-testid="family-compute">
+                  <b>Compute</b><span>High CPU</span>
+                </button>
+                <button
+                  class="tile"
+                  data-family="memory"
+                  id="family-memory"
+                  data-testid="family-memory">
+                  <b>Memory</b><span>Large RAM</span>
+                </button>
+                <button
+                  class="tile"
+                  data-family="gpu"
+                  id="family-gpu"
+                  data-testid="family-gpu">
+                  <b>GPU</b><span>Accelerated</span>
+                </button>
+              </div>
+              <div class="field">
+                <label for="plan">Plan</label
+                ><select id="plan" data-testid="plan"></select>
+              </div>
+            </section>
+
+            <!-- 2. Image & storage -->
+            <section
+              class="card tab-pane"
+              id="tab-image"
+              role="tabpanel"
+              hidden>
+              <h2>Image &amp; storage</h2>
+              <p class="sub">Operating system and the boot volume.</p>
+              <div class="grid2">
+                <div class="field">
+                  <label for="os-image">Operating system</label>
+                  <select id="os-image" data-testid="os-image">
+                    <option value="ubuntu-24">Ubuntu 24.04 LTS</option>
+                    <option value="ubuntu-22">Ubuntu 22.04 LTS</option>
+                    <option value="debian-12">Debian 12</option>
+                    <option value="rocky-9">Rocky Linux 9</option>
+                    <option value="windows-2022">Windows Server 2022</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="volume-type">Volume type</label>
+                  <select id="volume-type" data-testid="volume-type">
+                    <option value="standard-ssd">Standard SSD</option>
+                    <option value="fast-ssd">Fast SSD</option>
+                    <option value="hdd">Hard disk (archive)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="volume-size">Boot volume size (GB)</label>
+                  <input
+                    type="number"
+                    id="volume-size"
+                    data-testid="volume-size"
+                    value="20"
+                    min="10"
+                    max="2000" />
+                </div>
+              </div>
+              <div class="row" style="margin-top: 12px">
+                <div>
+                  <b>Delete volume with server</b
+                  ><span
+                    >Remove the boot volume when the server is deleted.</span
+                  >
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="delete-volume"
+                    data-testid="delete-volume"
+                    checked
+                    aria-label="Delete volume with server" /><span
+                    class="knob"></span
+                ></label>
+              </div>
+            </section>
+
+            <!-- 3. Network access -->
+            <section
+              class="card tab-pane"
+              id="tab-network"
+              role="tabpanel"
+              hidden>
+              <h2>Network access</h2>
+              <p class="sub">Firewall rules and addressing.</p>
+              <div class="row">
+                <div>
+                  <b>Allow web traffic (HTTP, port 80)</b
+                  ><span>Opens port 80 to the internet.</span>
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="allow-http"
+                    data-testid="allow-http"
+                    aria-label="Allow web traffic (HTTP, port 80)" /><span
+                    class="knob"></span
+                ></label>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Allow secure web traffic (HTTPS, port 443)</b
+                  ><span>Opens port 443 to the internet.</span>
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="allow-https"
+                    data-testid="allow-https"
+                    aria-label="Allow secure web traffic (HTTPS, port 443)" /><span
+                    class="knob"></span
+                ></label>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Allow SSH from anywhere (port 22)</b
+                  ><span>Not recommended for production.</span>
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="allow-ssh"
+                    data-testid="allow-ssh"
+                    aria-label="Allow SSH from anywhere (port 22)" /><span
+                    class="knob"></span
+                ></label>
+              </div>
+              <div class="grid2" style="margin-top: 12px">
+                <div class="field">
+                  <label for="public-ip">Public IP address</label>
+                  <select id="public-ip" data-testid="public-ip">
+                    <option value="ephemeral">Ephemeral</option>
+                    <option value="static">Static (reserved)</option>
+                    <option value="none">None (private only)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="private-network">Private network</label>
+                  <select id="private-network" data-testid="private-network">
+                    <option value="default">default</option>
+                    <option value="prod-net">prod-net</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- 4. Protection -->
+            <section
+              class="card tab-pane"
+              id="tab-protection"
+              role="tabpanel"
+              hidden>
+              <h2>Protection</h2>
+              <p class="sub">Harden the server and its data.</p>
+              <div class="row">
+                <div>
+                  <b>Verified boot</b
+                  ><span>Only boot software signed by a trusted key.</span>
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="verified-boot"
+                    data-testid="verified-boot"
+                    aria-label="Verified boot" /><span class="knob"></span
+                ></label>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Encrypt volumes with your own key</b
+                  ><span
+                    >Use a customer-managed key instead of the default
+                    key.</span
+                  >
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="customer-key"
+                    data-testid="customer-key"
+                    aria-label="Encrypt volumes with your own key" /><span
+                    class="knob"></span
+                ></label>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Integrity alerts</b
+                  ><span>Alert if the boot sequence changes unexpectedly.</span>
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="integrity-alerts"
+                    data-testid="integrity-alerts"
+                    checked
+                    aria-label="Integrity alerts" /><span class="knob"></span
+                ></label>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Deletion lock</b
+                  ><span
+                    >Prevent the server from being deleted by mistake.</span
+                  >
+                </div>
+                <label class="switch"
+                  ><input
+                    type="checkbox"
+                    id="deletion-lock"
+                    data-testid="deletion-lock"
+                    aria-label="Deletion lock" /><span class="knob"></span
+                ></label>
+              </div>
+            </section>
+
+            <!-- 5. Backups & billing -->
+            <section
+              class="card tab-pane"
+              id="tab-billing"
+              role="tabpanel"
+              hidden>
+              <h2>Backups &amp; billing</h2>
+              <p class="sub">Snapshots and how you pay.</p>
+              <div class="field">
+                <label for="backup-schedule">Backup schedule</label>
+                <select id="backup-schedule" data-testid="backup-schedule">
+                  <option value="none">No backups</option>
+                  <option value="daily">Daily snapshots (7 days)</option>
+                  <option value="weekly">Weekly snapshots (4 weeks)</option>
+                </select>
+              </div>
+              <div class="field" style="margin-top: 18px">
+                <label>Pricing model</label>
+              </div>
+              <div class="radio-row">
+                <label class="radio"
+                  ><input
+                    type="radio"
+                    name="pricing"
+                    id="pricing-ondemand"
+                    data-testid="pricing-ondemand"
+                    value="ondemand"
+                    checked />
+                  <div>
+                    <b>On-demand</b
+                    ><span>Pay per hour. Never interrupted.</span>
+                  </div></label
+                >
+                <label class="radio"
+                  ><input
+                    type="radio"
+                    name="pricing"
+                    id="pricing-flex"
+                    data-testid="pricing-flex"
+                    value="flex" />
+                  <div>
+                    <b>Flex</b
+                    ><span
+                      >About 60% cheaper. Can be reclaimed with 30 seconds'
+                      notice.</span
+                    >
+                  </div></label
+                >
+              </div>
+            </section>
+          </div>
+
+          <aside class="summary" aria-label="Cost summary">
+            <h3>Estimated cost</h3>
+            <div class="price" id="cost-total">
+              $0.00 <small>/ month</small>
+            </div>
+            <div style="color: #94a3b8; font-size: 12.5px" id="cost-hourly">
+              ≈ $0.000 per hour
+            </div>
+            <div class="lines">
+              <div>
+                <span id="cost-plan-label">Plan</span
+                ><span id="cost-plan">$0.00</span>
+              </div>
+              <div>
+                <span id="cost-volume-label">Boot volume</span
+                ><span id="cost-volume">$0.00</span>
+              </div>
+              <div>
+                <span>Backups</span><span id="cost-backups">$0.00</span>
+              </div>
+              <div><span>Static IP</span><span id="cost-ip">$0.00</span></div>
+            </div>
+            <span class="tag" id="flex-tag" hidden>Flex discount applied</span>
+          </aside>
+        </div>
+      </main>
+
+      <footer class="bar">
+        <button class="btn primary" id="launch-btn" data-testid="launch-btn">
+          Launch server
+        </button>
+        <button class="btn ghost" id="cancel-btn" data-testid="cancel-btn">
+          Cancel
+        </button>
+        <span class="demo-note"
+          >Fictional console for demos. Nothing is created.</span
+        >
+      </footer>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+      var PLANS = {
+        standard: [
+          ["s2", "S2 · 2 vCPU · 4 GB", 24],
+          ["s4", "S4 · 4 vCPU · 16 GB", 96],
+          ["s8", "S8 · 8 vCPU · 32 GB", 192],
+        ],
+        compute: [
+          ["c4", "C4 · 4 vCPU · 8 GB", 110],
+          ["c8", "C8 · 8 vCPU · 16 GB", 220],
+          ["c16", "C16 · 16 vCPU · 32 GB", 440],
+        ],
+        memory: [
+          ["m4", "M4 · 4 vCPU · 32 GB", 160],
+          ["m8", "M8 · 8 vCPU · 64 GB", 320],
+        ],
+        gpu: [
+          ["g1", "G1 · 8 vCPU · 1 GPU", 780],
+          ["g2", "G2 · 16 vCPU · 2 GPUs", 1560],
+        ],
+      };
+      var DATACENTERS = {
+        "us-east": ["a", "b", "c"],
+        "us-west": ["a", "b"],
+        "eu-central": ["a", "b", "c"],
+        "ap-south": ["a", "b"],
+      };
+      var VOLUME_PER_GB = { "standard-ssd": 0.1, "fast-ssd": 0.17, hdd: 0.04 };
+      var $ = function (id) {
+        return document.getElementById(id);
+      };
+      var family = "standard";
+
+      function showTab(key) {
+        document.querySelectorAll(".step").forEach(function (s) {
+          s.classList.toggle("active", s.getAttribute("data-tab") === key);
+        });
+        document.querySelectorAll(".tab-pane").forEach(function (p) {
+          var on = p.id === "tab-" + key;
+          p.classList.toggle("active", on);
+          if (on) p.removeAttribute("hidden");
+          else p.setAttribute("hidden", "");
+        });
+      }
+      document.querySelectorAll(".step").forEach(function (s) {
+        s.addEventListener("click", function () {
+          showTab(s.getAttribute("data-tab"));
+        });
+      });
+
+      function fillDatacenters() {
+        var r = $("region").value,
+          sel = $("datacenter");
+        sel.innerHTML = "";
+        DATACENTERS[r].forEach(function (z) {
+          var o = document.createElement("option");
+          o.value = r + "-" + z;
+          o.textContent = r + "-" + z;
+          sel.appendChild(o);
+        });
+      }
+      function fillPlans() {
+        var sel = $("plan"),
+          prev = sel.value;
+        sel.innerHTML = "";
+        PLANS[family].forEach(function (p) {
+          var o = document.createElement("option");
+          o.value = p[0];
+          o.textContent = p[1];
+          sel.appendChild(o);
+        });
+        if (
+          Array.from(sel.options).some(function (o) {
+            return o.value === prev;
+          })
+        )
+          sel.value = prev;
+      }
+      document.querySelectorAll(".tile").forEach(function (t) {
+        t.addEventListener("click", function () {
+          family = t.getAttribute("data-family");
+          document.querySelectorAll(".tile").forEach(function (x) {
+            x.classList.toggle("on", x === t);
+          });
+          fillPlans();
+          updateCost();
+        });
+      });
+
+      function money(v) {
+        return "$" + v.toFixed(2);
+      }
+      function updateCost() {
+        var plan =
+          PLANS[family].find(function (p) {
+            return p[0] === $("plan").value;
+          }) || PLANS[family][0];
+        var flex = $("pricing-flex").checked;
+        var planCost = plan[2] * (flex ? 0.4 : 1);
+        var vol =
+          Math.max(10, parseInt($("volume-size").value || "10", 10)) *
+          VOLUME_PER_GB[$("volume-type").value];
+        var backups = { none: 0, daily: vol * 0.5, weekly: vol * 0.25 }[
+          $("backup-schedule").value
+        ];
+        var ip = $("public-ip").value === "static" ? 3.5 : 0;
+        var total = planCost + vol + backups + ip;
+        $("cost-plan-label").textContent = plan[1].split(" · ")[0] + " plan";
+        $("cost-plan").textContent = money(planCost);
+        $("cost-volume").textContent = money(vol);
+        $("cost-backups").textContent = money(backups);
+        $("cost-ip").textContent = money(ip);
+        $("cost-total").innerHTML = money(total) + " <small>/ month</small>";
+        $("cost-hourly").textContent =
+          "≈ $" + (total / 730).toFixed(3) + " per hour";
+        $("flex-tag").hidden = !flex;
+      }
+
+      $("region").addEventListener("change", function () {
+        fillDatacenters();
+        updateCost();
+      });
+      [
+        "plan",
+        "volume-type",
+        "volume-size",
+        "backup-schedule",
+        "public-ip",
+        "pricing-ondemand",
+        "pricing-flex",
+      ].forEach(function (id) {
+        $(id).addEventListener("change", updateCost);
+        $(id).addEventListener("input", updateCost);
+      });
+      function toast(msg) {
+        var t = $("toast");
+        t.textContent = msg;
+        t.style.display = "block";
+        setTimeout(function () {
+          t.style.display = "none";
+        }, 3500);
+      }
+      $("launch-btn").addEventListener("click", function () {
+        toast(
+          "Demo: '" +
+            $("server-name").value +
+            "' would launch now. Nothing was created.",
+        );
+      });
+      $("cancel-btn").addEventListener("click", function () {
+        toast("Cancelled.");
+      });
+
+      fillDatacenters();
+      fillPlans();
+      updateCost();
+    </script>
+
+    <!-- Wayfinder widget: the floating "Ask Wayfinder" button. -->
+    <script
+      src="/wayfinder.js"
+      data-key="wf_demo"
+      data-tenant="acme-cloud"></script>
+  </body>
+</html>

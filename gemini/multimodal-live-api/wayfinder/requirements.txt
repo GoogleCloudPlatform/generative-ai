@@ -1,0 +1,12 @@
+fastapi>=0.115.0
+starlette>=1.0.1  # CVE-2026-48710
+uvicorn[standard]>=0.30.0
+websockets>=13.0
+google-genai>=2.31.0,<3
+google-adk>=2.11.0,<3
+google-cloud-discoveryengine>=0.13.0
+google-cloud-storage>=2.10.0  # only needed for provision_docs.py --local-dir uploads
+google-auth>=2.0.0
+python-dotenv>=1.0.0
+httpx>=0.27.0
+sse-starlette>=2.1.0

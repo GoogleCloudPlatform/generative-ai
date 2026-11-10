@@ -15,6 +15,7 @@ acked
 acking
 acli
 AClient
+acme
 acodec
 acomplete
 acrossfade
@@ -78,6 +79,7 @@ antiword
 anullsrc
 ANZ
 aoa
+Aoede
 AOT
 apac
 APAC
@@ -112,6 +114,7 @@ Artsakh
 arun
 arxiv
 asdf
+asearch
 AServer
 asetpts
 ASF
@@ -157,6 +160,7 @@ AWT
 axs
 axvline
 Ayra
+Ayyagari
 Ayyappa
 backstory
 backticks
@@ -366,7 +370,6 @@ colorway
 colurna
 colvis
 colwidth
-CTAs
 Cómo
 Condesa
 Connectez
@@ -410,6 +413,7 @@ csch
 cse
 Csvg
 cta
+CTAs
 ctd
 CTEs
 ctext
@@ -430,6 +434,7 @@ cycleways
 cygpath
 CZE
 czf
+D'orsay
 DALL
 Daniil
 Darabont
@@ -446,6 +451,7 @@ DCR
 ddata
 ddbb
 ddl
+debian
 declaratively
 decord
 dedup
@@ -454,6 +460,7 @@ deepeval
 DeepEval
 deepseek
 defn
+delenv
 DELET
 deliv
 Demis
@@ -461,9 +468,9 @@ Demme
 demoable
 demoed
 demouser
-Demuxer
 demuxer
 demuxers
+Demuxer
 denorm
 dente
 Depatmint
@@ -515,16 +522,16 @@ doi
 DOIs
 Donen
 Doogler
-D'orsay
 dotpath
 dotprompt
+DOTX
 Downscale
 dpf
 dpi
 dpo
 DPO
-DPR
 dpr
+DPR
 DQN
 draig
 Dreesen
@@ -740,8 +747,8 @@ fsreq
 fsspec
 FTPS
 fts
-Ftyp
 ftyp
+Ftyp
 Fudd
 fulltext
 fullurl
@@ -762,6 +769,7 @@ gapic
 Gatace
 gauff
 Gaussians
+gax
 gbif
 gboolean
 gbp
@@ -917,9 +925,11 @@ hazmat
 Hbf
 HBox
 hclient
+hdd
 HDFC
 hdfs
 HDFS
+hdhp
 hdlr
 hdmi
 HDMI
@@ -944,12 +954,13 @@ Hiromasa
 Hisaki
 historien
 histplot
-HITL
 hitl
+HITL
 Hiya
 Hlc
 hline
 Hmmm
+hmo
 HMO
 HMR
 hnsw
@@ -968,6 +979,7 @@ hovermode
 hparams
 HREDRAW
 Hritik
+hsa
 HSA
 HTH
 HTMX
@@ -1066,8 +1078,8 @@ ixed
 izakaya
 ize
 ized
-jaccard
 J'aime
+jaccard
 JAISH
 Jaival
 japonicum
@@ -1174,6 +1186,8 @@ Kwanzan
 kyc
 KYC
 Kylian
+L'avenir
+l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1187,7 +1201,6 @@ langgraph
 Laomedeia
 lastb
 latte
-L'avenir
 lavfi
 lbl
 LCEL
@@ -1202,7 +1215,6 @@ levelname
 Leventer
 lexer
 lexers
-l'harmonie
 liberties
 libmp
 lic
@@ -1528,7 +1540,11 @@ oai
 objc
 ocr
 ODb
+ODP
 odr
+ODS
+ODT
+officedocument
 Offthread
 oglevel
 Ohashi
@@ -1569,6 +1585,7 @@ openat
 openfda
 openssl
 opentype
+openxmlformats
 Oppo
 opsz
 oraw
@@ -1634,6 +1651,7 @@ PDFs
 PEFT
 PEGI
 Pengyu
+peopleops
 pepe
 Persero
 persistable
@@ -1672,8 +1690,8 @@ pkce
 pkl
 pks
 playlists
-Playout
 playout
+Playout
 PLLu
 pllum
 plotly
@@ -1704,20 +1722,21 @@ PORTFILE
 Portugu
 postictal
 powerups
+ppo
 PPO
 prag
 Pranav
 praw
 prcntg
 PRD
-Prehashed
-PRIN
 Pré
 PREBROWSE
 preds
 preflight
 pregel
+Prehashed
 prereleases
+PRIN
 Priya
 prm
 proc
@@ -2151,6 +2170,7 @@ Terabytes
 termcolor
 terraform
 Testables
+testid
 Tetsuo
 TEXTCOLOR
 texting
@@ -2181,6 +2201,7 @@ tiktoken
 timechart
 timecoded
 timecodes
+timeoff
 tion
 titlebar
 TLDR
@@ -2252,6 +2273,7 @@ Tuteja
 tval
 twd
 twiml
+twofa
 typehints
 uab
 ubuntu
@@ -2397,6 +2419,7 @@ Wakatipu
 waterjet
 WAU
 Wavenet
+wayfinder
 wcag
 wcontext
 wcslen
@@ -2448,6 +2471,7 @@ woken
 womens
 Womens
 wook
+wordprocessingml
 workarounds
 worklets
 wparam

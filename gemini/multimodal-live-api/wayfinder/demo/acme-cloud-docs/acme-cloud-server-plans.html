@@ -1,0 +1,122 @@
+<!doctype html>
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ACME Cloud: choosing a server plan</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 24px;
+        color: #0f172a;
+        line-height: 1.55;
+      }
+      h1 {
+        color: #0f766e;
+      }
+      h2 {
+        margin-top: 28px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #e2e8f0;
+        padding: 8px 10px;
+        text-align: left;
+      }
+      th {
+        background: #f0fdfa;
+      }
+      .note {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 10px 14px;
+        margin: 16px 0;
+      }
+      .fine {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ACME Cloud: choosing a server plan</h1>
+
+    <p>
+      Every ACME Cloud server runs on a <b>plan</b>. Plans are grouped into four
+      families.
+    </p>
+    <table>
+      <tr>
+        <th>Family</th>
+        <th>Best for</th>
+        <th>Plans</th>
+      </tr>
+      <tr>
+        <td>Standard</td>
+        <td>Web servers, APIs, small databases</td>
+        <td>S2 (2 vCPU, 4 GB), S4 (4 vCPU, 16 GB), S8 (8 vCPU, 32 GB)</td>
+      </tr>
+      <tr>
+        <td>Compute</td>
+        <td>Batch jobs, video encoding, CPU-bound services</td>
+        <td>C4, C8, C16</td>
+      </tr>
+      <tr>
+        <td>Memory</td>
+        <td>In-memory caches and analytics</td>
+        <td>M4 (32 GB), M8 (64 GB)</td>
+      </tr>
+      <tr>
+        <td>GPU</td>
+        <td>Machine learning inference and rendering</td>
+        <td>G1 (1 GPU), G2 (2 GPUs)</td>
+      </tr>
+    </table>
+    <h2>Recommendations</h2>
+    <ul>
+      <li>
+        A <b>production web server</b> usually starts on <b>Standard S4</b> in
+        the region closest to its users.
+      </li>
+      <li>
+        Choose <b>Memory</b> plans for in-memory databases such as caches.
+      </li>
+      <li>
+        You can change plans later; the server restarts during the change.
+      </li>
+    </ul>
+    <h2>Regions</h2>
+    <p>
+      ACME Cloud offers four regions: <b>US East</b>, <b>US West</b>,
+      <b>EU Central</b>, and <b>Asia Pacific South</b>. Each region has two or
+      three datacenters. There is no region called US East 2 or EU North.
+    </p>
+
+    <p class="fine">ACME Cloud is a fictional product used for demos.</p>
+  </body>
+</html>
