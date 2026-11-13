@@ -6,6 +6,7 @@ This repository explores various techniques and use-cases for embedding in Machi
 
 - [Agent Platform Vector Search Introduction](vector-search-2-intro.ipynb): An introduction to setting up and using Agent Platform Vector Search 2.0.
 - [Build a Travel Agent with Agent Retrieval and ADK](vector-search-2-travel-agent.ipynb): Ingest Airbnb listings into an Agent Retrieval Collection, then wrap hybrid search as a tool an ADK agent calls on its own.
+- [Search Your Documents with SearchDocuments in Agent Retrieval](agent-retrieval-search-documents.ipynb): Ingest PDFs from Cloud Storage into a data store with managed ingestion, then search them with one SearchDocuments call, with metadata and page-range filters and reranking.
 - [Tuning Recall and Latency with Target Recall in Agent Retrieval](agent-retrieval-target-recall.ipynb): Measure what the `target_recall` search parameter does to result quality and query latency on a 3M-item ANN index, using the public interactive demo endpoint so no Google Cloud project is needed.
 - [Search Inside Videos with Managed Video Ingestion in Agent Retrieval](agent-retrieval-video-search.ipynb): Ingest videos from Cloud Storage into a video data store, then find moments by describing a scene or what was said, with metadata and time-range filters and an audio mode comparison.
 - [Import from BigQuery into Vector Search](bigquery-import.ipynb): Learn how to import vector embedding data from a BigQuery data source into a Vector Search index.
