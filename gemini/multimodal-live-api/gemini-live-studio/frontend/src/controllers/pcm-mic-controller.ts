@@ -13,29 +13,33 @@
 // limitations under the License.
 
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
-import {
-  createPcmCaptureContext,
-  int16ArrayToLittleEndianBytes,
-  uint8ArrayToBase64,
-} from '../pcm-capture';
+import { PcmMic } from '../lib/live/pcm-mic';
 import { showToast } from '../theme/events';
 
 /**
- * ReactiveController managing 16kHz PCM microphone capture via AudioWorkletNode.
- * Automatically releases microphone tracks and AudioContext on disconnect.
+ * ReactiveController adapter around headless `PcmMic` (`lib/live/pcm-mic.ts`).
  */
 export class PcmMicController implements ReactiveController {
-  isRecording = false;
-
   private readonly host: ReactiveControllerHost;
-  private audioContext: AudioContext | null = null;
-  private audioWorkletNode: AudioWorkletNode | null = null;
-  private mediaStream: MediaStream | null = null;
-  private startToken = 0;
+  private readonly mic: PcmMic;
 
   constructor(host: ReactiveControllerHost) {
     this.host = host;
+    this.mic = new PcmMic({
+      onStateChange: () => this.host.requestUpdate(),
+      onError: (err) => {
+        console.error('Microphone access denied:', err);
+        showToast(
+          'Microphone access denied or unavailable. Check browser permissions.',
+          'danger',
+        );
+      },
+    });
     host.addController(this);
+  }
+
+  get isRecording(): boolean {
+    return this.mic.isRecording;
   }
 
   hostConnected(): void {}
@@ -45,92 +49,14 @@ export class PcmMicController implements ReactiveController {
   }
 
   async toggle(onBase64PcmChunk: (base64: string) => void): Promise<void> {
-    if (this.isRecording) {
-      this.stop();
-    } else {
-      await this.start(onBase64PcmChunk);
-    }
+    await this.mic.toggle(onBase64PcmChunk);
   }
 
   async start(onBase64PcmChunk: (base64: string) => void): Promise<void> {
-    const token = ++this.startToken;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { channelCount: 1, sampleRate: 16000 },
-      });
-      if (token !== this.startToken) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
-      if (this.mediaStream) {
-        this.mediaStream.getTracks().forEach((t) => t.stop());
-      }
-      this.mediaStream = stream;
-
-      if (!this.audioContext) {
-        const ctx = await createPcmCaptureContext();
-        if (token !== this.startToken) {
-          ctx.close().catch(() => {});
-          this.stop();
-          return;
-        }
-        this.audioContext = ctx;
-      }
-
-      if (this.audioContext.state === 'suspended') {
-        await this.audioContext.resume();
-        if (token !== this.startToken || !this.audioContext) {
-          this.stop();
-          return;
-        }
-      }
-
-      const source = this.audioContext.createMediaStreamSource(
-        this.mediaStream,
-      );
-      this.audioWorkletNode = new AudioWorkletNode(
-        this.audioContext,
-        'pcm-processor',
-      );
-
-      this.audioWorkletNode.port.onmessage = (e) => {
-        const int16Data = e.data as Int16Array;
-        const uint8Data = int16ArrayToLittleEndianBytes(int16Data);
-        const base64Data = uint8ArrayToBase64(uint8Data);
-        onBase64PcmChunk(base64Data);
-      };
-
-      source.connect(this.audioWorkletNode);
-      this.isRecording = true;
-      this.host.requestUpdate();
-    } catch (err) {
-      console.error('Microphone access denied:', err);
-      this.stop();
-      showToast(
-        'Microphone access denied or unavailable. Check browser permissions.',
-        'danger',
-      );
-    }
+    await this.mic.start(onBase64PcmChunk);
   }
 
   stop(): void {
-    this.startToken++;
-    if (this.audioWorkletNode) {
-      this.audioWorkletNode.port.onmessage = null;
-      this.audioWorkletNode.disconnect();
-      this.audioWorkletNode = null;
-    }
-    if (this.mediaStream) {
-      this.mediaStream.getTracks().forEach((t) => t.stop());
-      this.mediaStream = null;
-    }
-    if (this.audioContext) {
-      this.audioContext.close().catch(() => {});
-      this.audioContext = null;
-    }
-    if (this.isRecording) {
-      this.isRecording = false;
-      this.host.requestUpdate();
-    }
+    this.mic.stop();
   }
 }

@@ -17,7 +17,7 @@
 
 .PHONY: help dev run-backend run-frontend build container-build docker-build \
 	lint license license-check test test-go test-frontend test-examples visual-check \
-	deploy pack-skill
+	deploy pack-skill sync-livebridge
 
 CONTAINER_CLI := $(shell if [ -x /usr/local/bin/container ]; then echo /usr/local/bin/container; else echo docker; fi)
 IMAGE_TAG ?= gemini-live-studio:local
@@ -27,6 +27,7 @@ LICENSE_IGNORES := -ignore '**/node_modules/**' -ignore '**/dist/**' \
 	-ignore '**/*.json' -ignore '**/*.yaml' -ignore '**/*.yml' -ignore '**/*.md'
 
 LINT_DEPS :=
+SYNC_DEPS :=
 DEPLOY_ENV :=
 HELP_EXTRA :=
 
@@ -73,17 +74,23 @@ docker-build: container-build
 lint: $(LINT_DEPS)
 	@unformatted="$$(gofmt -s -l $$(find . -name '*.go' -not -path '*/node_modules/*'))"; \
 		test -z "$$unformatted" || { echo "gofmt -s needed:"; echo "$$unformatted"; exit 1; }
-	@go vet .
+	@diff -qr livebridge examples/local-code-assistant/internal/livebridge
+	@go vet . ./livebridge/...
 	@for d in $(EXAMPLES); do (cd $$d && go vet ./...) || exit 1; done
 	@if command -v golangci-lint >/dev/null; then \
-		golangci-lint run . && for d in $(EXAMPLES); do (cd $$d && golangci-lint run ./...) || exit 1; done; \
+		golangci-lint run . ./livebridge/... && for d in $(EXAMPLES); do (cd $$d && golangci-lint run ./...) || exit 1; done; \
 	else echo "golangci-lint not installed; skipping (go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest)"; fi
 	@cd frontend && npm run lint
 
 test: test-go test-frontend test-examples
 
 test-go:
-	@go test .
+	@go test . ./livebridge/...
+
+sync-livebridge: $(SYNC_DEPS)
+	@mkdir -p examples/local-code-assistant/internal/livebridge
+	@rm -f examples/local-code-assistant/internal/livebridge/*.go
+	@cp -f livebridge/*.go examples/local-code-assistant/internal/livebridge/
 
 # Frontend tests run in headless Chromium. First run:
 # `cd frontend && npx playwright install chromium`, or set CHROMIUM_PATH.

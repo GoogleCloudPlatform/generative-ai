@@ -14,11 +14,7 @@
 
 package main
 
-import (
-	"log/slog"
-	"slices"
-	"strings"
-)
+import "gemini-live-studio/livebridge"
 
 // Curated registries of models and locations a browser client may request.
 // The server's own env-configured defaults are always allowed in addition, so
@@ -39,26 +35,10 @@ var (
 	}
 )
 
-// allowedValues returns the registry with the server default prepended when
-// it is not already listed.
 func allowedValues(def string, registry []string) []string {
-	if def == "" || slices.Contains(registry, def) {
-		return slices.Clone(registry)
-	}
-	return append([]string{def}, registry...)
+	return livebridge.AllowedValues(def, registry)
 }
 
-// resolveAllowed returns the client-requested value if it is the server
-// default or in the registry, and the server default otherwise. Client input
-// must never reach the Vertex API unchecked.
 func resolveAllowed(kind, requested, def string, registry []string) string {
-	requested = strings.TrimSpace(requested)
-	if requested == "" || requested == def {
-		return def
-	}
-	if slices.Contains(registry, requested) {
-		return requested
-	}
-	slog.Warn("rejected client-requested value not in allowlist; using default", "kind", kind, "requested", requested, "default", def)
-	return def
+	return livebridge.ResolveAllowed(kind, requested, def, registry)
 }

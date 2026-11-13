@@ -224,6 +224,7 @@ blindspot
 blogs
 BLR
 bluesky
+BMFF
 bml
 bname
 bnb
@@ -468,6 +469,7 @@ demoable
 demoed
 demouser
 demuxer
+demuxers
 Demuxer
 denorm
 dente
@@ -488,6 +490,8 @@ dflt
 dfs
 Dgektczl
 DHH
+Diataxis
+diataxis
 diffable
 diffed
 diffs
@@ -710,6 +714,7 @@ FLX
 Fmaj
 fmeasure
 fmeta
+fmp
 FMWK
 Foauth
 Folmer
@@ -1227,6 +1232,7 @@ linting
 lipgloss
 listdir
 litellm
+livebridge
 livekit
 LIVEKIT
 Livewire
@@ -1315,6 +1321,7 @@ mcp
 MCP
 Mcps
 MCQ
+mdat
 mdc
 MDD
 mdia
@@ -1388,6 +1395,7 @@ modelarmor
 modelfile
 Molaison
 monty
+moof
 Mookie
 moov
 morty
@@ -1841,6 +1849,7 @@ reddit
 redef
 redmine
 Redmine
+reexported
 regexes
 reidx
 remai
@@ -1897,6 +1906,7 @@ Rosberg
 rosetta
 ROSETTA
 ROUVs
+RPCs
 rpet
 rrf
 RRF
@@ -2156,6 +2166,7 @@ TBY
 tcard
 tcd
 TCEHY
+TCtx
 teardowns
 telematics
 telework
@@ -2216,6 +2227,7 @@ tomentosa
 Tongsheng
 tonkotsu
 toolcall
+toolchange
 toolsets
 toolu
 topbar
@@ -2313,6 +2325,7 @@ unserialisable
 unsloth
 Unsloth
 unstaged
+unsub
 unsubstituted
 unterminated
 upd
@@ -2431,6 +2444,8 @@ webclient
 webfonts
 webinar
 webinars
+Webmcp
+webmcp
 webm
 webpage
 webpages

@@ -4512,25 +4512,9 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "ReactiveController managing MSE (`MediaSource` / `SourceBuffer`) fMP4 video\nplayback, dynamic codec negotiation, interruption flushing, quota eviction,\nand inter-turn PTS gap jumping so the avatar never stalls between speech turns.",
+          "description": "ReactiveController adapter around headless `Fmp4Player` (`lib/live/fmp4-player.ts`).",
           "name": "Fmp4PlayerController",
           "members": [
-            {
-              "kind": "field",
-              "name": "hasReceivedVideo",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "configuredCodec",
-              "type": {
-                "text": "string"
-              },
-              "default": "'avc1.42C020, mp4a.40.2'"
-            },
             {
               "kind": "field",
               "name": "host",
@@ -4543,86 +4527,28 @@
             },
             {
               "kind": "field",
-              "name": "videoEl",
+              "name": "player",
               "type": {
-                "text": "HTMLVideoElement | null"
+                "text": "Fmp4Player"
               },
               "privacy": "private",
-              "default": "null"
+              "readonly": true,
+              "default": "new Fmp4Player({ onFirstChunk: () => this.host.requestUpdate(), })"
             },
             {
               "kind": "field",
-              "name": "mediaSource",
-              "type": {
-                "text": "MediaSource | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "sourceBuffer",
-              "type": {
-                "text": "SourceBuffer | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "bufferQueue",
-              "type": {
-                "text": "Uint8Array[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "objectUrl",
-              "type": {
-                "text": "string | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "pendingTrimFuture",
+              "name": "hasReceivedVideo",
               "type": {
                 "text": "boolean"
               },
-              "privacy": "private",
-              "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "handleSourceOpen",
-              "privacy": "private",
               "readonly": true
             },
             {
               "kind": "field",
-              "name": "handleSourceError",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleSourceBufferUpdateEnd",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleSourceBufferError",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleVideoError",
-              "privacy": "private",
+              "name": "configuredCodec",
+              "type": {
+                "text": "string"
+              },
               "readonly": true
             },
             {
@@ -4711,56 +4637,6 @@
                   "text": "void"
                 }
               }
-            },
-            {
-              "kind": "method",
-              "name": "trimFutureBufferedMedia",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "evictOldBufferedMedia",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "initSourceBuffer",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "onSourceBufferUpdateEnd",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "processBufferQueue",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
             }
           ]
         }
@@ -4782,49 +4658,9 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Shared ReactiveController (`LiveSocketController`) managing the `/ws` and\n`/ws/live` WebSocket switchboard lifecycle, transcript merging, tool card\nupdates, interruption handling, graceful 15s termination fallback timer,\nand user-visible error toasts on abnormal close codes.",
+          "description": "ReactiveController adapter around headless `LiveSocketClient`\n(`lib/live/live-socket.ts`), bridging Lit updates, toast notifications, and\n`disconnect` CustomEvents.",
           "name": "LiveSocketController",
           "members": [
-            {
-              "kind": "field",
-              "name": "status",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Connecting...'"
-            },
-            {
-              "kind": "field",
-              "name": "transcript",
-              "type": {
-                "text": "TranscriptEntry[]"
-              },
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "isTerminating",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "sessionModel",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "kind": "field",
-              "name": "sessionLocation",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "kind": "field",
               "name": "host",
@@ -4837,57 +4673,50 @@
             },
             {
               "kind": "field",
-              "name": "ws",
-              "type": {
-                "text": "WebSocket | null"
-              },
+              "name": "client",
               "privacy": "private",
-              "default": "null"
+              "readonly": true,
+              "default": "new LiveSocketClient()"
             },
             {
               "kind": "field",
-              "name": "options",
+              "name": "status",
               "type": {
-                "text": "LiveSocketConnectOptions | null"
+                "text": "string"
               },
-              "privacy": "private",
-              "default": "null"
+              "readonly": true
             },
             {
               "kind": "field",
-              "name": "terminateTimeoutId",
+              "name": "transcript",
               "type": {
-                "text": "ReturnType<typeof setTimeout> | null"
+                "text": "TranscriptEntry[]"
               },
-              "privacy": "private",
-              "default": "null"
+              "readonly": true
             },
             {
               "kind": "field",
-              "name": "hasDispatchedDisconnect",
+              "name": "isTerminating",
               "type": {
                 "text": "boolean"
               },
-              "privacy": "private",
-              "default": "false"
+              "readonly": true
             },
             {
               "kind": "field",
-              "name": "limitReached",
+              "name": "sessionModel",
               "type": {
-                "text": "boolean"
+                "text": "string"
               },
-              "privacy": "private",
-              "default": "false"
+              "readonly": true
             },
             {
               "kind": "field",
-              "name": "hadErrorEvent",
+              "name": "sessionLocation",
               "type": {
-                "text": "boolean"
+                "text": "string"
               },
-              "privacy": "private",
-              "default": "false"
+              "readonly": true
             },
             {
               "kind": "method",
@@ -5009,88 +4838,6 @@
                   "text": "void"
                 }
               }
-            },
-            {
-              "kind": "method",
-              "name": "handleJsonMessage",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "msg",
-                  "type": {
-                    "text": "Record<string, unknown>"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "appendTranscriptTurn",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "role",
-                  "type": {
-                    "text": "'user' | 'assistant'"
-                  }
-                },
-                {
-                  "name": "text",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "isFinished",
-                  "type": {
-                    "text": "boolean"
-                  }
-                },
-                {
-                  "name": "concatenatePartials",
-                  "type": {
-                    "text": "boolean"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "surfaceCloseToast",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "CloseEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "dispatchDisconnect",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
             }
           ]
         }
@@ -5112,17 +4859,9 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "ReactiveController managing 16kHz PCM microphone capture via AudioWorkletNode.\nAutomatically releases microphone tracks and AudioContext on disconnect.",
+          "description": "ReactiveController adapter around headless `PcmMic` (`lib/live/pcm-mic.ts`).",
           "name": "PcmMicController",
           "members": [
-            {
-              "kind": "field",
-              "name": "isRecording",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "kind": "field",
               "name": "host",
@@ -5135,39 +4874,21 @@
             },
             {
               "kind": "field",
-              "name": "audioContext",
+              "name": "mic",
               "type": {
-                "text": "AudioContext | null"
+                "text": "PcmMic"
               },
               "privacy": "private",
-              "default": "null"
+              "readonly": true,
+              "default": "new PcmMic({ onStateChange: () => this.host.requestUpdate(), onError: (err) => { console.error('Microphone access denied:', err); showToast( 'Microphone access denied or unavailable. Check browser permissions.', 'danger', ); }, })"
             },
             {
               "kind": "field",
-              "name": "audioWorkletNode",
+              "name": "isRecording",
               "type": {
-                "text": "AudioWorkletNode | null"
+                "text": "boolean"
               },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "mediaStream",
-              "type": {
-                "text": "MediaStream | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "startToken",
-              "type": {
-                "text": "number"
-              },
-              "privacy": "private",
-              "default": "0"
+              "readonly": true
             },
             {
               "kind": "method",
@@ -5250,33 +4971,9 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "ReactiveController managing gapless 24kHz PCM audio playback, interruption\nflushing, and audio-reactive frequency analysis (`AnalyserNode`).\n\nAudio routing follows the Audio-Reactive Mute pattern:\n  BufferSource -> AnalyserNode -> OutputGainNode -> AudioContext.destination\nMuting sets `OutputGainNode.gain.value = 0` so the visualizer remains\nreactive to model speech even when speaker output is muted.",
+          "description": "ReactiveController adapter around headless `PcmPlayer` (`lib/live/pcm-player.ts`).",
           "name": "PcmPlayerController",
           "members": [
-            {
-              "kind": "field",
-              "name": "hasReceivedAudio",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "isMuted",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "sampleRate",
-              "type": {
-                "text": "number"
-              },
-              "default": "24000"
-            },
             {
               "kind": "field",
               "name": "host",
@@ -5289,54 +4986,37 @@
             },
             {
               "kind": "field",
-              "name": "audioContext",
+              "name": "player",
               "type": {
-                "text": "AudioContext | null"
+                "text": "PcmPlayer"
               },
               "privacy": "private",
-              "default": "null"
+              "readonly": true,
+              "default": "new PcmPlayer({ onStateChange: () => this.host.requestUpdate(), })"
             },
             {
               "kind": "field",
-              "name": "analyserNode",
+              "name": "hasReceivedAudio",
               "type": {
-                "text": "AnalyserNode | null"
+                "text": "boolean"
               },
-              "privacy": "private",
-              "default": "null"
+              "readonly": true
             },
             {
               "kind": "field",
-              "name": "outputGainNode",
+              "name": "isMuted",
               "type": {
-                "text": "GainNode | null"
+                "text": "boolean"
               },
-              "privacy": "private",
-              "default": "null"
+              "readonly": true
             },
             {
               "kind": "field",
-              "name": "audioQueue",
-              "type": {
-                "text": "AudioBuffer[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "activeSources",
-              "privacy": "private",
-              "default": "new Set<AudioBufferSourceNode>()"
-            },
-            {
-              "kind": "field",
-              "name": "nextPlayTime",
+              "name": "sampleRate",
               "type": {
                 "text": "number"
               },
-              "privacy": "private",
-              "default": "0"
+              "readonly": true
             },
             {
               "kind": "field",
@@ -5417,26 +5097,6 @@
             {
               "kind": "method",
               "name": "destroy",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "destroyContext",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "schedulePlayback",
-              "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
@@ -6228,6 +5888,2051 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/lib/live/chime-synth.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CHIME_PRESETS",
+          "type": {
+            "text": "Record<\n  Exclude<ChimePreset, 'off'>,\n  ChimePresetParams\n>"
+          },
+          "default": "{ soft: { cutoffHz: 780, peakGain: 0.032, durationSec: 0.85, includeUpperFourth: true, }, subtle: { cutoffHz: 620, peakGain: 0.014, durationSec: 0.55, includeUpperFourth: false, }, }"
+        },
+        {
+          "kind": "function",
+          "name": "normalizeChimePreset",
+          "return": {
+            "type": {
+              "text": "ChimePreset"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string | null | undefined"
+              }
+            },
+            {
+              "name": "fallback",
+              "default": "'soft'",
+              "type": {
+                "text": "ChimePreset"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "class",
+          "description": "Synthesizes warm, non-intrusive procedural Web Audio cues (392 Hz G4 sine\nfundamental with an optional 523.25 Hz C5 overtone through a gentle low-pass\nfilter) without shipping external audio assets.",
+          "name": "ChimeSynth",
+          "members": [
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "ChimePreset"
+              },
+              "default": "initialMode"
+            },
+            {
+              "kind": "method",
+              "name": "setMode",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "mode",
+                  "type": {
+                    "text": "ChimePreset"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "cycleMode",
+              "return": {
+                "type": {
+                  "text": "ChimePreset"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "playAmbientCue",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "ctx",
+                  "type": {
+                    "text": "AudioContext"
+                  }
+                }
+              ],
+              "description": "Plays an ambient alert cue on `ctx` and returns its duration in seconds\n(0 when `mode === 'off'`)."
+            },
+            {
+              "kind": "method",
+              "name": "playTurnTone",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "ctx",
+                  "type": {
+                    "text": "AudioContext"
+                  }
+                }
+              ],
+              "description": "Plays a brief single-note confirmation tone (`392 Hz` low-passed sine)."
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CHIME_PRESETS",
+          "declaration": {
+            "name": "CHIME_PRESETS",
+            "module": "src/lib/live/chime-synth.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "normalizeChimePreset",
+          "declaration": {
+            "name": "normalizeChimePreset",
+            "module": "src/lib/live/chime-synth.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ChimeSynth",
+          "declaration": {
+            "name": "ChimeSynth",
+            "module": "src/lib/live/chime-synth.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/fmp4-player.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Framework-agnostic MSE (`MediaSource` / `SourceBuffer`) fMP4 player for\nGemini Live avatar video streams. Handles codec negotiation, barge-in buffer\ntrimming (`flushAndAbort`), `QuotaExceededError` range eviction, and\ninter-turn PTS gap jumping so the avatar never stalls between speech turns.",
+          "name": "Fmp4Player",
+          "members": [
+            {
+              "kind": "field",
+              "name": "hasReceivedVideo",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "configuredCodec",
+              "type": {
+                "text": "string"
+              },
+              "default": "'avc1.42C020, mp4a.40.2'"
+            },
+            {
+              "kind": "field",
+              "name": "callbacks",
+              "type": {
+                "text": "Fmp4PlayerCallbacks"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "callbacks"
+            },
+            {
+              "kind": "field",
+              "name": "videoEl",
+              "type": {
+                "text": "HTMLVideoElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "mediaSource",
+              "type": {
+                "text": "MediaSource | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "sourceBuffer",
+              "type": {
+                "text": "SourceBuffer | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "bufferQueue",
+              "type": {
+                "text": "Uint8Array[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "objectUrl",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "pendingTrimFuture",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "handleSourceOpen",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleSourceError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleSourceBufferUpdateEnd",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleSourceBufferError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleVideoError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "attach",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "videoEl",
+                  "type": {
+                    "text": "HTMLVideoElement"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setCodec",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "codecs",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "appendChunk",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "chunk",
+                  "type": {
+                    "text": "Uint8Array"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "flushAndAbort",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "destroy",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "trimFutureBufferedMedia",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "evictOldBufferedMedia",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "initSourceBuffer",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onSourceBufferUpdateEnd",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "processBufferQueue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "Fmp4Player",
+          "declaration": {
+            "name": "Fmp4Player",
+            "module": "src/lib/live/fmp4-player.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/chime-synth"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/fmp4-player"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/live-socket"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/pcm-mic"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/pcm-player"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/transcript-assembler"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/lib/live/webmcp-host"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/live-socket.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "describeCloseEvent",
+          "return": {
+            "type": {
+              "text": "CloseDiagnostic | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "code",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "rawReason",
+              "type": {
+                "text": "string | undefined"
+              }
+            },
+            {
+              "name": "state",
+              "type": {
+                "text": "{\n    limitReachedAlreadySurfaced: boolean;\n    isTerminating: boolean;\n    hadErrorEvent: boolean;\n  }"
+              }
+            }
+          ],
+          "description": "Classifies a WebSocket CloseEvent into a user-facing diagnostic message, or\n`null` when the close was a normal user-requested termination (1000) or an\nalready-announced 10-minute session cap."
+        },
+        {
+          "kind": "class",
+          "description": "Framework-agnostic WebSocket switchboard client handling initial setup,\nbinary media routing, partial/final transcript assembly, tool call cards and\ncancellations, graceful farewell termination, and RFC 6455 close diagnostics.",
+          "name": "LiveSocketClient",
+          "members": [
+            {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Connecting...'"
+            },
+            {
+              "kind": "field",
+              "name": "isTerminating",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "sessionModel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "sessionLocation",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "transcriptAssembler",
+              "readonly": true,
+              "default": "new TranscriptAssembler()"
+            },
+            {
+              "kind": "field",
+              "name": "ws",
+              "type": {
+                "text": "WebSocket | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "LiveSocketClientOptions | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "terminateTimeoutId",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "hasNotifiedDisconnect",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "limitReached",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "hadErrorEvent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "transcript",
+              "type": {
+                "text": "TranscriptItem[]"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "connect",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "type": {
+                    "text": "LiveSocketClientOptions"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "sendPayload",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "payload",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "sendAudioChunk",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "base64Data",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "sendVideoFrame",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "base64Jpeg",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "sendText",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "rawText",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "sendToolResult",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "id",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "result",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                },
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "{ imageDataUrl?: string; execMs?: number }"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "terminate",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "cleanup",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveEndpointUrl",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "endpoint",
+                  "default": "'/ws'"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleJsonMessage",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "msg",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "notifyDisconnect",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "describeCloseEvent",
+          "declaration": {
+            "name": "describeCloseEvent",
+            "module": "src/lib/live/live-socket.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LiveSocketClient",
+          "declaration": {
+            "name": "LiveSocketClient",
+            "module": "src/lib/live/live-socket.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/pcm-mic.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createPcmCaptureContext",
+          "return": {
+            "type": {
+              "text": "Promise<AudioContext>"
+            }
+          },
+          "description": "Creates a 16 kHz AudioContext with an inline AudioWorklet processor that\naccumulates Float32 microphone samples into 2048-sample Int16 chunks\n(~128 ms at 16 kHz) off the main UI thread."
+        },
+        {
+          "kind": "function",
+          "name": "int16ArrayToLittleEndianBytes",
+          "return": {
+            "type": {
+              "text": "Uint8Array"
+            }
+          },
+          "parameters": [
+            {
+              "name": "int16",
+              "type": {
+                "text": "Int16Array"
+              }
+            }
+          ],
+          "description": "Converts an Int16Array chunk into little-endian PCM bytes."
+        },
+        {
+          "kind": "function",
+          "name": "uint8ArrayToBase64",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "bytes",
+              "type": {
+                "text": "Uint8Array"
+              }
+            }
+          ],
+          "description": "Encodes a Uint8Array into a standard Base64 string."
+        },
+        {
+          "kind": "function",
+          "name": "computeInt16Rms",
+          "return": {
+            "type": {
+              "text": "number"
+            }
+          },
+          "parameters": [
+            {
+              "name": "int16",
+              "type": {
+                "text": "Int16Array"
+              }
+            }
+          ],
+          "description": "Computes normalized RMS energy in [0, 1] for an Int16 PCM frame."
+        },
+        {
+          "kind": "class",
+          "description": "Framework-agnostic 16 kHz AudioWorklet microphone capture with an async\nstartToken guard so rapid start/stop transitions never leak tracks.",
+          "name": "PcmMic",
+          "members": [
+            {
+              "kind": "field",
+              "name": "isRecording",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "isSoftMuted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "callbacks",
+              "type": {
+                "text": "PcmMicCallbacks"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "callbacks"
+            },
+            {
+              "kind": "field",
+              "name": "audioContext",
+              "type": {
+                "text": "AudioContext | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "audioWorkletNode",
+              "type": {
+                "text": "AudioWorkletNode | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "mediaStream",
+              "type": {
+                "text": "MediaStream | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "startToken",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "method",
+              "name": "setSoftMuted",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "muted",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Soft-mutes outbound PCM chunks without releasing the hardware microphone\nstream (used when gating mic input during assistant speech)."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "onBase64PcmChunk",
+                  "type": {
+                    "text": "(base64: string) => void"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "start",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "onBase64PcmChunk",
+                  "type": {
+                    "text": "(base64: string) => void"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "createPcmCaptureContext",
+          "declaration": {
+            "name": "createPcmCaptureContext",
+            "module": "src/lib/live/pcm-mic.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "int16ArrayToLittleEndianBytes",
+          "declaration": {
+            "name": "int16ArrayToLittleEndianBytes",
+            "module": "src/lib/live/pcm-mic.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "uint8ArrayToBase64",
+          "declaration": {
+            "name": "uint8ArrayToBase64",
+            "module": "src/lib/live/pcm-mic.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "computeInt16Rms",
+          "declaration": {
+            "name": "computeInt16Rms",
+            "module": "src/lib/live/pcm-mic.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "PcmMic",
+          "declaration": {
+            "name": "PcmMic",
+            "module": "src/lib/live/pcm-mic.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/pcm-player.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Framework-agnostic gapless 24 kHz PCM audio player with barge-in flushing and\nAudio-Reactive Mute routing:\n  BufferSource -> AnalyserNode -> OutputGainNode -> AudioContext.destination\n\nSetting `isMuted` zeroes `OutputGainNode.gain` so frequency visualizers keep\nanimating during model speech even when speaker audio is muted.",
+          "name": "PcmPlayer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "hasReceivedAudio",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "isMuted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "sampleRate",
+              "type": {
+                "text": "number"
+              },
+              "default": "24000"
+            },
+            {
+              "kind": "field",
+              "name": "callbacks",
+              "type": {
+                "text": "PcmPlayerCallbacks"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "callbacks"
+            },
+            {
+              "kind": "field",
+              "name": "audioContext",
+              "type": {
+                "text": "AudioContext | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "analyserNode",
+              "type": {
+                "text": "AnalyserNode | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "outputGainNode",
+              "type": {
+                "text": "GainNode | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "audioQueue",
+              "type": {
+                "text": "AudioBuffer[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "activeSources",
+              "privacy": "private",
+              "default": "new Set<AudioBufferSourceNode>()"
+            },
+            {
+              "kind": "field",
+              "name": "nextPlayTime",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "analyser",
+              "type": {
+                "text": "AnalyserNode | null"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "context",
+              "type": {
+                "text": "AudioContext | null"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "isPlaying",
+              "type": {
+                "text": "boolean"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "init",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "sampleRate",
+                  "default": "24000"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "toggleMute",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setMuted",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "muted",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "deferPlayback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "seconds",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Advances the scheduled playhead by `seconds` so procedural chimes do not\noverlap incoming speech chunks."
+            },
+            {
+              "kind": "method",
+              "name": "feed",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "pcmData",
+                  "type": {
+                    "text": "ArrayBuffer"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "flushAndInterrupt",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "destroy",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "destroyContext",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "schedulePlayback",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "PcmPlayer",
+          "declaration": {
+            "name": "PcmPlayer",
+            "module": "src/lib/live/pcm-player.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/transcript-assembler.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseToolCallItem",
+          "return": {
+            "type": {
+              "text": "TranscriptItem"
+            }
+          },
+          "parameters": [
+            {
+              "name": "msg",
+              "type": {
+                "text": "Record<string, unknown>"
+              }
+            }
+          ],
+          "description": "Parses a server `tool_call` JSON message into a structured `TranscriptItem`."
+        },
+        {
+          "kind": "class",
+          "description": "Pure, immutable streaming transcript accumulator for Gemini Live user and\nmodel speech turns plus tool cards and barge-in markers.",
+          "name": "TranscriptAssembler",
+          "members": [
+            {
+              "kind": "field",
+              "name": "entries",
+              "type": {
+                "text": "TranscriptItem[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "TranscriptItem[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "addUserText",
+              "return": {
+                "type": {
+                  "text": "TranscriptItem[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "appendTurn",
+              "return": {
+                "type": {
+                  "text": "TranscriptItem[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "role",
+                  "type": {
+                    "text": "'user' | 'assistant'"
+                  }
+                },
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "isFinished",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "concatenatePartials",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "addToolCall",
+              "return": {
+                "type": {
+                  "text": "TranscriptItem[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "msg",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "cancelToolCalls",
+              "return": {
+                "type": {
+                  "text": "TranscriptItem[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "ids",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "markInterrupted",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "sealActiveTurns",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseToolCallItem",
+          "declaration": {
+            "name": "parseToolCallItem",
+            "module": "src/lib/live/transcript-assembler.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TranscriptAssembler",
+          "declaration": {
+            "name": "TranscriptAssembler",
+            "module": "src/lib/live/transcript-assembler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/lib/live/webmcp-host.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "nativeModelContext",
+          "return": {
+            "type": {
+              "text": "ModelContextLike | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "default": "typeof document !== 'undefined'\n    ? document\n    : undefined",
+              "type": {
+                "text": "Document | undefined"
+              }
+            }
+          ],
+          "description": "Returns `document.modelContext` when the browser supports WebMCP, else `null`."
+        },
+        {
+          "kind": "class",
+          "description": "",
+          "name": "WebmcpToolError",
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "'WebmcpToolError'"
+            }
+          ],
+          "superclass": {
+            "name": "Error",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "class",
+          "description": "",
+          "name": "WebmcpCallEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "caller",
+              "type": {
+                "text": "WebmcpCaller"
+              },
+              "readonly": true,
+              "default": "caller"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "readonly": true,
+              "default": "name"
+            },
+            {
+              "kind": "field",
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown>"
+              },
+              "readonly": true,
+              "default": "args"
+            },
+            {
+              "kind": "field",
+              "name": "result",
+              "type": {
+                "text": "WebmcpToolResult"
+              },
+              "readonly": true,
+              "default": "result"
+            },
+            {
+              "kind": "field",
+              "name": "imageDataUrl",
+              "type": {
+                "text": "string | undefined"
+              },
+              "readonly": true,
+              "default": "imageDataUrl"
+            },
+            {
+              "kind": "field",
+              "name": "ms",
+              "type": {
+                "text": "number"
+              },
+              "readonly": true,
+              "default": "ms"
+            }
+          ],
+          "superclass": {
+            "name": "Event",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "function",
+          "name": "canonicalJSON",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "unknown"
+              }
+            }
+          ],
+          "description": "Deterministic key-sorted JSON serialization for schema and argument comparison."
+        },
+        {
+          "kind": "function",
+          "name": "annotationsFor",
+          "return": {
+            "type": {
+              "text": "WebmcpAnnotations | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "def",
+              "type": {
+                "text": "Pick<\n    WebmcpToolDefinition<unknown>,\n    'readOnly' | 'consequential' | 'untrusted'\n  >"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "asObject",
+          "return": {
+            "type": {
+              "text": "Record<string, unknown> | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "unknown"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "class",
+          "description": "Framework-agnostic WebMCP (`document.modelContext`) and fallback tool host:\n- Verifies tool ownership (name, description, canonical schema, and window)\n  before advertising or executing tools so third-party injected scripts\n  cannot hijack model tool calls.\n- Negotiates both Chrome 154 JSON-string arguments and CG spec object\n  arguments automatically.\n- Optionally coalesces concurrent identical calls (`coalesceInFlight: true`)\n  to prevent duplicate interactive modals or file pickers.",
+          "name": "WebmcpToolHost",
+          "members": [
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'webmcp' | 'fallback'"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "running",
+              "readonly": true,
+              "default": "new Set<string>()"
+            },
+            {
+              "kind": "field",
+              "name": "externalCalls",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "diagnostics",
+              "type": {
+                "text": "WebmcpDiagnostics"
+              },
+              "readonly": true,
+              "default": "{ schemaType: '', argsForm: null, firstError: '', dropped: [], conflicts: [], }"
+            },
+            {
+              "kind": "field",
+              "name": "mc",
+              "type": {
+                "text": "ModelContextLike | null"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "mc"
+            },
+            {
+              "kind": "field",
+              "name": "defs",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Map<string, WebmcpToolDefinition<TCtx>>()"
+            },
+            {
+              "kind": "field",
+              "name": "registrations",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Map<string, AbortController>()"
+            },
+            {
+              "kind": "field",
+              "name": "makeContext",
+              "type": {
+                "text": "(signal: AbortSignal) => TCtx"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "makeContext"
+            },
+            {
+              "kind": "field",
+              "name": "pendingOwn",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Map<string, { caller: WebmcpCaller }[]>()"
+            },
+            {
+              "kind": "field",
+              "name": "inFlight",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Map< string, Promise<WebmcpToolExecutionOutput> >()"
+            },
+            {
+              "kind": "method",
+              "name": "register",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "defs",
+                  "type": {
+                    "text": "readonly WebmcpToolDefinition<TCtx>[]"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "unregister",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "names",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "isRegistered",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "list",
+              "return": {
+                "type": {
+                  "text": "Promise<WebmcpToolInfo[]>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "call",
+              "return": {
+                "type": {
+                  "text": "Promise<WebmcpToolResult>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "args",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "text": "AbortSignal"
+                  }
+                },
+                {
+                  "name": "caller",
+                  "default": "'app'",
+                  "type": {
+                    "text": "Exclude<WebmcpCaller, 'external'>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "callWithOutput",
+              "return": {
+                "type": {
+                  "text": "Promise<WebmcpToolExecutionOutput>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "args",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "text": "AbortSignal"
+                  }
+                },
+                {
+                  "name": "caller",
+                  "default": "'app'",
+                  "type": {
+                    "text": "Exclude<WebmcpCaller, 'external'>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "isOurs",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "t",
+                  "type": {
+                    "text": "WebmcpRegisteredTool"
+                  }
+                },
+                {
+                  "name": "schema",
+                  "type": {
+                    "text": "Record<string, unknown> | undefined"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "executeViaModelContext",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<string | null>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "tool",
+                  "type": {
+                    "text": "WebmcpRegisteredTool"
+                  }
+                },
+                {
+                  "name": "args",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "text": "AbortSignal"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "run",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<WebmcpToolExecutionOutput>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "def",
+                  "type": {
+                    "text": "WebmcpToolDefinition<TCtx>"
+                  }
+                },
+                {
+                  "name": "args",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "text": "AbortSignal"
+                  }
+                },
+                {
+                  "name": "caller",
+                  "type": {
+                    "text": "WebmcpCaller"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "runSingle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<WebmcpToolExecutionOutput>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "def",
+                  "type": {
+                    "text": "WebmcpToolDefinition<TCtx>"
+                  }
+                },
+                {
+                  "name": "args",
+                  "type": {
+                    "text": "Record<string, unknown>"
+                  }
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "text": "AbortSignal"
+                  }
+                },
+                {
+                  "name": "caller",
+                  "type": {
+                    "text": "WebmcpCaller"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              }
+            },
+            {
+              "name": "running",
+              "type": {
+                "text": "Event"
+              }
+            },
+            {
+              "name": "caller",
+              "type": {
+                "text": "WebmcpCallEvent"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "EventTarget",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "nativeModelContext",
+          "declaration": {
+            "name": "nativeModelContext",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "WebmcpToolError",
+          "declaration": {
+            "name": "WebmcpToolError",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "WebmcpCallEvent",
+          "declaration": {
+            "name": "WebmcpCallEvent",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "canonicalJSON",
+          "declaration": {
+            "name": "canonicalJSON",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "annotationsFor",
+          "declaration": {
+            "name": "annotationsFor",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "asObject",
+          "declaration": {
+            "name": "asObject",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "WebmcpToolHost",
+          "declaration": {
+            "name": "WebmcpToolHost",
+            "module": "src/lib/live/webmcp-host.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/live-session.ts",
       "declarations": [
         {
@@ -6653,61 +8358,22 @@
     {
       "kind": "javascript-module",
       "path": "src/pcm-capture.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "createPcmCaptureContext",
-          "return": {
-            "type": {
-              "text": "Promise<AudioContext>"
-            }
-          },
-          "description": "Shared 16kHz PCM microphone capture pipeline using AudioWorkletNode.\nBuffers Float32 samples into 2048-sample Int16 chunks (~128ms at 16kHz)\nand posts each full chunk to the main thread via port.onmessage."
-        },
-        {
-          "kind": "function",
-          "name": "int16ArrayToLittleEndianBytes",
-          "return": {
-            "type": {
-              "text": "Uint8Array"
-            }
-          },
-          "parameters": [
-            {
-              "name": "int16",
-              "type": {
-                "text": "Int16Array"
-              }
-            }
-          ],
-          "description": "Converts a chunk posted by the 'pcm-processor' worklet (an Int16Array)\ninto little-endian bytes."
-        },
-        {
-          "kind": "function",
-          "name": "uint8ArrayToBase64",
-          "return": {
-            "type": {
-              "text": "string"
-            }
-          },
-          "parameters": [
-            {
-              "name": "bytes",
-              "type": {
-                "text": "Uint8Array"
-              }
-            }
-          ],
-          "description": "Converts a Uint8Array into a Base64 string safely."
-        }
-      ],
+      "declarations": [],
       "exports": [
+        {
+          "kind": "js",
+          "name": "computeInt16Rms",
+          "declaration": {
+            "name": "computeInt16Rms",
+            "module": "./lib/live/pcm-mic"
+          }
+        },
         {
           "kind": "js",
           "name": "createPcmCaptureContext",
           "declaration": {
             "name": "createPcmCaptureContext",
-            "module": "src/pcm-capture.ts"
+            "module": "./lib/live/pcm-mic"
           }
         },
         {
@@ -6715,7 +8381,7 @@
           "name": "int16ArrayToLittleEndianBytes",
           "declaration": {
             "name": "int16ArrayToLittleEndianBytes",
-            "module": "src/pcm-capture.ts"
+            "module": "./lib/live/pcm-mic"
           }
         },
         {
@@ -6723,7 +8389,7 @@
           "name": "uint8ArrayToBase64",
           "declaration": {
             "name": "uint8ArrayToBase64",
-            "module": "src/pcm-capture.ts"
+            "module": "./lib/live/pcm-mic"
           }
         }
       ]
