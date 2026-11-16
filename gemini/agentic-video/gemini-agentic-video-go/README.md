@@ -2,7 +2,7 @@
 
 An idiomatic Go reference implementation and interactive CLI demonstrating [Gemini agentic video understanding](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/video-understanding) with the official Google Gen AI SDK (`google.golang.org/genai`). Provides reusable Go patterns, backend client factories, and production code examples (single-video, multi-video synthesis, multi-turn dialogue, token telemetry) alongside an interactive CLI tool—featuring active Think ➔ Act ➔ Observe dynamic timeline navigation, sub-second precision, and up to 96% token reduction compared to static frame ingestion.
 
-[![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Google Gen AI SDK](https://img.shields.io/badge/Google%20Gen%20AI%20SDK-v1.77.0-4285F4?logo=google)](https://pkg.go.dev/google.golang.org/genai)
 [![User Guide](https://img.shields.io/badge/Documentation-User%20Guide-blue?logo=markdown)](docs/user-guide.md)
@@ -169,7 +169,7 @@ func main() {
 
 ### Prerequisites
 
-- [Go 1.25+](https://golang.org/dl/)
+- [Go 1.25+](https://go.dev/dl/)
 - A Google Cloud Project with the Agent Platform / Vertex AI / Gemini API enabled
 - Authenticated credentials via Application Default Credentials (`gcloud auth application-default login`)
 
