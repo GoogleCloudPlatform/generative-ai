@@ -22,10 +22,7 @@ if ! command -v uv &> /dev/null; then
     exit 1
 fi
 
-# Define the uv run command with all necessary dependencies
-UV_RUN="uv run --with autoflake --with ruff --with nbqa --with nbformat>=5.10.4 --with git+https://github.com/tensorflow/docs"
-
-# Sorting and de-duplicating spelling allow file
+# Spelling allow file maintenance
 SPELLING_ALLOW_FILE=".github/actions/spelling/allow.txt"
 SPELLING_EXPECT_FILE=".github/actions/spelling/expect.txt"
 if [ -f "$SPELLING_EXPECT_FILE" ]; then
@@ -36,91 +33,75 @@ fi
 
 if [ -f "$SPELLING_ALLOW_FILE" ]; then
     echo "Sorting and de-duplicating $SPELLING_ALLOW_FILE"
-    sort -u "$SPELLING_ALLOW_FILE" -o "$SPELLING_ALLOW_FILE"
+    LC_ALL=C sort -u "$SPELLING_ALLOW_FILE" -o "$SPELLING_ALLOW_FILE"
 fi
 
 # Determine files to lint
 FORMAT_ALL=false
-UNSAFE_FIXES=false
-PASSED_FILES=""
+UNSAFE_FLAG=""
+LINT_PATHS_NB=()
+LINT_PATHS_PY=()
+
+add_file() {
+  local f="$1"
+  if [[ "$f" == *.ipynb ]]; then
+    LINT_PATHS_NB+=("$f")
+  elif [[ "$f" == *.py ]] && [[ "${f##*/}" != "noxfile.py" ]]; then
+    LINT_PATHS_PY+=("$f")
+  fi
+}
+
 for arg in "$@"; do
   if [ "$arg" == "--all" ]; then
     FORMAT_ALL=true
   elif [ "$arg" == "--unsafe-fixes" ]; then
-    UNSAFE_FIXES=true
-  elif [[ "$arg" == *.ipynb ]] || [[ "$arg" == *.py ]]; then
-    PASSED_FILES="$PASSED_FILES $arg"
+    UNSAFE_FLAG="--unsafe-fixes"
+  else
+    add_file "$arg"
   fi
 done
 
-LINT_PATHS_NB=""
-LINT_PATHS_PY=""
-
-if [ -n "$PASSED_FILES" ]; then
-  for f in $PASSED_FILES; do
-    if [[ "$f" == *.ipynb ]]; then
-      LINT_PATHS_NB="$LINT_PATHS_NB $f"
-    elif [[ "$f" == *.py ]]; then
-      LINT_PATHS_PY="$LINT_PATHS_PY $f"
-    fi
-  done
-elif [ "$FORMAT_ALL" = true ]; then
-  LINT_PATHS_NB=$(find . -name "*.ipynb" -not -path "*/.*")
-  LINT_PATHS_PY=$(find . -name "*.py" -not -path "*/.*" -not -name "noxfile.py")
-else
-  TARGET_BRANCH="main"
-  # Get changed files
-  CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" | sort -u)
-  STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" | sort -u)
-  COMMITTED_FILES=$(git diff HEAD "$TARGET_BRANCH" --name-only --diff-filter=ACMRTUXB | sort -u)
-  
-  ALL_CHANGED=$(echo "$CHANGED_FILES $STAGED_FILES $COMMITTED_FILES" | tr ' ' '\n' | sort -u)
-  
-  for f in $ALL_CHANGED; do
-    if [ -f "$f" ]; then
-      if [[ "$f" == *.ipynb ]]; then
-        LINT_PATHS_NB="$LINT_PATHS_NB $f"
-      elif [[ "$f" == *.py ]] && [ "$f" != "noxfile.py" ]; then
-        LINT_PATHS_PY="$LINT_PATHS_PY $f"
-      fi
-    fi
-  done
-fi
-
-# --- Format Notebooks ---
-if [ -n "$LINT_PATHS_NB" ]; then
-  echo "Formatting notebooks..."
-  
-  # Run custom notebook processor
-  $UV_RUN python3 scripts/notebook_processor.py $LINT_PATHS_NB
-  
-  # Run nbqa tools
-  $UV_RUN nbqa autoflake $LINT_PATHS_NB -i -r --remove-all-unused-imports
-  
-  UNSAFE_FLAG=""
-  if [ "$UNSAFE_FIXES" = true ]; then
-    UNSAFE_FLAG=" --unsafe-fixes"
+if [ "${#LINT_PATHS_NB[@]}" -eq 0 ] && [ "${#LINT_PATHS_PY[@]}" -eq 0 ]; then
+  if [ "$FORMAT_ALL" = true ]; then
+    while IFS= read -r f; do
+      add_file "$f"
+    done < <(find . -not -path "*/.*" \( -name "*.ipynb" -o -name "*.py" \))
+  else
+    TARGET_BRANCH="main"
+    while IFS= read -r f; do
+      [ -f "$f" ] && add_file "$f"
+    done < <(git diff --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" -- '*.ipynb' '*.py')
   fi
-  $UV_RUN nbqa "ruff check --fix-only$UNSAFE_FLAG" $LINT_PATHS_NB
-  
-  $UV_RUN nbqa "ruff format" $LINT_PATHS_NB
-  
-  $UV_RUN python3 -m tensorflow_docs.tools.nbfmt $LINT_PATHS_NB
-else
-  echo "No notebooks to format."
 fi
 
-# --- Format Python Files ---
-if [ -n "$LINT_PATHS_PY" ]; then
-  echo "Formatting Python files..."
-  $UV_RUN autoflake -i -r --remove-all-unused-imports $LINT_PATHS_PY
-  
-  UNSAFE_FLAG=""
-  if [ "$UNSAFE_FIXES" = true ]; then
-    UNSAFE_FLAG=" --unsafe-fixes"
-  fi
-  $UV_RUN ruff check --fix-only$UNSAFE_FLAG $LINT_PATHS_PY
-  $UV_RUN ruff format $LINT_PATHS_PY
-else
-  echo "No Python files to format."
+if [ "${#LINT_PATHS_NB[@]}" -eq 0 ] && [ "${#LINT_PATHS_PY[@]}" -eq 0 ]; then
+  echo "No notebooks or Python files to format."
+  exit 0
 fi
+
+# Only pull notebook-specific dependencies when notebooks are present
+UV_WITH=(--with ruff)
+if [ "${#LINT_PATHS_NB[@]}" -gt 0 ]; then
+  UV_WITH+=(--with "nbformat>=5.10.4" --with "git+https://github.com/tensorflow/docs")
+fi
+
+# Run all formatting steps inside a single uv environment
+uv run "${UV_WITH[@]}" bash -s -- "${#LINT_PATHS_NB[@]}" "$UNSAFE_FLAG" "${LINT_PATHS_NB[@]}" "${LINT_PATHS_PY[@]}" << 'EOF'
+  set -e
+  nb_count=$1
+  unsafe_flag=$2
+  shift 2
+
+  if [ "$nb_count" -gt 0 ]; then
+    echo "Formatting $nb_count notebook(s)..."
+    python3 scripts/notebook_processor.py "${@:1:$nb_count}"
+  fi
+
+  echo "Running ruff check and format on $# file(s)..."
+  ruff check --fix-only ${unsafe_flag:+"$unsafe_flag"} "$@"
+  ruff format "$@"
+
+  if [ "$nb_count" -gt 0 ]; then
+    python3 -m tensorflow_docs.tools.nbfmt "${@:1:$nb_count}"
+  fi
+EOF
