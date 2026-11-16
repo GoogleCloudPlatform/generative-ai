@@ -36,7 +36,7 @@ fi
 
 if [ -f "$SPELLING_ALLOW_FILE" ]; then
     echo "Sorting and de-duplicating $SPELLING_ALLOW_FILE"
-    LC_ALL=en_US.UTF-8 sort -u "$SPELLING_ALLOW_FILE" -o "$SPELLING_ALLOW_FILE"
+    LC_ALL=C sort -u "$SPELLING_ALLOW_FILE" -o "$SPELLING_ALLOW_FILE"
 fi
 
 # Determine files to lint
@@ -73,9 +73,9 @@ else
   CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" | sort -u)
   STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" | sort -u)
   COMMITTED_FILES=$(git diff HEAD "$TARGET_BRANCH" --name-only --diff-filter=ACMRTUXB | sort -u)
-  
+
   ALL_CHANGED=$(echo "$CHANGED_FILES $STAGED_FILES $COMMITTED_FILES" | tr ' ' '\n' | sort -u)
-  
+
   for f in $ALL_CHANGED; do
     if [ -f "$f" ]; then
       if [[ "$f" == *.ipynb ]]; then
@@ -90,21 +90,21 @@ fi
 # --- Format Notebooks ---
 if [ -n "$LINT_PATHS_NB" ]; then
   echo "Formatting notebooks..."
-  
+
   # Run custom notebook processor
   $UV_RUN python3 scripts/notebook_processor.py $LINT_PATHS_NB
-  
+
   # Run nbqa tools
   $UV_RUN nbqa autoflake $LINT_PATHS_NB -i -r --remove-all-unused-imports
-  
+
   UNSAFE_FLAG=""
   if [ "$UNSAFE_FIXES" = true ]; then
     UNSAFE_FLAG=" --unsafe-fixes"
   fi
   $UV_RUN nbqa "ruff check --fix-only$UNSAFE_FLAG" $LINT_PATHS_NB
-  
+
   $UV_RUN nbqa "ruff format" $LINT_PATHS_NB
-  
+
   $UV_RUN python3 -m tensorflow_docs.tools.nbfmt $LINT_PATHS_NB
 else
   echo "No notebooks to format."
@@ -114,7 +114,7 @@ fi
 if [ -n "$LINT_PATHS_PY" ]; then
   echo "Formatting Python files..."
   $UV_RUN autoflake -i -r --remove-all-unused-imports $LINT_PATHS_PY
-  
+
   UNSAFE_FLAG=""
   if [ "$UNSAFE_FIXES" = true ]; then
     UNSAFE_FLAG=" --unsafe-fixes"
