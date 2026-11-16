@@ -91,15 +91,51 @@ def fix_markdown_links(
     return "\n".join(new_lines), changes_made
 
 
-def update_notebook_links(notebook_paths: list[str]) -> None:
-    """Checks and fixes specific types of links in the provided list of notebooks."""
-    print("Checking notebook links...")
+def wrap_param_blocks(
+    cell_source: str, max_line_length: int = DEFAULT_RUFF_LINE_LENGTH
+) -> tuple[str, bool]:
+    """Wraps long '@param' lines in a code cell with '# fmt: off/on'."""
+    if "@param" not in cell_source:
+        return cell_source, False
+
+    source_lines = cell_source.split("\n")
+    clean_source_lines = [
+        line for line in source_lines if line.strip() not in ["# fmt: off", "# fmt: on"]
+    ]
+
+    param_indices = [
+        i
+        for i, line in enumerate(clean_source_lines)
+        if "@param" in line and len(line) >= max_line_length
+    ]
+
+    if not param_indices:
+        return cell_source, False
+
+    first_param_index = param_indices[0]
+    last_param_index = param_indices[-1]
+
+    new_source_lines = []
+    for i, line in enumerate(clean_source_lines):
+        if i == first_param_index:
+            new_source_lines.append("# fmt: off")
+        new_source_lines.append(line)
+        if i == last_param_index:
+            new_source_lines.append("# fmt: on")
+
+    new_source = "\n".join(new_source_lines)
+    return new_source, new_source != cell_source
+
+
+def process_notebooks(
+    notebook_paths: list[str],
+    max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
+) -> None:
+    """Processes notebooks in a single pass: wraps '@param' blocks and fixes links."""
+    print("Processing notebooks ('@param' blocks and links)...")
     links_updated_count = 0
 
     for notebook_path in notebook_paths:
-        # False positive
-        if "vector-search-2-intro" in notebook_path:
-            continue
         try:
             with open(notebook_path, encoding="utf-8") as f:
                 notebook = nbformat.read(f, as_version=4)
@@ -107,92 +143,49 @@ def update_notebook_links(notebook_paths: list[str]) -> None:
             relative_notebook_path = os.path.relpath(
                 notebook_path, start=os.getcwd()
             ).lower()
-            notebook_modified = False
+            check_links = "vector-search-2-intro" not in notebook_path
+            params_modified = False
+            links_modified = False
 
             for cell in notebook.cells:
-                if (
-                    cell.cell_type == "markdown"
+                if cell.cell_type == "code":
+                    updated_source, changed = wrap_param_blocks(
+                        cell.source, max_line_length=max_line_length
+                    )
+                    if changed:
+                        cell.source = updated_source
+                        params_modified = True
+                elif (
+                    check_links
+                    and cell.cell_type == "markdown"
                     and "<table" in cell.source
                     and "colab" in cell.source
                 ):
-                    updated_source, changes_made = fix_markdown_links(
+                    updated_source, changed = fix_markdown_links(
                         cell.source, relative_notebook_path
                     )
-                    if changes_made:
+                    if changed:
                         cell.source = updated_source
-                        notebook_modified = True
+                        links_modified = True
 
-            if notebook_modified:
+            if params_modified:
+                print(
+                    f"  -> Wrapped '@param' blocks with '# fmt: off/on' in {notebook_path}"
+                )
+
+            if links_modified:
                 links_updated_count += 1
-                with open(notebook_path, "w", encoding="utf-8") as f:
-                    nbformat.write(notebook, f)
                 print(f"  -> Fixed links in {notebook_path}")
 
+            if params_modified or links_modified:
+                with open(notebook_path, "w", encoding="utf-8") as f:
+                    nbformat.write(notebook, f)
+
         except Exception as e:
-            print(f"Could not check links in {notebook_path}. Error: {e}")
+            print(f"Could not process notebook {notebook_path}. Error: {e}")
 
     if links_updated_count > 0:
         print(f"Fixed links in {links_updated_count} notebooks.")
-
-
-def preprocess_notebook(
-    notebook_paths: list[str],
-    max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
-) -> None:
-    """Parses notebooks and wraps '@param' blocks with '# fmt: off/on'."""
-    print("Checking for '@param' blocks to wrap with '# fmt: off/on'...")
-    for path in notebook_paths:
-        try:
-            with open(path, encoding="utf-8") as f:
-                notebook = nbformat.read(f, as_version=4)
-
-            notebook_modified = False
-            for cell in notebook.cells:
-                if cell.cell_type != "code" or "@param" not in cell.source:
-                    continue
-
-                source_lines = cell.source.split("\n")
-
-                clean_source_lines = [
-                    line
-                    for line in source_lines
-                    if line.strip() not in ["# fmt: off", "# fmt: on"]
-                ]
-
-                param_indices = [
-                    i
-                    for i, line in enumerate(clean_source_lines)
-                    if "@param" in line and len(line) >= max_line_length
-                ]
-
-                if not param_indices:
-                    continue
-
-                first_param_index = param_indices[0]
-                last_param_index = param_indices[-1]
-
-                # Reconstruct the cell source with new directives
-                new_source_lines = []
-                for i, line in enumerate(clean_source_lines):
-                    if i == first_param_index:
-                        new_source_lines.append("# fmt: off")
-                    new_source_lines.append(line)
-                    if i == last_param_index:
-                        new_source_lines.append("# fmt: on")
-
-                new_source = "\n".join(new_source_lines)
-
-                if new_source != cell.source:
-                    cell.source = new_source
-                    notebook_modified = True
-
-            if notebook_modified:
-                print(f"  -> Wrapped '@param' blocks with '# fmt: off/on' in {path}")
-                with open(path, "w", encoding="utf-8") as f:
-                    nbformat.write(notebook, f)
-
-        except Exception as e:
-            print(f"Could not process notebook {path}. Error: {e}")
 
 
 if __name__ == "__main__":
@@ -202,6 +195,4 @@ if __name__ == "__main__":
         )
         sys.exit(1)
 
-    notebook_paths = sys.argv[1:]
-    preprocess_notebook(notebook_paths)
-    update_notebook_links(notebook_paths)
+    process_notebooks(sys.argv[1:])

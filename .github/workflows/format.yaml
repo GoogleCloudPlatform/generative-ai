@@ -1,0 +1,52 @@
+name: Auto Format
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: format-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  format:
+    name: Auto Format
+    # Only run on PRs from the same repository so GITHUB_TOKEN can push commits
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git fetch origin "${BASE_REF}:${BASE_REF}"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2
+        with:
+          enable-cache: true
+
+      - name: Run formatting script
+        run: ./scripts/format.sh
+
+      - name: Commit and push formatting changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "Holt Skinner"
+            git config user.email "holtskinner@google.com"
+            git add -A
+            git commit -m "chore: auto-format files"
+            git push
+          else
+            echo "No formatting changes to commit."
+          fi
