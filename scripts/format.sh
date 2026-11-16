@@ -41,13 +41,16 @@ FORMAT_ALL=false
 UNSAFE_FLAG=""
 LINT_PATHS_NB=()
 LINT_PATHS_PY=()
+LINT_PATHS_GHA=()
 
 add_file() {
-  local f="$1"
+  local f="${1#./}"
   if [[ "$f" == *.ipynb ]]; then
     LINT_PATHS_NB+=("$f")
   elif [[ "$f" == *.py ]] && [[ "${f##*/}" != "noxfile.py" ]]; then
     LINT_PATHS_PY+=("$f")
+  elif [[ "$f" =~ ^\.github/(workflows/.*|actions/.*/action)\.(yml|yaml)$ ]]; then
+    LINT_PATHS_GHA+=("$f")
   fi
 }
 
@@ -61,47 +64,71 @@ for arg in "$@"; do
   fi
 done
 
-if [ "${#LINT_PATHS_NB[@]}" -eq 0 ] && [ "${#LINT_PATHS_PY[@]}" -eq 0 ]; then
+if [ "${#LINT_PATHS_NB[@]}" -eq 0 ] && [ "${#LINT_PATHS_PY[@]}" -eq 0 ] && [ "${#LINT_PATHS_GHA[@]}" -eq 0 ]; then
   if [ "$FORMAT_ALL" = true ]; then
     while IFS= read -r f; do
       add_file "$f"
-    done < <(find . -not -path "*/.*" \( -name "*.ipynb" -o -name "*.py" \))
+    done < <(
+      find . -not -path "*/.*" \( -name "*.ipynb" -o -name "*.py" \)
+      find .github/workflows .github/actions -type f \( -name "*.yml" -o -name "*.yaml" \) 2>/dev/null || true
+    )
   else
     TARGET_BRANCH="main"
     while IFS= read -r f; do
       [ -f "$f" ] && add_file "$f"
-    done < <(git diff --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" -- '*.ipynb' '*.py')
+    done < <(git diff --name-only --diff-filter=ACMRTUXB "$TARGET_BRANCH" -- '*.ipynb' '*.py' '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/actions/*/action.yml' '.github/actions/*/action.yaml')
   fi
 fi
 
-if [ "${#LINT_PATHS_NB[@]}" -eq 0 ] && [ "${#LINT_PATHS_PY[@]}" -eq 0 ]; then
-  echo "No notebooks or Python files to format."
+if [ "${#LINT_PATHS_NB[@]}" -eq 0 ] && [ "${#LINT_PATHS_PY[@]}" -eq 0 ] && [ "${#LINT_PATHS_GHA[@]}" -eq 0 ]; then
+  echo "No notebooks, Python files, or GitHub Actions files to format."
   exit 0
 fi
 
-# Only pull notebook-specific dependencies when notebooks are present
-UV_WITH=(--with ruff)
+# Only pull dependencies needed for the detected file types
+UV_WITH=()
+if [ "${#LINT_PATHS_NB[@]}" -gt 0 ] || [ "${#LINT_PATHS_PY[@]}" -gt 0 ]; then
+  UV_WITH+=(--with ruff)
+fi
 if [ "${#LINT_PATHS_NB[@]}" -gt 0 ]; then
   UV_WITH+=(--with "nbformat>=5.10.4" --with "git+https://github.com/tensorflow/docs")
 fi
+if [ "${#LINT_PATHS_GHA[@]}" -gt 0 ]; then
+  UV_WITH+=(--with zizmor)
+fi
 
 # Run all formatting steps inside a single uv environment
-uv run "${UV_WITH[@]}" bash -s -- "${#LINT_PATHS_NB[@]}" "$UNSAFE_FLAG" "${LINT_PATHS_NB[@]}" "${LINT_PATHS_PY[@]}" << 'EOF'
+uv run "${UV_WITH[@]}" bash -s -- "${#LINT_PATHS_NB[@]}" "${#LINT_PATHS_PY[@]}" "$UNSAFE_FLAG" "${LINT_PATHS_NB[@]}" "${LINT_PATHS_PY[@]}" "${LINT_PATHS_GHA[@]}" << 'EOF'
   set -e
   nb_count=$1
-  unsafe_flag=$2
-  shift 2
+  py_count=$2
+  unsafe_flag=$3
+  shift 3
+
+  ruff_count=$((nb_count + py_count))
+  gha_count=$(($# - ruff_count))
 
   if [ "$nb_count" -gt 0 ]; then
     echo "Formatting $nb_count notebook(s)..."
     python3 scripts/notebook_processor.py "${@:1:$nb_count}"
   fi
 
-  echo "Running ruff check and format on $# file(s)..."
-  ruff check --fix-only ${unsafe_flag:+"$unsafe_flag"} "$@"
-  ruff format "$@"
+  if [ "$ruff_count" -gt 0 ]; then
+    echo "Running ruff check and format on $ruff_count file(s)..."
+    ruff check --fix-only ${unsafe_flag:+"$unsafe_flag"} "${@:1:$ruff_count}"
+    ruff format "${@:1:$ruff_count}"
+  fi
 
   if [ "$nb_count" -gt 0 ]; then
     python3 -m tensorflow_docs.tools.nbfmt "${@:1:$nb_count}"
+  fi
+
+  if [ "$gha_count" -gt 0 ]; then
+    zizmor_fix_mode="safe"
+    if [ -n "$unsafe_flag" ]; then
+      zizmor_fix_mode="all"
+    fi
+    echo "Running zizmor --fix=$zizmor_fix_mode on $gha_count GitHub Actions file(s)..."
+    zizmor --fix="$zizmor_fix_mode" "${@:$((ruff_count + 1))}" || true
   fi
 EOF

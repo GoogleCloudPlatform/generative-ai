@@ -15,8 +15,6 @@ concurrency:
 jobs:
   format:
     name: Auto Format
-    # Only run on PRs from the same repository so GITHUB_TOKEN can push commits
-    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
 
     steps:
@@ -40,6 +38,7 @@ jobs:
         run: ./scripts/format.sh
 
       - name: Commit and push formatting changes
+        if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "Holt Skinner"
@@ -49,4 +48,15 @@ jobs:
             git push
           else
             echo "No formatting changes to commit."
+          fi
+
+      - name: Check formatting on fork PRs
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Formatting changes are required. Please run './scripts/format.sh' locally and push the changes."
+            git status --short
+            exit 1
+          else
+            echo "No formatting changes needed."
           fi
