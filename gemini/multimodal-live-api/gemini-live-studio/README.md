@@ -86,12 +86,12 @@ building a new voice or avatar agent takes ~100 lines of application code. See
 
 ### Prerequisites
 
-| Requirement                                             | Version | Notes                                                             |
-| ------------------------------------------------------- | ------- | ----------------------------------------------------------------- |
-| [Go](https://go.dev/doc/install)                        | 1.26+   | see `go.mod`                                                      |
-| [Node.js](https://nodejs.org/en/download/)              | 22.18+  | for the Vite frontend                                             |
-| [gcloud CLI](https://cloud.google.com/sdk/docs/install) | any     | for Application Default Credentials                               |
-| Google Cloud project                                    | n/a     | with the Gemini Enterprise Agent Platform (Vertex AI) API enabled |
+| Requirement                                                      | Version | Notes                                                             |
+| ---------------------------------------------------------------- | ------- | ----------------------------------------------------------------- |
+| [Go](https://go.dev/doc/install)                                 | 1.26+   | see `go.mod`                                                      |
+| [Node.js](https://nodejs.org/en/download/)                       | 22.18+  | for the Vite frontend                                             |
+| [gcloud CLI](https://docs.cloud.google.com/sdk/docs/install-sdk) | any     | for Application Default Credentials                               |
+| Google Cloud project                                             | n/a     | with the Gemini Enterprise Agent Platform (Vertex AI) API enabled |
 
 > **Access note:** the avatar surface (`VIDEO` response modality) and custom
 > avatars may require your project to be allowlisted. Without access, sessions
@@ -140,7 +140,7 @@ make dev
 ```
 
 This starts the Go server on `localhost:8080` and the Vite dev server on
-`localhost:5173`. Open **<http://localhost:5173>**. Run `make help` to list
+`localhost:5173`. Open **`http://localhost:5173`**. Run `make help` to list
 every target.
 
 ## Using the app
