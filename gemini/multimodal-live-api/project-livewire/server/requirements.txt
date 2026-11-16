@@ -1,6 +1,6 @@
 websockets==14.1
 google-auth==2.37.0
-certifi==2024.12.14
+certifi==2026.10.18
 requests==2.32.3
 google-genai==1.3.0
 aiohttp==3.12.14
