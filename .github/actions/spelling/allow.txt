@@ -434,7 +434,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 DALL
 Daniil
 Darabont
@@ -469,8 +468,8 @@ demoable
 demoed
 demouser
 demuxer
-demuxers
 Demuxer
+demuxers
 denorm
 dente
 Depatmint
@@ -490,8 +489,8 @@ dflt
 dfs
 Dgektczl
 DHH
-Diataxis
 diataxis
+Diataxis
 diffable
 diffed
 diffs
@@ -523,6 +522,7 @@ doi
 DOIs
 Donen
 Doogler
+D'orsay
 dotpath
 dotprompt
 DOTX
@@ -1081,8 +1081,8 @@ ixed
 izakaya
 ize
 ized
-J'aime
 jaccard
+J'aime
 JAISH
 Jaival
 japonicum
@@ -1189,8 +1189,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -1204,6 +1202,7 @@ langgraph
 Laomedeia
 lastb
 latte
+L'avenir
 lavfi
 lbl
 LCEL
@@ -1218,6 +1217,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 libmp
 lic
@@ -2444,9 +2444,9 @@ webclient
 webfonts
 webinar
 webinars
-Webmcp
-webmcp
 webm
+webmcp
+Webmcp
 webpage
 webpages
 webrtc
