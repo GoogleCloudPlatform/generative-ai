@@ -174,6 +174,7 @@ DHH
 DKA
 DLC
 DLCs
+dna
 DOCDB
 DOIs
 DOTX
@@ -536,8 +537,10 @@ Milito
 Minato
 Mirai
 Misaki
+misrouted
 Mitani
 Miyabi
+mlr
 Mnih
 Molaison
 Mookie
@@ -551,6 +554,8 @@ NDCG
 NDEBUG
 NER
 NFRs
+neur
+neurips
 NGRAM
 NGRAMS
 NHK
@@ -628,10 +633,13 @@ PGHOST
 PGPORT
 PGUSER
 PLLu
+plore
 PLOTLYENV
+pmlr
 PNGs
 PORTFILE
 PPO
+prebuffer
 PRD
 PREBROWSE
 PRIN
@@ -682,6 +690,8 @@ Quickbot
 Qwen
 Qwiklabs
 RAGAS
+raycaster
+rcvd
 RDONLY
 REAUTH
 REPOURL
@@ -750,6 +760,7 @@ SSRF
 SSZ
 STARTPTS
 STIX
+stopwords
 SUBLANG
 SVA
 SWP
@@ -917,6 +928,7 @@ Virat
 Viru
 Visualise
 Volodymyr
+voxplore
 WAFs
 WAI
 WAU
