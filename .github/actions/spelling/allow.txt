@@ -550,6 +550,7 @@ NCCREATE
 NDCG
 NDEBUG
 NER
+NFRs
 NGRAM
 NGRAMS
 NHK
@@ -2073,6 +2074,7 @@ pydrive
 pydub
 pymupdf
 pyo
+pyparseit
 pypdf
 pypi
 pyplot
@@ -2577,5 +2579,6 @@ zfill
 zfq
 zimie
 zipcode
+zipstream
 zmin
 zola
