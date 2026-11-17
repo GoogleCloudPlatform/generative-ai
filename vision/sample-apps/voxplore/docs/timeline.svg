@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 290" width="1000" height="290" role="img" aria-labelledby="t d" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+<title id="t">VoxPlore: one request over time</title>
+<desc id="d">A timeline with five lanes. The user asks. The avatar says it is building the scene and keeps explaining for about thirty seconds while a background model writes the scene. When the scene is on the stage the avatar invites the user to try it, and it comments when the user moves a slider.</desc>
+<defs><marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#57606a"/></marker>
+<marker id="hb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1a73e8"/></marker>
+<marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e37400"/></marker></defs>
+<rect x="0.5" y="0.5" width="999" height="289" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<g transform="translate(0 -296)">
+<rect x="24" y="314" width="12" height="12" rx="3" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.3"/>
+<text x="42" y="324" font-size="11.5" fill="#1f2328">real-time conversation</text>
+<rect x="186" y="314" width="12" height="12" rx="3" fill="#fef7e0" stroke="#e37400" stroke-width="1.3"/>
+<text x="204" y="324" font-size="11.5" fill="#1f2328">background generation</text>
+<text x="24" y="361" font-size="11.5" fill="#1f2328" font-weight="600">User</text>
+<line x1="190" y1="357" x2="956.5" y2="357" stroke="#eaeef2" stroke-width="22" stroke-linecap="butt"/>
+<text x="24" y="395" font-size="11.5" fill="#1f2328" font-weight="600">Avatar</text>
+<line x1="190" y1="391" x2="956.5" y2="391" stroke="#eaeef2" stroke-width="22" stroke-linecap="butt"/>
+<text x="24" y="429" font-size="11.5" fill="#1f2328" font-weight="600">Messages</text>
+<line x1="190" y1="425" x2="956.5" y2="425" stroke="#eaeef2" stroke-width="22" stroke-linecap="butt"/>
+<text x="24" y="463" font-size="11.5" fill="#1f2328" font-weight="600">Background model</text>
+<line x1="190" y1="459" x2="956.5" y2="459" stroke="#eaeef2" stroke-width="22" stroke-linecap="butt"/>
+<text x="24" y="497" font-size="11.5" fill="#1f2328" font-weight="600">Stage</text>
+<line x1="190" y1="493" x2="956.5" y2="493" stroke="#eaeef2" stroke-width="22" stroke-linecap="butt"/>
+<line x1="266.6" y1="340" x2="266.6" y2="510" stroke="#57606a" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="678.4" y1="340" x2="678.4" y2="510" stroke="#57606a" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="825.1" y1="340" x2="825.1" y2="510" stroke="#57606a" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="190.0" y="346" width="72.3" height="22" rx="5" fill="#ffffff" stroke="#57606a"/>
+<text x="198.0" y="361" font-size="10.5" fill="#1f2328">asks</text>
+<rect x="790.1" y="346" width="35.0" height="22" rx="5" fill="#ffffff" stroke="#57606a"/>
+<text x="832.1" y="361" font-size="10.5" fill="#1f2328">moves a slider</text>
+<rect x="271.0" y="380" width="403.0" height="22" rx="5" fill="#e8f0fe" stroke="#1a73e8"/>
+<text x="279.0" y="395" font-size="10.5" fill="#174ea6">says it is building the scene, and keeps explaining gradient descent</text>
+<rect x="682.8" y="380" width="76.6" height="22" rx="5" fill="#e8f0fe" stroke="#1a73e8"/>
+<text x="690.8" y="395" font-size="10.5" fill="#174ea6">"try it"</text>
+<rect x="829.5" y="380" width="96.4" height="22" rx="5" fill="#e8f0fe" stroke="#1a73e8"/>
+<text x="837.5" y="395" font-size="10.5" fill="#174ea6">comments</text>
+<circle cx="266.6" cy="425" r="5" fill="#1f2328"/>
+<text x="276.6" y="429" font-size="10.5" fill="#1f2328">function call, answered "in progress"</text>
+<circle cx="678.4" cy="425" r="5" fill="#1f2328"/>
+<text x="688.4" y="429" font-size="10.5" fill="#1f2328">"displayed"</text>
+<circle cx="825.1" cy="425" r="5" fill="#1f2328"/>
+<text x="835.1" y="429" font-size="10.5" fill="#1f2328">user action</text>
+<rect x="271.0" y="448" width="403.0" height="22" rx="5" fill="#fef7e0" stroke="#e37400"/>
+<text x="279.0" y="463" font-size="10.5" fill="#8a4b00">the code model writes the scene: 19 s</text>
+<rect x="678.4" y="482" width="278.1" height="22" rx="5" fill="#ffffff" stroke="#57606a"/>
+<text x="686.4" y="497" font-size="10.5" fill="#1f2328">scene on the stage, interactive</text>
+<line x1="190" y1="516" x2="956.5" y2="516" stroke="#57606a" stroke-width="1"/>
+<line x1="190.0" y1="516" x2="190.0" y2="521" stroke="#57606a" stroke-width="1"/>
+<text x="190.0" y="534" font-size="10.5" fill="#57606a" text-anchor="middle">0 s</text>
+<line x1="409.0" y1="516" x2="409.0" y2="521" stroke="#57606a" stroke-width="1"/>
+<text x="409.0" y="534" font-size="10.5" fill="#57606a" text-anchor="middle">10 s</text>
+<line x1="628.0" y1="516" x2="628.0" y2="521" stroke="#57606a" stroke-width="1"/>
+<text x="628.0" y="534" font-size="10.5" fill="#57606a" text-anchor="middle">20 s</text>
+<line x1="847.0" y1="516" x2="847.0" y2="521" stroke="#57606a" stroke-width="1"/>
+<text x="847.0" y="534" font-size="10.5" fill="#57606a" text-anchor="middle">30 s</text>
+<text x="976" y="566" font-size="10.5" fill="#57606a" text-anchor="end">Drawn with the medians measured in the evaluation: 3.5 s from request to function call, 19 s to generate a scene.</text>
+</g>
+</svg>

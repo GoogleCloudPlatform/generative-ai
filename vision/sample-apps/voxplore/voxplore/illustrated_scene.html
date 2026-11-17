@@ -1,0 +1,167 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+html, body { margin: 0; height: 100%; overflow: hidden; background: #141b24; color: #e9eef3; font: 14px/1.4 system-ui, sans-serif; }
+body { display: flex; flex-direction: row; }
+#panel { display: flex; flex-direction: column; gap: 6px; width: 200px; flex-shrink: 0; box-sizing: border-box; padding: 12px; overflow-y: auto; background: rgba(20, 27, 36, 0.9); border-right: 1px solid rgba(255, 255, 255, 0.12); }
+#panel h1 { margin: 0 0 4px; font-size: 13px; font-weight: 600; }
+#panel button { padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.16); background: transparent; color: #c3ced9; font: inherit; text-align: left; cursor: pointer; }
+#panel button:hover, #panel button:focus-visible { border-color: rgba(125, 188, 255, 0.7); color: #e9eef3; outline: none; }
+#panel button.on { border-color: #7dbcff; background: rgba(90, 169, 255, 0.25); color: #e6f1ff; }
+#panel #quiz { margin-top: 8px; border-color: rgba(125, 188, 255, 0.5); background: rgba(90, 169, 255, 0.25); color: #e6f1ff; text-align: center; }
+#view { position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
+#picture { position: relative; max-width: 100%; max-height: 100%; }
+#picture img { display: block; width: 100%; height: 100%; border-radius: 6px; user-select: none; }
+.spot { position: absolute; box-sizing: border-box; border: 2px solid transparent; border-radius: 8px; background: transparent; padding: 0; cursor: pointer; }
+.spot::after { content: ''; position: absolute; left: var(--x, 50%); top: var(--y, 50%); width: 12px; height: 12px; margin: -8px 0 0 -8px; border-radius: 50%; background: #7dbcff; border: 2px solid #141b24; box-shadow: 0 0 0 2px rgba(125, 188, 255, 0.45); }
+.spot:hover, .spot:focus-visible { border-color: rgba(125, 188, 255, 0.8); background: rgba(125, 188, 255, 0.12); outline: none; }
+.spot.on { border-color: #7dbcff; background: rgba(125, 188, 255, 0.18); box-shadow: 0 0 0 4000px rgba(10, 14, 20, 0.45); z-index: 2; }
+.spot.on::after { display: none; }
+.quiz .spot::after { background: #e9eef3; box-shadow: none; }
+.spot.miss { border-color: #ff6b6b; }
+#info { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); max-width: 80%; display: none; padding: 8px 14px; border-radius: 10px; background: rgba(20, 27, 36, 0.92); border: 1px solid rgba(125, 188, 255, 0.45); text-align: center; z-index: 5; }
+#info b { display: block; }
+#note { position: absolute; right: 14px; top: 12px; font-size: 11px; color: #c3ced9; background: rgba(20, 27, 36, 0.8); padding: 2px 8px; border-radius: 4px; z-index: 5; }
+@media (max-width: 640px) {
+    body { flex-direction: column-reverse; }
+    #panel { flex-direction: row; flex-wrap: wrap; width: auto; max-height: 34%; border-right: 0; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+    #panel h1 { width: 100%; }
+    #panel #quiz { margin-top: 0; }
+}
+</style></head><body>
+<div id="panel"><h1 id="title"></h1></div>
+<div id="view"><div id="picture"><img id="image" alt="" draggable="false"></div><div id="note">Generated illustration</div><div id="info"></div></div>
+<script>
+const data = __DATA__;
+const tutor = window.tutor || { event() {} };
+const panel = document.getElementById('panel');
+const view = document.getElementById('view');
+const picture = document.getElementById('picture');
+const image = document.getElementById('image');
+const info = document.getElementById('info');
+document.getElementById('title').textContent = data.title;
+image.src = data.image;
+image.alt = data.title;
+
+function fit() {
+    const room = view.getBoundingClientRect();
+    const width = Math.min(room.width - 20, (room.height - 20) * data.ratio);
+    picture.style.width = `${Math.max(width, 50)}px`;
+    picture.style.height = `${Math.max(width, 50) / data.ratio}px`;
+}
+// the frame can be measured before it has its final size, so the picture follows every change of the view
+new ResizeObserver(fit).observe(view);
+window.addEventListener('resize', fit);
+image.addEventListener('load', fit);
+fit();
+
+let target = null;
+let tries = 0;
+
+function show(title, text) {
+    info.innerHTML = '';
+    const heading = document.createElement('b');
+    heading.textContent = title;
+    info.append(heading, text || '');
+    info.style.display = 'block';
+}
+
+function mark(index) {
+    data.parts.forEach((part, i) => {
+        part.spot.classList.toggle('on', i === index);
+        part.entry.classList.toggle('on', i === index);
+        part.spot.classList.remove('miss');
+    });
+}
+
+function choose(index) {
+    const part = data.parts[index];
+    if (target === null) {
+        mark(index);
+        show(part.name, part.info);
+        tutor.event('select', { part: part.name });
+        return;
+    }
+    tries += 1;
+    if (index !== target) {
+        part.spot.classList.add('miss');
+        show(`Find: ${data.parts[target].name}`, 'Not this one. Try again.');
+        return;
+    }
+    const found = data.parts[target];
+    target = null;
+    picture.classList.remove('quiz');
+    panel.classList.remove('quiz');
+    mark(index);
+    show(found.name, found.info);
+    tutor.event('outcome', { what: `found the ${found.name} in ${tries} ${tries === 1 ? 'try' : 'tries'}` });
+}
+
+// where a part's dot goes: the point nearest its center that no smaller part on top of it covers
+function anchor(index) {
+    const [top, left, bottom, right] = data.parts[index].box;
+    const above = data.parts.slice(index + 1).map((part) => part.box);
+    let best = null;
+    for (let row = 1; row <= 9; row += 1) {
+        for (let column = 1; column <= 9; column += 1) {
+            const x = left + ((right - left) * column) / 10;
+            const y = top + ((bottom - top) * row) / 10;
+            if (above.some(([t, l, b, r]) => x >= l - 8 && x <= r + 8 && y >= t - 8 && y <= b + 8)) continue;
+            const distance = Math.abs(column - 5) + Math.abs(row - 5);
+            if (!best || distance < best.distance) best = { distance, x: column * 10, y: row * 10 };
+        }
+    }
+    return best || { x: 50, y: 50 };
+}
+
+data.parts.forEach((part, index) => {
+    const [top, left, bottom, right] = part.box;
+    const spot = document.createElement('button');
+    spot.className = 'spot';
+    spot.title = part.name;
+    spot.setAttribute('aria-label', part.name);
+    spot.style.cssText = `top:${top / 10}%;left:${left / 10}%;width:${(right - left) / 10}%;height:${(bottom - top) / 10}%`;
+    const dot = anchor(index);
+    spot.style.setProperty('--x', `${dot.x}%`);
+    spot.style.setProperty('--y', `${dot.y}%`);
+    part.dot = dot;
+    spot.addEventListener('click', () => choose(index));
+    picture.appendChild(spot);
+    const entry = document.createElement('button');
+    entry.textContent = part.name;
+    entry.addEventListener('click', () => { if (target === null) choose(index); });
+    panel.appendChild(entry);
+    part.spot = spot;
+    part.entry = entry;
+});
+
+const quiz = document.createElement('button');
+quiz.id = 'quiz';
+quiz.textContent = 'Quiz me';
+quiz.addEventListener('click', () => {
+    target = Math.floor(Math.random() * data.parts.length);
+    tries = 0;
+    mark(-1);
+    picture.classList.add('quiz');
+    data.parts.forEach((part) => { part.spot.title = ''; });
+    show(`Find: ${data.parts[target].name}`, 'Click it in the picture.');
+    tutor.event('press', { button: 'Quiz me', asked: data.parts[target].name });
+});
+panel.appendChild(quiz);
+</script>
+</body></html>
