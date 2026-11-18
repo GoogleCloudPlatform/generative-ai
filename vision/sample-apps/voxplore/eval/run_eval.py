@@ -41,10 +41,9 @@ from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(ROOT / ".env")
 
+import server  # noqa: E402
 import websockets  # noqa: E402
 from google.genai import types  # noqa: E402
-
-import server  # noqa: E402
 from voxplore import (  # noqa: E402
     SetupMessage,
     app_name,
