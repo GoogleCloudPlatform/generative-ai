@@ -1,0 +1,9 @@
+pydantic>=2.0.0
+websockets>=11.0.0
+google-adk>=0.1.0
+google-genai>=2.19,<3
+google-auth>=2.0.0
+python-dotenv>=1.0.0
+certifi>=2024.0.0
+pypdfium2>=4.30.0
+Pillow>=10.0.0

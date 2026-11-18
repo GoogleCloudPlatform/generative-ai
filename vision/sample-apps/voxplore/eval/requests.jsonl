@@ -1,0 +1,84 @@
+{"id": "none-01", "category": "none", "request": "What is the capital of Australia?", "expected": ["none"]}
+{"id": "none-02", "category": "none", "request": "Explain overfitting in one sentence.", "expected": ["none"]}
+{"id": "none-03", "category": "none", "request": "Who proved Fermat's last theorem?", "expected": ["none"]}
+{"id": "none-04", "category": "none", "request": "What is 17 times 23?", "expected": ["none"]}
+{"id": "none-05", "category": "none", "request": "Give me a one-line definition of entropy.", "expected": ["none"]}
+{"id": "none-06", "category": "none", "request": "What can you help me with?", "expected": ["none"]}
+{"id": "none-07", "category": "none", "request": "How do you say thank you in Japanese?", "expected": ["none"]}
+{"id": "none-08", "category": "none", "request": "Is a tomato a fruit or a vegetable?", "expected": ["none"]}
+{"id": "none-09", "category": "none", "request": "What is the difference between speed and velocity?", "expected": ["none"]}
+{"id": "none-10", "category": "none", "request": "Why is the sky blue? Keep it short.", "expected": ["none"]}
+{"id": "image-01", "category": "image", "request": "Draw a labeled diagram of the water cycle.", "expected": ["image"]}
+{"id": "image-02", "category": "image", "request": "Show me a picture of a medieval castle on a hill.", "expected": ["image"]}
+{"id": "image-03", "category": "image", "request": "Make an infographic of the layers of the atmosphere.", "expected": ["image"]}
+{"id": "image-04", "category": "image", "request": "Sketch the structure of a neuron with labels.", "expected": ["image"]}
+{"id": "image-05", "category": "image", "request": "Create a poster about recycling for a classroom.", "expected": ["image"]}
+{"id": "image-06", "category": "image", "request": "Show me what a mitochondrion looks like.", "expected": ["image"]}
+{"id": "image-07", "category": "image", "request": "Draw a flowchart of the scientific method.", "expected": ["image"]}
+{"id": "image-08", "category": "image", "request": "Illustrate the phases of the moon.", "expected": ["image"]}
+{"id": "image-09", "category": "image", "request": "Make a logo for a school chess club.", "expected": ["image"]}
+{"id": "image-10", "category": "image", "request": "Draw the architecture of a transformer model as a diagram.", "expected": ["image"]}
+{"id": "image-11", "category": "image", "request": "Generate a picture of a red panda in a bamboo forest.", "expected": ["image"]}
+{"id": "image-12", "category": "image", "request": "Give me a chart comparing the sizes of the planets.", "expected": ["image"]}
+{"id": "image-13", "category": "image", "request": "Show me an illustration of a plant cell with its organelles labeled.", "expected": ["image", "illustrated"]}
+{"id": "image-14", "category": "image", "request": "Make a mockup of a homework planner app screen.", "expected": ["image"]}
+{"id": "video-01", "category": "video", "request": "Make a short video of a volcano erupting.", "expected": ["video"]}
+{"id": "video-02", "category": "video", "request": "Animate a butterfly emerging from a chrysalis.", "expected": ["video"]}
+{"id": "video-03", "category": "video", "request": "Create a clip of waves crashing at sunset.", "expected": ["video"]}
+{"id": "video-04", "category": "video", "request": "Show me a video of a glacier calving into the sea.", "expected": ["video"]}
+{"id": "video-05", "category": "video", "request": "Make a short animation of a rocket launch.", "expected": ["video"]}
+{"id": "video-06", "category": "video", "request": "I'd like a clip of a hummingbird feeding from a flower.", "expected": ["video"]}
+{"id": "video-07", "category": "video", "request": "Make a video of the northern lights over a lake.", "expected": ["video"]}
+{"id": "video-08", "category": "video", "request": "Create a short time-lapse style video of a seed sprouting.", "expected": ["video"]}
+{"id": "scene-01", "category": "scene", "request": "Show me a water molecule in 3D.", "expected": ["scene"], "facts": ["The molecule has exactly three atoms: one oxygen and two hydrogens.", "Both hydrogens are bonded to the oxygen and not to each other.", "The molecule is bent, not linear.", "The oxygen atom is drawn larger than the hydrogen atoms."]}
+{"id": "scene-02", "category": "scene", "request": "Show me a methane molecule that I can rotate.", "expected": ["scene"], "facts": ["There is one carbon atom and exactly four hydrogen atoms.", "Each hydrogen is bonded to the central carbon.", "The hydrogens are arranged around the carbon in three dimensions, not all in one line."]}
+{"id": "scene-03", "category": "scene", "request": "Show a 3D carbon dioxide molecule.", "expected": ["scene"], "facts": ["There are exactly three atoms: one carbon and two oxygens.", "The carbon is in the middle, between the two oxygens.", "The three atoms lie on a straight line."]}
+{"id": "scene-04", "category": "scene", "request": "Let me explore the orbits of the four inner planets, with a speed control.", "expected": ["scene"], "facts": ["Exactly four planets orbit the Sun: Mercury, Venus, Earth and Mars.", "From the Sun outward the order is Mercury, Venus, Earth, Mars.", "The Sun is at the center of the orbits.", "Every label that is shown is spelled correctly."]}
+{"id": "scene-05", "category": "scene", "request": "Show me an interactive cube with its faces, edges and vertices.", "expected": ["scene"], "facts": ["The solid shown is a cube.", "Any stated count of faces is 6.", "Any stated count of edges is 12.", "Any stated count of vertices is 8."]}
+{"id": "scene-06", "category": "scene", "request": "Show the unit circle and let me move the angle.", "expected": ["scene"], "facts": ["There is a circle centered at the origin with x and y axes.", "A point on the circle has its angle marked from the positive x axis.", "Cosine is associated with the x coordinate and sine with the y coordinate.", "Every label that is shown is legible and spelled correctly."]}
+{"id": "scene-07", "category": "scene", "request": "Build a pendulum simulation where I can change the length.", "expected": ["scene"], "facts": ["A bob hangs from a fixed pivot by a string or rod.", "The length is shown or can be adjusted.", "Any formula shown for the period is T = 2 pi sqrt(L / g).", "Every label that is shown is legible and spelled correctly."]}
+{"id": "scene-08", "category": "scene", "request": "I want to play with gradient descent on a simple loss curve and change the learning rate.", "expected": ["scene"], "facts": ["A loss curve or surface with a visible minimum is shown.", "A point or a path shows steps moving along the curve.", "The learning rate is shown or can be adjusted.", "Any update rule shown subtracts the gradient (w minus learning rate times gradient)."]}
+{"id": "scene-09", "category": "scene", "request": "Show me a 3D model of the DNA double helix.", "expected": ["scene"], "facts": ["Two strands are wound around each other in a double helix.", "The strands are connected by base pairs, like rungs.", "Any base pairing that is labeled pairs A with T and C with G.", "Every label that is shown is spelled correctly."]}
+{"id": "scene-10", "category": "scene", "request": "Let me change the slope and intercept of a line and see it on a graph.", "expected": ["scene"], "facts": ["There are x and y axes with a straight line.", "The slope and the intercept are shown or can be adjusted.", "Any equation shown has the form y = m x + b."]}
+{"id": "scene-11", "category": "scene", "request": "Let me try projectile motion with different launch angles.", "expected": ["scene"], "facts": ["A curved, parabolic trajectory starts from the ground.", "The launch angle is shown or can be adjusted.", "Any formula shown for the range is R = v^2 sin(2 theta) / g."]}
+{"id": "scene-12", "category": "scene", "request": "Let me explore how a sine wave changes with frequency and amplitude.", "expected": ["scene"], "facts": ["A sinusoidal curve is drawn on axes.", "Amplitude and frequency are shown or can be adjusted.", "Any equation shown has the form y = A sin(2 pi f t) or y = A sin(omega t)."]}
+{"id": "scene-13", "category": "scene", "request": "Simulate a mass on a spring with adjustable stiffness.", "expected": ["scene"]}
+{"id": "scene-14", "category": "scene", "request": "Show me a 3D model of a small neural network with three layers.", "expected": ["scene"]}
+{"id": "scene-15", "category": "scene", "request": "Show me the Earth's tilt and how it causes the seasons, in 3D.", "expected": ["scene"]}
+{"id": "scene-16", "category": "scene", "request": "Let me experiment with a converging lens and its focal length.", "expected": ["scene"]}
+{"id": "scene-17", "category": "scene", "request": "Give me an interactive bubble sort that I can step through.", "expected": ["scene"]}
+{"id": "scene-18", "category": "scene", "request": "Show me a 3D tetrahedron and let me spin it.", "expected": ["scene"]}
+{"id": "ambiguous-01", "category": "ambiguous", "request": "Show me how a pendulum works.", "expected": ["scene", "video", "image"]}
+{"id": "ambiguous-02", "category": "ambiguous", "request": "Explain gradient descent visually.", "expected": ["scene", "image"]}
+{"id": "ambiguous-03", "category": "ambiguous", "request": "Show me the solar system.", "expected": ["image", "scene"]}
+{"id": "ambiguous-04", "category": "ambiguous", "request": "Show me how the heart pumps blood.", "expected": ["video", "image", "scene", "illustrated"]}
+{"id": "ambiguous-05", "category": "ambiguous", "request": "Can you show me a benzene ring?", "expected": ["image", "scene"]}
+{"id": "ambiguous-06", "category": "ambiguous", "request": "Visualize the Pythagorean theorem for me.", "expected": ["image", "scene"]}
+{"id": "hard-01", "category": "hard", "request": "Show me a benzene molecule in 3D.", "expected": ["scene"], "facts": ["There are exactly six carbon atoms, arranged in a ring.", "There are exactly six hydrogen atoms.", "Each carbon is bonded to exactly one hydrogen."]}
+{"id": "hard-02", "category": "hard", "request": "Make an interactive bar chart of these scores: Ana 3, Ben 7, Chloe 5, Dev 9.", "expected": ["scene"], "facts": ["There are exactly four bars, labeled Ana, Ben, Chloe and Dev.", "Dev has the tallest bar and Ana the shortest.", "Ben's bar is taller than Chloe's.", "Any values shown are 3, 7, 5 and 9 for Ana, Ben, Chloe and Dev."]}
+{"id": "hard-03", "category": "hard", "request": "Plot the line y = 2x + 1 and let me move a point along it.", "expected": ["scene"], "facts": ["The line crosses the y axis at 1.", "The line passes through the point (1, 3).", "Any equation shown is y = 2x + 1."]}
+{"id": "hard-04", "category": "hard", "request": "Show a regular hexagon and its interior angles.", "expected": ["scene"], "facts": ["The polygon has exactly six sides.", "All six sides look equal in length.", "Any interior angle stated is 120 degrees."]}
+{"id": "hard-05", "category": "hard", "request": "Show me an analog clock set to 3:40 that I can change.", "expected": ["scene"], "facts": ["The minute hand points at the 8.", "The hour hand is between the 3 and the 4.", "The dial shows the numbers 1 to 12 in clockwise order, or twelve hour marks."]}
+{"id": "hard-06", "category": "hard", "request": "Show the electron shells of a sodium atom.", "expected": ["scene"], "facts": ["There are exactly 11 electrons in total.", "From the inside out, the shells hold 2, 8 and 1 electrons.", "The nucleus is at the center."]}
+{"id": "implicit-01", "category": "implicit", "request": "What does the inside of a volcano look like?", "expected": ["image"]}
+{"id": "implicit-02", "category": "implicit", "request": "What does a cheetah look like when it runs?", "expected": ["video"]}
+{"id": "implicit-03", "category": "implicit", "request": "How does the bond angle change the shape of a water molecule? I'd like to try it.", "expected": ["scene"]}
+{"id": "implicit-04", "category": "implicit", "request": "I'd like to see what happens to a parabola when I change its coefficients.", "expected": ["scene"]}
+{"id": "implicit-05", "category": "implicit", "request": "What did the surface of Mars look like to the rovers?", "expected": ["image"]}
+{"id": "implicit-06", "category": "implicit", "request": "How does a jellyfish swim?", "expected": ["video", "image"]}
+{"id": "implicit-07", "category": "implicit", "request": "Show me the anatomy of the human heart.", "expected": ["image", "illustrated"]}
+{"id": "implicit-08", "category": "implicit", "request": "How do the gears on a bicycle work? Let me try different sizes.", "expected": ["scene"]}
+{"id": "implicit-09", "category": "implicit", "request": "What is the derivative of x squared?", "expected": ["none"]}
+{"id": "implicit-10", "category": "implicit", "request": "Can you remind me what a prime number is?", "expected": ["none"]}
+{"id": "implicit-11", "category": "implicit", "request": "What does the Eiffel Tower look like at night?", "expected": ["image"]}
+{"id": "implicit-12", "category": "implicit", "request": "I want to see how two waves interfere when I change the phase between them.", "expected": ["scene"]}
+{"id": "implicit-13", "category": "implicit", "request": "What does a thunderstorm look like as it forms?", "expected": ["video", "image"]}
+{"id": "implicit-14", "category": "implicit", "request": "How does a frog's life cycle go?", "expected": ["image", "video"]}
+{"id": "annotate-01", "category": "annotate", "request": "This is my update rule for gradient descent. Can you check it and mark what is wrong?", "expected": ["annotate"], "frame": "frames/update_rule.jpg", "markup": "Circle the plus sign and write a minus sign next to it."}
+{"id": "annotate-02", "category": "annotate", "request": "Is my addition right? Mark the mistake if there is one.", "expected": ["annotate"], "frame": "frames/addition.jpg", "markup": "Circle the result 622 and write 632 next to it."}
+{"id": "annotate-03", "category": "annotate", "request": "Can you point at the mistake in what I wrote?", "expected": ["annotate"], "frame": "frames/expansion.jpg", "markup": "Circle the right-hand side and write '+ 6x' in the gap between x^2 and 9."}
+{"id": "illustrated-01", "category": "illustrated", "request": "Let me explore the human body: I want to click on the organs.", "expected": ["illustrated"]}
+{"id": "illustrated-02", "category": "illustrated", "request": "I want an interactive view of a plant cell where I can click each organelle.", "expected": ["illustrated"]}
+{"id": "illustrated-03", "category": "illustrated", "request": "Let me explore the landmarks of Rome on an illustrated view I can click.", "expected": ["illustrated"]}
+{"id": "illustrated-04", "category": "illustrated", "request": "Quiz me on the parts of a flower with something I can click.", "expected": ["illustrated"]}
+{"id": "illustrated-05", "category": "illustrated", "request": "An interactive simulation of the human body, please.", "expected": ["illustrated"]}

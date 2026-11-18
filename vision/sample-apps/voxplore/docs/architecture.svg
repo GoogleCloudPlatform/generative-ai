@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 302" width="1000" height="302" role="img" aria-labelledby="t d" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+<title id="t">VoxPlore: system overview</title>
+<desc id="d">The user and the live model talk in real time. The live model sends a function call to a tool runner, which answers at once and hands the work to one of four background models. The result appears on a stage, and what is displayed and what the user does with it are reported back to the live model.</desc>
+<defs><marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#57606a"/></marker>
+<marker id="hb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1a73e8"/></marker>
+<marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e37400"/></marker></defs>
+<rect x="0.5" y="0.5" width="999" height="301" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<g transform="translate(0 0)">
+<rect x="24" y="28" width="12" height="12" rx="3" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.3"/>
+<text x="42" y="38" font-size="11.5" fill="#1f2328">real-time conversation</text>
+<rect x="186" y="28" width="12" height="12" rx="3" fill="#fef7e0" stroke="#e37400" stroke-width="1.3"/>
+<text x="204" y="38" font-size="11.5" fill="#1f2328">background generation</text>
+<circle cx="66" cy="132" r="13" fill="none" stroke="#1f2328" stroke-width="1.6"/>
+<path d="M40 178 C40 154 92 154 92 178" fill="none" stroke="#1f2328" stroke-width="1.6"/>
+<text x="66" y="200" font-size="12.5" fill="#1f2328" font-weight="600" text-anchor="middle">User</text>
+<rect x="190" y="92" width="214" height="116" rx="12" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+<text x="206" y="118" font-size="14" fill="#174ea6" font-weight="600">Live model</text>
+<text x="206" y="135" font-size="10.5" fill="#174ea6" font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace">gemini-3.8-live</text>
+<text x="206" y="160" font-size="11.5" fill="#1f2328">speaks through the avatar,</text>
+<text x="206" y="176" font-size="11.5" fill="#1f2328">listens and watches,</text>
+<text x="206" y="192" font-size="11.5" fill="#1f2328">decides when to call a function</text>
+<rect x="352" y="119.0" width="3.2" height="6" rx="1.6" fill="#1a73e8"/>
+<rect x="359" y="116.0" width="3.2" height="12" rx="1.6" fill="#1a73e8"/>
+<rect x="366" y="113.0" width="3.2" height="18" rx="1.6" fill="#1a73e8"/>
+<rect x="373" y="117.0" width="3.2" height="10" rx="1.6" fill="#1a73e8"/>
+<rect x="380" y="114.0" width="3.2" height="16" rx="1.6" fill="#1a73e8"/>
+<rect x="387" y="118.0" width="3.2" height="8" rx="1.6" fill="#1a73e8"/>
+<line x1="100" y1="134" x2="186" y2="134" stroke="#1a73e8" stroke-width="1.6" marker-end="url(#hb)"/>
+<line x1="186" y1="166" x2="100" y2="166" stroke="#1a73e8" stroke-width="1.6" marker-end="url(#hb)"/>
+<text x="143" y="126" font-size="10.5" fill="#57606a" text-anchor="middle">voice, camera</text>
+<text x="143" y="182" font-size="10.5" fill="#57606a" text-anchor="middle">voice, avatar</text>
+<text x="143" y="222" font-size="11.5" fill="#1a73e8" font-weight="600" text-anchor="middle">real-time loop</text>
+<rect x="478" y="116" width="118" height="68" rx="10" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="537" y="142" font-size="12.5" fill="#1f2328" font-weight="600" text-anchor="middle">Tool runner</text>
+<text x="537" y="159" font-size="10.5" fill="#57606a" text-anchor="middle">answers at once,</text>
+<text x="537" y="173" font-size="10.5" fill="#57606a" text-anchor="middle">works in background</text>
+<line x1="408" y1="136" x2="474" y2="136" stroke="#e37400" stroke-width="1.5" marker-end="url(#ha)"/>
+<text x="441" y="128" font-size="10.5" fill="#8a4b00" text-anchor="middle">function call</text>
+<line x1="474" y1="164" x2="408" y2="164" stroke="#57606a" stroke-width="1.5" marker-end="url(#h)"/>
+<text x="441" y="180" font-size="10.5" fill="#57606a" text-anchor="middle">"in progress"</text>
+<rect x="660" y="62" width="132" height="38" rx="9" fill="#fef7e0" stroke="#e37400" stroke-width="1.3"/>
+<text x="672" y="78" font-size="12" fill="#8a4b00" font-weight="600">Images</text>
+<text x="672" y="92" font-size="10" fill="#57606a">Nano Banana</text>
+<path d="M596 150 C628 150 628 81 656 81" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<path d="M792 81 C820 81 820 150 846 150" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<rect x="660" y="108" width="132" height="38" rx="9" fill="#fef7e0" stroke="#e37400" stroke-width="1.3"/>
+<text x="672" y="124" font-size="12" fill="#8a4b00" font-weight="600">Videos</text>
+<text x="672" y="138" font-size="10" fill="#57606a">Gemini Omni</text>
+<path d="M596 150 C628 150 628 127 656 127" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<path d="M792 127 C820 127 820 150 846 150" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<rect x="660" y="154" width="132" height="38" rx="9" fill="#fef7e0" stroke="#e37400" stroke-width="1.3"/>
+<text x="672" y="170" font-size="12" fill="#8a4b00" font-weight="600">Scene code</text>
+<text x="672" y="184" font-size="10" fill="#57606a">Gemini 4 Argon</text>
+<path d="M596 150 C628 150 628 173 656 173" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<path d="M792 173 C820 173 820 150 846 150" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<rect x="660" y="200" width="132" height="38" rx="9" fill="#fef7e0" stroke="#e37400" stroke-width="1.3"/>
+<text x="672" y="216" font-size="12" fill="#8a4b00" font-weight="600">Papers, frames</text>
+<text x="672" y="230" font-size="10" fill="#57606a">Gemini 3.8 Flash</text>
+<path d="M596 150 C628 150 628 219 656 219" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<path d="M792 219 C820 219 820 150 846 150" fill="none" stroke="#e37400" stroke-width="1.3" marker-end="url(#ha)"/>
+<text x="726" y="50" font-size="11.5" fill="#8a4b00" font-weight="600" text-anchor="middle">background loop: 10 to 90 s</text>
+<rect x="850" y="84" width="126" height="132" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.3"/>
+<text x="913" y="104" font-size="12.5" fill="#1f2328" font-weight="600" text-anchor="middle">Stage</text>
+<rect x="860" y="114" width="50" height="40" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<line x1="885" y1="128" x2="873" y2="143" stroke="#57606a" stroke-width="1.5"/><line x1="885" y1="128" x2="897" y2="143" stroke="#57606a" stroke-width="1.5"/>
+<circle cx="885" cy="128" r="6" fill="#57606a"/><circle cx="873" cy="143" r="4" fill="#ffffff" stroke="#57606a"/><circle cx="897" cy="143" r="4" fill="#ffffff" stroke="#57606a"/>
+<rect x="916" y="114" width="50" height="40" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<path d="M922 122 C930 152 946 152 960 124" fill="none" stroke="#57606a" stroke-width="1.6"/><circle cx="952" cy="138" r="3.2" fill="#57606a"/>
+<rect x="860" y="160" width="50" height="40" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<path d="M879 171 L879 189 L894 180 z" fill="#57606a"/>
+<rect x="916" y="160" width="50" height="40" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<line x1="923" y1="180" x2="959" y2="180" stroke="#d0d7de" stroke-width="3" stroke-linecap="round"/><circle cx="946" cy="180" r="5" fill="#57606a"/>
+<line x1="923" y1="170" x2="950" y2="170" stroke="#57606a" stroke-width="1.2"/><line x1="923" y1="190" x2="942" y2="190" stroke="#57606a" stroke-width="1.2"/>
+<text x="913" y="232" font-size="10.5" fill="#57606a" text-anchor="middle">renders generated code in</text>
+<text x="913" y="246" font-size="10.5" fill="#57606a" text-anchor="middle">a sandboxed browser frame</text>
+<path d="M913 254 V276 H297 V212" fill="none" stroke="#57606a" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#h)"/>
+<text x="605" y="269" font-size="11" fill="#1f2328" text-anchor="middle">what is displayed, and what the user clicks, drags or plays</text>
+</g>
+</svg>

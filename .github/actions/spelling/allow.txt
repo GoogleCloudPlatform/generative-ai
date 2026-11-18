@@ -1293,6 +1293,7 @@ dlon
 dlp
 dmi
 dml
+dna
 docai
 docstore
 docstores
@@ -1819,10 +1820,12 @@ middot
 millis
 minf
 miranda
+misrouted
 misroutes
 mjpeg
 mlit
 mlp
+mlr
 mmarco
 mmlu
 mmol
@@ -1887,6 +1890,8 @@ neil
 nemri
 neq
 netif
+neur
+neurips
 newaxis
 newaxisngram
 nexcept
@@ -2023,10 +2028,12 @@ pks
 playlists
 playout
 pllum
+plore
 plotly
 plpgsql
 plt
 pmb
+pmlr
 pobj
 podcast
 podcasts
@@ -2046,6 +2053,7 @@ ppo
 prag
 praw
 prcntg
+prebuffer
 preds
 preflight
 pregel
@@ -2113,10 +2121,12 @@ rarian
 rarians
 ratelimit
 rawbytes
+raycaster
 rbc
 rbeat
 rbf
 rbm
+rcvd
 rdoc
 reallocations
 reauth
@@ -2273,6 +2283,7 @@ stdcall
 stext
 stitle
 stockouts
+stopwords
 stp
 strdupv
 streamlit
@@ -2467,6 +2478,7 @@ vnc
 voiceover
 vos
 votre
+voxplore
 vqa
 vreason
 vrtx

@@ -1,0 +1,227 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxPlore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="app-container">
+        <header>
+            <div class="header-titles">
+                <div class="logo-icon"><span class="material-icons">school</span></div>
+                <div>
+                    <h1>VoxPlore</h1>
+                    <p>Your tutor: Professor Kira</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="artifacts-toggle-btn" class="action-btn artifacts-btn" title="Toggle Artifacts Pane" style="display: none;">
+                    <span class="material-icons">auto_awesome</span>
+                    <span>Artifacts</span>
+                    <span id="artifacts-badge-count" class="badge-count">0</span>
+                </button>
+                <a id="results-link" class="action-btn reset" href="results.html" target="_blank" rel="noopener" title="Evaluation results" style="display: none; text-decoration: none;">Results</a>
+                <button id="reset-btn" class="action-btn reset" title="Clear everything and start a new session">New session</button>
+                <button id="connect-btn" class="action-btn connect">Connect</button>
+                <button id="disconnect-btn" class="action-btn disconnect" style="display: none;">Disconnect</button>
+                <div id="status-badge" class="badge disconnected">Disconnected</div>
+            </div>
+        </header>
+        <main>
+            <div class="tutor-section">
+                <div class="visualizer-container">
+                    <video id="avatar-video" class="avatar-view" autoplay playsinline muted controls></video>
+                    <img id="avatar-image" class="avatar-view" alt="Avatar" style="display: none;" />
+                    <canvas id="avatar-canvas" class="avatar-view" style="display: none;"></canvas>
+                    <video id="input-preview" class="input-preview" autoplay playsinline muted style="display: none;"></video>
+                    <div id="avatar-placeholder" class="avatar-placeholder">
+                        <span class="material-icons placeholder-icon">videocam_off</span>
+                        <div class="spinner" style="display: none;"></div>
+                        <p id="avatar-status">Click Connect to start</p>
+                    </div>
+                </div>
+                <div class="tutor-info">
+                    <h2 id="tutor-name">Professor Kira</h2>
+                    <p>Ready to answer your questions!</p>
+                    <div class="teacher-picker">
+                        <label>Teacher
+                            <select id="avatar-select"></select>
+                        </label>
+                        <label>Voice
+                            <select id="voice-select"></select>
+                        </label>
+                    </div>
+                    <div class="teacher-picker mode-picker">
+                        <label>Mode
+                            <select id="mode-select" title="What the tutor is set up for">
+                                <option value="learning">Learning</option>
+                                <option value="research">Research</option>
+                            </select>
+                        </label>
+                        <label class="proactive-toggle" title="The tutor shows images and scenes on its own while it explains">
+                            <span>Proactive</span>
+                            <span class="switch"><input type="checkbox" id="proactive-toggle"><i></i><b id="proactive-state">Off</b></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="activity-panel" id="activity-panel" style="display: none;">
+                    <div class="activity-title">Tutor activity</div>
+                    <div class="activity-list" id="activity-list"></div>
+                </div>
+            </div>
+
+            <aside class="artifacts-pane" id="artifacts-pane">
+                <div class="artifacts-header">
+                    <div class="artifacts-title-group">
+                        <span class="material-icons artifacts-icon">auto_awesome</span>
+                        <h2>Stage</h2>
+                        <span id="artifacts-pane-count" class="artifacts-chip">0</span>
+                    </div>
+                    <div class="artifacts-header-actions">
+                        <span id="paper-badge" class="paper-badge" style="display: none;"></span>
+                        <button id="artifacts-expand-btn" class="icon-btn-ghost artifacts-expand-btn" title="Expand artifacts pane" style="display: none;">
+                            <span class="material-icons">keyboard_double_arrow_left</span>
+                        </button>
+                        <button id="artifacts-close-btn" class="icon-btn-ghost artifacts-minimize-btn" title="Minimize artifacts pane">
+                            <span class="material-icons">keyboard_double_arrow_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="artifacts-empty" id="artifacts-empty">
+                    <div class="artifacts-empty-icon">
+                        <span class="material-icons">auto_awesome</span>
+                    </div>
+                    <h3>Ask the tutor to show you something</h3>
+                    <p>By voice or by text. Images, videos and interactive scenes appear here.</p>
+                    <div class="suggestions">
+                        <button class="suggestion" data-prompt="Show me a water molecule in 3D.">A water molecule in 3D</button>
+                        <button class="suggestion" data-prompt="I want to play with gradient descent and change the learning rate.">Play with gradient descent</button>
+                        <button class="suggestion" data-prompt="Draw a labeled diagram of the water cycle.">A diagram of the water cycle</button>
+                        <button class="suggestion" data-prompt="Make a short video of a volcano erupting.">A video of a volcano</button>
+                        <button class="suggestion" data-prompt="Can you check what I am showing you and mark any mistake?">Check my work on camera</button>
+                        <button class="suggestion" data-action="paper">Discuss a research paper</button>
+                    </div>
+                </div>
+
+                <div class="artifacts-content" id="artifacts-content" style="display: none;">
+                    <div class="featured-artifact-container" id="featured-artifact-container">
+                        <div class="featured-media-wrapper" id="featured-media-wrapper">
+                            <!-- Image, Video or Pending Indicator injected dynamically -->
+                        </div>
+                        <div class="featured-meta" id="featured-meta">
+                            <div class="featured-meta-header">
+                                <span class="artifact-type-pill" id="featured-type-pill">Image</span>
+                                <span class="artifact-model-pill" id="featured-model-pill">Nano Banana</span>
+                                <span class="artifact-time" id="featured-time">Just now</span>
+                            </div>
+                            <p class="featured-prompt" id="featured-prompt"></p>
+                            <div class="featured-actions">
+                                <a id="featured-download-btn" class="featured-btn download" download href="#" title="Download artifact">
+                                    <span class="material-icons">download</span>
+                                    <span>Download</span>
+                                </a>
+                                <button id="featured-source-btn" class="featured-btn" title="Show the page of the paper this scene was built from, side by side" style="display: none;">
+                                    <span class="material-icons">description</span>
+                                    <span>Show in paper</span>
+                                </button>
+                                <button id="featured-fullscreen-btn" class="featured-btn" title="View Full Size">
+                                    <span class="material-icons">fullscreen</span>
+                                    <span>Expand</span>
+                                </button>
+                                <button id="featured-copy-btn" class="featured-btn" title="Copy prompt">
+                                    <span class="material-icons">content_copy</span>
+                                    <span id="featured-copy-text">Copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="artifacts-gallery-section" id="artifacts-gallery-section">
+                        <div class="artifacts-gallery-header">
+                            <span>Recent Artifacts</span>
+                        </div>
+                        <div class="artifacts-gallery-strip" id="artifacts-gallery-strip">
+                            <!-- Thumbnails injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="paper-popover" id="paper-popover" style="display: none;">
+                    <div class="paper-popover-title">Add pictures or a paper</div>
+                    <div class="paper-popover-row">
+                        <button id="paper-upload-btn" class="featured-btn">
+                            <span class="material-icons">upload_file</span>
+                            <span>Upload files</span>
+                        </button>
+                        <span class="paper-popover-hint">Pictures become references for images and videos. A PDF is read as a paper.</span>
+                    </div>
+                    <div class="paper-popover-hint">Or find a paper with Google Search:</div>
+                    <div class="paper-popover-row">
+                        <input type="text" id="paper-query" placeholder="Title, arXiv ID or link" />
+                        <button id="paper-find-btn" class="featured-btn">
+                            <span class="material-icons">search</span>
+                            <span>Find</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="upload-tray" id="upload-tray"></div>
+
+                <div class="input-area">
+                    <button id="mic-btn" class="icon-btn" disabled title="Microphone on/off"><span class="material-icons">mic</span></button>
+                    <button id="camera-btn" class="icon-btn" disabled title="Share your camera with the avatar"><span class="material-icons">videocam</span></button>
+                    <button id="screen-btn" class="icon-btn" disabled title="Share your screen with the avatar"><span class="material-icons">screen_share</span></button>
+                    <button id="paper-btn" class="icon-btn" disabled title="Add pictures or a research paper"><span class="material-icons">attach_file</span></button>
+                    <input type="file" id="paper-file" accept="image/*,application/pdf,.pdf" multiple hidden />
+                    <input type="text" id="user-input" placeholder="Ask a question, or ask for an image, a video or a 3D scene..." disabled />
+                    <button id="send-btn" class="icon-btn primary" disabled><span class="material-icons">send</span></button>
+                </div>
+            </aside>
+
+            <div class="learning-section">
+                <div class="chat-log" id="chat-log">
+                    <div class="message system">
+                        <span class="material-icons">info</span>
+                        <p id="welcome-text">Welcome. Click Connect, then ask by voice or by text. The tutor can draw, film, build interactive scenes, check your work on camera and discuss a research paper.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Fullscreen Lightbox Modal -->
+    <div id="media-lightbox" class="media-lightbox" style="display: none;">
+        <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+        <div class="lightbox-container">
+            <button id="lightbox-close-btn" class="lightbox-close" title="Close">
+                <span class="material-icons">close</span>
+            </button>
+            <div id="lightbox-content" class="lightbox-content"></div>
+            <div id="lightbox-caption" class="lightbox-caption"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
