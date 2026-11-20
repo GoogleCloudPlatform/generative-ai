@@ -1,0 +1,59 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "Gate 2: Agent PR CI (dev -> staging & staging -> main)"
+
+on:
+  pull_request:
+    branches: [staging, main]
+    paths:
+      - "app/**"
+      - "model_serving/**"
+      - "tests/**"
+      - "environments/**"
+      - "cicd/**"
+      - "pyproject.toml"
+      - ".github/workflows/**"
+
+jobs:
+  unit-and-contract-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python & uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.13"
+          enable-cache: false
+
+      - name: Install dependencies, ruff & pip-audit
+        run: |
+          uv venv
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          uv pip install pytest pytest-asyncio ruff pip-audit "google-adk[eval]" google-auth httpx python-dotenv
+
+      - name: Supply-Chain Vulnerability Audit (OSV / PyPI Advisory Check)
+        run: pip-audit --strict --desc
+
+      - name: Run Gate 2 Linting, Formatting & Deterministic Unit Tests
+        run: |
+          ruff format --check app/ cicd/ model_serving/ tests/
+          ruff check app/ cicd/ model_serving/ tests/
+          PYTHONPATH=. pytest tests/unit/test_agent_unit.py -k "not integration" -v

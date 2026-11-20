@@ -1,0 +1,60 @@
+[project]
+name = "adk-gemma-agentops"
+version = "0.1.0"
+description = "AgentOps Reference Implementation: Google ADK + Gemma 4 Cloud FinOps & GPU Capacity Advisor"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "Apache-2.0"
+authors = [
+    { name = "Pedro Melendez" }
+]
+keywords = ["agent-catalog", "adk", "gemma4", "finops", "agentops"]
+
+dependencies = [
+    "google-adk[eval]>=2.10.0",
+    "google-auth>=2.38.0",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "ruff>=0.9.0",
+]
+lint = [
+    "ruff>=0.9.0",
+]
+mac = [
+    "mlx-lm>=0.22.0",
+    "fastapi>=0.115.8",
+    "uvicorn>=0.34.0",
+    "transformers>=4.49.0",
+    "torch>=2.6.0",
+    "accelerate>=1.4.0",
+    "huggingface-hub>=0.29.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests as live integration tests (deselect with -m 'not integration')",
+]
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+# Preserve inline `# noqa:` directives needed under strict upstream configs
+# (e.g. `GoogleCloudPlatform/generative-ai/.ruff.toml`).
+ignore = ["RUF100"]
