@@ -63,7 +63,7 @@ Deploying to private Cloud Run revisions from source (`gcloud run deploy --sourc
 | `roles/run.admin` | Project | Creates services, sets `--no-allow-unauthenticated` IAM policies (`roles/run.developer` cannot modify service IAM), shifts canary traffic tags, and invokes tagged revision URLs. |
 | `roles/cloudbuild.builds.editor` | Project | Submits `gcloud run deploy --source .` container builds to Cloud Build. |
 | `roles/artifactregistry.admin` | Project | Creates and pushes images to the `cloud-run-source-deploy` Docker repository. |
-| `roles/storage.admin` | Project | Uploads source tarballs to the `run-sources-<PROJECT>-<REGION>` Cloud Storage bucket. |
+| `roles/storage.admin` | Project | Uploads source archives to the `run-sources-<PROJECT>-<REGION>` Cloud Storage bucket. |
 | `roles/aiplatform.user` | Project | Calls `gemini-3.8-flash` Judge (`final_response_match_v2`, `hallucinations_v1`, safety rubric) and serverless Gemini Agent Platform Gemma 4 MaaS (`global`) during Gate 3A. |
 | `roles/iam.serviceAccountUser` | Compute SA | Attaches the runtime Compute Engine service account to deployed Cloud Run revisions. |
 | `roles/iam.serviceAccountTokenCreator` | Self + WIF Principal | Allows keyless WIF (`external_account`) runners to mint Cloud Run OIDC identity tokens (`gcloud auth print-identity-token --impersonate-service-account=... --include-email`) for Gate 3B and Gate 4 checks. |

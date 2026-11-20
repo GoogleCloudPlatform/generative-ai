@@ -12,6 +12,7 @@ AFX
 AGG
 AIP
 AIphone
+AIza
 ALCS
 ALDS
 ALLOWALL
@@ -280,6 +281,7 @@ Frontline
 Ftyp
 Fudd
 Fushimi
+GAESA
 GBP
 GDM
 GEOGPOINT
@@ -1159,6 +1161,7 @@ cer
 cfbundle
 cfo
 chatbots
+chatcmpl
 chatmcp
 chipset
 chipsets
@@ -1406,6 +1409,7 @@ figwidth
 filestem
 fillmode
 fillna
+finops
 fintech
 fiqa
 firestore
@@ -1495,6 +1499,7 @@ getpid
 geval
 gfile
 gguf
+gha
 ghchinoy
 ghcr
 giallo
@@ -1847,6 +1852,7 @@ mpga
 mpim
 mpld
 mpn
+mps
 mrag
 mro
 mrr
@@ -2172,6 +2178,7 @@ rmsg
 rnd
 rooney
 rosetta
+rpcs
 rpet
 rrf
 rsc
@@ -2246,9 +2253,11 @@ sittin
 siu
 skillsets
 skincare
+skipif
 sklearn
 sku
 slf
+slo
 slowloris
 sme
 smolagent
@@ -2316,6 +2325,7 @@ sxs
 sylvatica
 symlinking
 syscalls
+sysconf
 tabular
 tagline
 takahashi
@@ -2480,6 +2490,7 @@ vos
 votre
 voxplore
 vqa
+vram
 vreason
 vrtx
 vscode
@@ -2516,6 +2527,7 @@ werther
 wght
 whitegrid
 wiersz
+wif
 wiffle
 wikipedia
 wil

@@ -5,7 +5,7 @@ Google's [*Prototype to Production*](https://www.kaggle.com/whitepaper-prototype
 A practical AgentOps reference implementation for taking an open-weights Google ADK + Gemma 4 agent (a Cloud FinOps & GPU Capacity Advisor in `app/`) from local Apple Silicon prototyping to isolated Google Cloud production via keyless GitHub Actions CI/CD:
 
 1. **Stage 1 - Local Prototyping on Apple Silicon (`dev` | Gate 1 & PR Gate 2)**: Run a warm 4-bit Gemma server locally (`mlx` / `mps`) at `$0` cloud cost, author deterministic FinOps tools, enforce the single-user Work Multiplier (`K <= 2`) via `pytest`, and gate Pull Requests on standard CPU runners (`pip-audit` + unit tests in `< 30s`).
-2. **Stage 2 - Pre-Production Validation on Cloud Run (`staging` | Gate 3A & 3B)**: Authenticate keylessly via Workload Identity Federation (OIDC) into `staging-project`, deploy zero-traffic dark revisions (`--no-traffic`) backed by Gemini Agent Platform Gemma 4 MaaS (`google/gemma-4-26b-a4b-it-maas`) at `$0` idle GPU cost, evaluate trajectories with Gemini 3.8 Flash as an LLM Judge (`adk eval`), and run a concurrent dark-URL smoke & P95 latency gate before shifting traffic.
+2. **Stage 2 - Pre-Production Validation on Cloud Run (`staging` | Gate 3A & 3B)**: Authenticate via keyless Workload Identity Federation (OIDC) into `staging-project`, deploy zero-traffic dark revisions (`--no-traffic`) backed by Gemini Agent Platform Gemma 4 MaaS (`google/gemma-4-26b-a4b-it-maas`) at `$0` idle GPU cost, evaluate trajectories with Gemini 3.8 Flash as an LLM Judge (`adk eval`), and run a concurrent dark-URL smoke & P95 latency gate before shifting traffic.
 3. **Stage 3 - Isolated Production Canary Rollout & Closed-Loop Feedback (`main` | Gate 4)**: Promote to an isolated `prod-project` on Cloud Run + Gemini Agent Platform Gemma 4 MaaS (add Gemini Agent Platform Provisioned Throughput (PT) when guaranteed high-QPS SLAs are needed), validate behind a `10%` Cloud Run Canary split, and verify the full `Observe -> Act -> Evolve` loop when new production traces expose a regression.
 
 > [!NOTE]
@@ -555,7 +555,7 @@ Now complete the Evolve loop using local test-driven development at `$0` cloud G
 
 #### Test Case 3: Production Canary Rollout (`staging -> main` | Gate 4)
 
-With Staging green across all 5 golden cases and latency SLOs, promote the certified revision to `main` so Gate 4 executes a progressive `10%` Production Canary before full cutover:
+With Staging green across all 5 golden cases and the P95 latency SLO, promote the certified revision to `main` so Gate 4 executes a progressive `10%` Production Canary before full cutover:
 
 1. **Open the Production Release PR (`staging -> main`)**: Create the Release PR proposing `v1.0.1` from `staging` into `main`:
 
