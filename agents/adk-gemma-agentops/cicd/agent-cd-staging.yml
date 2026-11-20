@@ -1,0 +1,152 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "Gate 3: Staging Deploy, Eval & Latency Gate (staging branch)"
+
+# Triggered when agent code, sanitized eval traces, or staging config land on staging.
+on:
+  push:
+    branches: [staging]
+    paths:
+      - "app/**"
+      - "model_serving/**"
+      - "tests/**"
+      - "environments/staging.env"
+      - "pyproject.toml"
+      - ".github/workflows/agent-cd-staging.yml"
+  workflow_dispatch:
+
+jobs:
+  staging-deploy-and-gate:
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository (staging branch)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Resolve Staging Configuration
+        env:
+          CFG_PROJECT: ${{ vars.GCP_PROJECT_ID }}
+          CFG_REGION: ${{ vars.GCP_REGION }}
+          CFG_MAAS_MODEL: ${{ vars.GEMMA_MAAS_MODEL_ID }}
+        run: |
+          ENV_FILE="environments/staging.env"
+          [ -f "$ENV_FILE" ] || ENV_FILE="environments/staging.env.example"
+          while IFS='=' read -r key val || [ -n "$key" ]; do
+            [[ "$key" =~ ^[[:space:]]*# || -z "$key" ]] && continue
+            key=$(echo "$key" | tr -d '[:space:]')
+            val=$(echo "$val" | tr -d '\r')
+            export "${key}=${val}"
+            echo "${key}=${val}" >> "$GITHUB_ENV"
+          done < "$ENV_FILE"
+
+          {
+            echo "DEPLOY_TAG=sha-${GITHUB_SHA::7}"
+            echo "SERVICE_NAME=${CLOUD_RUN_SERVICE:-gemma-agent-staging}"
+            echo "TARGET_REGION=${CFG_REGION:-${GCP_REGION:-us-west1}}"
+            echo "TARGET_PROJECT=${CFG_PROJECT:-${GOOGLE_CLOUD_PROJECT:-staging-project}}"
+            echo "MAAS_MODEL=${CFG_MAAS_MODEL:-${GEMMA_MAAS_MODEL_ID:-google/gemma-4-26b-a4b-it-maas}}"
+          } >> "$GITHUB_ENV"
+
+      - name: Set up Python & uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.13"
+          enable-cache: false
+
+      - name: Authenticate to Google Cloud Staging via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER_STAGING }}
+          service_account: ${{ vars.WIF_SA_STAGING }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          uv pip install "google-adk[eval]" google-auth httpx python-dotenv
+
+      - name: Deploy Dark Revision to Cloud Run Staging (--no-traffic)
+        run: |
+          ENV_VARS="AGENT_ENV=staging,USE_MAAS=1,GEMMA_MAAS_MODEL_ID=${MAAS_MODEL},GOOGLE_CLOUD_PROJECT=${TARGET_PROJECT},GOOGLE_CLOUD_LOCATION=global,GCP_REGION=${TARGET_REGION}"
+          EXTRA_ARGS=()
+          if gcloud run services describe "${SERVICE_NAME}" --region="${TARGET_REGION}" --project="${TARGET_PROJECT}" >/dev/null 2>&1; then
+            EXTRA_ARGS+=(--no-traffic)
+          fi
+          gcloud run deploy "${SERVICE_NAME}" \
+            --source . \
+            --clear-base-image \
+            --region="${TARGET_REGION}" \
+            --project="${TARGET_PROJECT}" \
+            --tag="${DEPLOY_TAG}" \
+            --no-allow-unauthenticated \
+            --session-affinity \
+            --timeout=300s \
+            --min-instances="${MIN_INSTANCES:-1}" \
+            --max-instances="${MAX_INSTANCES:-1}" \
+            --set-env-vars="${ENV_VARS}" \
+            ${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}
+
+      - name: Gate 3A - ADK Eval (Trajectory & Gemini 3.8 Flash Judge)
+        env:
+          PYTHONPATH: "."
+          AGENT_ENV: staging
+          USE_MAAS: "1"
+          GOOGLE_GENAI_USE_VERTEXAI: "1"
+          GOOGLE_CLOUD_PROJECT: ${{ env.TARGET_PROJECT }}
+          GOOGLE_CLOUD_LOCATION: "global"
+          GEMMA_MAAS_MODEL_ID: ${{ env.MAAS_MODEL }}
+        run: |
+          adk eval app ./tests/eval/evalsets/golden.evalset.json \
+            --config_file_path=./tests/eval/eval_config.json \
+            --print_detailed_results
+
+      - name: Gate 3B - Dark-URL Concurrency & Latency Verification
+        run: |
+          SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
+            --region="${TARGET_REGION}" --project="${TARGET_PROJECT}" \
+            --format="value(status.url)")
+          DARK_URL=$(gcloud run services describe "${SERVICE_NAME}" \
+            --region="${TARGET_REGION}" --project="${TARGET_PROJECT}" \
+            --format="value(status.traffic.filter(tag=${DEPLOY_TAG}).extract(url).flatten())")
+          # Cloud Run requires the canonical service URL as the OIDC audience.
+          ID_TOKEN=$(gcloud auth print-identity-token \
+            --impersonate-service-account="${{ vars.WIF_SA_STAGING }}" \
+            --audiences="$SERVICE_URL" --include-email 2>/dev/null \
+            || gcloud auth print-identity-token --audiences="$SERVICE_URL" 2>/dev/null \
+            || gcloud auth print-identity-token)
+          SMOKE="${SMOKE_USERS:-5}"
+          python tests/load/load_test_cloud_run.py \
+            --url "${DARK_URL:-$SERVICE_URL}" \
+            --bearer-token "$ID_TOKEN" \
+            --users "$SMOKE" \
+            --concurrency "$SMOKE" \
+            --ramp-seconds 2 \
+            --slo-p95 "${SLO_P95_SECONDS:-35.0}"
+
+      - name: Shift Staging Traffic to Validated Revision (100%)
+        run: |
+          gcloud run services update-traffic "${SERVICE_NAME}" \
+            --region="${TARGET_REGION}" \
+            --project="${TARGET_PROJECT}" \
+            --to-tags="${DEPLOY_TAG}=100"

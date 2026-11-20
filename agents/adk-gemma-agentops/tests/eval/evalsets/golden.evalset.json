@@ -1,0 +1,177 @@
+{
+  "eval_set_id": "gemma4_finops_advisor_golden_evalset",
+  "name": "Gemma 4 Cloud FinOps & GPU Capacity Advisor Golden EvalSet",
+  "description": "Verifies tool-calling trajectory and grounded FinOps math across Dev (Mac MLX), Staging (Cloud Run), and Prod (Gemini Agent Platform).",
+  "eval_cases": [
+    {
+      "eval_id": "estimate_vram_for_gemma4_26b_moe",
+      "conversation": [
+        {
+          "invocation_id": "inv-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "How much VRAM does gemma-4-26B-A4B-it with 4bit quantization need, and what hardware do you recommend?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Gemma-4-26B-A4B-it with 4bit quantization requires 20.8 GB of VRAM. A recommended hardware tier includes a Mac M2/M3/M4 with 24-36GB Unified Memory (MLX) or a single NVIDIA L4 (24 GB VRAM)."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "estimate_gemma_vram",
+                "args": {
+                  "model_variant": "gemma-4-26B-A4B-it",
+                  "quantization": "4bit"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user_01",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "calculate_l4_hibernation_savings",
+      "conversation": [
+        {
+          "invocation_id": "inv-002",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Calculate the monthly serving cost on gemini_agent_platform for 2 nvidia-l4 replicas running 10 hours per day."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "The monthly serving cost is $690, with $966 in savings from off-hours hibernation."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "calculate_serving_cost",
+                "args": {
+                  "platform": "gemini_agent_platform",
+                  "gpu_type": "nvidia-l4",
+                  "hours_per_day": 10,
+                  "replicas": 2
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user_02",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "size_capacity_from_staging_baseline",
+      "conversation": [
+        {
+          "invocation_id": "inv-003",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Our Stage 2 step-load sweep measured 4.5 RPCs/sec per GPU replica. How many GPU replicas on Gemini Agent Platform and Cloud Run instances do we need for a target peak of 150 concurrent users with 2 turns per request and a 30 second P95 target?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "3-5 GPU replicas and 3 Cloud Run instances are recommended."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "size_endpoint_capacity",
+                "args": {
+                  "concurrent_users": 150,
+                  "turns_per_request": 2,
+                  "target_p95_seconds": 30.0,
+                  "measured_rpcs_per_sec_per_gpu": 4.5
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user_03",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "production_telemetry_burst_scaling",
+      "conversation": [
+        {
+          "invocation_id": "inv-004",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Our production telemetry captured a peak burst of 300 concurrent users with 2 turns per request and a target P95 latency of 25 seconds. With our staging baseline of 4.5 RPCs/sec per GPU, what are the recommended GPU replicas and Cloud Run instances?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "6-8 GPU replicas and 5 Cloud Run instances are recommended."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "size_endpoint_capacity",
+                "args": {
+                  "concurrent_users": 300,
+                  "turns_per_request": 2,
+                  "target_p95_seconds": 25.0,
+                  "measured_rpcs_per_sec_per_gpu": 4.5
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user_04",
+        "state": {}
+      }
+    }
+  ]
+}
