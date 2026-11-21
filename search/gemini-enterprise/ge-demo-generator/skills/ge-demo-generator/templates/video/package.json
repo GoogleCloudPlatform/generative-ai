@@ -7,7 +7,7 @@
     "build": "remotion render src/index.ts DemoHighlightReel out/video.mp4"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.520",
+    "@remotion/cli": "4.0.541",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "remotion": "4.0.520"
