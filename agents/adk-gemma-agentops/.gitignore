@@ -1,0 +1,28 @@
+# Python
+!.python-version
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment & Secrets
+.env
+!.env.example
+!environments/*.env
+!environments/*.env.example
+*.key.json
+
+# Logs, ADK, local walkthrough archive, & OS files
+logs/
+*.log
+*.pid
+.adk/
+WALKTHROUGH.md
+.DS_Store
