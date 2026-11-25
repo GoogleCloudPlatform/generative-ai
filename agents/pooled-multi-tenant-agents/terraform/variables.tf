@@ -29,6 +29,12 @@ variable "gateway_image" {
   default     = "us-docker.pkg.dev/cloudrun/container/hello"
 }
 
+variable "gateway_ingress" {
+  description = "Cloud Run ingress policy. Keep INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER for production ILB/IAP, or set INGRESS_TRAFFIC_ALL with IAM invoker auth for workstation verification."
+  type        = string
+  default     = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+}
+
 variable "tenants" {
   description = "Configuration-driven tenant onboarding map (Pattern A: Governed Pool)."
   type = map(object({

@@ -109,8 +109,19 @@ gcloud artifacts repositories create cymbal-agents \
   --repository-format=docker \
   --location="${REGION}"
 
+# On brand-new projects, grant the default Compute Engine build service account
+# permission to read source archives, write build logs, and push images:
+PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
+for role in roles/cloudbuild.builds.builder roles/storage.objectViewer roles/artifactregistry.writer roles/logging.logWriter; do
+  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+    --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+    --role="${role}" >/dev/null
+done
+
 gcloud builds submit --tag "${IMAGE}" .
 ```
+
+> Note: On a newly created project, wait ~30 seconds after `gcloud services enable` if `gcloud artifacts repositories create` reports propagation delay.
 
 2. Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars`,
    set `project_id`, `region`, and `gateway_image` to `${IMAGE}`, and apply:
@@ -126,20 +137,35 @@ locks, Memory Bank IAM CEL policies, and the Cloud Run gateway configured with
 `CYMBAL_LIVE_GEMINI=1`, `GOOGLE_GENAI_USE_VERTEXAI=true`, and
 `GOOGLE_CLOUD_LOCATION=global` (`gemini-4-hydrogen` and `gemini-4-carbon`).
 
-3. Apply `app/schema.sql` to your **AlloyDB for PostgreSQL** (or Cloud SQL for
-   PostgreSQL) cluster to create the `cymbal_mcp_app` role and
-   `FORCE ROW LEVEL SECURITY` policies:
+3. Apply `app/schema.sql` to an existing **AlloyDB for PostgreSQL** (or Cloud
+   SQL for PostgreSQL) cluster with `DATABASE_URL` set to create the
+   `cymbal_mcp_app` role and `FORCE ROW LEVEL SECURITY` policies:
 
 ```bash
 psql "${DATABASE_URL}" -f app/schema.sql
 ```
 
-4. Verify the deployed service health endpoint (through your internal load
-   balancer or IAP tunnel):
+4. Verify the deployed service health endpoint. By default, Terraform configures
+   `INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER` (so direct workstation requests
+   return `404` until fronted by an Internal Load Balancer or IAP). To test
+   `/healthz` directly from your workstation with IAM authentication, set
+   `gateway_ingress = "INGRESS_TRAFFIC_ALL"` in `terraform/terraform.tfvars`,
+   re-apply, grant yourself `roles/run.invoker`, and run:
 
 ```bash
+gcloud run services add-iam-policy-binding cymbal-pooled-gateway \
+  --region="${REGION}" \
+  --member="user:$(gcloud config get-value account)" \
+  --role="roles/run.invoker"
+
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
   "$(terraform -chdir=terraform output -raw gateway_uri)/healthz"
+```
+
+5. Clean up provisioned resources when finished:
+
+```bash
+terraform -chdir=terraform destroy
 ```
 
 To run the local CLI against live Gemini 4 without deploying Cloud Run, set the

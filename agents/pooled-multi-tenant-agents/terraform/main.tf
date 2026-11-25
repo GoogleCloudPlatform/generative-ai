@@ -85,9 +85,10 @@ resource "google_project_iam_member" "gateway_vertex_user" {
 }
 
 resource "google_cloud_run_v2_service" "pooled_gateway" {
-  name     = "cymbal-pooled-gateway"
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+  name                = "cymbal-pooled-gateway"
+  location            = var.region
+  ingress             = var.gateway_ingress
+  deletion_protection = false
 
   template {
     service_account = google_service_account.pooled_gateway.email

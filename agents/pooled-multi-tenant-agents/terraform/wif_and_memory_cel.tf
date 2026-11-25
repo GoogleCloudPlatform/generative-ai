@@ -15,14 +15,14 @@
 # Blog Section 1: Issuer-Bound Workload Identity Federation (WIF) per Tenant
 resource "google_iam_workload_identity_pool" "cymbal_tenants" {
   workload_identity_pool_id = "cymbal-pooled-tenants"
-  display_name              = "Cymbal Pooled Tenant Federation Pool"
+  display_name              = "Cymbal Pooled Tenant Pool"
 }
 
 resource "google_iam_workload_identity_pool_provider" "tenant_oidc" {
   for_each                           = var.tenants
   workload_identity_pool_id          = google_iam_workload_identity_pool.cymbal_tenants.workload_identity_pool_id
   workload_identity_pool_provider_id = "idp-${substr(md5(each.key), 0, 10)}"
-  display_name                       = "OIDC Issuer Lock for ${each.key}"
+  display_name                       = substr("OIDC ${each.key}", 0, 32)
 
   attribute_mapping = {
     "google.subject"      = "assertion.sub"
