@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+terraform/*.tfstate*
+terraform/.terraform/
+terraform/terraform.tfvars
+uv.lock
