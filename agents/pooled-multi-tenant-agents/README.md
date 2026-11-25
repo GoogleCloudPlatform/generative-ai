@@ -116,10 +116,9 @@ gcloud builds submit --tag "${IMAGE}" .
    set `project_id`, `region`, and `gateway_image` to `${IMAGE}`, and apply:
 
 ```bash
-cd terraform
-terraform init
-terraform plan
-terraform apply
+terraform -chdir=terraform init
+terraform -chdir=terraform plan
+terraform -chdir=terraform apply
 ```
 
 This provisions the Cloud KMS keys, per-tenant service accounts, WIF issuer

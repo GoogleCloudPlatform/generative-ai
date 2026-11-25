@@ -12,5 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-google-cloud-project-id"
-region     = "us-central1"
+project_id    = "your-google-cloud-project-id"
+region        = "us-central1"
+gateway_image = "us-central1-docker.pkg.dev/your-google-cloud-project-id/cymbal-agents/pooled-gateway:v1"
