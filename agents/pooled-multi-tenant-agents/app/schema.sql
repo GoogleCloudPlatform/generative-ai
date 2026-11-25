@@ -75,4 +75,5 @@ CREATE POLICY tenant_incidents_write_rbac_policy ON tenant_incidents
         NULLIF(current_setting('app.current_tenant_id', true), '') IS NOT NULL
         AND tenant_id = current_setting('app.current_tenant_id', true)
         AND current_setting('app.current_user_role', true) = 'sre_admin'
+        AND current_setting('app.current_agent_id', true) = 'cymbal_shared_diagnostic_agent'
     );

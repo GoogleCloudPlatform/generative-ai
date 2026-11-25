@@ -256,11 +256,15 @@ class GovernedGeminiRouter:
 
         if self._use_live_gemini:
             client = genai.Client()
+            thinking_level = (
+                genai.types.ThinkingLevel.HIGH if escalate else genai.types.ThinkingLevel.LOW
+            )
             result = client.models.generate_content(
                 model=model_name,
                 contents=post_prefix_context,
                 config=genai.types.GenerateContentConfig(
                     system_instruction=IMMUTABLE_PROVIDER_SYSTEM_PREFIX,
+                    thinking_config=genai.types.ThinkingConfig(thinking_level=thinking_level),
                 ),
             )
             response_text = result.text or ""

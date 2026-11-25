@@ -16,6 +16,7 @@
 import base64
 import hashlib
 import json
+import math
 import time
 import uuid
 from collections.abc import Callable, Mapping, Sequence
@@ -192,7 +193,7 @@ class DPoPVerifier:
             raise PermissionError("DPoP HTTP URI mismatch.")
 
         now = self._clock()
-        if abs(now - issued_at) > self._max_age_seconds:
+        if not math.isfinite(issued_at) or abs(now - issued_at) > self._max_age_seconds:
             raise PermissionError("DPoP proof outside allowed clock window.")
 
         if expected_jkt is not None and key_thumbprint != expected_jkt:
