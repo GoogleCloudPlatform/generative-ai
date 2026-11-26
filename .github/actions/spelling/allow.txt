@@ -2572,6 +2572,7 @@ xctest
 xcvi
 xdg
 xelatex
+xhigh
 xlabel
 xlim
 xmltodict
