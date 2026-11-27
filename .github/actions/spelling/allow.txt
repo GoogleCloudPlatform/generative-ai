@@ -244,6 +244,7 @@ Evalset
 Evalsets
 Eventarc
 Exfil
+Fairwind
 FAISS
 FAQs
 FDCWD
