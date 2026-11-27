@@ -36,3 +36,9 @@ The `gemini_data_analytics` directory contains notebooks that demonstrate how to
 The `self-evolving-ai` directory contains **Project Chrysalis**, a reference architecture for governed, self-evolving AI agents built with ADK and Gemini on Google Cloud. A multi-agent SRE system diagnoses a live outage, synthesizes and mounts its own Cloud KMS-signed mitigation tool, attributes credit to each action, distills operational principles into memory, and rewires its own agent topology behind a Human-in-the-Loop gate.
 
 - [Self-Evolving AI (Project Chrysalis)](self-evolving-ai/README.md): Architecting governed, self-evolving AI agents on Gemini Enterprise Agent Platform.
+
+### pooled-multi-tenant-agents
+
+The `pooled-multi-tenant-agents` directory contains a companion sample for B2B SaaS multi-tenant AI agents on shared Google Cloud infrastructure using FastAPI, `google-genai`, and Terraform. It enforces `Tenant ∩ User ∩ Agent` isolation across an ingress gateway (issuer-bound OIDC, RFC 9449 DPoP, ES256 `ctx+jwt`), an out-of-process credential broker, CMEK-encrypted sessions, **Memory Bank in Gemini** IAM CEL scopes, and **AlloyDB for PostgreSQL** `FORCE ROW LEVEL SECURITY`.
+
+- [Pooled Multi-Tenant AI Agents on Google Cloud](pooled-multi-tenant-agents/README.md): Reference code, Terraform configs, `demo.py` walkthrough, and cross-tenant isolation tests.

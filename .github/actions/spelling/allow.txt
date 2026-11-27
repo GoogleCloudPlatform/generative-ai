@@ -7,6 +7,7 @@ AClient
 ADAS
 ADK
 ADMA
+AESGCM
 AEvent
 AFX
 AGG
@@ -111,6 +112,7 @@ CAPTCH
 CASP
 CDIP
 CDNs
+CEL
 CHECKOV
 CHENNAI
 CLA
@@ -118,6 +120,7 @@ CLASSPATH
 CLIs
 CLOEXEC
 CLOUDSDK
+CMEK
 COCOAPODS
 COINIT
 CONOUT
@@ -147,6 +150,7 @@ Cardizem
 Casagrand
 Ceccotti
 Centros
+Cheruku
 Chiyoda
 Chocolat
 Choreo
@@ -169,6 +173,7 @@ Cómo
 D'orsay
 DALL
 DCR
+DEK
 DELET
 DERs
 DHH
@@ -199,6 +204,7 @@ Depatmint
 Derpanis
 Dexin
 Dgektczl
+Dhawal
 Diataxis
 Disturbia
 Doaa
@@ -235,6 +241,7 @@ Eleuther
 Eliquis
 Eliud
 Embs
+Entra
 Envane
 Enzo
 Eragon
@@ -252,6 +259,7 @@ FHIR
 FIA
 FILEFLAGS
 FILEOS
+FINV
 FITNESSS
 FLX
 FMWK
@@ -370,6 +378,7 @@ Hossein
 Hritik
 Hubmann
 Hyperdisk
+IBANs
 ICDAR
 ICICI
 ICML
@@ -589,6 +598,7 @@ Nigam
 Nihonga
 Niitsuma
 Nith
+Nithin
 Nominatim
 Norsk
 ODP
@@ -690,6 +700,7 @@ REAUTH
 REPOURL
 RLA
 RLHF
+RLS
 RMSE
 RNN
 RNNs
@@ -730,10 +741,12 @@ Ruchika
 Rupjit
 SAOT
 SDKROOT
+SECP
 SEK
 SELEC
 SEMCONV
 SEO
+SEPA
 SERPER
 SHEBA
 SIMONE
@@ -745,6 +758,7 @@ SMEs
 SMSN
 SNB
 SNE
+SPIFFE
 SPII
 SPLADE
 SRE
@@ -794,6 +808,7 @@ Skaffold
 Sketchfab
 Smartbuy
 Smaug
+Smitha
 Smol
 Smurfing
 Sono
@@ -909,6 +924,7 @@ Vandoorne
 Vardhan
 Vaswani
 Vayots
+Venkat
 Verbinski
 Verilog
 Ves
@@ -1048,6 +1064,7 @@ asid
 asis
 asplit
 astype
+ath
 ation
 atleast
 atms
@@ -1158,6 +1175,7 @@ cdiv
 cdn
 cdp
 ceb
+cel
 ceo
 cer
 cfbundle
@@ -1185,6 +1203,7 @@ cloudtrace
 cloudveil
 clsx
 cmap
+cmek
 cmn
 cnf
 cny
@@ -1227,6 +1246,7 @@ crewai
 cristo
 crm
 crosstab
+crv
 csa
 csch
 cse
@@ -1260,6 +1280,7 @@ dedup
 deepeval
 deepseek
 defn
+dek
 delenv
 deliv
 demoable
@@ -1309,6 +1330,7 @@ dotprompt
 dpf
 dpi
 dpo
+dpop
 dpr
 draig
 drilldown
@@ -1377,6 +1399,7 @@ euchlora
 eula
 euo
 eur
+eurobank
 evalgen
 evals
 evalset
@@ -1413,6 +1436,7 @@ fillmode
 fillna
 finops
 fintech
+finvault
 fiqa
 firestore
 firewalls
@@ -1604,10 +1628,12 @@ hparams
 hsa
 https
 httpx
+htu
 hvc
 hwnd
 hypercorn
 iap
+iat
 iban
 icd
 ictx
@@ -1681,6 +1707,7 @@ jetbrains
 jit
 jittering
 jiwer
+jkt
 jpy
 jsemer
 jsonable
@@ -1689,6 +1716,8 @@ jsonl
 jsonlines
 jsonpath
 jsonplus
+jti
+jtis
 jupyter
 jvm
 kaggle
@@ -1719,6 +1748,7 @@ kotlin
 kpi
 kpis
 krw
+kty
 kubectl
 kyc
 l'harmonie
@@ -1735,6 +1765,7 @@ lavfi
 lbl
 lecie
 lego
+lena
 lenght
 lenzing
 levelized
@@ -2016,6 +2047,7 @@ petabytes
 pevt
 pfas
 pgadmin
+pgbouncer
 pgid
 pgvector
 pharma
@@ -2067,6 +2099,7 @@ preds
 preflight
 pregel
 prereleases
+priya
 prm
 proc
 produc
@@ -2176,9 +2209,11 @@ ringspun
 ripgrep
 rlines
 rlog
+rls
 rmcp
 rmsg
 rnd
+rolname
 rooney
 rosetta
 rpcs
@@ -2201,6 +2236,7 @@ sakura
 sampwidth
 sargentii
 saveddir
+sbx
 scaffolded
 scann
 scattergl
@@ -2223,6 +2259,7 @@ selfie
 selftext
 selkirk
 seo
+sepa
 serde
 serialisable
 serper
@@ -2276,7 +2313,9 @@ sourcing
 spamming
 sparkline
 spearmanr
+spiffe
 splitlines
+spoofable
 sqkm
 sqm
 srlimit
@@ -2288,6 +2327,7 @@ ssh
 ssml
 ssn
 ssr
+ssrf
 sss
 staticmethod
 stbl

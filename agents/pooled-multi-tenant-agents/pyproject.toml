@@ -1,0 +1,47 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[project]
+name = "pooled-multi-tenant-agents"
+version = "0.3.0"
+description = "Reference architecture for pooled multi-tenant AI agents on Google Cloud with Gemini Enterprise Agent Platform."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "cryptography>=44.0.0",
+    "fastapi>=0.115.0",
+    "google-genai>=1.10.0",
+    "pydantic>=2.10.0",
+    "pyjwt>=2.10.0",
+    "uvicorn>=0.34.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.28.0",
+    "pytest>=8.3.0",
+    "ruff>=0.9.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
